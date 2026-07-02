@@ -1,0 +1,246 @@
+deploy	Set up job	﻿2026-07-02T06:47:07.9361101Z Current runner version: '2.335.1'
+deploy	Set up job	2026-07-02T06:47:07.9442086Z ##[group]Runner Image Provisioner
+deploy	Set up job	2026-07-02T06:47:07.9443801Z Hosted Compute Agent
+deploy	Set up job	2026-07-02T06:47:07.9445156Z Version: 20260624.560
+deploy	Set up job	2026-07-02T06:47:07.9446524Z Commit: 925d229a51159bc391ae97e54a2dd1fe20af789d
+deploy	Set up job	2026-07-02T06:47:07.9448305Z Build Date: 2026-06-24T18:26:47Z
+deploy	Set up job	2026-07-02T06:47:07.9449782Z Worker ID: {63f3519c-6d72-47ae-8b32-1076cb39f4d9}
+deploy	Set up job	2026-07-02T06:47:07.9451792Z Azure Region: eastus
+deploy	Set up job	2026-07-02T06:47:07.9453166Z ##[endgroup]
+deploy	Set up job	2026-07-02T06:47:07.9456008Z ##[group]Operating System
+deploy	Set up job	2026-07-02T06:47:07.9457317Z Ubuntu
+deploy	Set up job	2026-07-02T06:47:07.9458470Z 24.04.4
+deploy	Set up job	2026-07-02T06:47:07.9459792Z LTS
+deploy	Set up job	2026-07-02T06:47:07.9466502Z ##[endgroup]
+deploy	Set up job	2026-07-02T06:47:07.9467928Z ##[group]Runner Image
+deploy	Set up job	2026-07-02T06:47:07.9469284Z Image: ubuntu-24.04
+deploy	Set up job	2026-07-02T06:47:07.9471218Z Version: 20260628.225.1
+deploy	Set up job	2026-07-02T06:47:07.9473490Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260628.225/images/ubuntu/Ubuntu2404-Readme.md
+deploy	Set up job	2026-07-02T06:47:07.9477161Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260628.225
+deploy	Set up job	2026-07-02T06:47:07.9479417Z ##[endgroup]
+deploy	Set up job	2026-07-02T06:47:07.9502541Z ##[group]GITHUB_TOKEN Permissions
+deploy	Set up job	2026-07-02T06:47:07.9505674Z Contents: read
+deploy	Set up job	2026-07-02T06:47:07.9507115Z Metadata: read
+deploy	Set up job	2026-07-02T06:47:07.9508350Z Packages: read
+deploy	Set up job	2026-07-02T06:47:07.9509681Z ##[endgroup]
+deploy	Set up job	2026-07-02T06:47:07.9533709Z Secret source: Actions
+deploy	Set up job	2026-07-02T06:47:07.9535339Z Prepare workflow directory
+deploy	Set up job	2026-07-02T06:47:08.0273546Z Prepare all required actions
+deploy	Set up job	2026-07-02T06:47:08.0334473Z Getting action download info
+deploy	Set up job	2026-07-02T06:47:08.3114022Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+deploy	Set up job	2026-07-02T06:47:08.4276438Z Download action repository 'webfactory/ssh-agent@v0.9.1' (SHA:a6f90b1f127823b31d4d4a8d96047790581349bd)
+deploy	Set up job	2026-07-02T06:47:08.5491060Z Download action repository 'nick-fields/retry@v3' (SHA:ce71cc2ab81d554ebbe88c79ab5975992d79ba08)
+deploy	Set up job	2026-07-02T06:47:08.7565334Z Complete job name: deploy
+deploy	Notify on Start	﻿2026-07-02T06:47:08.8267968Z ##[group]Run curl -s -X POST "https://api.telegram.org/bot***/sendMessage" \
+deploy	Notify on Start	2026-07-02T06:47:08.8269520Z [36;1mcurl -s -X POST "https://api.telegram.org/bot***/sendMessage" \[0m
+deploy	Notify on Start	2026-07-02T06:47:08.8270613Z [36;1m-d "chat_id=***" \[0m
+deploy	Notify on Start	2026-07-02T06:47:08.8271239Z [36;1m-d "parse_mode=HTML" \[0m
+deploy	Notify on Start	2026-07-02T06:47:08.8271949Z [36;1m-d "reply_parameters={\"message_id\":669}" \[0m
+deploy	Notify on Start	2026-07-02T06:47:08.8273967Z [36;1m-d "text=🚀 DEPLOY STAGE STARTED 🚀 %0A----------------------------------------------%0A%0A Repo: <a href='https://github.com/8OHM-Technologies/ohmsite'>8OHM-Technologies/ohmsite</a> %0A Run: <a href='https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252'>28570841252</a>"[0m
+deploy	Notify on Start	2026-07-02T06:47:08.8498324Z shell: /usr/bin/bash -e {0}
+deploy	Notify on Start	2026-07-02T06:47:08.8499864Z ##[endgroup]
+deploy	Notify on Start	2026-07-02T06:47:09.2157865Z {"ok":true,"result":{"message_id":672,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782974829,"reply_to_message":{"message_id":669,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782974559,"text":"\ud83e\udde8 STARTED PRODUCTION OHMSite VPS DEPLOYMENT \ud83e\udde8 \n------------------------------------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite  \n Run: 28570841252","entities":[{"offset":130,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":164,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}],"link_preview_options":{"url":"https://github.com/8OHM-Technologies/ohmsite"}},"text":"\ud83d\ude80 DEPLOY STAGE STARTED \ud83d\ude80 \n----------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite \n Run: 28570841252","entities":[{"offset":83,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":116,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}]}}
+deploy	Checkout code	﻿2026-07-02T06:47:09.2372831Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+deploy	Checkout code	2026-07-02T06:47:09.2381676Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+deploy	Checkout code	2026-07-02T06:47:09.2382553Z with:
+deploy	Checkout code	2026-07-02T06:47:09.2383139Z   repository: 8OHM-Technologies/ohmsite
+deploy	Checkout code	2026-07-02T06:47:09.2387704Z   token: ***
+deploy	Checkout code	2026-07-02T06:47:09.2388247Z   ssh-strict: true
+deploy	Checkout code	2026-07-02T06:47:09.2388798Z   ssh-user: git
+deploy	Checkout code	2026-07-02T06:47:09.2389347Z   persist-credentials: true
+deploy	Checkout code	2026-07-02T06:47:09.2390126Z   clean: true
+deploy	Checkout code	2026-07-02T06:47:09.2390685Z   sparse-checkout-cone-mode: true
+deploy	Checkout code	2026-07-02T06:47:09.2391311Z   fetch-depth: 1
+deploy	Checkout code	2026-07-02T06:47:09.2391846Z   fetch-tags: false
+deploy	Checkout code	2026-07-02T06:47:09.2392388Z   show-progress: true
+deploy	Checkout code	2026-07-02T06:47:09.2392928Z   lfs: false
+deploy	Checkout code	2026-07-02T06:47:09.2393476Z   submodules: false
+deploy	Checkout code	2026-07-02T06:47:09.2394025Z   set-safe-directory: true
+deploy	Checkout code	2026-07-02T06:47:09.2394604Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:09.3506941Z Syncing repository: 8OHM-Technologies/ohmsite
+deploy	Checkout code	2026-07-02T06:47:09.3513992Z ##[group]Getting Git version info
+deploy	Checkout code	2026-07-02T06:47:09.3651340Z Working directory is '/home/runner/work/ohmsite/ohmsite'
+deploy	Checkout code	2026-07-02T06:47:09.3662769Z [command]/usr/bin/git version
+deploy	Checkout code	2026-07-02T06:47:09.3729634Z git version 2.54.0
+deploy	Checkout code	2026-07-02T06:47:09.3784556Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:09.3802783Z Temporarily overriding HOME='/home/runner/work/_temp/843649a9-20dd-42ae-9ee9-71490e470b37' before making global git config changes
+deploy	Checkout code	2026-07-02T06:47:09.3805490Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Checkout code	2026-07-02T06:47:09.3831762Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ohmsite/ohmsite
+deploy	Checkout code	2026-07-02T06:47:09.3931354Z Deleting the contents of '/home/runner/work/ohmsite/ohmsite'
+deploy	Checkout code	2026-07-02T06:47:09.3951902Z ##[group]Initializing the repository
+deploy	Checkout code	2026-07-02T06:47:09.3961166Z [command]/usr/bin/git init /home/runner/work/ohmsite/ohmsite
+deploy	Checkout code	2026-07-02T06:47:09.4075748Z hint: Using 'master' as the name for the initial branch. This default branch name
+deploy	Checkout code	2026-07-02T06:47:09.4097771Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+deploy	Checkout code	2026-07-02T06:47:09.4111726Z hint: to use in all of your new repositories, which will suppress this warning,
+deploy	Checkout code	2026-07-02T06:47:09.4114422Z hint: call:
+deploy	Checkout code	2026-07-02T06:47:09.4116079Z hint:
+deploy	Checkout code	2026-07-02T06:47:09.4117754Z hint: 	git config --global init.defaultBranch <name>
+deploy	Checkout code	2026-07-02T06:47:09.4119281Z hint:
+deploy	Checkout code	2026-07-02T06:47:09.4121072Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+deploy	Checkout code	2026-07-02T06:47:09.4123059Z hint: 'development'. The just-created branch can be renamed via this command:
+deploy	Checkout code	2026-07-02T06:47:09.4124706Z hint:
+deploy	Checkout code	2026-07-02T06:47:09.4125690Z hint: 	git branch -m <name>
+deploy	Checkout code	2026-07-02T06:47:09.4126755Z hint:
+deploy	Checkout code	2026-07-02T06:47:09.4128101Z hint: Disable this message with "git config set advice.defaultBranchName false"
+deploy	Checkout code	2026-07-02T06:47:09.4130636Z Initialized empty Git repository in /home/runner/work/ohmsite/ohmsite/.git/
+deploy	Checkout code	2026-07-02T06:47:09.4134570Z [command]/usr/bin/git remote add origin https://github.com/8OHM-Technologies/ohmsite
+deploy	Checkout code	2026-07-02T06:47:09.4182140Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:09.4184085Z ##[group]Disabling automatic garbage collection
+deploy	Checkout code	2026-07-02T06:47:09.4192695Z [command]/usr/bin/git config --local gc.auto 0
+deploy	Checkout code	2026-07-02T06:47:09.4251149Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:09.4253072Z ##[group]Setting up auth
+deploy	Checkout code	2026-07-02T06:47:09.4254745Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Checkout code	2026-07-02T06:47:09.4332507Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Checkout code	2026-07-02T06:47:09.4892804Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Checkout code	2026-07-02T06:47:09.4982784Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Checkout code	2026-07-02T06:47:09.5231368Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+deploy	Checkout code	2026-07-02T06:47:09.5271746Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:09.5282107Z ##[group]Fetching the repository
+deploy	Checkout code	2026-07-02T06:47:09.5289225Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +311cabeb8011ac822256e7d037a64fe55364a4c7:refs/remotes/origin/main
+deploy	Checkout code	2026-07-02T06:47:10.7006404Z From https://github.com/8OHM-Technologies/ohmsite
+deploy	Checkout code	2026-07-02T06:47:10.7008703Z  * [new ref]         311cabeb8011ac822256e7d037a64fe55364a4c7 -> origin/main
+deploy	Checkout code	2026-07-02T06:47:10.7072012Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:10.7073810Z ##[group]Determining the checkout info
+deploy	Checkout code	2026-07-02T06:47:10.7075375Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:10.7076522Z [command]/usr/bin/git sparse-checkout disable
+deploy	Checkout code	2026-07-02T06:47:10.7127069Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+deploy	Checkout code	2026-07-02T06:47:10.7174300Z ##[group]Checking out the ref
+deploy	Checkout code	2026-07-02T06:47:10.7176155Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+deploy	Checkout code	2026-07-02T06:47:11.4398710Z Switched to a new branch 'main'
+deploy	Checkout code	2026-07-02T06:47:11.4411229Z branch 'main' set up to track 'origin/main'.
+deploy	Checkout code	2026-07-02T06:47:11.4428847Z ##[endgroup]
+deploy	Checkout code	2026-07-02T06:47:11.4480389Z [command]/usr/bin/git log -1 --format=%H
+deploy	Checkout code	2026-07-02T06:47:11.4511178Z 311cabeb8011ac822256e7d037a64fe55364a4c7
+deploy	Install Cloudflared on Runner	﻿2026-07-02T06:47:11.4667192Z ##[group]Run wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+deploy	Install Cloudflared on Runner	2026-07-02T06:47:11.4668306Z [36;1mwget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64[0m
+deploy	Install Cloudflared on Runner	2026-07-02T06:47:11.4668979Z [36;1mchmod +x cloudflared-linux-amd64[0m
+deploy	Install Cloudflared on Runner	2026-07-02T06:47:11.4669471Z [36;1msudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared[0m
+deploy	Install Cloudflared on Runner	2026-07-02T06:47:11.4703745Z shell: /usr/bin/bash -e {0}
+deploy	Install Cloudflared on Runner	2026-07-02T06:47:11.4704124Z ##[endgroup]
+deploy	Configure SSH ProxyCommand	﻿2026-07-02T06:47:11.9327890Z ##[group]Run mkdir -p ~/.ssh
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9328307Z [36;1mmkdir -p ~/.ssh[0m
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9328898Z [36;1mecho "Host ***" >> ~/.ssh/config[0m
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9329375Z [36;1mecho "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config[0m
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9330179Z [36;1mecho "  StrictHostKeyChecking no" >> ~/.ssh/config[0m
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9364227Z shell: /usr/bin/bash -e {0}
+deploy	Configure SSH ProxyCommand	2026-07-02T06:47:11.9364547Z ##[endgroup]
+deploy	Set up SSH agent	﻿2026-07-02T06:47:11.9492891Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+deploy	Set up SSH agent	2026-07-02T06:47:11.9494492Z ##[group]Run webfactory/ssh-agent@v0.9.1
+deploy	Set up SSH agent	2026-07-02T06:47:11.9494825Z with:
+deploy	Set up SSH agent	2026-07-02T06:47:11.9496971Z   ssh-private-key: ***
+deploy	Set up SSH agent	2026-07-02T06:47:11.9497258Z   log-public-key: true
+deploy	Set up SSH agent	2026-07-02T06:47:11.9497512Z ##[endgroup]
+deploy	Set up SSH agent	2026-07-02T06:47:11.9921696Z Starting ssh-agent
+deploy	Set up SSH agent	2026-07-02T06:47:12.0121956Z SSH_AUTH_SOCK=/tmp/ssh-KCjwS59d4Eo5/agent.2041
+deploy	Set up SSH agent	2026-07-02T06:47:12.0123562Z SSH_AGENT_PID=2042
+deploy	Set up SSH agent	2026-07-02T06:47:12.0124762Z Adding private key(s) to agent
+deploy	Set up SSH agent	2026-07-02T06:47:12.0359004Z Identity added: (stdin) (tiaan@haasdAs-se-computerkas)
+deploy	Set up SSH agent	2026-07-02T06:47:12.0359821Z Key(s) added:
+deploy	Set up SSH agent	2026-07-02T06:47:12.0410678Z 256 SHA256:rVh7h8FKgQSkvZz7fGzF98iXs4IXoSaTuad0sPTHE/M tiaan@haasdAs-se-computerkas (ED25519)
+deploy	Set up SSH agent	2026-07-02T06:47:12.0420916Z Configuring deployment key(s)
+deploy	Set up SSH agent	2026-07-02T06:47:12.0463103Z Comment for (public) key 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB1gMUaXu1syhWUpcO813o7kd+E2ZDFIWFXSj5kszKXp tiaan@haasdAs-se-computerkas' does not match GitHub URL pattern. Not treating it as a GitHub deploy key.
+deploy	Deploy via Git Pull on VPS	﻿2026-07-02T06:47:12.0603463Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0604859Z ##[group]Run nick-fields/retry@v3
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0605155Z with:
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0605385Z   timeout_minutes: 10
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0605632Z   max_attempts: 3
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0605878Z   retry_wait_seconds: 10
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0612919Z   command: ssh -A -o StrictHostKeyChecking=no ***@*** 'bash -s' <<'EOF'
+deploy	Deploy via Git Pull on VPS	  set -euo pipefail
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  TARGET_DIR="/home/***/ohmsite"
+deploy	Deploy via Git Pull on VPS	  REPO_URL="git@github.com:8OHM-Technologies/landing-page.git"
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  if [ ! -d "$TARGET_DIR/.git" ]; then
+deploy	Deploy via Git Pull on VPS	    echo "Initializing repository directory structure..."
+deploy	Deploy via Git Pull on VPS	    mkdir -p "$TARGET_DIR"
+deploy	Deploy via Git Pull on VPS	    cd "$TARGET_DIR"
+deploy	Deploy via Git Pull on VPS	    git init
+deploy	Deploy via Git Pull on VPS	    git remote add origin "$REPO_URL"
+deploy	Deploy via Git Pull on VPS	    git fetch origin
+deploy	Deploy via Git Pull on VPS	    git checkout -f main
+deploy	Deploy via Git Pull on VPS	  else
+deploy	Deploy via Git Pull on VPS	    cd "$TARGET_DIR"
+deploy	Deploy via Git Pull on VPS	    git reset --hard HEAD
+deploy	Deploy via Git Pull on VPS	    git pull origin main
+deploy	Deploy via Git Pull on VPS	  fi
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  # Ensure Laravel storage directory permissions & structure
+deploy	Deploy via Git Pull on VPS	  mkdir -p storage/framework/{sessions,views,cache} storage/logs
+deploy	Deploy via Git Pull on VPS	  chmod -R 775 storage bootstrap/cache
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  echo "***" | docker login ghcr.io -u x3nZA --password-stdin
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  docker compose -f docker-compose.prod.yml pull
+deploy	Deploy via Git Pull on VPS	  docker compose -f docker-compose.prod.yml up -d
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  # Run Laravel database migrations & optimizations
+deploy	Deploy via Git Pull on VPS	  docker exec ohmsite-app php artisan migrate --force
+deploy	Deploy via Git Pull on VPS	  docker exec ohmsite-app php artisan config:cache
+deploy	Deploy via Git Pull on VPS	  docker exec ohmsite-app php artisan route:cache
+deploy	Deploy via Git Pull on VPS	  docker exec ohmsite-app php artisan view:cache
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	  docker image prune -f
+deploy	Deploy via Git Pull on VPS	EOF
+deploy	Deploy via Git Pull on VPS	
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0617170Z   polling_interval_seconds: 1
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0617478Z   warning_on_retry: true
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0617749Z   continue_on_error: false
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0618008Z env:
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0618274Z   SSH_AUTH_SOCK: /tmp/ssh-KCjwS59d4Eo5/agent.2041
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0618616Z   SSH_AGENT_PID: 2042
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.0618868Z ##[endgroup]
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:47:12.1312568Z ##[group]Attempt 1
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:49:25.5593864Z dial tcp ***:443: connect: connection timed out
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:49:25.5603449Z Connection closed by UNKNOWN port 65535
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:49:36.2958727Z ##[warning]Attempt 1 failed. Reason: Child_process exited with error code 255
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:49:36.2989870Z ##[endgroup]
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:49:36.2991068Z ##[group]Attempt 2
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:51:48.9186400Z dial tcp ***:443: connect: connection timed out
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:51:48.9218020Z Connection closed by UNKNOWN port 65535
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:51:59.4567562Z ##[warning]Attempt 2 failed. Reason: Child_process exited with error code 255
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:51:59.4570534Z ##[endgroup]
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:51:59.4574545Z ##[group]Attempt 3
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:54:12.2786765Z dial tcp ***:443: connect: connection timed out
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:54:12.2818748Z Connection closed by UNKNOWN port 65535
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:54:22.6116822Z ##[endgroup]
+deploy	Deploy via Git Pull on VPS	2026-07-02T06:54:22.6120458Z ##[error]Final attempt failed. Child_process exited with error code 255
+deploy	Notify on Failure	﻿2026-07-02T06:54:22.6242648Z ##[group]Run curl -s -X POST "https://api.telegram.org/bot***/sendMessage" \
+deploy	Notify on Failure	2026-07-02T06:54:22.6243524Z [36;1mcurl -s -X POST "https://api.telegram.org/bot***/sendMessage" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6243995Z [36;1m-d "chat_id=***" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6244287Z [36;1m-d "parse_mode=HTML" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6244630Z [36;1m-d "reply_parameters={\"message_id\":669}" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6245818Z [36;1m-d "text=❌ DEPLOY STAGE FAILED ❌ %0A------------------------------------------------%0A%0A Repo: <a href='https://github.com/8OHM-Technologies/ohmsite'>8OHM-Technologies/ohmsite</a> %0A Run: <a href='https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252'>28570841252</a>"[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6247132Z [36;1m[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6247670Z [36;1mcurl -s -X POST "https://api.telegram.org/bot***/sendMessage" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6248108Z [36;1m-d "chat_id=***" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6248401Z [36;1m-d "parse_mode=HTML" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6248744Z [36;1m-d "reply_parameters={\"message_id\":669}" \[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6250426Z [36;1m-d "text=❌ FAILED PRODUCTION OHMSite VPS DEPLOYMENT ❌ %0A------------------------------------------------------------------------%0A%0A Repo: <a href='https://github.com/8OHM-Technologies/ohmsite'>8OHM-Technologies/ohmsite</a> %0A Run: <a href='https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252'>28570841252</a>"[0m
+deploy	Notify on Failure	2026-07-02T06:54:22.6284192Z shell: /usr/bin/bash -e {0}
+deploy	Notify on Failure	2026-07-02T06:54:22.6284485Z env:
+deploy	Notify on Failure	2026-07-02T06:54:22.6284764Z   SSH_AUTH_SOCK: /tmp/ssh-KCjwS59d4Eo5/agent.2041
+deploy	Notify on Failure	2026-07-02T06:54:22.6285159Z   SSH_AGENT_PID: 2042
+deploy	Notify on Failure	2026-07-02T06:54:22.6285452Z ##[endgroup]
+deploy	Notify on Failure	2026-07-02T06:54:23.3557158Z {"ok":true,"result":{"message_id":673,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782975262,"reply_to_message":{"message_id":669,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782974559,"text":"\ud83e\udde8 STARTED PRODUCTION OHMSite VPS DEPLOYMENT \ud83e\udde8 \n------------------------------------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite  \n Run: 28570841252","entities":[{"offset":130,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":164,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}],"link_preview_options":{"url":"https://github.com/8OHM-Technologies/ohmsite"}},"text":"\u274c DEPLOY STAGE FAILED \u274c \n------------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite \n Run: 28570841252","entities":[{"offset":82,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":115,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}]}}{"ok":true,"result":{"message_id":674,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782975263,"reply_to_message":{"message_id":669,"from":{"id":8978671590,"is_bot":true,"first_name":"8OHMBot","username":"InfinityOhmTechnologiesBot"},"chat":{"id":***,"first_name":"Tiaan","last_name":"Fourie","type":"private"},"date":1782974559,"text":"\ud83e\udde8 STARTED PRODUCTION OHMSite VPS DEPLOYMENT \ud83e\udde8 \n------------------------------------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite  \n Run: 28570841252","entities":[{"offset":130,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":164,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}],"link_preview_options":{"url":"https://github.com/8OHM-Technologies/ohmsite"}},"text":"\u274c FAILED PRODUCTION OHMSite VPS DEPLOYMENT \u274c \n------------------------------------------------------------------------\n\n Repo: 8OHM-Technologies/ohmsite \n Run: 28570841252","entities":[{"offset":127,"length":25,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite"},{"offset":160,"length":11,"type":"text_link","url":"https://github.com/8OHM-Technologies/ohmsite/actions/runs/28570841252"}]}}
+deploy	Post Set up SSH agent	﻿2026-07-02T06:54:23.3659727Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+deploy	Post Set up SSH agent	2026-07-02T06:54:23.3661410Z Post job cleanup.
+deploy	Post Set up SSH agent	2026-07-02T06:54:23.4061904Z Stopping SSH agent
+deploy	Post Set up SSH agent	2026-07-02T06:54:23.4130593Z unset SSH_AUTH_SOCK;
+deploy	Post Set up SSH agent	2026-07-02T06:54:23.4140705Z unset SSH_AGENT_PID;
+deploy	Post Set up SSH agent	2026-07-02T06:54:23.4149277Z echo Agent pid 2042 killed;
+deploy	Post Checkout code	﻿2026-07-02T06:54:23.4301120Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+deploy	Post Checkout code	2026-07-02T06:54:23.4302501Z Post job cleanup.
+deploy	Post Checkout code	2026-07-02T06:54:23.5431026Z [command]/usr/bin/git version
+deploy	Post Checkout code	2026-07-02T06:54:23.5538534Z git version 2.54.0
+deploy	Post Checkout code	2026-07-02T06:54:23.5609521Z Temporarily overriding HOME='/home/runner/work/_temp/6007b424-47df-479e-94ce-6f69d627b23d' before making global git config changes
+deploy	Post Checkout code	2026-07-02T06:54:23.5641347Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Post Checkout code	2026-07-02T06:54:23.5657059Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ohmsite/ohmsite
+deploy	Post Checkout code	2026-07-02T06:54:23.5716946Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Post Checkout code	2026-07-02T06:54:23.5759244Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Post Checkout code	2026-07-02T06:54:23.6151424Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Post Checkout code	2026-07-02T06:54:23.6411365Z http.https://github.com/.extraheader
+deploy	Post Checkout code	2026-07-02T06:54:23.6455902Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+deploy	Post Checkout code	2026-07-02T06:54:23.6459123Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Complete job	﻿2026-07-02T06:54:23.7016342Z Cleaning up orphan processes
+deploy	Complete job	2026-07-02T06:54:23.7308858Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, nick-fields/retry@v3, webfactory/ssh-agent@v0.9.1. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

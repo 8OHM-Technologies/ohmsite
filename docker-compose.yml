@@ -9,8 +9,11 @@ services:
     container_name: ohmsite-app
     restart: unless-stopped
     working_dir: /var/www
+    env_file:
+      - .env
     volumes:
       - .:/var/www
+      - ./storage:/var/www/storage
     networks:
       - 8ohm-network
 

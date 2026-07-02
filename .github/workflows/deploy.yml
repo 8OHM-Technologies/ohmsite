@@ -1,4 +1,4 @@
-name: PRODUCTION OHMSite VPS DEPLOYMENT
+name: OHMSITE - PRODUCTION VPS DEPLOY
 
 on:
   push:
@@ -107,7 +107,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install Dependencies
         run: npm install
       - name: Build
@@ -158,7 +158,7 @@ jobs:
       - name: Set up Node for frontend asset build
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install Node Dependencies and Build Assets
         run: |
