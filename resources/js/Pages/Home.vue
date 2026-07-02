@@ -186,7 +186,7 @@ onUnmounted(() => {
 
 <template>
 
-  <Head title="The Path to Digital Sovereignty" />
+  <Head title="Host Your World. Own Your Data." />
 
   <div class="home-page-container">
     <div class="background-visuals">
@@ -203,7 +203,7 @@ onUnmounted(() => {
       <section class="hero container" id="home">
         <div class="eyebrow-badge reveal-item">
           <span class="eyebrow-dot"></span>
-          <span class="eyebrow-text">The Path to Digital Sovereignty</span>
+          <span class="eyebrow-text">Privacy-first Edge Computing</span>
         </div>
 
         <h1 class="hero-title reveal-item">
@@ -221,13 +221,13 @@ onUnmounted(() => {
 
         <div class="cta-group reveal-item">
           <a href="#consumer" class="btn btn-primary">
-            <span>Consumer: Smart Ecosystems</span>
+            <span>DIY Smart Home Ecosystems</span>
             <div class="btn-icon">
               <i class="ph-light ph-house"></i>
             </div>
           </a>
           <a href="#b2b" class="btn btn-secondary">
-            <span>B2B: Enterprise Strategy</span>
+            <span>B2B Services</span>
             <div class="btn-icon">
               <i class="ph-light ph-buildings"></i>
             </div>
@@ -319,181 +319,11 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="consumer" aria-label="Consumer Bento Grid">
-        <div class="section-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Consumer Division</span>
-          </div>
-          <h2 class="section-title">The Self-Hosted Home</h2>
-          <p class="section-subtitle">
-            Self-hosting is the first step to true digital sovereignty. Build your own secure, private
-            ecosystem.
-          </p>
-        </div>
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-7 reveal-item">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-book-open"></i>
-              </div>
-              <h3 class="card-title">
-                OhmBase: DIY Sovereignty Blueprints
-              </h3>
-              <p class="card-desc">
-                We provide the knowledge and tools for you to
-                host your own digital life. Our blueprints guide
-                you through deploying everything you need from
-                Home Assistant, local AI agents, secure media
-                servers and more. All without mandatory cloud
-                lock-in or ring-fenced ecosystems.
-              </p>
-              <ul class="card-list">
-                <li class="card-list-item">
-                  <i class="ph-light ph-brain card-list-icon"></i>
-                  <div>
-                    <strong>Local AI & Automation:</strong>
-                    Lay the foundation to run personalized
-                    AI agents and complex automations that
-                    process entirely within the walls of
-                    your home.
-                  </div>
-                </li>
-                <li class="card-list-item">
-                  <i class="ph-light ph-plug card-list-icon"></i>
-                  <div>
-                    <strong>Legacy Integration:</strong>
-                    Safely bridge older alarms, gate motors,
-                    and sensors directly into your
-                    self-hosted network.
-                  </div>
-                </li>
-              </ul>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer')">
-                <span>Access Blueprints</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-arrow-right"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-5 reveal-item accent-glow">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-shopping-bag"></i>
-              </div>
-              <h3 class="card-title">Edge Hardware Store</h3>
-              <p class="card-desc">
-                Skip the compatibility research. We stock all of
-                the components you need to jumpstart your
-                self-hosting journey. In the future, this
-                identical foundation will seamlessly power our
-                in development all-in-one, open-standard smart home devices.
-              </p>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer')">
-                <span>Browse Store</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-shopping-bag"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="store" class="store-section container reveal-item">
-        <div class="store-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Shop Components Online</span>
-          </div>
-          <h2 class="store-title">Hardware Kits</h2>
-          <p class="store-subtitle">
-            No cloud tethers, no forced subscriptions, just pure
-            local compute that you control. Whether you want to plug-and-play or tinker like us, our store has
-            something for you. And if it does not, contact us and we'll see what we can do!
-          </p>
-        </div>
-
-        <div id="productGrid" class="product-grid">
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Pre-Configured</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-hard-drives"></i>
-              </div>
-              <h3 class="product-title">Smart Home Core</h3>
-              <p class="product-description">
-                Includes hardware, installation and
-                pre-configuration of Proxmox VE running Home
-                Assistant OS. The foundation for your sovereign
-                home network.
-              </p>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Your Hardware</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-hard-drives"></i>
-              </div>
-              <h3 class="product-title">
-                Smart Home Core (Software & Configuration)
-              </h3>
-              <p class="product-description">
-                Installation and configuration of Proxmox VE
-                running Home Assistant OS, using hardware
-                provided by you.
-              </p>
-              <a href="#" style="
-                color: var(--color-accent-primary);
-                font-size: 0.75rem;
-                margin-bottom: 10px;
-                display: block;
-              ">Check hardware requirements</a>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Blueprint #1 Kit</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-cpu"></i>
-              </div>
-              <h3 class="product-title">
-                Legacy Alarm Conversion Kit
-              </h3>
-              <p class="product-description">
-                Opto-isolated interface board to safely bridge
-                high-voltage alarm states into 3.3V
-                microcontrollers.
-              </p>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division">
         <div class="section-header">
           <div class="eyebrow-badge secondary">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Enterprise Division</span>
+            <span class="eyebrow-text">B2B Services</span>
           </div>
           <h2 class="section-title">
             Managed Data Pipelines & AI Advisory
@@ -513,31 +343,41 @@ onUnmounted(() => {
                 Data-as-a-Service (DaaS) Solutions
               </h3>
               <p class="card-desc">
-                Stop wrestling with messy spreadsheets and manual reporting. We custom design and build
-                robust data acquisition engines that transform your business-critical information into
-                actionable intelligence. Delivered entirely as a managed service, we offer flexible packages
-                tailored to your scale:
+                Stop wrestling with messy spreadsheets, manual reporting, and rigid legacy software. We build robust
+                data acquisition engines that transform volatile, unstructured information into actionable intelligence.
+                Delivered entirely as a managed service, our data offerings scale across three distinct tiers based on
+                your technical maturity and operational needs:
               </p>
               <div class="editorial-grid">
                 <div class="editorial-grid-item">
-                  <strong>The Foundation (Pre-Built Pipelines):</strong>
-                  We securely connect your core operational tools, extract the data, and deliver a single
-                  source of truth dashboard updated daily. A flat monthly subscription with zero
-                  infrastructure management required on your end.
+                  <strong>Level 1: Raw Data Provisioning</strong>
+                  Built for engineering, actuarial, and data science teams who have their own infrastructure and require
+                  high-quality, cleansed data at scale. We deliver clean, structured raw data extracts from disparate
+                  public records directly to your team via API or flat file (JSON/CSV). You pay for the clean data and
+                  complex transformations, without the enterprise headcount overhead.
                 </div>
                 <div class="editorial-grid-item">
-                  <strong>The Bespoke Build (Custom DaaS):</strong>
-                  Tailored data extraction from legacy systems, high-scale scraping of public registries,
-                  complex transformations, and custom BI dashboards designed for your unique KPIs.
-                  Includes SLA-backed monthly maintenance.
+                  <strong>Level 2: Analytics & Dashboard Subscriptions</strong>
+                  Designed for non-technical stakeholders who need immediate visual insights without dealing with raw
+                  code. We take our structured Level 1 data and layer it into a secure, intuitive dashboard. You pay a
+                  flat, recurring monthly subscription for simplified analytics, visual trends, and reporting that saves
+                  your team operational time—with zero infrastructure management required on your end.
                 </div>
               </div>
               <div class="editorial-grid">
                 <div class="editorial-grid-item">
-                  <strong>Fractional Data Engineering:</strong>
-                  Fully managed, end-to-end data architecture. From real-time streaming to predictive
-                  analytics and hybrid AI workflows, we act as your dedicated internal data team without
-                  the enterprise headcount.
+                  <strong>Level 3: Custom Data Engineering (Proprietary Retainer)</strong>
+                  For enterprise clients requiring highly specialized, end-to-end data pipelines that remain completely
+                  proprietary. We engineer your entire technical process from source to dashboard—ingesting your
+                  internal legacy systems alongside niche external sources, applying custom AI entity extraction, and
+                  building bespoke BI dashboards.
+                </div>
+
+                <div class="editorial-grid-item">
+                  <strong>Request Datasets: </strong>
+                  Don't see the specific dataset your industry relies on? Submit a Dataset Request. If the data is
+                  publicly viable and aligns with our roadmap, we will build the pipeline, structure the data, and make
+                  it available as a shared resource.
                 </div>
               </div>
               <button type="button" class="btn btn-primary dashboard-trigger-btn" @click="goToDashboard">
@@ -695,6 +535,176 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <section class="features-section container reveal-item" id="consumer" aria-label="Consumer Bento Grid">
+        <div class="section-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">Consumer Division</span>
+          </div>
+          <h2 class="section-title">The Self-Hosted Smart Home</h2>
+          <p class="section-subtitle">
+            Self-hosting is the first step to true digital sovereignty. Learn how to build your own secure, private
+            smart home ecosystem.
+          </p>
+        </div>
+        <div class="bento-grid">
+          <div class="bezel-card-outer col-span-7 reveal-item">
+            <div class="bezel-card-inner">
+              <div class="card-icon">
+                <i class="ph-light ph-book-open"></i>
+              </div>
+              <h3 class="card-title">
+                OhmBase: DIY Smart Home Blueprints
+              </h3>
+              <p class="card-desc">
+                We provide the knowledge and tools for you to
+                host your own digital life. Our blueprints guide
+                you through deploying everything you need from
+                Home Assistant, local AI agents, secure media
+                servers and more. All without mandatory cloud
+                lock-in or ring-fenced ecosystems.
+              </p>
+              <ul class="card-list">
+                <li class="card-list-item">
+                  <i class="ph-light ph-brain card-list-icon"></i>
+                  <div>
+                    <strong>Local AI & Automation:</strong>
+                    Lay the foundation to run personalized
+                    AI agents and complex automations that
+                    process entirely within the walls of
+                    your home.
+                  </div>
+                </li>
+                <li class="card-list-item">
+                  <i class="ph-light ph-plug card-list-icon"></i>
+                  <div>
+                    <strong>Legacy Integration:</strong>
+                    Safely bridge older alarms, gate motors,
+                    and sensors directly into your
+                    self-hosted network.
+                  </div>
+                </li>
+              </ul>
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
+                @click="openModal('consumer')">
+                <span>Go to Ohmbase</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-arrow-right"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer col-span-5 reveal-item accent-glow">
+            <div class="bezel-card-inner">
+              <div class="card-icon">
+                <i class="ph-light ph-shopping-bag"></i>
+              </div>
+              <h3 class="card-title">Edge Hardware Store</h3>
+              <p class="card-desc">
+                Skip the compatibility research. We stock all of
+                the components you need to jumpstart your
+                self-hosting journey. In the future, this
+                identical foundation will seamlessly power our
+                in development all-in-one, open-standard smart home devices.
+              </p>
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
+                @click="openModal('consumer')">
+                <span>Browse Store</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-shopping-bag"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="store" class="store-section container reveal-item">
+        <div class="store-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">Online Store</span>
+          </div>
+          <h2 class="store-title">Hardware Kits</h2>
+          <p class="store-subtitle">
+            No cloud tethers, no forced subscriptions, just pure
+            local compute that you control. Whether you want to plug-and-play or tinker like us, our store has
+            something for you. And if it does not, contact us and we'll see what we can do!
+          </p>
+        </div>
+
+        <div id="productGrid" class="product-grid">
+          <div class="bezel-card-outer product-card reveal-item">
+            <div class="bezel-card-inner">
+              <div class="product-badge">Pre-Configured</div>
+              <div class="product-image-placeholder">
+                <i class="ph-light ph-hard-drives"></i>
+              </div>
+              <h3 class="product-title">Smart Home Core</h3>
+              <p class="product-description">
+                Includes hardware, installation and
+                pre-configuration of Proxmox VE running Home
+                Assistant OS. The foundation for your sovereign
+                home network.
+              </p>
+              <div class="product-meta">
+                <span class="product-price"></span>
+                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer product-card reveal-item">
+            <div class="bezel-card-inner">
+              <div class="product-badge">Your Hardware</div>
+              <div class="product-image-placeholder">
+                <i class="ph-light ph-hard-drives"></i>
+              </div>
+              <h3 class="product-title">
+                Smart Home Core (Software & Configuration)
+              </h3>
+              <p class="product-description">
+                Installation and configuration of Proxmox VE
+                running Home Assistant OS, using hardware
+                provided by you.
+              </p>
+              <a href="#" style="
+                color: var(--color-accent-primary);
+                font-size: 0.75rem;
+                margin-bottom: 10px;
+                display: block;
+              ">Check hardware requirements</a>
+              <div class="product-meta">
+                <span class="product-price"></span>
+                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer product-card reveal-item">
+            <div class="bezel-card-inner">
+              <div class="product-badge">Blueprint #1 Kit</div>
+              <div class="product-image-placeholder">
+                <i class="ph-light ph-cpu"></i>
+              </div>
+              <h3 class="product-title">
+                Legacy Alarm Conversion Kit
+              </h3>
+              <p class="product-description">
+                Opto-isolated interface board to safely bridge
+                high-voltage alarm states into 3.3V
+                microcontrollers.
+              </p>
+              <div class="product-meta">
+                <span class="product-price"></span>
+                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="features-section container reveal-item" id="roadmap" aria-label="Future Vision and Roadmap">
         <div class="section-header">
           <div class="eyebrow-badge secondary">
@@ -763,7 +773,7 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Infinity Ohm FAQs</span>
+            <span class="eyebrow-text">FAQs</span>
           </div>
           <h2 class="section-title section-title-large">
             Frequently Asked Questions
@@ -1099,8 +1109,8 @@ onUnmounted(() => {
   letter-spacing: -1.5px;
   color: var(--color-text-primary);
   max-width: 950px;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
+  padding-top: 4rem !important;
+  padding-bottom: 3rem !important;
 }
 
 .hero-title .gradient-text {
@@ -1118,6 +1128,8 @@ onUnmounted(() => {
   line-height: 1.7;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
 }
 
 /* --- Buttons --- */
@@ -1343,7 +1355,7 @@ onUnmounted(() => {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-top: 10px !important;
 }
 
 .card-desc:last-child {
@@ -1381,7 +1393,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
   text-align: left;
 }
 
@@ -1440,7 +1453,8 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-bottom: 28px;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
   text-align: left;
 }
 
@@ -1717,7 +1731,7 @@ onUnmounted(() => {
   color: #ffffff;
 }
 
-/* --- Shop Section --- */
+/* --- Store Section --- */
 .store-section {
   position: relative;
   z-index: 10;

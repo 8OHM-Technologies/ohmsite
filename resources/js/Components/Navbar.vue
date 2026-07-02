@@ -42,7 +42,7 @@ const handleScroll = () => {
     scrollProgress.value = Math.min(scrollY / 200, 1);
 
     if (route().current('home')) {
-        const sections = ['home', 'brands', 'categories', 'about', 'contact'];
+        const sections = ['home', 'philosophy', 'consumer', 'b2b', 'shop.index', 'contact'];
         for (const section of sections) {
             const el = document.getElementById(section);
             if (el) {
@@ -59,9 +59,9 @@ const handleScroll = () => {
 const navLinks = [
     { name: 'Home', id: 'home', type: 'route', icon: Home },
     { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
-    { name: 'Consumer Division', id: 'consumer', type: 'anchor', icon: Home },
-    { name: 'B2B Division', id: 'b2b', type: 'anchor', icon: Grid },
-    { name: 'Shop', id: 'shop.index', type: 'route', icon: ShoppingBag },
+    { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
+    { name: 'DIY Smart Home Ecosystems', id: 'consumer', type: 'anchor', icon: Home },
+    { name: 'Hardware Store', id: 'shop.index', type: 'route', icon: ShoppingBag },
     { name: 'Enquire Now', id: 'contact', type: 'anchor', icon: Star },
 ];
 
@@ -103,21 +103,22 @@ const getHref = (link) => {
 <template>
     <nav :class="[
         'fixed top-0 w-full z-50 transition-all duration-500 flex flex-col items-center',
-        isScrolled ? 'py-3 bg-black/80 backdrop-blur-xl border-b border-white/5' : 'py-6 lg:py-10'
+        isScrolled ? 'py-3 bg-black/60 backdrop-blur-xl border-b border-white/5' : 'py-6 2xl:py-10'
     ]">
-        <div class="w-full px-4 sm:px-8 lg:px-12 flex lg:grid lg:grid-cols-3 items-center justify-between max-w-[1920px] mx-auto relative">
+        <div
+            class="w-full px-4 sm:px-8 2xl:px-12 flex 2xl:grid 2xl:grid-cols-3 items-center justify-between max-w-[1920px] mx-auto relative">
 
             <!-- Mobile Menu Toggle -->
             <button @click="isMobileMenuOpen = true"
-                class="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors">
+                class="2xl:hidden p-2 text-zinc-400 hover:text-white transition-colors">
                 <Menu class="w-6 h-6" />
             </button>
 
             <!-- Logo Section - Center on mobile/tablet, Left on desktop when scrolled -->
-            <div class="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:justify-self-start transition-all duration-500 flex items-center"
-                :class="[isScrolled ? 'lg:w-40' : 'lg:w-auto']">
+            <div class="absolute left-1/2 -translate-x-1/2 2xl:static 2xl:translate-x-0 2xl:justify-self-start transition-all duration-500 flex items-center"
+                :class="[isScrolled ? '2xl:w-40' : '2xl:w-auto']">
                 <Link :href="route('home')" class="block">
-                    <img src="/assets/images/logo-white.png" alt="Logo" class="transition-all duration-500" :style="{
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="transition-all duration-500" :style="{
                         height: isScrolled ? '24px' : '48px',
                         maxHeight: '128px'
                     }" />
@@ -125,11 +126,11 @@ const getHref = (link) => {
             </div>
 
             <!-- Desktop Links Section -->
-            <div class="hidden lg:flex lg:justify-self-center items-center space-x-1 bg-zinc-900/40 rounded-full p-1 border border-white/5 backdrop-blur-sm transition-opacity duration-300"
+            <div class="hidden 2xl:flex 2xl:justify-self-center items-center space-x-1 bg-zinc-900/40 rounded-full p-1 border border-white/5 backdrop-blur-sm transition-opacity duration-300"
                 :class="[isScrolled ? 'opacity-100' : 'opacity-100']">
                 <template v-for="link in navLinks" :key="link.name">
                     <Link v-if="link.type === 'route' || !route().current('home')" :href="getHref(link)" :class="[
-                        'px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 relative z-10 whitespace-nowrap',
+                        'px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all duration-300 relative z-10 whitespace-nowrap',
                         isLinkActive(link) ? 'text-black' : 'text-zinc-500 hover:text-white'
                     ]">
                         <span class="relative z-10">{{ link.name }}</span>
@@ -138,7 +139,7 @@ const getHref = (link) => {
                         </div>
                     </Link>
                     <a v-else :href="'#' + link.id" :class="[
-                        'px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 relative z-10 whitespace-nowrap',
+                        'px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all duration-300 relative z-10 whitespace-nowrap',
                         isLinkActive(link) ? 'text-black' : 'text-zinc-500 hover:text-white'
                     ]">
                         <span class="relative z-10">{{ link.name }}</span>
@@ -147,18 +148,18 @@ const getHref = (link) => {
                         </div>
                     </a>
                 </template>
-            </div>
-
-            <!-- Right Side: Search, Cart, Profile -->
-            <div class="flex lg:justify-self-end items-center space-x-2 sm:space-x-4">
                 <!-- Search (Desktop) -->
                 <div class="hidden md:relative md:flex items-center group">
                     <Search
                         class="w-4 h-4 absolute left-3.5 text-zinc-500 group-focus-within:text-white transition-colors" />
                     <input type="text" v-model="searchQuery" @keyup.enter="performSearch" placeholder="Search..."
-                        class="bg-zinc-900/50 border border-white/5 rounded-full py-2 pl-10 pr-4 text-[10px] w-32 focus:w-48 transition-all duration-500 focus:ring-1 focus:ring-white/20 placeholder:text-zinc-600 text-white uppercase font-bold tracking-widest" />
+                        class="bg-zinc-900/50 border border-white/5 rounded-full py-2 pl-10 pr-4 text-[11px] w-32 focus:w-48 transition-all duration-500 focus:ring-1 focus:ring-white/20 placeholder:text-zinc-600 text-white uppercase font-bold tracking-widest" />
                 </div>
 
+            </div>
+
+            <!-- Right Side: Search, Cart, Profile -->
+            <div class="hidden md:flex 2xl:justify-self-end items-center space-x-2 sm:space-x-4">
                 <!-- Wishlist -->
                 <Link :href="route('favorites.index')"
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 group border border-transparent hover:border-white/5">
@@ -171,7 +172,7 @@ const getHref = (link) => {
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 relative group border border-transparent hover:border-white/5">
                     <ShoppingCart class="w-5 h-5 text-zinc-500 group-hover:text-white" />
                     <span v-if="$page.props.cart_count > 0"
-                        class="absolute top-1 right-1 bg-white text-black text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
+                        class="absolute top-1 right-1 bg-white text-black text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
                             $page.props.cart_count }}</span>
                 </Link>
 
@@ -186,12 +187,12 @@ const getHref = (link) => {
                                         class="w-8 h-8 bg-zinc-800 border border-white/10 rounded-full flex items-center justify-center overflow-hidden">
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
-                                        <span v-else class="text-[10px] font-black">{{ auth.user.name.charAt(0)
+                                        <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
                                             }}</span>
                                     </div>
                                     <span
-                                        class="hidden sm:inline-block text-[10px] font-black tracking-widest uppercase text-zinc-300">{{
-                                        auth.user.name }}</span>
+                                        class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
+                                            auth.user.name }}</span>
                                 </button>
                             </template>
                             <template #content>
@@ -207,7 +208,7 @@ const getHref = (link) => {
                     </template>
                     <template v-else>
                         <Link :href="route('login')"
-                            class="text-[9px] font-black tracking-[0.2em] uppercase bg-white text-black px-6 py-3 rounded-full hover:bg-zinc-200 transition-all shadow-xl active:scale-95">
+                            class="text-[11px] font-black tracking-[0.2em] uppercase bg-white text-black px-6 py-3 rounded-full hover:bg-zinc-200 transition-all shadow-xl active:scale-95">
                             Login</Link>
                     </template>
                 </div>
@@ -218,7 +219,7 @@ const getHref = (link) => {
         <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="-translate-x-full"
             enter-to-class="translate-x-0" leave-active-class="transition duration-200 ease-in"
             leave-from-class="translate-x-0" leave-to-class="-translate-x-full">
-            <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] lg:hidden">
+            <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] 2xl:hidden">
                 <!-- Overlay -->
                 <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" @click="isMobileMenuOpen = false"></div>
 
@@ -226,7 +227,7 @@ const getHref = (link) => {
                 <div
                     class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-zinc-900 border-r border-white/5 shadow-2xl flex flex-col">
                     <div class="p-8 flex items-center justify-between border-b border-white/5">
-                        <img src="/assets/images/logo-white.png" alt="Logo" class="h-6" />
+                        <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
                         <button @click="isMobileMenuOpen = false" class="p-2 text-zinc-500 hover:text-white">
                             <X class="w-6 h-6" />
                         </button>
@@ -250,7 +251,7 @@ const getHref = (link) => {
                                     <div class="flex items-center gap-4">
                                         <component :is="link.icon" class="w-5 h-5" />
                                         <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <ChevronRight class="w-4 h-4 opacity-50" />
                                 </Link>
@@ -260,11 +261,41 @@ const getHref = (link) => {
                                     <div class="flex items-center gap-4">
                                         <component :is="link.icon" class="w-5 h-5" />
                                         <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <ChevronRight class="w-4 h-4 opacity-50" />
                                 </a>
                             </template>
+
+                            <div class="h-px bg-white/5 my-2"></div>
+
+                            <!-- Favorites -->
+                            <Link :href="route('favorites.index')"
+                                class="flex items-center justify-between p-4 rounded-2xl transition-all"
+                                :class="[route().current('favorites.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                <div class="flex items-center gap-4">
+                                    <Heart class="w-5 h-5"
+                                        :class="{ 'fill-rose-500 text-rose-500': route().current('favorites.index') }" />
+                                    <span class="text-xs font-black uppercase tracking-widest">Favorites</span>
+                                </div>
+                                <ChevronRight class="w-4 h-4 opacity-50" />
+                            </Link>
+
+                            <!-- Cart -->
+                            <Link :href="route('cart.index')"
+                                class="flex items-center justify-between p-4 rounded-2xl transition-all"
+                                :class="[route().current('cart.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        <ShoppingCart class="w-5 h-5" />
+                                        <span v-if="$page.props.cart_count > 0"
+                                            class="absolute -top-1.5 -right-1.5 bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{
+                                                $page.props.cart_count }}</span>
+                                    </div>
+                                    <span class="text-xs font-black uppercase tracking-widest">Cart</span>
+                                </div>
+                                <ChevronRight class="w-4 h-4 opacity-50" />
+                            </Link>
                         </nav>
                     </div>
 
@@ -277,10 +308,10 @@ const getHref = (link) => {
                                     {{ auth.user.name.charAt(0) }}
                                 </div>
                                 <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-white">{{
+                                    <p class="text-[11px] font-black uppercase tracking-widest text-white">{{
                                         auth.user.name }}
                                     </p>
-                                    <p class="text-[9px] font-bold uppercase tracking-widest text-zinc-600 mt-0.5">My
+                                    <p class="text-[11px] font-bold uppercase tracking-widest text-zinc-600 mt-0.5">My
                                         Account
                                     </p>
                                 </div>

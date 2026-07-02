@@ -25,6 +25,8 @@
         "ziggy-js": "^2.6.2"
     },
     "dependencies": {
+        "@headlessui/vue": "^1.7.23",
+        "@heroicons/vue": "^2.2.0",
         "@phosphor-icons/vue": "^2.2.1",
         "lodash": "^4.18.1",
         "lucide-vue-next": "^1.0.0",

@@ -13,6 +13,15 @@ use Illuminate\Support\Carbon;
 
 class HomeController extends Controller
 {
+    public function test()
+    {
+        try {
+            return Inertia::render('Test');
+        } catch (\Throwable $e) {
+            return Inertia::render('Test');
+        }
+    }
+    
     public function index()
     {
         try {

@@ -6,20 +6,24 @@
 
         <title inertia>{{ config('app.name', 'Projektii') }}</title>
         <meta name="description" content="E-Commerce SaaS Platform for premium footwear. Shop the latest brands and exclusive collections.">
-        
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website">
+        <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" sizes="any">
+        <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="{{ asset('assets/images/apple-touch-icon.png') }}">
+        <link rel="manifest" href="{{ asset('assets/images/manifest.json') }}">
+
+            <!-- Open Graph / Facebook -->
+            <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="{{ config('app.name', 'Projektii') }}">
         <meta property="og:description" content="E-Commerce SaaS Platform for premium footwear.">
-        <meta property="og:image" content="{{ asset('assets/images/logo-white.png') }}">
+        <meta property="og:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
         <meta property="twitter:title" content="{{ config('app.name', 'Projektii') }}">
         <meta property="twitter:description" content="E-Commerce SaaS Platform for premium footwear.">
-        <meta property="twitter:image" content="{{ asset('assets/images/logo-white.png') }}">
+        <meta property="twitter:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
