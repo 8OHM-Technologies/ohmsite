@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+@theme {
+    --font-sans: "Poppins", "Figtree", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-satoshi: "Satoshi", sans-serif;
+    --font-neue: "Neue Montreal", sans-serif;
+
+    --color-admin-sidebar: #0F0F10;
+    --color-admin-main: #09090B;
+    --color-admin-accent: #C7A27C;
+    --color-admin-modern: #9FE870;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ── OHMSite Landing Page Design Tokens ── */
+:root {
+    /* Typography */
+    --font-display: 'Satoshi', 'Poppins', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+
+    /* Core palette — dark theme */
+    --color-bg: #0a0a0f;
+    --color-text-primary: #f0f0f5;
+    --color-text-secondary: #a0a0b0;
+    --color-text-muted: #606070;
+
+    /* Accents */
+    --color-accent-primary: #ff8800;
+    --color-accent-secondary: #8dd7da;
+
+    /* Surfaces (glass cards) */
+    --color-surface-outer: rgba(255, 255, 255, 0.04);
+    --color-surface-inner: rgba(255, 255, 255, 0.06);
+
+    /* Borders (glass cards) */
+    --color-border-outer: rgba(255, 255, 255, 0.08);
+    --color-border-inner: rgba(255, 255, 255, 0.10);
+
+    /* Motion */
+    --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+}
