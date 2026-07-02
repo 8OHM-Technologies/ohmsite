@@ -57,6 +57,7 @@ jobs:
 
   # 2. Run PHP/Laravel and Frontend Tests in Parallel
   laravel-tests:
+    needs: detect-changes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -83,8 +84,23 @@ jobs:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: php artisan test
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ LARAVEL TESTS FAILED ❌ %0A----------------------------------------------%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FAILED ${{github.workflow}} ❌ %0A------------------------------------------------------------------------%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
 
   frontend-tests:
+    needs: detect-changes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -96,6 +112,20 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FRONTEND TESTS FAILED ❌ %0A----------------------------------------------%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FAILED ${{github.workflow}} ❌ %0A------------------------------------------------------------------------%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
 
   # 3. Build and Push only images with detected changes
   build-and-push:
