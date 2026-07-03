@@ -27,7 +27,7 @@ const submit = () => {
         <!-- Left Side: Image & Info (Perfectly Matched with Login) -->
         <div class="hidden lg:flex lg:w-2/3 relative">
             <img src="/assets/images/Ohmsite_LoginBack.webp" alt="Auth Background"
-                class="absolute inset-0 w-full h-full object-cover opacity-60" />
+                class="absolute inset-0 w-full h-full object-cover opacity-60" style="object-fit: cover;" />
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
 
             <div class="relative z-10 p-20 flex flex-col justify-between w-full h-full">
