@@ -287,11 +287,15 @@ jobs:
               echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
               docker compose -f docker-compose.prod.yml pull
-              docker compose -f docker-compose.prod.yml up -d
 
-              # Clear old build files and copy new ones from container to host
+              # Extract fresh build assets from the new app image using a temporary container
               rm -rf public/build
-              docker cp ohmsite-app:/var/www/public/build ./public/
+              docker rm -f temp-app || true
+              docker create --name temp-app ghcr.io/8ohm-technologies/ohmsite-app:latest
+              docker cp temp-app:/var/www/public/build ./public/
+              docker rm -f temp-app
+
+              docker compose -f docker-compose.prod.yml up -d
 
               # Run Laravel database migrations & optimizations
               docker exec ohmsite-app php artisan migrate --force
