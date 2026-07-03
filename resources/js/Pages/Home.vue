@@ -40,9 +40,11 @@ const openModal = (division = '') => {
 
   if (division) {
     if (division === 'architecture') {
-      form.division = 'b2b-architecture'
+      form.division = 'level3-pipeline'
     } else if (division === 'coeus') {
-      form.division = 'b2b-data'
+      form.division = 'sample-dataset'
+    } else if (division === 'consumer') {
+      form.division = 'consumer-hardware'
     } else {
       form.division = division
     }
@@ -141,6 +143,7 @@ const checkHashAndParams = () => {
 onMounted(() => {
   // Add body class for scroll snapping
   document.body.classList.add('home-page-active')
+  document.documentElement.classList.add('home-page-active')
 
   // Check URL params/hash for contact modal
   checkHashAndParams()
@@ -175,6 +178,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.classList.remove('home-page-active')
+  document.documentElement.classList.remove('home-page-active')
   window.removeEventListener('hashchange', checkHashAndParams)
   window.removeEventListener('keydown', handleKeyDown)
   document.removeEventListener('mousemove', handleMouseMove)
@@ -202,36 +206,389 @@ onUnmounted(() => {
     <main>
       <section class="hero container" id="home">
         <div class="eyebrow-badge reveal-item">
-          <span class="eyebrow-dot"></span>
-          <span class="eyebrow-text">Privacy-first Edge Computing</span>
+          <span class="eyebrow-dot" style="background: #ff5f56; box-shadow: 0 0 8px #ff5f56;"></span>
+          <span class="eyebrow-text">South African Labour & Employment Law</span>
         </div>
 
         <h1 class="hero-title reveal-item">
-          Host Your World.<br />
-          <span class="gradient-text">Own Your Data.</span>
+          Turn Fragmented Legal Data<br />
+          <span class="gradient-text">into Unfair Analytical Advantage</span>
         </h1>
 
         <p class="hero-tagline reveal-item">
-          We deliver strategic engineering roadmaps and custom blueprints that empower individuals and SMMEs to
-          reclaim absolute control of their technology. Specializing in secure, local-first architectures, modular
-          smart retrofitting, and edge computing, we look far beyond rigid, isolated tech stacks. Our independent
-          advisory ensures your entire ecosystem—whether on-premises, cloud, or hybrid—is seamlessly integrated,
-          highly resilient, and entirely under your own control.
+          South African public data sources are notoriously unstable. We absorb the operational risk of scraping,
+          cleaning, and structuring records from the CCMA, Labour Courts, and High Courts. Get continuous,
+          POPIA-compliant data feeds delivered directly into your models, or access macro-trends via our interactive
+          dashboards.
         </p>
 
         <div class="cta-group reveal-item">
-          <a href="#consumer" class="btn btn-primary">
-            <span>DIY Smart Home Ecosystems</span>
+          <a href="#level1" class="btn btn-primary">
+            <span>Browse the Data Store</span>
             <div class="btn-icon">
-              <i class="ph-light ph-house"></i>
+              <i class="ph-light ph-database"></i>
             </div>
           </a>
-          <a href="#b2b" class="btn btn-secondary">
-            <span>B2B Services</span>
+          <a href="#level2" class="btn btn-secondary">
+            <span>Book a Dashboard Demo</span>
             <div class="btn-icon">
-              <i class="ph-light ph-buildings"></i>
+              <i class="ph-light ph-presentation"></i>
             </div>
           </a>
+        </div>
+
+        <!-- Trust & Provenance Banner -->
+        <div class="trust-banner container reveal-item" id="trust-banner">
+          <div class="trust-banner-inner">
+            <span class="trust-title">Ingesting From Trusted Public Jurisdictions & Registries:</span>
+            <div class="trust-logos">
+              <div class="trust-logo-item">
+                <i class="ph-light ph-scales"></i>
+                <span>CCMA</span>
+              </div>
+              <div class="trust-logo-item">
+                <i class="ph-light ph-briefcase"></i>
+                <span>Labour Court</span>
+              </div>
+              <div class="trust-logo-item">
+                <i class="ph-light ph-scales"></i>
+                <span>High Court Registries</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division">
+        <div class="section-header">
+          <div class="eyebrow-badge secondary">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">B2B Legal Data Services</span>
+          </div>
+          <h2 class="section-title">
+            Flexible Delivery for Legal, HR, and Compliance Teams
+          </h2>
+          <p class="section-subtitle">
+            Skip the manual research. Get structured South African public legal data delivered via high-speed feeds or
+            explore trends visually.
+          </p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Card 1: Level 1 -->
+          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level1">
+            <div class="bezel-card-inner"
+              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px;">
+              <div>
+                <div class="card-visual-wrapper">
+                  <div class="mock-diagram-compact">
+                    <div class="mock-header">
+                      <span class="mock-dot red"></span>
+                      <span class="mock-dot yellow"></span>
+                      <span class="mock-dot green"></span>
+                      <span class="mock-title">judgement_parsed.json</span>
+                    </div>
+                    <pre class="mock-code-compact"><code>{
+  <span class="yaml-key">"court"</span>: <span class="yaml-val">"Labour Court"</span>,
+  <span class="yaml-key">"case_number"</span>: <span class="yaml-val">"JS869/2022"</span>,
+  <span class="yaml-key">"reportable"</span>: <span class="yaml-val">"Yes"</span>,
+  <span class="yaml-key">"subjects"</span>: <span class="yaml-val">"Labour > Dismissal"</span>,
+  <span class="yaml-key">"result"</span>: <span class="yaml-val">"Dismissed with costs"</span>
+}</code></pre>
+                  </div>
+                </div>
+
+                <div class="compliance-badge">
+                  <i class="ph-fill ph-shield-check"></i>
+                  <span>POPIA Compliant Processing</span>
+                </div>
+
+                <h3 class="card-title" style="margin-top: 16px;">
+                  Historic Data Archives (Level 1)
+                </h3>
+                <p class="card-desc">
+                  Skip the scraping and bypass broken PDFs. Get 10+ years of pristine, POPIA-compliant historic labor
+                  law data fully cleaned, parsed, and enriched with legal metadata. Delivered in JSON, CSV, or Parquet
+                  for immediate integration into your internal AI models or academic research.
+                </p>
+              </div>
+
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
+                @click="openModal('sample-dataset')">
+                <span>Download Free Sample Dataset</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-download"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Level 2 -->
+          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level2">
+            <div class="bezel-card-inner"
+              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px;">
+              <div>
+                <div class="card-visual-wrapper">
+                  <div class="mock-chart-container">
+                    <div class="mock-header">
+                      <span class="mock-dot red"></span>
+                      <span class="mock-dot yellow"></span>
+                      <span class="mock-dot green"></span>
+                      <span class="mock-title">case_volume_by_sector.svg</span>
+                    </div>
+                    <div class="mock-chart-content">
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar" style="height: 80%">
+                          <span class="chart-tooltip">Retail: 12.8k cases</span>
+                        </div>
+                        <span class="chart-label">Retail</span>
+                      </div>
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar" style="height: 55%">
+                          <span class="chart-tooltip">Mining: 8.3k cases</span>
+                        </div>
+                        <span class="chart-label">Mining</span>
+                      </div>
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar" style="height: 65%">
+                          <span class="chart-tooltip">Mfg: 9.5k cases</span>
+                        </div>
+                        <span class="chart-label">Mfg</span>
+                      </div>
+                      <div class="chart-bar-wrapper">
+                        <div class="chart-bar" style="height: 40%">
+                          <span class="chart-tooltip">Fin: 6.2k cases</span>
+                        </div>
+                        <span class="chart-label">Fin</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="compliance-badge">
+                  <i class="ph-fill ph-shield-check"></i>
+                  <span>POPIA Compliant Processing</span>
+                </div>
+
+                <h3 class="card-title" style="margin-top: 16px;">
+                  Analytics Dashboard (Level 2)
+                </h3>
+                <p class="card-desc">
+                  Built for law firms and HR enterprises requiring macro insights with zero technical setup. Track
+                  judicial trends, average trial durations, specific law firm win/loss ratios, and industry risk surges
+                  in a responsive, interactive visual environment.
+                </p>
+              </div>
+
+              <button type="button" class="btn btn-primary dashboard-trigger-btn btn-align-bottom"
+                @click="goToDashboard">
+                <span>View Demo Dashboard</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-arrow-up-right"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Level 3 -->
+          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level3">
+            <div class="bezel-card-inner"
+              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px; padding-left: 20px; padding-right: 20px;">
+              <div>
+                <div class="card-visual-wrapper" style="padding: 0;">
+                  <div class="coeus-diagram-container"
+                    style="border: none; border-radius: 16px; background: rgba(0,0,0,0.25);">
+                    <svg class="coeus-svg" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 100 150 Q 175 240 250 240" class="flow-base" />
+                      <path d="M 100 150 Q 175 240 250 240" class="flow-path path-trigger" />
+                      <path d="M 240 240 L 240 60" class="flow-base" />
+                      <path d="M 240 240 L 240 60" class="flow-path path-solve-req" />
+                      <path d="M 260 60 L 260 240" class="flow-base" />
+                      <path d="M 260 60 L 260 240" class="flow-path path-solve-res" />
+                      <path d="M 250 240 Q 325 240 400 150" class="flow-base" />
+                      <path d="M 250 240 Q 325 240 400 150" class="flow-path path-store" />
+                    </svg>
+
+                    <div class="diagram-node" style="left: 22%; top: 50%; width: 110px; padding: 4px 6px;">
+                      <div class="node-icon" style="font-size: 0.9rem;">
+                        <i class="ph-light ph-cloud-arrow-down"></i>
+                      </div>
+                      <div class="node-content">
+                        <span class="node-title" style="font-size: 0.58rem;">Ingestion</span>
+                        <span class="node-subtitle" style="font-size: 0.48rem;">Scrapers</span>
+                      </div>
+                    </div>
+
+                    <div class="diagram-node node-solver" style="left: 50%; top: 22%; width: 110px; padding: 4px 6px;">
+                      <div class="node-icon" style="font-size: 0.9rem; color: var(--color-accent-secondary);">
+                        <i class="ph-light ph-brain"></i>
+                      </div>
+                      <div class="node-content">
+                        <span class="node-title" style="font-size: 0.58rem;">AI/LLM</span>
+                        <span class="node-subtitle" style="font-size: 0.48rem;">Enrichment</span>
+                      </div>
+                    </div>
+
+                    <div class="diagram-node" style="left: 50%; top: 78%; width: 110px; padding: 4px 6px;">
+                      <div class="node-icon" style="font-size: 0.9rem;">
+                        <i class="ph-light ph-terminal-window"></i>
+                      </div>
+                      <div class="node-content">
+                        <span class="node-title" style="font-size: 0.58rem;">Processing</span>
+                        <span class="node-subtitle" style="font-size: 0.48rem;">Workers</span>
+                      </div>
+                    </div>
+
+                    <div class="diagram-node" style="left: 78%; top: 50%; width: 110px; padding: 4px 6px;">
+                      <div class="node-icon" style="font-size: 0.9rem;">
+                        <i class="ph-light ph-database"></i>
+                      </div>
+                      <div class="node-content">
+                        <span class="node-title" style="font-size: 0.58rem;">Streams</span>
+                        <span class="node-subtitle" style="font-size: 0.48rem;">APIs</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <h3 class="card-title" style="margin-top: 48px;">
+                  Custom Proprietary Pipelines (Level 3)
+                </h3>
+                <p class="card-desc">
+                  Stop losing sleep over structural shifts in government websites. We act as your outsourced data
+                  engineering team. We build, maintain, and stream automated legal feeds directly into your internal
+                  systems (iManage, Salesforce, SQL) with custom rule-based alerting and absolute exclusivity.
+                </p>
+              </div>
+
+              <button type="button" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
+                @click="openModal('level3-pipeline')">
+                <span>Speak with an Architect</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-user-gear"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request a Pipeline Section -->
+        <div class="request-pipeline-card reveal-item" id="request-pipeline" style="margin-top: 48px;">
+          <div class="bezel-card-outer col-span-12">
+            <div class="bezel-card-inner editorial-card"
+              style="padding: 40px; background: linear-gradient(180deg, #0b0e12 0%, #06080b 100%);">
+              <div class="editorial-left">
+                <div class="card-icon">
+                  <i class="ph-light ph-git-pull-request"></i>
+                </div>
+                <h3 class="card-title">
+                  Don’t see your jurisdiction? Request a Pipeline.
+                </h3>
+                <p class="card-desc" style="max-width: 800px; margin-bottom: 24px;">
+                  We are actively expanding our public data catalog. If your firm requires a specific court registry,
+                  regulatory body, or public record dataset, submit a request. If the source passes our technical and
+                  market viability checks, we build the pipeline at zero setup cost to you and add it to our public data
+                  store.
+                </p>
+                <button type="button" class="btn btn-primary contact-trigger-btn"
+                  @click="openModal('pipeline-request')">
+                  <span>Submit a Source Request</span>
+                  <div class="btn-icon">
+                    <i class="ph-light ph-plus"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section container reveal-item" id="consumer" aria-label="Consumer Bento Grid">
+        <div class="section-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">Sovereign Tech Foundation</span>
+          </div>
+          <h2 class="section-title">Infinity Ohm Labs</h2>
+          <p class="section-subtitle">
+            The enterprise data architectures we build are born from a radical philosophy: absolute digital sovereignty.
+            Explore our open-source blueprints and hardware store, designed to help individuals build their own
+            self-hosted, cloud-free smart home ecosystems.
+          </p>
+        </div>
+        <div class="bento-grid">
+          <div class="bezel-card-outer col-span-7 reveal-item">
+            <div class="bezel-card-inner">
+              <div class="card-icon">
+                <i class="ph-light ph-book-open"></i>
+              </div>
+              <h3 class="card-title">
+                OhmBase: DIY Smart Home Blueprints
+              </h3>
+              <p class="card-desc">
+                We provide the knowledge and tools for you to
+                host your own digital life. Our blueprints guide
+                you through deploying everything you need from
+                Home Assistant, local AI agents, secure media
+                servers and more. All without mandatory cloud
+                lock-in or ring-fenced ecosystems.
+              </p>
+              <ul class="card-list">
+                <li class="card-list-item">
+                  <i class="ph-light ph-brain card-list-icon"></i>
+                  <div>
+                    <strong>Local AI & Automation:</strong>
+                    Lay the foundation to run personalized
+                    AI agents and complex automations that
+                    process entirely within the walls of
+                    your home.
+                  </div>
+                </li>
+                <li class="card-list-item">
+                  <i class="ph-light ph-plug card-list-icon"></i>
+                  <div>
+                    <strong>Legacy Integration:</strong>
+                    Safely bridge older alarms, gate motors,
+                    and sensors directly into your
+                    self-hosted network.
+                  </div>
+                </li>
+              </ul>
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
+                @click="openModal('consumer-hardware')">
+                <span>Go to Ohmbase</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-arrow-right"></i>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer col-span-5 reveal-item accent-glow">
+            <div class="bezel-card-inner">
+              <div class="card-icon">
+                <i class="ph-light ph-shopping-bag"></i>
+              </div>
+              <h3 class="card-title">Sovereign Hardware Store</h3>
+              <p class="card-desc" style="margin-bottom: 12px;">
+                We are engineering open-standard, self-contained smart home controllers and stocking components to power
+                your self-hosting journey without vendor lock-in.
+              </p>
+              <div class="product-status"
+                style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
+                <span class="status-dot"
+                  style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
+                Store Launching Soon
+              </div>
+              <button type="button" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
+                @click="openModal('consumer-hardware')">
+                <span>Join the Waitlist</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-bell"></i>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -319,392 +676,6 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division">
-        <div class="section-header">
-          <div class="eyebrow-badge secondary">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">B2B Services</span>
-          </div>
-          <h2 class="section-title">
-            Managed Data Pipelines & AI Advisory
-          </h2>
-          <p class="section-subtitle">
-            Translating the self-hosted philosophy into enterprise-grade operations. We transform chaotic SaaS
-            data and unstructured registries into clean, automated dashboards and APIs.
-          </p>
-        </div>
-        <div class="bezel-card-outer col-span-12 reveal-item accent-glow">
-          <div class="bezel-card-inner editorial-card">
-            <div class="editorial-left">
-              <div class="card-icon">
-                <i class="ph-light ph-git-branch"></i>
-              </div>
-              <h3 class="card-title">
-                Data-as-a-Service (DaaS) Solutions
-              </h3>
-              <p class="card-desc">
-                Stop wrestling with messy spreadsheets, manual reporting, and rigid legacy software. We build robust
-                data acquisition engines that transform volatile, unstructured information into actionable intelligence.
-                Delivered entirely as a managed service, our data offerings scale across three distinct tiers based on
-                your technical maturity and operational needs:
-              </p>
-              <div class="editorial-grid">
-                <div class="editorial-grid-item">
-                  <strong>Level 1: Raw Data Provisioning</strong>
-                  Built for engineering, actuarial, and data science teams who have their own infrastructure and require
-                  high-quality, cleansed data at scale. We deliver clean, structured raw data extracts from disparate
-                  public records directly to your team via API or flat file (JSON/CSV). You pay for the clean data and
-                  complex transformations, without the enterprise headcount overhead.
-                </div>
-                <div class="editorial-grid-item">
-                  <strong>Level 2: Analytics & Dashboard Subscriptions</strong>
-                  Designed for non-technical stakeholders who need immediate visual insights without dealing with raw
-                  code. We take our structured Level 1 data and layer it into a secure, intuitive dashboard. You pay a
-                  flat, recurring monthly subscription for simplified analytics, visual trends, and reporting that saves
-                  your team operational time—with zero infrastructure management required on your end.
-                </div>
-              </div>
-              <div class="editorial-grid">
-                <div class="editorial-grid-item">
-                  <strong>Level 3: Custom Data Engineering (Proprietary Retainer)</strong>
-                  For enterprise clients requiring highly specialized, end-to-end data pipelines that remain completely
-                  proprietary. We engineer your entire technical process from source to dashboard—ingesting your
-                  internal legacy systems alongside niche external sources, applying custom AI entity extraction, and
-                  building bespoke BI dashboards.
-                </div>
-
-                <div class="editorial-grid-item">
-                  <strong>Request Datasets: </strong>
-                  Don't see the specific dataset your industry relies on? Submit a Dataset Request. If the data is
-                  publicly viable and aligns with our roadmap, we will build the pipeline, structure the data, and make
-                  it available as a shared resource.
-                </div>
-              </div>
-              <button type="button" class="btn btn-primary dashboard-trigger-btn" @click="goToDashboard">
-                <span>View Demo Dashboard</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-arrow-up-right"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-6 reveal-item accent-glow">
-            <div class="bezel-card-inner" style="
-              padding: 0;
-              overflow: hidden;
-              display: flex;
-              flex-direction: column;
-            ">
-              <div class="mock-diagram" style="
-                border: none;
-                border-radius: 0;
-                height: 100%;
-              ">
-                <div class="mock-header">
-                  <span class="mock-dot red"></span>
-                  <span class="mock-dot yellow"></span>
-                  <span class="mock-dot green"></span>
-                  <span class="mock-title">example_judgement_entity.json</span>
-                </div>
-                <pre class="mock-code" style="
-                  border-radius: 0;
-                  margin: 0;
-                  height: 100%;
-                "><code style="font-size: 0.75rem; text-align: left;">
-{
-    <span class="yaml-key">"applicant_plaintiff":</span> <span class="yaml-val">"An Employee..."</span>,
-    <span class="yaml-key">"respondent_defendant":</span> <span class="yaml-val">"Big Company (Pty) Ltd t/a..."</span>,
-    <span class="yaml-key">"judgment_date":</span> <span class="yaml-val">"2025-05-29"</span>,
-    <span class="yaml-key">"case_number":</span> <span class="yaml-val">"JS869/2022"</span>,
-    <span class="yaml-key">"reportable":</span> <span class="yaml-val">"Yes"</span>,
-    <span class="yaml-key">"subjects":</span> <span class="yaml-val">"Labour > Dismissal"</span>,
-    <span class="yaml-key">"court":</span> <span class="yaml-val">"Labour Court"</span>,
-    <span class="yaml-key">"judges":</span> <span class="yaml-val">"Prinsloo J"</span>,
-    <span class="yaml-key">"court_location":</span> <span class="yaml-val">"Johannesburg"</span>,
-    <span class="yaml-key">"result":</span> <span class="yaml-val">"Order 1. The Plaintiff's case is dismissed..."</span>,
-    <span class="yaml-key">"trade_unions":</span> <span class="yaml-val">"Some Trade Union..."</span>,
-    <span class="yaml-key">"ai_summary":</span> <span class="yaml-val">"This Labour Court judgment concerns a substantive..."</span>,
-    <span class="yaml-key">"ai_keywords":</span> <span class="yaml-val">"Labour Relations Act, Unfair Dismissal..."</span>,
-}</code></pre>
-              </div>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-6 reveal-item accent-glow">
-            <div class="bezel-card-inner flush">
-              <div class="editorial-right" id="data-engineering">
-                <div class="coeus-diagram-container">
-                  <svg class="coeus-svg" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 100 150 Q 175 240 250 240" class="flow-base" />
-                    <path d="M 100 150 Q 175 240 250 240" class="flow-path path-trigger" />
-                    <path d="M 240 240 L 240 60" class="flow-base" />
-                    <path d="M 240 240 L 240 60" class="flow-path path-solve-req" />
-                    <path d="M 260 60 L 260 240" class="flow-base" />
-                    <path d="M 260 60 L 260 240" class="flow-path path-solve-res" />
-                    <path d="M 250 240 Q 325 240 400 150" class="flow-base" />
-                    <path d="M 250 240 Q 325 240 400 150" class="flow-path path-store" />
-                  </svg>
-
-                  <div class="diagram-node" style="left: 20%; top: 50%">
-                    <div class="node-icon">
-                      <i class="ph-light ph-cloud-arrow-down"></i>
-                    </div>
-                    <div class="node-content">
-                      <span class="node-title">Ingestion</span>
-                      <span class="node-subtitle">Automated Scrapers</span>
-                    </div>
-                    <span class="pulse-dot"></span>
-                  </div>
-
-                  <div class="diagram-node node-solver" style="left: 50%; top: 20%">
-                    <div class="node-icon">
-                      <i class="ph-light ph-brain"></i>
-                    </div>
-                    <div class="node-content">
-                      <span class="node-title">Intelligence</span>
-                      <span class="node-subtitle">AI/LLM</span>
-                    </div>
-                    <span class="pulse-dot-secondary"></span>
-                  </div>
-
-                  <div class="diagram-node" style="left: 50%; top: 80%">
-                    <div class="node-icon">
-                      <i class="ph-light ph-terminal-window"></i>
-                    </div>
-                    <div class="node-content">
-                      <span class="node-title">Processing</span>
-                      <span class="node-subtitle">Python Workers</span>
-                    </div>
-                    <span class="pulse-dot"></span>
-                  </div>
-
-                  <div class="diagram-node" style="left: 80%; top: 50%">
-                    <div class="node-icon">
-                      <i class="ph-light ph-database"></i>
-                    </div>
-                    <div class="node-content">
-                      <span class="node-title">Provision</span>
-                      <span class="node-subtitle">Structured APIs</span>
-                    </div>
-                    <span class="pulse-dot"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-12 reveal-item accent-glow">
-            <div class="bezel-card-inner editorial-card">
-              <div class="editorial-left">
-                <div class="card-icon">
-                  <i class="ph-light ph-git-branch"></i>
-                </div>
-                <h3 class="card-title">
-                  Custom IT & AI Consultancy
-                </h3>
-                <p class="card-desc">
-                  We design specialized on-premises server environments for businesses requiring strict
-                  data sovereignty.
-                </p>
-                <div class="editorial-grid">
-                  <div class="editorial-grid-item">
-                    <strong>Local-First Infrastructure:</strong>
-                    Designing zero-trust web topologies and internal services (document hosting,
-                    intranet) with cloud-level reliability but local-level privacy.
-                  </div>
-                  <div class="editorial-grid-item">
-                    <strong>Hybrid AI Workflows:</strong>
-                    Seamlessly blending secure, localized LLM inference setups and RAG databases with
-                    powerful cloud integrations when intensive scale is required.
-                  </div>
-                </div>
-                <button type="button" class="btn btn-primary contact-trigger-btn" @click="openModal('architecture')">
-                  <span>Request Consultation</span>
-                  <div class="btn-icon">
-                    <i class="ph-light ph-arrow-up-right"></i>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="features-section container reveal-item" id="consumer" aria-label="Consumer Bento Grid">
-        <div class="section-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Consumer Division</span>
-          </div>
-          <h2 class="section-title">The Self-Hosted Smart Home</h2>
-          <p class="section-subtitle">
-            Self-hosting is the first step to true digital sovereignty. Learn how to build your own secure, private
-            smart home ecosystem.
-          </p>
-        </div>
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-7 reveal-item">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-book-open"></i>
-              </div>
-              <h3 class="card-title">
-                OhmBase: DIY Smart Home Blueprints
-              </h3>
-              <p class="card-desc">
-                We provide the knowledge and tools for you to
-                host your own digital life. Our blueprints guide
-                you through deploying everything you need from
-                Home Assistant, local AI agents, secure media
-                servers and more. All without mandatory cloud
-                lock-in or ring-fenced ecosystems.
-              </p>
-              <ul class="card-list">
-                <li class="card-list-item">
-                  <i class="ph-light ph-brain card-list-icon"></i>
-                  <div>
-                    <strong>Local AI & Automation:</strong>
-                    Lay the foundation to run personalized
-                    AI agents and complex automations that
-                    process entirely within the walls of
-                    your home.
-                  </div>
-                </li>
-                <li class="card-list-item">
-                  <i class="ph-light ph-plug card-list-icon"></i>
-                  <div>
-                    <strong>Legacy Integration:</strong>
-                    Safely bridge older alarms, gate motors,
-                    and sensors directly into your
-                    self-hosted network.
-                  </div>
-                </li>
-              </ul>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer')">
-                <span>Go to Ohmbase</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-arrow-right"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-5 reveal-item accent-glow">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-shopping-bag"></i>
-              </div>
-              <h3 class="card-title">Edge Hardware Store</h3>
-              <p class="card-desc">
-                Skip the compatibility research. We stock all of
-                the components you need to jumpstart your
-                self-hosting journey. In the future, this
-                identical foundation will seamlessly power our
-                in development all-in-one, open-standard smart home devices.
-              </p>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer')">
-                <span>Browse Store</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-shopping-bag"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="store" class="store-section container reveal-item">
-        <div class="store-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Online Store</span>
-          </div>
-          <h2 class="store-title">Hardware Kits</h2>
-          <p class="store-subtitle">
-            No cloud tethers, no forced subscriptions, just pure
-            local compute that you control. Whether you want to plug-and-play or tinker like us, our store has
-            something for you. And if it does not, contact us and we'll see what we can do!
-          </p>
-        </div>
-
-        <div id="productGrid" class="product-grid">
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Pre-Configured</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-hard-drives"></i>
-              </div>
-              <h3 class="product-title">Smart Home Core</h3>
-              <p class="product-description">
-                Includes hardware, installation and
-                pre-configuration of Proxmox VE running Home
-                Assistant OS. The foundation for your sovereign
-                home network.
-              </p>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Your Hardware</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-hard-drives"></i>
-              </div>
-              <h3 class="product-title">
-                Smart Home Core (Software & Configuration)
-              </h3>
-              <p class="product-description">
-                Installation and configuration of Proxmox VE
-                running Home Assistant OS, using hardware
-                provided by you.
-              </p>
-              <a href="#" style="
-                color: var(--color-accent-primary);
-                font-size: 0.75rem;
-                margin-bottom: 10px;
-                display: block;
-              ">Check hardware requirements</a>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer product-card reveal-item">
-            <div class="bezel-card-inner">
-              <div class="product-badge">Blueprint #1 Kit</div>
-              <div class="product-image-placeholder">
-                <i class="ph-light ph-cpu"></i>
-              </div>
-              <h3 class="product-title">
-                Legacy Alarm Conversion Kit
-              </h3>
-              <p class="product-description">
-                Opto-isolated interface board to safely bridge
-                high-voltage alarm states into 3.3V
-                microcontrollers.
-              </p>
-              <div class="product-meta">
-                <span class="product-price"></span>
-                <span class="product-status"><span class="status-dot"></span>Coming Soon</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="features-section container reveal-item" id="roadmap" aria-label="Future Vision and Roadmap">
         <div class="section-header">
           <div class="eyebrow-badge secondary">
@@ -785,17 +756,13 @@ onUnmounted(() => {
             <div class="bezel-card-inner">
               <h4 class="card-title-small">
                 <i class="ph-light ph-recycle"></i>
-                How do the Consumer and B2B divisions relate?
+                How do Infinity Ohm Labs and the B2B divisions relate?
               </h4>
               <p class="faq-answer">
-                Both divisions are built on the identical core
-                philosophy: achieving true digital sovereignty
-                through self-hosting and on-premises control.
-                The Consumer division empowers individuals to
-                host their own secure ecosystems at home, while
-                the B2B division delivers enterprise-grade
-                on-premises IT/AI consultancy and custom data
-                engineering.
+                Both are built on the identical core philosophy: achieving true digital sovereignty through self-hosting
+                and on-premises control. Infinity Ohm Labs serves as our open-source R&D foundation, empowering
+                individuals to host their own secure ecosystems at home, while our B2B division delivers
+                enterprise-grade public data pipelines and custom data engineering.
               </p>
             </div>
           </div>
@@ -830,9 +797,8 @@ onUnmounted(() => {
           <div v-show="!showSuccess" id="contactFormWrapper">
             <h2 class="modal-title">Enquiry</h2>
             <p class="modal-subtitle">
-              Our online store and the OhmBase guides are in the
-              works, but until then, let us know what you need and
-              we'll get back to you within 48 hours.
+              Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware
+              waitlists? Reach out below.
             </p>
 
             <form @submit.prevent="handleSubmit">
@@ -850,19 +816,25 @@ onUnmounted(() => {
                   v-model="form.email" />
               </div>
               <div class="form-group">
-                <label for="division">Which division would you like to speak to?</label>
+                <label for="division">What are you interested in?</label>
                 <select id="division" name="division" required v-model="form.division">
                   <option value="" disabled selected>
-                    Choose a division...
+                    Choose an option...
                   </option>
-                  <option value="consumer">
-                    Consumer: DIY Kits & Hardware
+                  <option value="sample-dataset">
+                    Request Sample Dataset (Level 1)
                   </option>
-                  <option value="b2b-architecture">
-                    B2B: Self-Hosted Architecture & AI Consultancy
+                  <option value="dashboard-demo">
+                    Book Dashboard Demo (Level 2)
                   </option>
-                  <option value="b2b-data">
-                    B2B: Data Engineering & Analytics Pipelines
+                  <option value="level3-pipeline">
+                    Request a Level 3 Custom Pipeline
+                  </option>
+                  <option value="pipeline-request">
+                    Submit a Source Request (Roadmap)
+                  </option>
+                  <option value="consumer-hardware">
+                    Consumer DIY Hardware & Labs
                   </option>
                   <option value="general">
                     General Enquiry
@@ -945,9 +917,11 @@ onUnmounted(() => {
   padding: 0;
 }
 
+:global(html.home-page-active),
 :global(body.home-page-active) {
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 100px;
 }
 
 .container {
@@ -1052,14 +1026,17 @@ onUnmounted(() => {
   width: 100%;
   position: relative;
   z-index: 10;
-  padding-top: 10rem;
+  padding-top: 8rem;
   padding-bottom: 4rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  box-sizing: border-box;
 }
 
 .eyebrow-badge {
@@ -1070,7 +1047,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .eyebrow-dot {
@@ -1109,8 +1086,8 @@ onUnmounted(() => {
   letter-spacing: -1.5px;
   color: var(--color-text-primary);
   max-width: 950px;
-  padding-top: 4rem !important;
-  padding-bottom: 3rem !important;
+  margin: 0;
+  padding: 0;
 }
 
 .hero-title .gradient-text {
@@ -1123,13 +1100,12 @@ onUnmounted(() => {
 .hero-tagline {
   color: var(--color-text-secondary);
   max-width: 800px;
-  margin-bottom: 48px;
   font-weight: 400;
   line-height: 1.7;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* --- Buttons --- */
@@ -1139,7 +1115,8 @@ onUnmounted(() => {
   flex-wrap: wrap;
   justify-content: center;
   z-index: 10;
-  padding-top: 2rem;
+  margin: 0;
+  padding: 0;
 }
 
 .btn {
@@ -1249,6 +1226,10 @@ onUnmounted(() => {
 
 .col-span-5 {
   grid-column: span 5;
+}
+
+.col-span-4 {
+  grid-column: span 4;
 }
 
 .bezel-card-outer {
@@ -2134,7 +2115,8 @@ footer {
   .col-span-12,
   .col-span-7,
   .col-span-6,
-  .col-span-5 {
+  .col-span-5,
+  .col-span-4 {
     grid-column: span 1 !important;
   }
 
@@ -2271,5 +2253,222 @@ footer {
   line-height: 1.6;
   margin-bottom: 32px;
   max-width: 360px;
+}
+
+/* --- Trust & Provenance Banner --- */
+.trust-banner {
+  /* margin-top: 1rem;
+  margin-bottom: 5rem; */
+}
+
+.trust-banner-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-outer);
+  padding: 24px 32px;
+  border-radius: 24px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.03);
+}
+
+.trust-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.trust-logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.trust-logo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+.trust-logo-item:hover {
+  opacity: 1;
+}
+
+.trust-logo-item i {
+  color: var(--color-accent-primary);
+  font-size: 1.1rem;
+}
+
+/* --- Card Visuals and Badges --- */
+.card-visual-wrapper {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-border-outer);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 24px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.compliance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(141, 215, 218, 0.06);
+  border: 1px solid rgba(141, 215, 218, 0.15);
+  color: var(--color-accent-secondary);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.compliance-badge i {
+  font-size: 0.85rem;
+}
+
+.mock-diagram-compact {
+  width: 100%;
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mock-code-compact {
+  padding: 12px;
+  margin: 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.72rem;
+  color: #ffa844;
+  line-height: 1.4;
+  background: #07090c;
+  text-align: left;
+}
+
+/* --- CCMA Case Volume Sector Chart --- */
+.mock-chart-container {
+  width: 100%;
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mock-chart-content {
+  padding: 20px;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  background: #07090c;
+  position: relative;
+}
+
+.chart-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 18%;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.chart-bar {
+  width: 100%;
+  background: linear-gradient(to top, rgba(255, 136, 0, 0.4), var(--color-accent-primary));
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 10px rgba(255, 136, 0, 0.15);
+}
+
+.chart-bar:hover {
+  background: linear-gradient(to top, rgba(255, 136, 0, 0.6), #ffa133);
+  box-shadow: 0 0 15px rgba(255, 136, 0, 0.4);
+  transform: scaleX(1.05);
+}
+
+.chart-tooltip {
+  position: absolute;
+  bottom: 105%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(11, 14, 18, 0.95);
+  border: 1px solid var(--color-border-inner);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.chart-bar:hover .chart-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.chart-label {
+  font-size: 0.58rem;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* --- Request a Pipeline styling --- */
+.request-pipeline-card .editorial-card {
+  background: linear-gradient(180deg, #0b0e12 0%, #06080b 100%);
+  border-color: rgba(255, 136, 0, 0.15);
+}
+
+.request-pipeline-card:hover .bezel-card-outer {
+  border-color: rgba(255, 136, 0, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 50px rgba(255, 136, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .trust-banner {
+    margin-top: 0;
+    margin-bottom: 3rem;
+  }
+
+  .trust-banner-inner {
+    padding: 16px;
+  }
+
+  .trust-logos {
+    gap: 16px;
+  }
+
+  .trust-logo-item {
+    font-size: 0.8rem;
+  }
 }
 </style>
