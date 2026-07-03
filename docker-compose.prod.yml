@@ -3,7 +3,7 @@ services:
   # Laravel PHP Application
   # ---------------------------------------------------------
   app:
-    image: ghcr.io/8ohm-technologies/landing-page-app:latest
+    image: ghcr.io/8ohm-technologies/ohmsite-app:latest
     container_name: ohmsite-app
     restart: unless-stopped
     working_dir: /var/www
@@ -19,7 +19,7 @@ services:
   # Nginx Web Server
   # ---------------------------------------------------------
   web:
-    image: ghcr.io/8ohm-technologies/landing-page-web:latest
+    image: ghcr.io/8ohm-technologies/ohmsite-web:latest
     container_name: ohmsite-web
     restart: unless-stopped
     volumes:

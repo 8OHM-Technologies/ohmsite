@@ -21,7 +21,7 @@ jobs:
             -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
             -d "parse_mode=HTML" \
             -d "text=🧨 STARTED ${{github.workflow}} 🧨 %0A------------------------------------------------------------------------%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a>  %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>")
-          
+
           MSG_ID=$(echo "$RESPONSE" | jq '.result.message_id')
           echo "msg_id=$MSG_ID" >> $GITHUB_OUTPUT
 
@@ -64,7 +64,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
           coverage: xdebug
       - name: Install Dependencies
@@ -107,7 +107,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
       - name: Install Dependencies
         run: npm install
       - name: Build
@@ -149,7 +149,7 @@ jobs:
       - name: Set up PHP for production asset build
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
 
       - name: Install Composer Dependencies (Production)
@@ -158,7 +158,7 @@ jobs:
       - name: Set up Node for frontend asset build
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
 
       - name: Install Node Dependencies and Build Assets
         run: |
@@ -182,7 +182,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/8ohm-technologies/landing-page-app:latest
+          tags: ghcr.io/8ohm-technologies/ohmsite-app:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -193,7 +193,7 @@ jobs:
           context: .
           file: Dockerfile.web
           push: true
-          tags: ghcr.io/8ohm-technologies/landing-page-web:latest
+          tags: ghcr.io/8ohm-technologies/ohmsite-web:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -261,7 +261,7 @@ jobs:
               set -euo pipefail
 
               TARGET_DIR="/home/deploy-user/ohmsite"
-              REPO_URL="git@github.com:8OHM-Technologies/landing-page.git"
+              REPO_URL="git@github.com:8OHM-Technologies/ohmsite.git"
 
               if [ ! -d "$TARGET_DIR/.git" ]; then
                 echo "Initializing repository directory structure..."
