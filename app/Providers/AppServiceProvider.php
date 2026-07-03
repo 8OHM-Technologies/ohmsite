@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+
         Vite::prefetch(concurrency: 3);
 
         RateLimiter::for('login', function (Request $request) {
