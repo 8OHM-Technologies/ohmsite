@@ -214,120 +214,120 @@ const getHref = (link) => {
                 </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Mobile Menu Drawer -->
-        <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="-translate-x-full"
-            enter-to-class="translate-x-0" leave-active-class="transition duration-200 ease-in"
-            leave-from-class="translate-x-0" leave-to-class="-translate-x-full">
-            <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] 2xl:hidden">
-                <!-- Overlay -->
-                <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" @click="isMobileMenuOpen = false"></div>
+    <!-- Mobile Menu Drawer -->
+    <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="-translate-x-full"
+        enter-to-class="translate-x-0" leave-active-class="transition duration-200 ease-in"
+        leave-from-class="translate-x-0" leave-to-class="-translate-x-full">
+        <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] 2xl:hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" @click="isMobileMenuOpen = false"></div>
 
-                <!-- Drawer -->
-                <div
-                    class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-zinc-900 border-r border-white/5 shadow-2xl flex flex-col">
-                    <div class="p-8 flex items-center justify-between border-b border-white/5">
-                        <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
-                        <button @click="isMobileMenuOpen = false" class="p-2 text-zinc-500 hover:text-white">
-                            <X class="w-6 h-6" />
-                        </button>
+            <!-- Drawer -->
+            <div
+                class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-zinc-900 border-r border-white/5 shadow-2xl flex flex-col">
+                <div class="p-8 flex items-center justify-between border-b border-white/5">
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
+                    <button @click="isMobileMenuOpen = false" class="p-2 text-zinc-500 hover:text-white">
+                        <X class="w-6 h-6" />
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                    <!-- Mobile Search -->
+                    <div class="relative group">
+                        <Search class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" />
+                        <input type="text" v-model="searchQuery" @keyup.enter="performSearch"
+                            placeholder="Search products..."
+                            class="w-full bg-black border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold uppercase tracking-widest text-white focus:ring-1 focus:ring-white/20" />
                     </div>
 
-                    <div class="flex-1 overflow-y-auto p-8 space-y-8">
-                        <!-- Mobile Search -->
-                        <div class="relative group">
-                            <Search class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" />
-                            <input type="text" v-model="searchQuery" @keyup.enter="performSearch"
-                                placeholder="Search products..."
-                                class="w-full bg-black border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold uppercase tracking-widest text-white focus:ring-1 focus:ring-white/20" />
-                        </div>
-
-                        <!-- Main Links -->
-                        <nav class="space-y-2">
-                            <template v-for="link in navLinks" :key="link.name">
-                                <Link v-if="link.type === 'route' || !route().current('home')" :href="getHref(link)"
-                                    class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                    :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
-                                    <div class="flex items-center gap-4">
-                                        <component :is="link.icon" class="w-5 h-5" />
-                                        <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
-                                    </div>
-                                    <ChevronRight class="w-4 h-4 opacity-50" />
-                                </Link>
-                                <a v-else :href="'#' + link.id" @click="isMobileMenuOpen = false"
-                                    class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                    :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
-                                    <div class="flex items-center gap-4">
-                                        <component :is="link.icon" class="w-5 h-5" />
-                                        <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
-                                    </div>
-                                    <ChevronRight class="w-4 h-4 opacity-50" />
-                                </a>
-                            </template>
-
-                            <div class="h-px bg-white/5 my-2"></div>
-
-                            <!-- Favorites -->
-                            <Link :href="route('favorites.index')"
+                    <!-- Main Links -->
+                    <nav class="space-y-2">
+                        <template v-for="link in navLinks" :key="link.name">
+                            <Link v-if="link.type === 'route' || !route().current('home')" :href="getHref(link)"
                                 class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                :class="[route().current('favorites.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                                 <div class="flex items-center gap-4">
-                                    <Heart class="w-5 h-5"
-                                        :class="{ 'fill-rose-500 text-rose-500': route().current('favorites.index') }" />
-                                    <span class="text-xs font-black uppercase tracking-widest">Favorites</span>
+                                    <component :is="link.icon" class="w-5 h-5" />
+                                    <span class="text-xs font-black uppercase tracking-widest">{{ link.name
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
-
-                            <!-- Cart -->
-                            <Link :href="route('cart.index')"
+                            <a v-else :href="'#' + link.id" @click="isMobileMenuOpen = false"
                                 class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                :class="[route().current('cart.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                                 <div class="flex items-center gap-4">
-                                    <div class="relative">
-                                        <ShoppingCart class="w-5 h-5" />
-                                        <span v-if="$page.props.cart_count > 0"
-                                            class="absolute -top-1.5 -right-1.5 bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{
-                                                $page.props.cart_count }}</span>
-                                    </div>
-                                    <span class="text-xs font-black uppercase tracking-widest">Cart</span>
+                                    <component :is="link.icon" class="w-5 h-5" />
+                                    <span class="text-xs font-black uppercase tracking-widest">{{ link.name
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
-                            </Link>
-                        </nav>
-                    </div>
+                            </a>
+                        </template>
 
-                    <!-- Footer / Account -->
-                    <div class="p-8 border-t border-white/5 bg-black/50">
-                        <div v-if="auth.user" class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-black">
-                                    {{ auth.user.name.charAt(0) }}
-                                </div>
-                                <div>
-                                    <p class="text-[11px] font-black uppercase tracking-widest text-white">{{
-                                        auth.user.name }}
-                                    </p>
-                                    <p class="text-[11px] font-bold uppercase tracking-widest text-zinc-600 mt-0.5">My
-                                        Account
-                                    </p>
-                                </div>
+                        <div class="h-px bg-white/5 my-2"></div>
+
+                        <!-- Favorites -->
+                        <Link :href="route('favorites.index')"
+                            class="flex items-center justify-between p-4 rounded-2xl transition-all"
+                            :class="[route().current('favorites.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                            <div class="flex items-center gap-4">
+                                <Heart class="w-5 h-5"
+                                    :class="{ 'fill-rose-500 text-rose-500': route().current('favorites.index') }" />
+                                <span class="text-xs font-black uppercase tracking-widest">Favorites</span>
                             </div>
-                            <Link :href="route('logout')" method="post" as="button"
-                                class="p-2 text-zinc-500 hover:text-rose-500 transition-colors">
-                                <LogOut class="w-5 h-5" />
-                            </Link>
+                            <ChevronRight class="w-4 h-4 opacity-50" />
+                        </Link>
+
+                        <!-- Cart -->
+                        <Link :href="route('cart.index')"
+                            class="flex items-center justify-between p-4 rounded-2xl transition-all"
+                            :class="[route().current('cart.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <ShoppingCart class="w-5 h-5" />
+                                    <span v-if="$page.props.cart_count > 0"
+                                        class="absolute -top-1.5 -right-1.5 bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{
+                                            $page.props.cart_count }}</span>
+                                </div>
+                                <span class="text-xs font-black uppercase tracking-widest">Cart</span>
+                            </div>
+                            <ChevronRight class="w-4 h-4 opacity-50" />
+                        </Link>
+                    </nav>
+                </div>
+
+                <!-- Footer / Account -->
+                <div class="p-8 border-t border-white/5 bg-black/50">
+                    <div v-if="auth.user" class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-black">
+                                {{ auth.user.name.charAt(0) }}
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-black uppercase tracking-widest text-white">{{
+                                    auth.user.name }}
+                                </p>
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-zinc-600 mt-0.5">My
+                                    Account
+                                </p>
+                            </div>
                         </div>
-                        <Link v-else :href="route('login')"
-                            class="w-full flex items-center justify-center py-4 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs">
-                            Sign In
+                        <Link :href="route('logout')" method="post" as="button"
+                            class="p-2 text-zinc-500 hover:text-rose-500 transition-colors">
+                            <LogOut class="w-5 h-5" />
                         </Link>
                     </div>
+                    <Link v-else :href="route('login')"
+                        class="w-full flex items-center justify-center py-4 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs">
+                        Sign In
+                    </Link>
                 </div>
             </div>
-        </Transition>
-    </nav>
+        </div>
+    </Transition>
 </template>
