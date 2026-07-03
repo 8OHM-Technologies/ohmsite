@@ -149,12 +149,12 @@ const getHref = (link) => {
                     </a>
                 </template>
                 <!-- Search (Desktop) -->
-                <div class="hidden md:relative md:flex items-center group">
+                <!-- <div class="hidden md:relative md:flex items-center group">
                     <Search
                         class="w-4 h-4 absolute left-3.5 text-zinc-500 group-focus-within:text-white transition-colors" />
                     <input type="text" v-model="searchQuery" @keyup.enter="performSearch" placeholder="Search..."
                         class="bg-zinc-900/50 border border-white/5 rounded-full py-2 pl-10 pr-4 text-[11px] w-32 focus:w-48 transition-all duration-500 focus:ring-1 focus:ring-white/20 placeholder:text-zinc-600 text-white uppercase font-bold tracking-widest" />
-                </div>
+                </div> -->
 
             </div>
 
@@ -188,7 +188,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -251,7 +251,7 @@ const getHref = (link) => {
                                     <div class="flex items-center gap-4">
                                         <component :is="link.icon" class="w-5 h-5" />
                                         <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <ChevronRight class="w-4 h-4 opacity-50" />
                                 </Link>
@@ -261,7 +261,7 @@ const getHref = (link) => {
                                     <div class="flex items-center gap-4">
                                         <component :is="link.icon" class="w-5 h-5" />
                                         <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <ChevronRight class="w-4 h-4 opacity-50" />
                                 </a>

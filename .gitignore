@@ -141,3 +141,6 @@ out
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Custom
+resources/js/Pages/Test.vue

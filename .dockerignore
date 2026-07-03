@@ -12,3 +12,4 @@ storage/framework/views/*
 storage/logs/*
 vendor
 AuthBucket/
+resources/js/Pages/Test.vue
