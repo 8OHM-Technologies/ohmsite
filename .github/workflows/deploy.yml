@@ -111,7 +111,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Build
-        run: npm run build
+        run: |
+          rm -rf public/build
+          npm run build
       - name: Notify on Failure
         if: failure()
         run: |
@@ -162,6 +164,7 @@ jobs:
 
       - name: Install Node Dependencies and Build Assets
         run: |
+          rm -rf public/build
           npm install
           npm run build
 
@@ -285,6 +288,10 @@ jobs:
 
               docker compose -f docker-compose.prod.yml pull
               docker compose -f docker-compose.prod.yml up -d
+
+              # Clear old build files and copy new ones from container to host
+              rm -rf public/build
+              docker cp ohmsite-app:/var/www/public/build ./public/
 
               # Run Laravel database migrations & optimizations
               docker exec ohmsite-app php artisan migrate --force
