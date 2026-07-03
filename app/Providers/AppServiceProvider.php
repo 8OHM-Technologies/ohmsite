@@ -24,7 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //\Illuminate\Support\Facades\URL::forceScheme('https');
+        if (!app()->environment('local')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
 
         Vite::prefetch(concurrency: 3);
 
