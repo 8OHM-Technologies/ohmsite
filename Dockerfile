@@ -58,7 +58,7 @@ COPY --chown=dev:www-data . /var/www
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Copy the compiled assets from the frontend build stage
-COPY --from=frontend_builder --chown=dev:www-data /app/public/build /var/www
+COPY --from=frontend_builder --chown=dev:www-data /app/public/build /var/www/public/build
 
 # Set explicit execution permissions for Laravel cache and storage directories
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
