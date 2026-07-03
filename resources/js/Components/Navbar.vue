@@ -61,7 +61,7 @@ const navLinks = [
     { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
     { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
     { name: 'DIY Smart Home Ecosystems', id: 'consumer', type: 'anchor', icon: Home },
-    { name: 'Hardware Store', id: 'shop.index', type: 'route', icon: ShoppingBag },
+    { name: 'Shop Hardware', id: 'shop.index', type: 'route', icon: ShoppingBag },
     { name: 'Enquire Now', id: 'contact', type: 'anchor', icon: Star },
 ];
 
@@ -188,7 +188,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -252,7 +252,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
@@ -262,7 +262,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </a>

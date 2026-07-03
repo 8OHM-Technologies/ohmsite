@@ -315,7 +315,7 @@ onUnmounted(() => {
 
               <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
                 @click="openModal('sample-dataset')">
-                <span>Download Free Sample Dataset</span>
+                <span>Download Free Sample</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-download"></i>
                 </div>
@@ -2009,7 +2009,7 @@ footer {
   border-radius: 12px;
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 0.7em;
   transition: all 0.3s ease;
 }
 
