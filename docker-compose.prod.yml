@@ -32,7 +32,7 @@ services:
       - app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ohmsite.rule=Host(`8ohm.co.za`, `www.8ohm.co.za`)"
+      - "traefik.http.routers.ohmsite.rule=Host(`8ohm.co.za`) || Host(`www.8ohm.co.za`)"
       - "traefik.http.routers.ohmsite.entrypoints=websecure"
       - "traefik.http.routers.ohmsite.tls=true"
       - "traefik.http.services.ohmsite.loadbalancer.server.port=80"
