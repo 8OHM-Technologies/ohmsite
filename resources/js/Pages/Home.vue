@@ -484,7 +484,7 @@ onUnmounted(() => {
                 <h3 class="card-title">
                   Don’t see your jurisdiction? Request a Pipeline.
                 </h3>
-                <p class="card-desc" style="max-width: 800px; margin-bottom: 24px;">
+                <p class="card-desc">
                   We are actively expanding our public data catalog. If your firm requires a specific court registry,
                   regulatory body, or public record dataset, submit a request. If the source passes our technical and
                   market viability checks, we build the pipeline at zero setup cost to you and add it to our public data
@@ -570,7 +570,7 @@ onUnmounted(() => {
                 <i class="ph-light ph-shopping-bag"></i>
               </div>
               <h3 class="card-title">Sovereign Hardware Store</h3>
-              <p class="card-desc" style="margin-bottom: 12px;">
+              <p class="card-desc">
                 We are engineering open-standard, self-contained smart home controllers and stocking components to power
                 your self-hosting journey without vendor lock-in.
               </p>
@@ -1337,6 +1337,8 @@ onUnmounted(() => {
   font-size: 0.95rem;
   line-height: 1.6;
   margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  max-width: 800px;
 }
 
 .card-desc:last-child {

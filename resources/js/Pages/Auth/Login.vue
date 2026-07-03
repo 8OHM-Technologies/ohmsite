@@ -32,7 +32,7 @@ const submit = () => {
 
     <div class="min-h-screen bg-black text-white font-sans flex overflow-hidden">
         <!-- Left Side: Image & Info (Perfectly Matched with Register) -->
-        <div class="hidden lg:flex lg:w-1/2 relative">
+        <div class="hidden lg:flex lg:w-2/3 relative">
             <img src="/assets/images/Ohmsite_LoginBack.webp" alt="Auth Background"
                 class="absolute inset-0 w-full h-full object-cover opacity-70" />
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
@@ -91,7 +91,7 @@ const submit = () => {
         </div>
 
         <!-- Right Side: Form Container (Perfectly Matched with Register) -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-10 bg-zinc-950 overflow-y-auto h-screen">
+        <div class="w-full lg:w-1/3 flex items-center justify-center p-10 bg-zinc-950 overflow-y-auto h-screen">
             <div class="max-w-md w-full space-y-10 py-10">
                 <div class="text-center lg:text-left">
                     <h2 class="text-4xl font-black uppercase tracking-tighter">Welcome back</h2>
