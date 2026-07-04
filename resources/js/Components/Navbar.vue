@@ -58,10 +58,10 @@ const handleScroll = () => {
 
 const navLinks = [
     { name: 'Home', id: 'home', type: 'route', icon: Home },
-    { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
     { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
     { name: 'DIY Smart Home Ecosystems', id: 'consumer', type: 'anchor', icon: Home },
     { name: 'Shop Hardware', id: 'shop.index', type: 'route', icon: ShoppingBag },
+    { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
     { name: 'Enquire Now', id: 'contact', type: 'anchor', icon: Star },
 ];
 
@@ -103,20 +103,20 @@ const getHref = (link) => {
 <template>
     <nav :class="[
         'fixed top-0 w-full z-50 transition-all duration-500 flex flex-col items-center',
-        isScrolled ? 'py-3 bg-black/60 backdrop-blur-xl border-b border-white/5' : 'py-6 2xl:py-10'
+        isScrolled ? 'py-3 bg-black/60 backdrop-blur-xl border-b border-white/5' : 'py-6 nav:py-10'
     ]">
         <div
-            class="w-full px-4 sm:px-8 2xl:px-12 flex 2xl:grid 2xl:grid-cols-3 items-center justify-between max-w-[1920px] mx-auto relative">
+            class="w-full px-4 sm:px-8 nav:px-12 flex nav:grid nav:grid-cols-3 items-center justify-between max-w-[1920px] mx-auto relative">
 
             <!-- Mobile Menu Toggle -->
             <button @click="isMobileMenuOpen = true"
-                class="2xl:hidden p-2 text-zinc-400 hover:text-white transition-colors">
+                class="nav:hidden p-2 text-zinc-400 hover:text-white transition-colors">
                 <Menu class="w-6 h-6" />
             </button>
 
             <!-- Logo Section - Center on mobile/tablet, Left on desktop when scrolled -->
-            <div class="absolute left-1/2 -translate-x-1/2 2xl:static 2xl:translate-x-0 2xl:justify-self-start transition-all duration-500 flex items-center"
-                :class="[isScrolled ? '2xl:w-40' : '2xl:w-auto']">
+            <div class="absolute left-1/2 -translate-x-1/2 nav:static nav:translate-x-0 nav:justify-self-start transition-all duration-500 flex items-center"
+                :class="[isScrolled ? 'nav:w-40' : 'nav:w-auto']">
                 <Link :href="route('home')" class="block">
                     <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="transition-all duration-500" :style="{
                         height: isScrolled ? '24px' : '48px',
@@ -126,7 +126,7 @@ const getHref = (link) => {
             </div>
 
             <!-- Desktop Links Section -->
-            <div class="hidden 2xl:flex 2xl:justify-self-center items-center space-x-1 bg-zinc-900/40 rounded-full p-1 border border-white/5 backdrop-blur-sm transition-opacity duration-300"
+            <div class="hidden nav:flex nav:justify-self-center items-center space-x-1 bg-zinc-900/40 rounded-full p-1 border border-white/5 backdrop-blur-sm transition-opacity duration-300"
                 :class="[isScrolled ? 'opacity-100' : 'opacity-100']">
                 <template v-for="link in navLinks" :key="link.name">
                     <Link v-if="link.type === 'route' || !route().current('home')" :href="getHref(link)" :class="[
@@ -159,7 +159,7 @@ const getHref = (link) => {
             </div>
 
             <!-- Right Side: Search, Cart, Profile -->
-            <div class="hidden md:flex 2xl:justify-self-end items-center space-x-2 sm:space-x-4">
+            <div class="hidden md:flex nav:justify-self-end items-center space-x-2 sm:space-x-4">
                 <!-- Wishlist -->
                 <Link :href="route('favorites.index')"
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 group border border-transparent hover:border-white/5">
@@ -188,7 +188,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -220,7 +220,7 @@ const getHref = (link) => {
     <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="-translate-x-full"
         enter-to-class="translate-x-0" leave-active-class="transition duration-200 ease-in"
         leave-from-class="translate-x-0" leave-to-class="-translate-x-full">
-        <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] 2xl:hidden">
+        <div v-if="isMobileMenuOpen" class="fixed inset-0 z-[60] nav:hidden">
             <!-- Overlay -->
             <div class="absolute inset-0 bg-black/90 backdrop-blur-xl" @click="isMobileMenuOpen = false"></div>
 
@@ -252,7 +252,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
@@ -262,7 +262,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </a>

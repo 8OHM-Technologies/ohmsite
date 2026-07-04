@@ -28,6 +28,8 @@
     --color-admin-main: #09090B;
     --color-admin-accent: #8dd7da;
     --color-admin-modern: #ff8800;
+
+    --breakpoint-nav: 1436px;
 }
 
 html {

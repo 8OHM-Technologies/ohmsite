@@ -13,7 +13,6 @@ const props = defineProps({
   auth: Object,
 });
 
-const isModalOpen = ref(false)
 const showSuccess = ref(false)
 const isSending = ref(false)
 const formError = ref('')
@@ -31,10 +30,6 @@ const orb3 = ref(null)
 let revealObserver = null
 
 const openModal = (division = '') => {
-  // Reset form
-  form.name = ''
-  form.email = ''
-  form.message = ''
   formError.value = ''
   showSuccess.value = false
 
@@ -48,29 +43,21 @@ const openModal = (division = '') => {
     } else {
       form.division = division
     }
-  } else {
-    form.division = ''
   }
 
-  isModalOpen.value = true
-  document.body.style.overflow = 'hidden'
+  const contactSection = document.getElementById('contact')
+  if (contactSection) {
+    contactSection.scrollIntoView({ behavior: 'smooth' })
+  }
 }
 
-const closeModal = () => {
-  isModalOpen.value = false
-  document.body.style.overflow = 'auto'
-  // Clear hash from URL so it doesn't stay #contact
-  if (window.location.hash === '#contact' || window.location.hash === '#enquire') {
-    history.pushState("", document.title, window.location.pathname + window.location.search);
-  }
-  setTimeout(() => {
-    showSuccess.value = false
-    formError.value = ''
-    form.name = ''
-    form.email = ''
-    form.message = ''
-    form.division = ''
-  }, 500)
+const resetForm = () => {
+  showSuccess.value = false
+  formError.value = ''
+  form.name = ''
+  form.email = ''
+  form.message = ''
+  form.division = ''
 }
 
 const handleSubmit = async () => {
@@ -113,11 +100,7 @@ const goToDashboard = () => {
   window.location.href = '/dashboard/index.html'
 }
 
-const handleKeyDown = (e) => {
-  if (e.key === 'Escape' && isModalOpen.value) {
-    closeModal()
-  }
-}
+// Keyboard handler removed
 
 const handleMouseMove = (e) => {
   const x = e.clientX / window.innerWidth
@@ -149,8 +132,7 @@ onMounted(() => {
   checkHashAndParams()
   window.addEventListener('hashchange', checkHashAndParams)
 
-  // Keyboard and mouse events
-  window.addEventListener('keydown', handleKeyDown)
+  // Mouse events
   document.addEventListener('mousemove', handleMouseMove)
 
   // Setup Reveal Intersection Observer
@@ -180,7 +162,6 @@ onUnmounted(() => {
   document.body.classList.remove('home-page-active')
   document.documentElement.classList.remove('home-page-active')
   window.removeEventListener('hashchange', checkHashAndParams)
-  window.removeEventListener('keydown', handleKeyDown)
   document.removeEventListener('mousemove', handleMouseMove)
   if (revealObserver) {
     revealObserver.disconnect()
@@ -212,7 +193,7 @@ onUnmounted(() => {
 
         <h1 class="hero-title reveal-item">
           Turn Fragmented Legal Data<br />
-          <span class="gradient-text">into Unfair Analytical Advantage</span>
+          <span class="gradient-text">into Analytical Advantage</span>
         </h1>
 
         <p class="hero-tagline reveal-item">
@@ -768,6 +749,93 @@ onUnmounted(() => {
           </div>
         </div>
       </section>
+
+      <section class="contact-section container reveal-item" id="contact" aria-label="Enquire Now">
+        <div class="section-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">Enquiry</span>
+          </div>
+          <h2 class="section-title section-title-large">
+            Enquire Now
+          </h2>
+          <p class="section-subtitle">
+            Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware
+            waitlists? Reach out below.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="bezel-card-outer reveal-item">
+            <div class="bezel-card-inner">
+              <div v-show="!showSuccess" id="contactFormWrapper">
+                <form @submit.prevent="handleSubmit" class="contact-form">
+                  <div class="form-status error" :class="{ active: formError }" id="formError">
+                    <i class="ph-light ph-warning-circle"></i>
+                    <span class="error-text">{{ formError }}</span>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="name">What do we call you?</label>
+                      <input type="text" id="name" name="name" required placeholder="John Doe" v-model="form.name" />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="email">How do we get in touch?</label>
+                      <input type="email" id="email" name="email" required placeholder="example@email.com"
+                        v-model="form.email" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="division">What are you interested in?</label>
+                    <select id="division" name="division" required v-model="form.division">
+                      <option value="" disabled selected>Choose an option...</option>
+                      <option value="sample-dataset">Request Sample Dataset (Level 1)</option>
+                      <option value="dashboard-demo">Book Dashboard Demo (Level 2)</option>
+                      <option value="level3-pipeline">Request a Level 3 Custom Pipeline</option>
+                      <option value="pipeline-request">Submit a Source Request (Roadmap)</option>
+                      <option value="consumer-hardware">Consumer DIY Hardware & Labs</option>
+                      <option value="general">General Enquiry</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="message">How can we help you?</label>
+                    <textarea id="message" name="message" rows="4" required placeholder="Detail your requirements..."
+                      v-model="form.message"></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary submit-btn" :disabled="isSending"
+                    :style="isSending ? { opacity: 0.7 } : {}">
+                    <span>{{ isSending ? 'Sending...' : 'Send Message' }}</span>
+                    <div class="btn-icon">
+                      <i class="ph-light ph-paper-plane-tilt"></i>
+                    </div>
+                  </button>
+                </form>
+              </div>
+
+              <div v-show="showSuccess" class="form-status-success active" id="successMessage">
+                <div class="success-icon">
+                  <i class="ph-light ph-check-circle"></i>
+                </div>
+                <h3 class="success-title">Enquiry Sent</h3>
+                <p class="success-desc">
+                  Thank you for your enquiry. Our team will get back to you within 48 hours.
+                </p>
+                <button type="button" class="btn btn-primary submit-btn" id="successCloseBtn" @click="resetForm">
+                  <span>Send Another Message</span>
+                  <div class="btn-icon">
+                    <i class="ph-light ph-paper-plane-tilt"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
@@ -785,96 +853,6 @@ onUnmounted(() => {
         </p>
       </div>
     </footer>
-
-    <!-- Contact Modal -->
-    <div id="contactModal" class="modal-overlay" :class="{ active: isModalOpen }" @click.self="closeModal">
-      <div class="modal-bezel-outer">
-        <div class="modal-content">
-          <button class="close-btn" id="closeContactBtn" aria-label="Close modal" @click="closeModal">
-            <i class="ph-light ph-x"></i>
-          </button>
-
-          <div v-show="!showSuccess" id="contactFormWrapper">
-            <h2 class="modal-title">Enquiry</h2>
-            <p class="modal-subtitle">
-              Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware
-              waitlists? Reach out below.
-            </p>
-
-            <form @submit.prevent="handleSubmit">
-              <div class="form-status error" :class="{ active: formError }" id="formError">
-                <i class="ph-light ph-warning-circle"></i>
-                <span class="error-text">{{ formError }}</span>
-              </div>
-              <div class="form-group">
-                <label for="name">What do we call you?</label>
-                <input type="text" id="name" name="name" required placeholder="John Doe" v-model="form.name" />
-              </div>
-              <div class="form-group">
-                <label for="email">How do we get in touch?</label>
-                <input type="email" id="email" name="email" required placeholder="example@email.com"
-                  v-model="form.email" />
-              </div>
-              <div class="form-group">
-                <label for="division">What are you interested in?</label>
-                <select id="division" name="division" required v-model="form.division">
-                  <option value="" disabled selected>
-                    Choose an option...
-                  </option>
-                  <option value="sample-dataset">
-                    Request Sample Dataset (Level 1)
-                  </option>
-                  <option value="dashboard-demo">
-                    Book Dashboard Demo (Level 2)
-                  </option>
-                  <option value="level3-pipeline">
-                    Request a Level 3 Custom Pipeline
-                  </option>
-                  <option value="pipeline-request">
-                    Submit a Source Request (Roadmap)
-                  </option>
-                  <option value="consumer-hardware">
-                    Consumer DIY Hardware & Labs
-                  </option>
-                  <option value="general">
-                    General Enquiry
-                  </option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="message">How can we help you?</label>
-                <textarea id="message" name="message" rows="4" required placeholder="Detail your requirements..."
-                  v-model="form.message"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary submit-btn" :disabled="isSending"
-                :style="isSending ? { opacity: 0.7 } : {}">
-                <span>{{ isSending ? 'Sending...' : 'Send Message' }}</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-paper-plane-tilt"></i>
-                </div>
-              </button>
-            </form>
-          </div>
-
-          <div v-show="showSuccess" class="form-status-success active" id="successMessage">
-            <div class="success-icon">
-              <i class="ph-light ph-check-circle"></i>
-            </div>
-            <h3 class="success-title">Enquiry Sent</h3>
-            <p class="success-desc">
-              Thank you for your enquiry. Our team will get back
-              to you within 48 hours.
-            </p>
-            <button type="button" class="btn btn-primary submit-btn" id="successCloseBtn" @click="closeModal">
-              <span>Close Window</span>
-              <div class="btn-icon">
-                <i class="ph-light ph-x"></i>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -896,23 +874,15 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-.home-page-container main h1,
-.home-page-container main h2,
-.home-page-container main h3,
-.home-page-container main h4,
-.home-page-container main p,
-.home-page-container main ul,
-.home-page-container main li,
-.home-page-container footer p,
-.home-page-container #contactModal h2,
-.home-page-container #contactModal p,
-.home-page-container #contactModal form,
-.home-page-container #contactModal .form-group,
-.home-page-container #contactModal label,
-.home-page-container #contactModal input,
-.home-page-container #contactModal textarea,
-.home-page-container #contactModal select,
-.home-page-container #contactModal button {
+.home-page-container .contact-section h2,
+.home-page-container .contact-section p,
+.home-page-container .contact-section form,
+.home-page-container .contact-section .form-group,
+.home-page-container .contact-section label,
+.home-page-container .contact-section input,
+.home-page-container .contact-section textarea,
+.home-page-container .contact-section select,
+.home-page-container .contact-section button {
   margin: 0;
   padding: 0;
 }
@@ -925,7 +895,7 @@ onUnmounted(() => {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
   width: 100%;
@@ -1266,15 +1236,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.bezel-card-inner.flush {
-  padding: 0;
-}
 
-.bezel-card-inner.flush .mock-diagram {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
 
 .card-icon {
   width: 52px;
@@ -1404,12 +1366,7 @@ onUnmounted(() => {
   color: var(--color-text-primary);
 }
 
-.product-link {
-  color: var(--color-accent-primary);
-  font-size: 0.75rem;
-  margin-bottom: 10px;
-  display: block;
-}
+
 
 /* --- Editorial Layout (B2B Structural Split) --- */
 .editorial-card {
@@ -1432,33 +1389,7 @@ onUnmounted(() => {
   align-self: flex-end;
 }
 
-.editorial-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
-  text-align: left;
-}
 
-.editorial-grid-item {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}
-
-.editorial-grid-item strong {
-  color: var(--color-text-primary);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.editorial-right {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 320px;
-}
 
 /* --- SVG Diagram Structure --- */
 .coeus-diagram-container {
@@ -1592,55 +1523,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.pulse-dot,
-.pulse-dot-secondary {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
 
-.pulse-dot {
-  background: var(--color-accent-primary);
-  box-shadow: 0 0 6px var(--color-accent-primary);
-  animation: node-pulse 2s infinite;
-}
-
-.pulse-dot-secondary {
-  background: var(--color-accent-secondary);
-  box-shadow: 0 0 6px var(--color-accent-secondary);
-  animation: node-pulse-sec 2s infinite;
-}
-
-@keyframes node-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 136, 0, 0.7);
-  }
-
-  70% {
-    box-shadow: 0 0 0 6px rgba(255, 136, 0, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 136, 0, 0);
-  }
-}
-
-@keyframes node-pulse-sec {
-  0% {
-    box-shadow: 0 0 0 0 rgba(141, 215, 218, 0.7);
-  }
-
-  70% {
-    box-shadow: 0 0 0 6px rgba(141, 215, 218, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(141, 215, 218, 0);
-  }
-}
 
 .mock-diagram {
   background: #050505;
@@ -1714,146 +1597,7 @@ onUnmounted(() => {
   color: #ffffff;
 }
 
-/* --- Store Section --- */
-.store-section {
-  position: relative;
-  z-index: 10;
-  padding-bottom: 4rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  height: 100%;
-  width: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-}
 
-.store-header {
-  text-align: center;
-  margin-bottom: 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.store-title {
-  font-family: var(--font-display);
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1.2;
-  color: var(--color-text-primary);
-  margin: 16px 0;
-}
-
-.store-subtitle {
-  color: var(--color-text-secondary);
-  max-width: 650px;
-  line-height: 1.6;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 24px;
-}
-
-.product-card .bezel-card-inner {
-  padding: 24px;
-  align-items: stretch;
-}
-
-.product-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 136, 0, 0.08);
-  border: 1px solid rgba(255, 136, 0, 0.25);
-  color: var(--color-accent-primary);
-  padding: 4px 12px;
-  border-radius: 100px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  z-index: 2;
-}
-
-.product-image-placeholder {
-  height: 200px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--color-border-outer);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-.product-image-placeholder i {
-  font-size: 3.5rem;
-  color: var(--color-accent-primary);
-  opacity: 0.6;
-  transition: all 0.5s var(--ease-premium);
-}
-
-.product-card:hover .product-image-placeholder i {
-  transform: scale(1.1);
-  opacity: 1;
-}
-
-.product-title {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 10px;
-}
-
-.product-description {
-  color: var(--color-text-secondary);
-  font-size: 0.88rem;
-  line-height: 1.5;
-  margin-bottom: 20px;
-  flex-grow: 1;
-}
-
-.product-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-top: 15px;
-  border-top: 1px solid var(--color-border-inner);
-}
-
-.product-price {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  font-family: var(--font-display);
-}
-
-.product-status {
-  font-size: 0.75rem;
-  color: var(--color-accent-secondary);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-}
-
-.status-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--color-accent-secondary);
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 6px var(--color-accent-secondary);
-}
 
 /* --- FAQ Grid --- */
 .faq-section {
@@ -1900,101 +1644,49 @@ footer {
   line-height: 1.8;
 }
 
-/* --- Contact Modal --- */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(5, 5, 5, 0.8);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  transition: opacity 0.5s var(--ease-premium);
-  padding: 24px;
-}
-
-.modal-overlay.active {
-  display: flex;
-  opacity: 1;
-}
-
-.modal-bezel-outer {
-  background: var(--color-surface-outer);
-  border: 1px solid var(--color-border-outer);
-  padding: 6px;
-  border-radius: 32px;
+/* --- Contact Section --- */
+.contact-section {
+  height: 100%;
   width: 100%;
-  max-width: 540px;
-  transform: scale(0.9) translateY(30px);
-  transition: transform 0.5s var(--ease-premium);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  padding-bottom: 6rem;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
-.modal-overlay.active .modal-bezel-outer {
-  transform: scale(1) translateY(0);
+.contact-grid {
+  max-width: 600px;
+  margin: 40px auto 0;
+  width: 100%;
 }
 
-.modal-content {
-  background: var(--color-surface-inner);
-  border: 1px solid var(--color-border-inner);
-  padding: 40px;
-  border-radius: 26px;
-  position: relative;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06);
+.contact-form {
   display: flex;
   flex-direction: column;
+  gap: 28px;
 }
 
-.close-btn {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-border-outer);
-  color: var(--color-text-secondary);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
 }
 
-.close-btn:hover {
-  color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.modal-title {
-  font-family: var(--font-display);
-  color: var(--color-text-primary);
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.modal-subtitle {
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
-  margin-bottom: 32px;
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
 }
 
 .form-group {
-  margin-bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-group label {
   color: var(--color-text-primary);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
@@ -2003,13 +1695,13 @@ footer {
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 14px 16px;
+  padding: 16px 20px 16px 28px !important;
   background-color: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--color-border-outer);
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: 0.7em;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
 }
 
@@ -2018,14 +1710,15 @@ footer {
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.34a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 16px center;
+  background-position: right 20px center;
   background-size: 14px;
-  padding-right: 40px;
+  padding-right: 48px;
 }
 
 .form-group select option {
   background: #0b0e12;
   color: #fff;
+  font-size: 0.95rem;
 }
 
 .form-group input:focus,
@@ -2087,8 +1780,8 @@ footer {
 
   .hero,
   .features-section,
-  .store-section,
-  .faq-section {
+  .faq-section,
+  .contact-section {
     height: auto;
     min-height: auto;
     scroll-snap-align: none;
@@ -2096,8 +1789,8 @@ footer {
   }
 
   .features-section,
-  .store-section,
-  .faq-section {
+  .faq-section,
+  .contact-section {
     padding-top: 80px;
     padding-bottom: 80px;
   }
@@ -2122,9 +1815,7 @@ footer {
     grid-column: span 1 !important;
   }
 
-  .proof-grid,
-  .faq-grid,
-  .product-grid {
+  .faq-grid {
     grid-template-columns: 1fr !important;
     gap: 24px !important;
   }
@@ -2137,15 +1828,6 @@ footer {
     flex-direction: column;
     gap: 32px;
     padding: 28px;
-  }
-
-  .editorial-right {
-    min-width: 100%;
-  }
-
-  .editorial-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
 
   .coeus-diagram-container {
@@ -2169,12 +1851,6 @@ footer {
 
   .node-subtitle {
     font-size: 0.48rem;
-  }
-
-  .pulse-dot,
-  .pulse-dot-secondary {
-    width: 4px;
-    height: 4px;
   }
 }
 
