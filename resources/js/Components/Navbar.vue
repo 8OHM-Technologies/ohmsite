@@ -118,7 +118,7 @@ const getHref = (link) => {
             <div class="absolute left-1/2 -translate-x-1/2 nav:static nav:translate-x-0 nav:justify-self-start transition-all duration-500 flex items-center"
                 :class="[isScrolled ? 'nav:w-40' : 'nav:w-auto']">
                 <Link :href="route('home')" class="block">
-                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="transition-all duration-500" :style="{
+                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="transition-all duration-500" :style="{
                         height: isScrolled ? '24px' : '48px',
                         maxHeight: '128px'
                     }" />
@@ -228,7 +228,7 @@ const getHref = (link) => {
             <div
                 class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-zinc-900 border-r border-white/5 shadow-2xl flex flex-col">
                 <div class="p-8 flex items-center justify-between border-b border-white/5">
-                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
+                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="h-6" />
                     <button @click="isMobileMenuOpen = false" class="p-2 text-zinc-500 hover:text-white">
                         <X class="w-6 h-6" />
                     </button>

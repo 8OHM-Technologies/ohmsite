@@ -16,14 +16,14 @@
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="{{ config('app.name', 'Projektii') }}">
         <meta property="og:description" content="E-Commerce SaaS Platform for premium footwear.">
-        <meta property="og:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
+        <meta property="og:image" content="{{ asset('assets/images/8OHM_Logo_border.webp') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
         <meta property="twitter:title" content="{{ config('app.name', 'Projektii') }}">
         <meta property="twitter:description" content="E-Commerce SaaS Platform for premium footwear.">
-        <meta property="twitter:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
+        <meta property="twitter:image" content="{{ asset('assets/images/8OHM_Logo_border.webp') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

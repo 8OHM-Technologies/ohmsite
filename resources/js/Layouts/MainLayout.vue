@@ -26,7 +26,7 @@ defineProps({
         </main>
 
         <footer class="pt-20 pb-10 border-t border-white/5 text-center">
-            <img src="/assets/images/8OHM_Logo.webp" class="h-8 mx-auto opacity-20 mb-8" />
+            <img src="/assets/images/8OHM_Logo_border.webp" class="h-8 mx-auto opacity-20 mb-8" />
             <div class="text-zinc-700 text-[10px] font-black uppercase tracking-[0.5em]">
                 © 2026 Infinity Ohm Technologies (Pty) Ltd. All rights reserved.
             </div>
