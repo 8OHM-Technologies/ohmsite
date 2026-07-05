@@ -42,7 +42,7 @@ onUnmounted(() => {
         leave-to-class="opacity-0">
         <div v-if="show" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black">
             <div class="relative mb-8">
-                <img src="/assets/images/8OHM_Logo_border.webp" class="h-16 animate-pulse" />
+                <img src="/assets/images/8OHM_Logo.webp" class="h-16 animate-pulse" />
                 <div class="absolute -inset-4 bg-white/5 blur-3xl rounded-full"></div>
             </div>
 

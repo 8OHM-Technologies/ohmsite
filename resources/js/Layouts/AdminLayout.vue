@@ -123,7 +123,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                 <!-- Sidebar Header -->
                 <div class="h-24 flex items-center px-8 border-b border-white/5">
                     <Link href="/" class="flex items-center gap-3 group">
-                        <img src="/assets/images/8OHM_Logo_border.webp" alt="Store"
+                        <img src="/assets/images/8OHM_Logo.webp" alt="Store"
                             class="h-8 transition-transform group-hover:scale-105" />
                     </Link>
                     <button @click="isSidebarOpen = false" class="ml-auto p-2 text-zinc-500 hover:text-white lg:hidden">
@@ -176,7 +176,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                     <button @click="isSidebarOpen = true" class="p-2 text-zinc-400 hover:text-white transition-colors">
                         <Menu class="w-6 h-6" />
                     </button>
-                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="h-6" />
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
                 </div>
 
                 <div class="hidden md:flex flex-1 max-w-xl mx-4 lg:mx-0">

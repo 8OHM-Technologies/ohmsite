@@ -60,7 +60,6 @@ const navLinks = [
     { name: 'Home', id: 'home', type: 'route', icon: Home },
     { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
     { name: 'DIY Smart Home Ecosystems', id: 'consumer', type: 'anchor', icon: Home },
-    { name: 'Shop Hardware', id: 'shop.index', type: 'route', icon: ShoppingBag },
     { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
     { name: 'Enquire Now', id: 'contact', type: 'anchor', icon: Star },
 ];
@@ -118,7 +117,7 @@ const getHref = (link) => {
             <div class="absolute left-1/2 -translate-x-1/2 nav:static nav:translate-x-0 nav:justify-self-start transition-all duration-500 flex items-center"
                 :class="[isScrolled ? 'nav:w-40' : 'nav:w-auto']">
                 <Link :href="route('home')" class="block">
-                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="transition-all duration-500" :style="{
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="transition-all duration-500" :style="{
                         height: isScrolled ? '24px' : '48px',
                         maxHeight: '128px'
                     }" />
@@ -188,7 +187,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -228,7 +227,7 @@ const getHref = (link) => {
             <div
                 class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-zinc-900 border-r border-white/5 shadow-2xl flex flex-col">
                 <div class="p-8 flex items-center justify-between border-b border-white/5">
-                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="h-6" />
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
                     <button @click="isMobileMenuOpen = false" class="p-2 text-zinc-500 hover:text-white">
                         <X class="w-6 h-6" />
                     </button>
@@ -252,7 +251,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
@@ -262,7 +261,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </a>

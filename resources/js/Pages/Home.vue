@@ -221,19 +221,19 @@ onUnmounted(() => {
         <!-- Trust & Provenance Banner -->
         <div class="trust-banner container reveal-item" id="trust-banner">
           <div class="trust-banner-inner">
-            <span class="trust-title">Ingesting From Trusted Public Jurisdictions & Registries:</span>
+            <span class="trust-title">Ingesting From Various Public Jurisdictions & Registries:</span>
             <div class="trust-logos">
               <div class="trust-logo-item">
                 <i class="ph-light ph-scales"></i>
-                <span>CCMA</span>
+                <span>saflii.org</span>
               </div>
               <div class="trust-logo-item">
                 <i class="ph-light ph-briefcase"></i>
-                <span>Labour Court</span>
+                <span>judiciary.org.za</span>
               </div>
               <div class="trust-logo-item">
                 <i class="ph-light ph-scales"></i>
-                <span>High Court Registries</span>
+                <span>statssa.gov.za</span>
               </div>
             </div>
           </div>
@@ -285,15 +285,23 @@ onUnmounted(() => {
                 </div>
 
                 <h3 class="card-title" style="margin-top: 16px;">
-                  Historic Data Archives (Level 1)
+                  Historic Data Archives <br> (Level 1)
                 </h3>
                 <p class="card-desc">
                   Skip the scraping and bypass broken PDFs. Get 10+ years of pristine, POPIA-compliant historic labor
-                  law data fully cleaned, parsed, and enriched with legal metadata. Delivered in JSON, CSV, or Parquet
-                  for immediate integration into your internal AI models or academic research.
+                  law data fully cleaned, PII removed, and enriched with legal metadata. Delivered in JSON, CSV, or
+                  Parquet
+                  for immediate integration into your internal AI models or academic research systems.<br><br>
+                  NOTE: The entries provided in the sample dataset may change, so keep checking back for updates, and
+                  grow your dataset for FREE!
                 </p>
+                <div class="product-status"
+                  style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
+                  <span class="status-dot"
+                    style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
+                  Dataset updated on 2026/06/05
+                </div>
               </div>
-
               <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
                 @click="openModal('sample-dataset')">
                 <span>Download Free Sample</span>
@@ -352,15 +360,22 @@ onUnmounted(() => {
                 </div>
 
                 <h3 class="card-title" style="margin-top: 16px;">
-                  Analytics Dashboard (Level 2)
+                  Analytics Dashboard <br> (Level 2)
                 </h3>
                 <p class="card-desc">
-                  Built for law firms and HR enterprises requiring macro insights with zero technical setup. Track
-                  judicial trends, average trial durations, specific law firm win/loss ratios, and industry risk surges
-                  in a responsive, interactive visual environment.
+                  Built for law firms, HR departments or anyone requiring macro insights with zero technical setup.
+                  Track
+                  judicial trends, average trial durations, win/loss ratios across various metrics, and industry risk
+                  surges in a responsive, interactive visual environment.<br><br>
+                  NOTE: Dashboard metrics are built using the data from the sample dataset.
                 </p>
+                <div class="product-status"
+                  style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
+                  <span class="status-dot"
+                    style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
+                  Dataset updated on 2026/06/05
+                </div>
               </div>
-
               <button type="button" class="btn btn-primary dashboard-trigger-btn btn-align-bottom"
                 @click="goToDashboard">
                 <span>View Demo Dashboard</span>
@@ -431,20 +446,24 @@ onUnmounted(() => {
                     </div>
                   </div>
                 </div>
-
-                <h3 class="card-title" style="margin-top: 48px;">
-                  Custom Proprietary Pipelines (Level 3)
+                <div class="compliance-badge">
+                  <i class="ph-fill ph-shield-check"></i>
+                  <span>POPIA Compliant Processing</span>
+                </div>
+                <h3 class="card-title" style="margin-top: 16px;">
+                  Custom Proprietary Pipelines <br> (Level 3)
                 </h3>
                 <p class="card-desc">
                   Stop losing sleep over structural shifts in government websites. We act as your outsourced data
-                  engineering team. We build, maintain, and stream automated legal feeds directly into your internal
-                  systems (iManage, Salesforce, SQL) with custom rule-based alerting and absolute exclusivity.
+                  engineering team. We build and maintain the pipeline to meet your requirements. And ensure that it
+                  streams automated
+                  data feeds directly into your internal
+                  systems (SQL, PowerBI, etc.), with custom rule-based alerting and absolute data sovereignty.
                 </p>
               </div>
-
               <button type="button" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
                 @click="openModal('level3-pipeline')">
-                <span>Speak with an Architect</span>
+                <span>Speak with an Engineer</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-user-gear"></i>
                 </div>
@@ -463,11 +482,12 @@ onUnmounted(() => {
                   <i class="ph-light ph-git-pull-request"></i>
                 </div>
                 <h3 class="card-title">
-                  Don’t see your jurisdiction? Request a Pipeline.
+                  Don’t see your jurisdiction or industry? Request a Pipeline.
                 </h3>
                 <p class="card-desc">
                   We are actively expanding our public data catalog. If your firm requires a specific court registry,
-                  regulatory body, or public record dataset, submit a request. If the source passes our technical and
+                  regulatory body, public record dataset, or more industry related meta data, submit a request. If the
+                  source passes our technical and
                   market viability checks, we build the pipeline at zero setup cost to you and add it to our public data
                   store.
                 </p>
@@ -550,18 +570,18 @@ onUnmounted(() => {
               <div class="card-icon">
                 <i class="ph-light ph-shopping-bag"></i>
               </div>
-              <h3 class="card-title">Sovereign Hardware Store</h3>
+              <h3 class="card-title">Smart Home & IoT Hardware Shop</h3>
               <p class="card-desc">
-                We are engineering open-standard, self-contained smart home controllers and stocking components to power
-                your self-hosting journey without vendor lock-in.
+                To support our blueprints, we are building an online shop, which will stock only open-standard, smart
+                home, IoT and other components.
               </p>
               <div class="product-status"
                 style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
                 <span class="status-dot"
                   style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
-                Store Launching Soon
+                Shop Launching Soon! Join the Waitlist to get notified...
               </div>
-              <button type="button" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
+              <button type="button" id="waitlist-submit" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
                 @click="openModal('consumer-hardware')">
                 <span>Join the Waitlist</span>
                 <div class="btn-icon">
@@ -792,11 +812,10 @@ onUnmounted(() => {
                     <label for="division">What are you interested in?</label>
                     <select id="division" name="division" required v-model="form.division">
                       <option value="" disabled selected>Choose an option...</option>
-                      <option value="sample-dataset">Request Sample Dataset (Level 1)</option>
-                      <option value="dashboard-demo">Book Dashboard Demo (Level 2)</option>
                       <option value="level3-pipeline">Request a Level 3 Custom Pipeline</option>
-                      <option value="pipeline-request">Submit a Source Request (Roadmap)</option>
+                      <option value="dataset-request">Request a Level 1 & 2 Dataset</option>
                       <option value="consumer-hardware">Consumer DIY Hardware & Labs</option>
+                      <option value="shop-waitlist">Join the Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
                     </select>
                   </div>
@@ -872,19 +891,6 @@ onUnmounted(() => {
 .home-page-container *::before,
 .home-page-container *::after {
   box-sizing: border-box;
-}
-
-.home-page-container .contact-section h2,
-.home-page-container .contact-section p,
-.home-page-container .contact-section form,
-.home-page-container .contact-section .form-group,
-.home-page-container .contact-section label,
-.home-page-container .contact-section input,
-.home-page-container .contact-section textarea,
-.home-page-container .contact-section select,
-.home-page-container .contact-section button {
-  margin: 0;
-  padding: 0;
 }
 
 :global(html.home-page-active),

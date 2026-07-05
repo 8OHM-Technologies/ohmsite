@@ -40,7 +40,7 @@ const submit = () => {
             <div class="relative z-10 p-20 flex flex-col justify-between w-full h-full">
                 <!-- Logo -->
                 <Link :href="route('home')">
-                    <img src="/assets/images/8OHM_Logo_border.webp" alt="Logo" class="h-12" />
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-12" />
                 </Link>
                 <div class="h-10"></div>
 

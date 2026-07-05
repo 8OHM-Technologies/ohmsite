@@ -108,7 +108,7 @@ const submit = () => {
 
             <!-- Brand Footer -->
             <div class="mt-12 text-center opacity-20">
-                <img src="/assets/images/8OHM_Logo_border.webp" class="h-6 mx-auto grayscale invert" />
+                <img src="/assets/images/8OHM_Logo.webp" class="h-6 mx-auto grayscale invert" />
             </div>
         </div>
     </div>
