@@ -18,6 +18,7 @@ import {
     Grid,
     Info
 } from 'lucide-vue-next';
+import { PhMusicNote, PhQuestion, PhToolbox } from '@phosphor-icons/vue';
 
 const props = defineProps({
     auth: Object,
@@ -42,7 +43,7 @@ const handleScroll = () => {
     scrollProgress.value = Math.min(scrollY / 200, 1);
 
     if (route().current('home')) {
-        const sections = ['home', 'philosophy', 'consumer', 'b2b', 'shop.index', 'contact'];
+        const sections = ['home', 'b2b', 'consultancy', 'consumer', 'philosophy', 'faq', 'contact'];
         for (const section of sections) {
             const el = document.getElementById(section);
             if (el) {
@@ -59,9 +60,10 @@ const handleScroll = () => {
 const navLinks = [
     { name: 'Home', id: 'home', type: 'route', icon: Home },
     { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
-    { name: 'DIY Smart Home Ecosystems', id: 'consumer', type: 'anchor', icon: Home },
-    { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: Info },
-    { name: 'Enquire Now', id: 'contact', type: 'anchor', icon: Star },
+    { name: 'DIY Smart Homes', id: 'consumer', type: 'anchor', icon: PhToolbox },
+    { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: PhMusicNote },
+    { name: 'FAQ', id: 'faq', type: 'anchor', icon: PhQuestion },
+    { name: 'Contact', id: 'contact', type: 'anchor', icon: Star },
 ];
 
 onMounted(() => {
@@ -87,6 +89,9 @@ const isLinkActive = (link) => {
         return route().current(link.id);
     }
     if (link.type === 'anchor' && route().current('home')) {
+        if (link.id === 'b2b' && activeSection.value === 'consultancy') {
+            return true;
+        }
         return activeSection.value === link.id;
     }
     return false;
@@ -187,7 +192,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -251,7 +256,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
@@ -261,7 +266,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </a>

@@ -3,6 +3,85 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Navbar from '@/Components/Navbar.vue'
 
+const frequencies = [
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'annually', label: 'Annually' },
+]
+const tiers = [
+  {
+    name: 'Basic',
+    id: 'tier-basic',
+    href: '#',
+    featured: false,
+    description: 'Raw data access. Get 20+ years of historical South African legal records and our real-time feed API. Receive pre-cleaned, POPIA-compliant court cases and decisions directly into your database. No dashboards or analytics included.',
+    price: { monthly: 'R699', annually: 'R6,999' },
+    highlights: [
+      '20+ Years of Historical Legal data',
+      'Real-time feed of new court cases and decisions',
+      'Access to our Knowledge Base',
+      'Standard Helpdesk Ticket Support',
+      'POPIA Compliant Data Entries'
+    ],
+  },
+  {
+    name: 'Complete',
+    id: 'tier-complete',
+    href: '#',
+    featured: true,
+    description: 'For teams requiring access to advanced analytics and trend analysis. Use our interactive Analytics Dashboard to track judicial trends, average trial durations, win/loss ratios, and litigation risk surges.',
+    price: { monthly: 'R3,499', annually: 'R34,990' },
+    highlights: [
+      'Includes everything from Basic plus...',
+      'Access to our Analytics Dashboard',
+      'Expanded API Endpoint Catalogue including analytics',
+      'Priority Helpdesk Ticket Support',
+      'POPIA Compliant Data Entries',
+    ],
+  },
+  {
+    name: 'Custom',
+    id: 'tier-custom',
+    href: '#',
+    featured: false,
+    description: 'Your outsourced data engineering team. We design, build, and maintain custom ingestion pipelines, custom API endpoints, and bespoke reporting dashboards tailored to your specific enterprise requirements.',
+    price: { monthly: 'Enquire', annually: 'Enquire' },
+    highlights: [
+      'Custom On-premises or Cloud Infrastructure',
+      'Private AI model deployments (LLMs) for sensitive data processing',
+      'Direct data feeds into your existing business systems'
+    ],
+  },
+]
+const sections = [
+  {
+    name: 'Features',
+    features: [
+      { name: 'Edge content delivery', tiers: { Basic: true, Complete: true, Scale: true } },
+      { name: 'Custom domains', tiers: { Basic: '1', Complete: '3', Scale: 'Unlimited' } },
+      { name: 'Team members', tiers: { Basic: '3', Complete: '20', Scale: 'Unlimited' } },
+      { name: 'Single sign-on (SSO)', tiers: { Basic: false, Complete: false, Scale: true } },
+    ],
+  },
+  {
+    name: 'Reporting',
+    features: [
+      { name: 'Data insights and Analytics', tiers: { Basic: true, Complete: true, Scale: true } },
+      { name: 'Automated reports', tiers: { Basic: false, Complete: true, Scale: true } },
+    ],
+  },
+  {
+    name: 'Support',
+    features: [
+      { name: '24/7 online support', tiers: { Basic: true, Complete: true, Scale: true } },
+      { name: 'Quarterly workshops', tiers: { Basic: false, Complete: true, Scale: true } },
+      { name: 'Priority phone support', tiers: { Basic: false, Complete: false, Scale: true } },
+      { name: '1:1 onboarding tour', tiers: { Basic: false, Complete: false, Scale: true } },
+    ],
+  },
+]
+
+const frequency = ref(frequencies[0])
+
 const props = defineProps({
   heroProducts: Array,
   brands: Array,
@@ -28,28 +107,6 @@ const orb1 = ref(null)
 const orb2 = ref(null)
 const orb3 = ref(null)
 let revealObserver = null
-
-const openModal = (division = '') => {
-  formError.value = ''
-  showSuccess.value = false
-
-  if (division) {
-    if (division === 'architecture') {
-      form.division = 'level3-pipeline'
-    } else if (division === 'coeus') {
-      form.division = 'sample-dataset'
-    } else if (division === 'consumer') {
-      form.division = 'consumer-hardware'
-    } else {
-      form.division = division
-    }
-  }
-
-  const contactSection = document.getElementById('contact')
-  if (contactSection) {
-    contactSection.scrollIntoView({ behavior: 'smooth' })
-  }
-}
 
 const resetForm = () => {
   showSuccess.value = false
@@ -100,8 +157,6 @@ const goToDashboard = () => {
   window.location.href = '/dashboard/index.html'
 }
 
-// Keyboard handler removed
-
 const handleMouseMove = (e) => {
   const x = e.clientX / window.innerWidth
   const y = e.clientY / window.innerHeight
@@ -119,7 +174,7 @@ const handleMouseMove = (e) => {
 const checkHashAndParams = () => {
   const params = new URLSearchParams(window.location.search)
   if (params.get('contact') === 'true' || window.location.hash === '#contact' || window.location.hash === '#enquire') {
-    openModal()
+    //Go to page location
   }
 }
 
@@ -187,31 +242,30 @@ onUnmounted(() => {
     <main>
       <section class="hero container" id="home">
         <div class="eyebrow-badge reveal-item">
-          <span class="eyebrow-dot" style="background: #ff5f56; box-shadow: 0 0 8px #ff5f56;"></span>
-          <span class="eyebrow-text">South African Labour & Employment Law</span>
+          <span class="eyebrow-dot"></span>
+          <span class="eyebrow-text">Data Engineering</span>
         </div>
 
         <h1 class="hero-title reveal-item">
-          Turn Fragmented Legal Data<br />
+          Turn Fragmented Data<br />
           <span class="gradient-text">into Analytical Advantage</span>
         </h1>
 
         <p class="hero-tagline reveal-item">
-          South African public data sources are notoriously unstable. We absorb the operational risk of scraping,
-          cleaning, and structuring records from the CCMA, Labour Courts, and High Courts. Get continuous,
-          POPIA-compliant data feeds delivered directly into your models, or access macro-trends via our interactive
-          dashboards.
+          South African public data sources are notoriously unstable and difficult to extract. We handle the extraction,
+          cleaning, and structuring of public records from the CCMA, Labour Courts, and StatsSA. Get reliable,
+          POPIA-compliant data feeds directly via API or track judicial trends using our Analytics Dashboard.
         </p>
 
         <div class="cta-group reveal-item">
-          <a href="#level1" class="btn btn-primary">
-            <span>Browse the Data Store</span>
+          <a href="#b2b" class="btn btn-primary">
+            <span>Get Started</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>
           </a>
-          <a href="#level2" class="btn btn-secondary">
-            <span>Book a Dashboard Demo</span>
+          <a href="#" class="btn btn-secondary">
+            <span>View Demo Dashboard</span>
             <div class="btn-icon">
               <i class="ph-light ph-presentation"></i>
             </div>
@@ -221,7 +275,7 @@ onUnmounted(() => {
         <!-- Trust & Provenance Banner -->
         <div class="trust-banner container reveal-item" id="trust-banner">
           <div class="trust-banner-inner">
-            <span class="trust-title">Ingesting From Various Public Jurisdictions & Registries:</span>
+            <span class="trust-title">Ingesting From The Following Public Sources:</span>
             <div class="trust-logos">
               <div class="trust-logo-item">
                 <i class="ph-light ph-scales"></i>
@@ -240,238 +294,175 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division">
+      <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division Pricing">
         <div class="section-header">
           <div class="eyebrow-badge secondary">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">B2B Legal Data Services</span>
+            <span class="eyebrow-text">Pricing</span>
           </div>
           <h2 class="section-title">
             Flexible Delivery for Legal, HR, and Compliance Teams
           </h2>
           <p class="section-subtitle">
-            Skip the manual research. Get structured South African public legal data delivered via high-speed feeds or
-            explore trends visually.
+            Skip the manual research. Get structured South African public legal data delivered via API data feeds or
+            explore trends visually using the dashboard.
           </p>
         </div>
-
         <div class="bento-grid">
-          <!-- Card 1: Level 1 -->
-          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level1">
-            <div class="bezel-card-inner"
-              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px;">
-              <div>
-                <div class="card-visual-wrapper">
-                  <div class="mock-diagram-compact">
-                    <div class="mock-header">
-                      <span class="mock-dot red"></span>
-                      <span class="mock-dot yellow"></span>
-                      <span class="mock-dot green"></span>
-                      <span class="mock-title">judgement_parsed.json</span>
-                    </div>
-                    <pre class="mock-code-compact"><code>{
-  <span class="yaml-key">"court"</span>: <span class="yaml-val">"Labour Court"</span>,
-  <span class="yaml-key">"case_number"</span>: <span class="yaml-val">"JS869/2022"</span>,
-  <span class="yaml-key">"reportable"</span>: <span class="yaml-val">"Yes"</span>,
-  <span class="yaml-key">"subjects"</span>: <span class="yaml-val">"Labour > Dismissal"</span>,
-  <span class="yaml-key">"result"</span>: <span class="yaml-val">"Dismissed with costs"</span>
-}</code></pre>
-                  </div>
-                </div>
+          <div class="bezel-card-outer col-span-12 reveal-item">
+            <div class="bezel-card-inner">
 
-                <div class="compliance-badge">
-                  <i class="ph-fill ph-shield-check"></i>
-                  <span>POPIA Compliant Processing</span>
-                </div>
-
-                <h3 class="card-title" style="margin-top: 16px;">
-                  Historic Data Archives <br> (Level 1)
-                </h3>
-                <p class="card-desc">
-                  Skip the scraping and bypass broken PDFs. Get 10+ years of pristine, POPIA-compliant historic labor
-                  law data fully cleaned, PII removed, and enriched with legal metadata. Delivered in JSON, CSV, or
-                  Parquet
-                  for immediate integration into your internal AI models or academic research systems.<br><br>
-                  NOTE: The entries provided in the sample dataset may change, so keep checking back for updates, and
-                  grow your dataset for FREE!
-                </p>
-                <div class="product-status"
-                  style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
-                  <span class="status-dot"
-                    style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
-                  Dataset updated on 2026/06/05
+              <!-- Billing Frequency Toggle -->
+              <div class="pricing-toggle-wrapper">
+                <div class="pricing-toggle-container">
+                  <button v-for="option in frequencies" :key="option.value" type="button" class="pricing-toggle-btn"
+                    :class="{ active: frequency.value === option.value }" @click="frequency = option">
+                    {{ option.label }}
+                  </button>
                 </div>
               </div>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('sample-dataset')">
-                <span>Download Free Sample</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-download"></i>
-                </div>
-              </button>
-            </div>
-          </div>
 
-          <!-- Card 2: Level 2 -->
-          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level2">
-            <div class="bezel-card-inner"
-              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px;">
-              <div>
-                <div class="card-visual-wrapper">
-                  <div class="mock-chart-container">
-                    <div class="mock-header">
-                      <span class="mock-dot red"></span>
-                      <span class="mock-dot yellow"></span>
-                      <span class="mock-dot green"></span>
-                      <span class="mock-title">case_volume_by_sector.svg</span>
-                    </div>
-                    <div class="mock-chart-content">
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar" style="height: 80%">
-                          <span class="chart-tooltip">Retail: 12.8k cases</span>
-                        </div>
-                        <span class="chart-label">Retail</span>
-                      </div>
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar" style="height: 55%">
-                          <span class="chart-tooltip">Mining: 8.3k cases</span>
-                        </div>
-                        <span class="chart-label">Mining</span>
-                      </div>
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar" style="height: 65%">
-                          <span class="chart-tooltip">Mfg: 9.5k cases</span>
-                        </div>
-                        <span class="chart-label">Mfg</span>
-                      </div>
-                      <div class="chart-bar-wrapper">
-                        <div class="chart-bar" style="height: 40%">
-                          <span class="chart-tooltip">Fin: 6.2k cases</span>
-                        </div>
-                        <span class="chart-label">Fin</span>
+              <!-- Pricing Tiers Grid -->
+              <div class="pricing-grid">
+                <div v-for="tier in tiers" :key="tier.id" class="pricing-card" :class="{ featured: tier.featured }">
+                  <div class="pricing-card-header">
+                    <h3 :id="tier.id" class="pricing-tier-name">{{ tier.name }}</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ tier.description }}</p>
+                    <div class="pricing-price-container">
+                      <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
+                      <div class="pricing-price-period">
+                        <span class="pricing-price-currency">ZAR</span>
+                        <span>Billed {{ frequency.value }}</span>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="compliance-badge">
-                  <i class="ph-fill ph-shield-check"></i>
-                  <span>POPIA Compliant Processing</span>
-                </div>
+                  <!-- Tier Action Button -->
+                  <a :href="tier.href" :aria-describedby="tier.id" class="btn"
+                    :class="[tier.featured ? 'btn-primary ' : 'btn-secondary']"
+                    style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <span>Buy {{ tier.name }}</span>
+                    <div class="btn-icon">
+                      <i class="ph-light ph-credit-card"></i>
+                    </div>
+                  </a>
 
-                <h3 class="card-title" style="margin-top: 16px;">
-                  Analytics Dashboard <br> (Level 2)
-                </h3>
-                <p class="card-desc">
-                  Built for law firms, HR departments or anyone requiring macro insights with zero technical setup.
-                  Track
-                  judicial trends, average trial durations, win/loss ratios across various metrics, and industry risk
-                  surges in a responsive, interactive visual environment.<br><br>
-                  NOTE: Dashboard metrics are built using the data from the sample dataset.
-                </p>
-                <div class="product-status"
-                  style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
-                  <span class="status-dot"
-                    style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
-                  Dataset updated on 2026/06/05
+                  <!-- Tier Highlights -->
+                  <ul class="pricing-features-list">
+                    <li v-for="mainFeature in tier.highlights" :key="mainFeature" class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>{{ mainFeature }}</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
-              <button type="button" class="btn btn-primary dashboard-trigger-btn btn-align-bottom"
-                @click="goToDashboard">
-                <span>View Demo Dashboard</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-arrow-up-right"></i>
-                </div>
-              </button>
-            </div>
-          </div>
 
-          <!-- Card 3: Level 3 -->
-          <div class="bezel-card-outer col-span-4 reveal-item accent-glow" id="level3">
-            <div class="bezel-card-inner"
-              style="display: flex; flex-direction: column; justify-content: space-between; min-height: 580px; padding-left: 20px; padding-right: 20px;">
-              <div>
-                <div class="card-visual-wrapper" style="padding: 0;">
-                  <div class="coeus-diagram-container"
-                    style="border: none; border-radius: 16px; background: rgba(0,0,0,0.25);">
-                    <svg class="coeus-svg" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M 100 150 Q 175 240 250 240" class="flow-base" />
-                      <path d="M 100 150 Q 175 240 250 240" class="flow-path path-trigger" />
-                      <path d="M 240 240 L 240 60" class="flow-base" />
-                      <path d="M 240 240 L 240 60" class="flow-path path-solve-req" />
-                      <path d="M 260 60 L 260 240" class="flow-base" />
-                      <path d="M 260 60 L 260 240" class="flow-path path-solve-res" />
-                      <path d="M 250 240 Q 325 240 400 150" class="flow-base" />
-                      <path d="M 250 240 Q 325 240 400 150" class="flow-path path-store" />
-                    </svg>
+              <!-- Comparison Table Container -->
+              <div class="comparison-section-container">
 
-                    <div class="diagram-node" style="left: 22%; top: 50%; width: 110px; padding: 4px 6px;">
-                      <div class="node-icon" style="font-size: 0.9rem;">
-                        <i class="ph-light ph-cloud-arrow-down"></i>
-                      </div>
-                      <div class="node-content">
-                        <span class="node-title" style="font-size: 0.58rem;">Ingestion</span>
-                        <span class="node-subtitle" style="font-size: 0.48rem;">Scrapers</span>
-                      </div>
-                    </div>
+                <!-- Mobile Comparison Section -->
+                <section aria-labelledby="mobile-comparison-heading" class="lg:hidden">
+                  <h2 id="mobile-comparison-heading" class="sr-only">Feature comparison</h2>
 
-                    <div class="diagram-node node-solver" style="left: 50%; top: 22%; width: 110px; padding: 4px 6px;">
-                      <div class="node-icon" style="font-size: 0.9rem; color: var(--color-accent-secondary);">
-                        <i class="ph-light ph-brain"></i>
+                  <div class="mobile-comparison-list">
+                    <div v-for="tier in tiers" :key="tier.id" class="mobile-comparison-tier"
+                      :class="{ featured: tier.featured }">
+                      <div class="mobile-tier-header">
+                        <h3 class="mobile-tier-title">{{ tier.name }}</h3>
+                        <p class="mobile-tier-desc">{{ tier.description }}</p>
                       </div>
-                      <div class="node-content">
-                        <span class="node-title" style="font-size: 0.58rem;">AI/LLM</span>
-                        <span class="node-subtitle" style="font-size: 0.48rem;">Enrichment</span>
-                      </div>
-                    </div>
 
-                    <div class="diagram-node" style="left: 50%; top: 78%; width: 110px; padding: 4px 6px;">
-                      <div class="node-icon" style="font-size: 0.9rem;">
-                        <i class="ph-light ph-terminal-window"></i>
-                      </div>
-                      <div class="node-content">
-                        <span class="node-title" style="font-size: 0.58rem;">Processing</span>
-                        <span class="node-subtitle" style="font-size: 0.48rem;">Workers</span>
-                      </div>
-                    </div>
+                      <div class="mobile-sections-list">
+                        <div v-for="section in sections" :key="section.name" class="mobile-section-group">
+                          <h4 class="mobile-section-title">{{ section.name }}</h4>
 
-                    <div class="diagram-node" style="left: 78%; top: 50%; width: 110px; padding: 4px 6px;">
-                      <div class="node-icon" style="font-size: 0.9rem;">
-                        <i class="ph-light ph-database"></i>
-                      </div>
-                      <div class="node-content">
-                        <span class="node-title" style="font-size: 0.58rem;">Streams</span>
-                        <span class="node-subtitle" style="font-size: 0.48rem;">APIs</span>
+                          <div class="mobile-features-box" :class="{ featured: tier.featured }">
+                            <dl class="mobile-features-dl">
+                              <div v-for="feature in section.features" :key="feature.name" class="mobile-feature-row">
+                                <dt class="mobile-feature-name">{{ feature.name }}</dt>
+                                <dd class="mobile-feature-value">
+                                  <span v-if="typeof feature.tiers[tier.name] === 'string'" class="value-text"
+                                    :class="{ featured: tier.featured }">
+                                    {{ feature.tiers[tier.name] }}
+                                  </span>
+                                  <template v-else>
+                                    <i v-if="feature.tiers[tier.name] === true"
+                                      class="ph-fill ph-check-circle icon-check" aria-hidden="true"></i>
+                                    <i v-else class="ph-fill ph-x-circle icon-cross" aria-hidden="true"></i>
+                                    <span class="sr-only">{{ feature.tiers[tier.name] === true ? 'Yes' : 'No' }}</span>
+                                  </template>
+                                </dd>
+                              </div>
+                            </dl>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="compliance-badge">
-                  <i class="ph-fill ph-shield-check"></i>
-                  <span>POPIA Compliant Processing</span>
-                </div>
-                <h3 class="card-title" style="margin-top: 16px;">
-                  Custom Proprietary Pipelines <br> (Level 3)
-                </h3>
-                <p class="card-desc">
-                  Stop losing sleep over structural shifts in government websites. We act as your outsourced data
-                  engineering team. We build and maintain the pipeline to meet your requirements. And ensure that it
-                  streams automated
-                  data feeds directly into your internal
-                  systems (SQL, PowerBI, etc.), with custom rule-based alerting and absolute data sovereignty.
-                </p>
+                </section>
+
+                <!-- Desktop Comparison Section -->
+                <section aria-labelledby="comparison-heading" class="hidden lg:block">
+                  <h2 id="comparison-heading" class="sr-only">Feature comparison</h2>
+
+                  <div class="comparison-table-wrapper">
+                    <!-- Column Highlights (placed behind the table using absolute positioning) -->
+                    <div class="comparison-column-bg-container" aria-hidden="true">
+                      <div class="comparison-th-empty"></div>
+                      <div v-for="tier in tiers" :key="tier.id" class="comparison-column-bg"
+                        :class="{ featured: tier.featured }"></div>
+                    </div>
+
+                    <table class="comparison-table">
+                      <thead>
+                        <tr class="comparison-row-header">
+                          <th scope="col" class="comparison-th-empty">
+                            <span class="sr-only">Feature</span>
+                          </th>
+                          <th v-for="tier in tiers" :key="tier.id" scope="col" class="comparison-th-tier">
+                            <h3 class="pricing-tier-name"
+                              :class="{ 'text-[var(--color-accent-primary)]': tier.featured }">{{ tier.name
+                              }}</h3>
+                            <p class="card-desc-small">{{ tier.description }}</p>
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody v-for="section in sections" :key="section.name">
+                        <tr>
+                          <th colspan="4" scope="colgroup" class="comparison-section-title">
+                            {{ section.name }}
+                          </th>
+                        </tr>
+                        <tr v-for="(feature, featureIdx) in section.features" :key="feature.name"
+                          class="comparison-row">
+                          <th scope="row" class="comparison-cell-feature">
+                            {{ feature.name }}
+                            <div v-if="featureIdx !== section.features.length - 1" class="comparison-row-divider" />
+                          </th>
+                          <td v-for="tier in tiers" :key="tier.id" class="comparison-cell-value"
+                            :class="{ featured: tier.featured }">
+                            <span v-if="typeof feature.tiers[tier.name] === 'string'">
+                              {{ feature.tiers[tier.name] }}
+                            </span>
+                            <template v-else>
+                              <i v-if="feature.tiers[tier.name] === true" class="ph-fill ph-check-circle icon-check"
+                                aria-hidden="true"></i>
+                              <i v-else class="ph-fill ph-x-circle icon-cross" aria-hidden="true"></i>
+                              <span class="sr-only">{{ feature.tiers[tier.name] === true ? 'Yes' : 'No' }}</span>
+                            </template>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+
               </div>
-              <button type="button" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
-                @click="openModal('level3-pipeline')">
-                <span>Speak with an Engineer</span>
-                <div class="btn-icon">
-                  <i class="ph-light ph-user-gear"></i>
-                </div>
-              </button>
+
             </div>
           </div>
         </div>
-
         <!-- Request a Pipeline Section -->
         <div class="request-pipeline-card reveal-item" id="request-pipeline" style="margin-top: 48px;">
           <div class="bezel-card-outer col-span-12">
@@ -482,23 +473,84 @@ onUnmounted(() => {
                   <i class="ph-light ph-git-pull-request"></i>
                 </div>
                 <h3 class="card-title">
-                  Don’t see your jurisdiction or industry? Request a Pipeline.
+                  Need a specific jurisdiction, registry, or regulatory dataset? Request a Pipeline.
                 </h3>
                 <p class="card-desc">
                   We are actively expanding our public data catalog. If your firm requires a specific court registry,
-                  regulatory body, public record dataset, or more industry related meta data, submit a request. If the
-                  source passes our technical and
-                  market viability checks, we build the pipeline at zero setup cost to you and add it to our public data
+                  regulatory
+                  body, or public record database, submit a request. If it passes our viability check, we will build and
+                  maintain the pipeline at zero setup cost to you, making the structured feed available in our data
                   store.
                 </p>
-                <button type="button" class="btn btn-primary contact-trigger-btn"
-                  @click="openModal('pipeline-request')">
+                <button type="button" class="btn btn-primary contact-trigger-btn">
                   <span>Submit a Source Request</span>
                   <div class="btn-icon">
                     <i class="ph-light ph-plus"></i>
                   </div>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section container reveal-item" id="consultancy" aria-label="IT Consultancy Section">
+        <div class="section-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">IT Consultancy</span>
+          </div>
+          <h2 class="section-title">Offline-first, cloud connected, privacy-focused</h2>
+          <p class="section-subtitle">
+            We specialise in designing offline-first solutions, with a focus on privacy and data sovereignty. Ensuring
+            that
+            you stay in
+            control of your data, and only connect to the cloud when you need to.
+          </p>
+        </div>
+        <div class="bento-grid">
+          <div class="bezel-card-outer col-span-12 reveal-item">
+            <div class="bezel-card-inner">
+              <div class="card-icon">
+                <i class="ph-light ph-shield-check"></i>
+              </div>
+              <h3 class="card-title">
+                Sovereign Data Infrastructure & Custom Engineering
+              </h3>
+              <p class="card-desc">
+                We design, build, and deploy high-performance on-premises networks, custom data pipelines, and local AI
+                systems. Keep your business-critical data and intellectual property under your own roof while
+                eliminating
+                external cloud dependencies.
+              </p>
+              <ul class="card-list">
+                <li class="card-list-item">
+                  <i class="ph-light ph-brain card-list-icon"></i>
+                  <div>
+                    <strong>On-Premises AI Model Integration:</strong>
+                    Deploy secure, open-source LLMs (like Llama-3) on your own hardware. Process sensitive documents,
+                    conduct
+                    internal search, and automate workflows locally with sub-200ms response times and zero external API
+                    data
+                    leaks.
+                  </div>
+                </li>
+                <li class="card-list-item">
+                  <i class="ph-light ph-plug card-list-icon"></i>
+                  <div>
+                    <strong>Legacy Systems & IoT Retrofitting:</strong>
+                    Safely bridge legacy machinery, older alarm panels, and analog sensors directly into your
+                    self-hosted
+                    network, extending hardware lifespan without compromising network isolation.
+                  </div>
+                </li>
+              </ul>
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+                <span>Enquire Now</span>
+                <div class="btn-icon">
+                  <i class="ph-light ph-arrow-right"></i>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -555,8 +607,7 @@ onUnmounted(() => {
                   </div>
                 </li>
               </ul>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer-hardware')">
+              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom">
                 <span>Go to Ohmbase</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
@@ -575,14 +626,13 @@ onUnmounted(() => {
                 To support our blueprints, we are building an online shop, which will stock only open-standard, smart
                 home, IoT and other components.
               </p>
-              <div class="product-status"
+              <div
                 style="margin-top: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--color-accent-secondary);">
                 <span class="status-dot"
                   style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
                 Shop Launching Soon! Join the Waitlist to get notified...
               </div>
-              <button type="button" id="waitlist-submit" class="btn btn-secondary contact-trigger-btn btn-align-bottom"
-                @click="openModal('consumer-hardware')">
+              <button type="button" id="waitlist-submit" class="btn btn-secondary contact-trigger-btn btn-align-bottom">
                 <span>Join the Waitlist</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-bell"></i>
@@ -774,7 +824,7 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Enquiry</span>
+            <span class="eyebrow-text">Contact</span>
           </div>
           <h2 class="section-title section-title-large">
             Enquire Now
@@ -996,6 +1046,31 @@ onUnmounted(() => {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+:link {
+  color: var(--color-accent-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+a:visited {
+  color: var(--color-accent-primary);
+  text-decoration: underline;
+}
+
+a:active {
+  color: var(--color-accent-secondary);
+}
+
+.card-flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 60rem !important;
+}
+
+.card-footer {
+  margin-top: auto;
+}
+
 /* --- Hero Section --- */
 .hero {
   height: 100vh;
@@ -1119,7 +1194,7 @@ onUnmounted(() => {
 
 .btn-primary {
   background: var(--color-accent-primary);
-  color: #050505;
+  color: #050505 !important;
   box-shadow: 0 10px 30px rgba(255, 136, 0, 0.2);
 }
 
@@ -2153,6 +2228,413 @@ footer {
 
   .trust-logo-item {
     font-size: 0.8rem;
+  }
+}
+
+/* ── Pricing Section Styles ── */
+.pricing-toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.pricing-toggle-container {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border-outer);
+  padding: 4px;
+  border-radius: 100px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.02);
+}
+
+.pricing-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 24px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.5s var(--ease-premium);
+  outline: none;
+}
+
+.pricing-toggle-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.pricing-toggle-btn.active {
+  background: var(--color-accent-primary);
+  color: #050505;
+  box-shadow: 0 4px 15px rgba(255, 136, 0, 0.2);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.pricing-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-outer);
+  border-radius: 20px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.6s var(--ease-premium);
+  position: relative;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.02);
+}
+
+.pricing-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.pricing-card.featured {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 136, 0, 0.25);
+  box-shadow: 0 0 40px rgba(255, 136, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.03);
+}
+
+.pricing-card.featured:hover {
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 136, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.pricing-card-header {
+  margin-bottom: 24px;
+}
+
+.pricing-tier-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.pricing-card.featured .pricing-tier-name {
+  color: var(--color-accent-primary);
+}
+
+.pricing-price-container {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pricing-price-value {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.pricing-price-period {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+
+.pricing-price-currency {
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-size: 0.8rem;
+}
+
+.pricing-features-list {
+  list-style: none;
+  padding: 0;
+  margin: 32px 0 0 0;
+  border-top: 1px solid var(--color-border-outer);
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex-grow: 1;
+}
+
+.pricing-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.pricing-feature-icon {
+  color: var(--color-accent-primary);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pricing-card.featured .pricing-feature-icon {
+  color: var(--color-accent-secondary);
+}
+
+/* ── Pricing Comparison Styles ── */
+.comparison-section-container {
+  margin-top: 80px;
+  padding-top: 48px;
+  border-top: 1px solid var(--color-border-outer);
+  width: 100%;
+}
+
+.comparison-table-wrapper {
+  position: relative;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.comparison-column-bg-container {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.comparison-column-bg {
+  height: 100%;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid rgba(255, 255, 255, 0.015);
+}
+
+.comparison-column-bg.featured {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(141, 215, 218, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 32px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.comparison-th-empty {
+  width: 25%;
+}
+
+.comparison-th-tier {
+  width: 25%;
+  text-align: center;
+  padding-bottom: 24px;
+}
+
+.comparison-th-tier .pricing-tier-name {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.comparison-row-header {
+  border-bottom: 1px solid var(--color-border-outer);
+}
+
+.comparison-section-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-accent-secondary);
+  padding: 32px 0 12px 16px;
+  text-align: left;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.comparison-row {
+  transition: background-color 0.3s ease;
+}
+
+.comparison-cell-feature {
+  width: 25%;
+  padding: 16px 16px;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  position: relative;
+}
+
+.comparison-row-divider {
+  position: absolute;
+  left: 16px;
+  right: -96px;
+  bottom: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.comparison-cell-value {
+  width: 25%;
+  text-align: center;
+  padding: 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.comparison-cell-value.featured {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.comparison-cell-value .icon-check {
+  color: var(--color-accent-secondary);
+  font-size: 1.25rem;
+}
+
+.comparison-cell-value .icon-cross {
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  opacity: 0.4;
+}
+
+/* ── Mobile Comparison Styles ── */
+.mobile-comparison-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.mobile-comparison-tier {
+  border: 1px solid var(--color-border-outer);
+  border-radius: 20px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.mobile-comparison-tier.featured {
+  border-color: rgba(255, 136, 0, 0.25);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mobile-tier-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border-outer);
+  padding-bottom: 16px;
+}
+
+.mobile-tier-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.mobile-comparison-tier.featured .mobile-tier-title {
+  color: var(--color-accent-primary);
+}
+
+.mobile-tier-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.mobile-sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mobile-section-title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-accent-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.mobile-features-box {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mobile-features-box.featured {
+  border-color: rgba(255, 136, 0, 0.1);
+}
+
+.mobile-features-dl {
+  margin: 0;
+  padding: 0;
+}
+
+.mobile-feature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.mobile-feature-row:last-child {
+  border-bottom: none;
+}
+
+.mobile-feature-name {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.mobile-feature-value {
+  margin: 0;
+}
+
+.mobile-feature-value .value-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.mobile-feature-value .value-text.featured {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.mobile-feature-value .icon-check {
+  color: var(--color-accent-secondary);
+  font-size: 1.1rem;
+}
+
+.mobile-feature-value .icon-cross {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  opacity: 0.4;
+}
+
+/* ── Responsive adjustments ── */
+@media (max-width: 1024px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 </style>
