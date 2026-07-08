@@ -420,11 +420,17 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Default for Pro & Managed Data Pipeline -->
-                    <div v-else class="pricing-price-container">
-                      <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
-                      <div class="pricing-price-period">
-                        <span class="pricing-price-currency">ZAR</span>
-                        <span>Billed {{ frequency.value }}</span>
+                    <div v-else class="developer-pricing-options">
+                      <div class="developer-pricing-option active" style="cursor: default;">
+                        <div class="pricing-price-container">
+                          <span v-if="tier.name === 'Managed Data Pipeline'" style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">starting at</span>
+                          <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
+                          <div class="pricing-price-period">
+                            <span class="pricing-price-currency">ZAR</span>
+                            <span>Billed {{ frequency.value }}</span>
+                          </div>
+                        </div>
+                        <span class="developer-pricing-label">{{ tier.name === 'Pro Dashboard' ? 'Full Dashboard Access' : 'Custom Implementation' }}</span>
                       </div>
                     </div>
                   </div>
@@ -445,7 +451,7 @@ onUnmounted(() => {
                     <a v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
-                      <span>Subscribe to {{ tier.name }}</span>
+                      <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
