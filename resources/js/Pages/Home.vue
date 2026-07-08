@@ -5,7 +5,7 @@ import Navbar from '@/Components/Navbar.vue'
 
 const frequencies = [
   { value: 'monthly', label: 'Monthly' },
-  { value: 'annually', label: 'Annually' },
+  { value: 'annually', label: 'Annually (Save 17%)' },
 ]
 const tiers = [
   {
@@ -50,7 +50,7 @@ const tiers = [
     href: '#',
     featured: false,
     description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
-    price: { monthly: 'R14,999', annually: 'R140,990' },
+    price: { monthly: 'R14,999', annually: 'R149,999' },
     highlights: [
       'Deployed on your own on-premises or cloud infrastructure',
       'Custom web scraping and ETL data engineering',
@@ -320,7 +320,7 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge secondary">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Datasets Pricing</span>
+            <span class="eyebrow-text">Data Solutions and IT Consulting</span>
           </div>
           <h2 class="section-title">
             SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals
@@ -505,19 +505,6 @@ onUnmounted(() => {
 
             </div>
           </div>
-        </div>
-      </section>
-
-      <section class="features-section container reveal-item" id="services2" aria-label="">
-        <div class="section-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Data Solutions and IT Consultancy</span>
-          </div>
-          <h2 class="section-title"></h2>
-          <p class="section-subtitle">
-
-          </p>
         </div>
         <div class="bento-grid">
           <div class="bezel-card-outer col-span-12 reveal-item">
@@ -829,7 +816,7 @@ onUnmounted(() => {
               <p class="faq-answer">
                 Both share our core philosophy of digital sovereignty. OhmBase is our open-source initiative empowering
                 individuals to self-host secure smart homes, while our business division delivers professional-grade
-                public data pipelines and IT consultancy.
+                public data pipelines and IT consulting.
               </p>
             </div>
           </div>
@@ -863,7 +850,7 @@ onUnmounted(() => {
 
                   <div class="form-row">
                     <div class="form-group">
-                      <label for="name">What do we call you?</label>
+                      <label for="name">Your name?</label>
                       <input type="text" id="name" name="name" required placeholder="John Doe" v-model="form.name" />
                     </div>
 
@@ -1734,8 +1721,8 @@ footer {
 }
 
 .contact-grid {
-  max-width: 600px;
-  margin: 40px auto 0;
+  max-width: 800px;
+  margin: 40px auto 40px;
   width: 100%;
 }
 

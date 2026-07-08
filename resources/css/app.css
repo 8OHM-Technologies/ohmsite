@@ -13,6 +13,41 @@
 @import "flyonui/src/vendor/waves.css";
 @import "flyonui/src/vendor/apexcharts.css";
 
+@plugin "flyonui/theme" {
+    name: "8OHM Dashboard Dark";
+    default: false;
+    prefersdark: false;
+    color-scheme: "dark";
+    --color-base-100: oklch(25.33% 0.016 252.42);
+    --color-base-200: oklch(23.26% 0.014 253.1);
+    --color-base-300: oklch(21.15% 0.012 254.09);
+    --color-base-content: oklch(97.807% 0.029 256.847);
+    --color-primary: #ff8800;
+    --color-primary-content: oklch(14% 0.004 49.25);
+    --color-secondary: #8dd7da;
+    --color-secondary-content: oklch(94% 0.028 342.258);
+    --color-accent: #ff8800;
+    --color-accent-content: oklch(14% 0.004 49.25);
+    --color-neutral: oklch(14% 0.005 285.823);
+    --color-neutral-content: oklch(92% 0.004 286.32);
+    --color-info: oklch(74% 0.16 232.661);
+    --color-info-content: oklch(14% 0.004 49.25);
+    --color-success: oklch(59% 0.145 163.225);
+    --color-success-content: oklch(14% 0.004 49.25);
+    --color-warning: oklch(82% 0.189 84.429);
+    --color-warning-content: oklch(14% 0.004 49.25);
+    --color-error: oklch(57% 0.245 27.325);
+    --color-error-content: oklch(14% 0.004 49.25);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
 /* ── Font Face Declarations ── */
 @font-face {
     font-family: 'Argentum Sans';
@@ -38,7 +73,7 @@
 
     --color-admin-sidebar: #0F0F10;
     --color-admin-main: #09090B;
-    --color-admin-accent: #8dd7da;
+    --color-admin-accent: #ff8800;
     --color-admin-modern: #ff8800;
 
     --breakpoint-nav: 1436px;
@@ -48,7 +83,7 @@ html {
     scroll-behavior: smooth;
 }
 
-/* ── OHMSite Landing Page Design Tokens ── */
+/* ── 8OHM.co.za Global Styles ── */
 :root {
     --color-brand: #ff8800;
 
