@@ -43,7 +43,7 @@ const handleScroll = () => {
     scrollProgress.value = Math.min(scrollY / 200, 1);
 
     if (route().current('home')) {
-        const sections = ['home', 'b2b', 'consultancy', 'consumer', 'philosophy', 'faq', 'contact'];
+        const sections = ['home', 'services', 'philosophy', 'ohmbase', 'faq', 'contact'];
         for (const section of sections) {
             const el = document.getElementById(section);
             if (el) {
@@ -58,10 +58,10 @@ const handleScroll = () => {
 };
 
 const navLinks = [
-    { name: 'Home', id: 'home', type: 'route', icon: Home },
-    { name: 'B2B Services', id: 'b2b', type: 'anchor', icon: Grid },
-    { name: 'DIY Smart Homes', id: 'consumer', type: 'anchor', icon: PhToolbox },
+    { name: 'Home', id: 'home', type: 'anchor', icon: Home },
+    { name: 'Services', id: 'services', type: 'anchor', icon: Grid },
     { name: 'Our Philosophy', id: 'philosophy', type: 'anchor', icon: PhMusicNote },
+    { name: 'OhmBase', id: 'ohmbase', type: 'anchor', icon: PhToolbox },
     { name: 'FAQ', id: 'faq', type: 'anchor', icon: PhQuestion },
     { name: 'Contact', id: 'contact', type: 'anchor', icon: Star },
 ];
@@ -89,9 +89,6 @@ const isLinkActive = (link) => {
         return route().current(link.id);
     }
     if (link.type === 'anchor' && route().current('home')) {
-        if (link.id === 'b2b' && activeSection.value === 'consultancy') {
-            return true;
-        }
         return activeSection.value === link.id;
     }
     return false;

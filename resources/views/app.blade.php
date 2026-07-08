@@ -12,7 +12,7 @@
         <link rel="manifest" href="{{ asset('assets/images/manifest.json') }}">
 
             <!-- Open Graph / Facebook -->
-            <meta property="og:type" content="website">
+        <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="{{ config('app.name', 'Projektii') }}">
         <meta property="og:description" content="E-Commerce SaaS Platform for premium footwear.">

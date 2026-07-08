@@ -9,86 +9,133 @@ const frequencies = [
 ]
 const tiers = [
   {
-    name: 'Basic',
-    id: 'tier-basic',
+    name: 'Developer API',
+    id: 'tier-developer',
     href: '#',
     featured: false,
-    description: 'Raw data access. Get 20+ years of historical South African legal records and our real-time feed API. Receive pre-cleaned, POPIA-compliant court cases and decisions directly into your database. No dashboards or analytics included.',
-    price: { monthly: 'R699', annually: 'R6,999' },
+    description: 'Power your custom applications or train AI models with direct access to our structured legal dataset feed. Includes 20+ years of historical cases and active live updates.',
+    price: { monthly: 'R399', annually: 'R3,999' },
+    onceOffPrice: 'R4,999',
     highlights: [
-      '20+ Years of Historical Legal data',
-      'Real-time feed of new court cases and decisions',
-      'Access to our Knowledge Base',
+      '20+ Years of Historical Legal Data',
+      'Live API access to new court cases and decisions',
+      'Structured JSON payloads & REST endpoints',
+      'Standard rate limits (1000 req/month)',
+      'Standard rates on new datasets',
       'Standard Helpdesk Ticket Support',
-      'POPIA Compliant Data Entries'
+      'POPIA Compliant Data Entries',
     ],
   },
   {
-    name: 'Complete',
-    id: 'tier-complete',
+    name: 'Pro Dashboard',
+    id: 'tier-pro',
     href: '#',
     featured: true,
-    description: 'For teams requiring access to advanced analytics and trend analysis. Use our interactive Analytics Dashboard to track judicial trends, average trial durations, win/loss ratios, and litigation risk surges.',
+    description: 'No code required. Access to the Legal Dataset through our interactive analytics dashboard. Includes standard API access and unlimited access to the archive dataset.',
     price: { monthly: 'R3,499', annually: 'R34,990' },
     highlights: [
-      'Includes everything from Basic plus...',
-      'Access to our Analytics Dashboard',
-      'Expanded API Endpoint Catalogue including analytics',
+      'Includes all Developer API features',
+      'No-code Interactive Analytics Dashboard',
+      'Visual trend analysis & CSV/Excel exports',
+      'Expanded API Endpoint Catalogue',
+      'Access new Datasets as Add-ons to your Pro Dashboard',
       'Priority Helpdesk Ticket Support',
       'POPIA Compliant Data Entries',
     ],
   },
   {
-    name: 'Custom',
-    id: 'tier-custom',
+    name: 'Managed Data Pipeline',
+    id: 'tier-pipeline',
     href: '#',
     featured: false,
-    description: 'Your outsourced data engineering team. We design, build, and maintain custom ingestion pipelines, custom API endpoints, and bespoke reporting dashboards tailored to your specific enterprise requirements.',
-    price: { monthly: 'Enquire', annually: 'Enquire' },
+    description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
+    price: { monthly: 'R14,999', annually: 'R140,990' },
     highlights: [
-      'Custom On-premises or Cloud Infrastructure',
-      'Private AI model deployments (LLMs) for sensitive data processing',
-      'Direct data feeds into your existing business systems'
+      'Includes all Pro Dashboard features',
+      'Deployed on your own on-premises or cloud infrastructure',
+      'Custom web scraping and ETL data engineering',
+      'Private AI models (LLMs) & secure processing for sensitive data',
+      'Direct influence over our data product roadmap',
+      '24/7 Dedicated Priority Support & SLA',
+      'POPIA Compliant Data Entries',
     ],
   },
-]
+];
+
+const roadmap = [
+  {
+    status: 'Live',
+    date: 'Current',
+    title: 'CCMA Arbitration Awards',
+    description: 'Over 20 years of sanitized, structured CCMA awards with daily live updates.',
+    icon: 'ph-check-circle',
+    iconClass: 'text-green-500'
+  },
+  {
+    status: 'Beta',
+    date: 'Q3 2026',
+    title: 'South African Labour Courts',
+    description: 'Comprehensive judgments from the Labour Court and Labour Appeal Court.',
+    icon: 'ph-spinner',
+    iconClass: 'text-blue-500'
+  },
+  {
+    status: 'Upcoming',
+    date: 'Q4 2026',
+    title: 'South African High Courts',
+    description: 'Comprehensive judgments from the High Court and Supreme Court of Appeal.',
+    icon: 'ph-calendar-blank',
+    iconClass: 'text-orange-500'
+  },
+  {
+    status: 'Planned',
+    date: 'Q1 2027',
+    title: 'Constitutional Court',
+    description: 'Comprehensive judgments from the Constitutional Court',
+    icon: 'ph-rocket-launch',
+    iconClass: 'text-purple-500'
+  },
+  {
+    status: 'Planned',
+    date: 'Q2 2027',
+    title: 'Tribunals and Other Courts',
+    description: 'Comprehensive judgments from the various SA Tribunals, as well as smaller courts like the Equality, Electoral and Tax Courts.',
+    icon: 'ph-rocket-launch',
+    iconClass: 'text-purple-500'
+  }
+];
 const sections = [
   {
     name: 'Features',
     features: [
-      { name: 'Edge content delivery', tiers: { Basic: true, Complete: true, Scale: true } },
-      { name: 'Custom domains', tiers: { Basic: '1', Complete: '3', Scale: 'Unlimited' } },
-      { name: 'Team members', tiers: { Basic: '3', Complete: '20', Scale: 'Unlimited' } },
-      { name: 'Single sign-on (SSO)', tiers: { Basic: false, Complete: false, Scale: true } },
+      { name: 'Historical CCMA/Labour Court Judgement Data', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Live CCMA/Labour Court Judgement Feed', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Analytics Dashboard', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Future Dataset Release Access', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Custom Domain & Branding', tiers: { 'Developer API': false, 'Pro Dashboard': false, 'Managed Data Pipeline': true } },
     ],
   },
   {
     name: 'Reporting',
     features: [
-      { name: 'Data insights and Analytics', tiers: { Basic: true, Complete: true, Scale: true } },
-      { name: 'Automated reports', tiers: { Basic: false, Complete: true, Scale: true } },
+      { name: 'Data insights and Analytics', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Automated reports', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
     ],
   },
   {
     name: 'Support',
     features: [
-      { name: '24/7 online support', tiers: { Basic: true, Complete: true, Scale: true } },
-      { name: 'Quarterly workshops', tiers: { Basic: false, Complete: true, Scale: true } },
-      { name: 'Priority phone support', tiers: { Basic: false, Complete: false, Scale: true } },
-      { name: '1:1 onboarding tour', tiers: { Basic: false, Complete: false, Scale: true } },
+      { name: 'Standard Helpdesk Support', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: 'Priority Helpdesk Support', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
+      { name: '24/7 Telephonic Support', tiers: { 'Developer API': false, 'Pro Dashboard': false, 'Managed Data Pipeline': true } },
     ],
   },
 ]
 
 const frequency = ref(frequencies[0])
+const developerOption = ref('subscription')
 
 const props = defineProps({
-  heroProducts: Array,
-  brands: Array,
-  categories: Array,
-  popularProducts: Array,
-  newArrivals: Array,
-  aboutUs: Object,
   auth: Object,
 });
 
@@ -243,7 +290,7 @@ onUnmounted(() => {
       <section class="hero container" id="home">
         <div class="eyebrow-badge reveal-item">
           <span class="eyebrow-dot"></span>
-          <span class="eyebrow-text">Data Engineering</span>
+          <span class="eyebrow-text">End-to-end Data Solutions</span>
         </div>
 
         <h1 class="hero-title reveal-item">
@@ -253,18 +300,20 @@ onUnmounted(() => {
 
         <p class="hero-tagline reveal-item">
           South African public data sources are notoriously unstable and difficult to extract. We handle the extraction,
-          cleaning, and structuring of public records from the CCMA, Labour Courts, and StatsSA. Get reliable,
-          POPIA-compliant data feeds directly via API or track judicial trends using our Analytics Dashboard.
+          cleaning, and structuring of public records—starting with the CCMA and Labour Courts, and expanding soon to
+          High Courts and beyond. Get reliable,
+          POPIA-compliant data feeds directly via API, track judicial trends using our Analytics Dashboard, or let us
+          build custom data pipelines for your proprietary needs.
         </p>
 
         <div class="cta-group reveal-item">
-          <a href="#b2b" class="btn btn-primary">
-            <span>Get Started</span>
+          <a href="#services" class="btn btn-primary">
+            <span>Explore Data Services</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>
           </a>
-          <a href="#" class="btn btn-secondary">
+          <a href="#demo" class="btn btn-secondary">
             <span>View Demo Dashboard</span>
             <div class="btn-icon">
               <i class="ph-light ph-presentation"></i>
@@ -294,18 +343,18 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="b2b" aria-label="B2B Division Pricing">
+      <section class="features-section container reveal-item" id="services" aria-label="Datasets Pricing">
         <div class="section-header">
           <div class="eyebrow-badge secondary">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Pricing</span>
+            <span class="eyebrow-text">Datasets Pricing</span>
           </div>
           <h2 class="section-title">
-            Flexible Delivery for Legal, HR, and Compliance Teams
+            SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals
           </h2>
           <p class="section-subtitle">
-            Skip the manual research. Get structured South African public legal data delivered via API data feeds or
-            explore trends visually using the dashboard.
+            Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon)
+            via download and API, or explore trends visually using our analytics dashboard.
           </p>
         </div>
         <div class="bento-grid">
@@ -328,7 +377,50 @@ onUnmounted(() => {
                   <div class="pricing-card-header">
                     <h3 :id="tier.id" class="pricing-tier-name">{{ tier.name }}</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">{{ tier.description }}</p>
-                    <div class="pricing-price-container">
+
+                    <!-- Dataset Selection -->
+                    <div v-if="tier.name === 'Developer API' || tier.name === 'Pro Dashboard'" class="form-group"
+                      style="margin-bottom: 20px; text-align: left;">
+                      <label :for="'dataset-' + tier.id"
+                        style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
+                        Dataset:</label>
+                      <select :id="'dataset-' + tier.id"
+                        style="width: 100%; padding: 10px 12px; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
+                        <option value="ccma" selected>CCMA/Labour Court Judgments</option>
+                      </select>
+                    </div>
+
+                    <!-- Pricing Value & Period -->
+                    <div v-if="tier.name === 'Developer API'" class="developer-pricing-options">
+                      <!-- Subscription Option -->
+                      <div class="developer-pricing-option" :class="{ active: developerOption === 'subscription' }"
+                        @click="developerOption = 'subscription'">
+                        <div class="pricing-price-container">
+                          <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
+                          <div class="pricing-price-period">
+                            <span class="pricing-price-currency">ZAR</span>
+                            <span>Billed {{ frequency.value }}</span>
+                          </div>
+                        </div>
+                        <span class="developer-pricing-label">Live API & Updates</span>
+                      </div>
+
+                      <!-- Once-off Option -->
+                      <div class="developer-pricing-option" :class="{ active: developerOption === 'once-off' }"
+                        @click="developerOption = 'once-off'">
+                        <div class="pricing-price-container">
+                          <span class="pricing-price-value">{{ tier.onceOffPrice }}</span>
+                          <div class="pricing-price-period">
+                            <span class="pricing-price-currency">ZAR</span>
+                            <span>Once-off fee</span>
+                          </div>
+                        </div>
+                        <span class="developer-pricing-label">20y Archive Download</span>
+                      </div>
+                    </div>
+
+                    <!-- Default for Pro & Managed Data Pipeline -->
+                    <div v-else class="pricing-price-container">
                       <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
                       <div class="pricing-price-period">
                         <span class="pricing-price-currency">ZAR</span>
@@ -337,175 +429,91 @@ onUnmounted(() => {
                     </div>
                   </div>
 
-                  <!-- Tier Action Button -->
-                  <a :href="tier.href" :aria-describedby="tier.id" class="btn"
-                    :class="[tier.featured ? 'btn-primary ' : 'btn-secondary']"
-                    style="width: 100%; justify-content: center; margin-top: 16px;">
-                    <span>Buy {{ tier.name }}</span>
-                    <div class="btn-icon">
-                      <i class="ph-light ph-credit-card"></i>
-                    </div>
-                  </a>
+                  <div style="margin-top: auto;">
+                    <!-- Tier Action Button -->
+                    <a v-if="tier.name === 'Developer API'"
+                      :href="developerOption === 'subscription' ? tier.href : tier.href + '-archive'"
+                      :aria-describedby="tier.id" class="btn btn-secondary"
+                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                      <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
+                        }}</span>
+                      <div class="btn-icon">
+                        <i class="ph-light"
+                          :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
+                      </div>
+                    </a>
+                    <a v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
+                      :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
+                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                      <span>Subscribe to {{ tier.name }}</span>
+                      <div class="btn-icon">
+                        <i class="ph-light"
+                          :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
+                      </div>
+                    </a>
 
-                  <!-- Tier Highlights -->
-                  <ul class="pricing-features-list">
-                    <li v-for="mainFeature in tier.highlights" :key="mainFeature" class="pricing-feature-item">
-                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                      <span>{{ mainFeature }}</span>
-                    </li>
-                  </ul>
+                    <!-- Tier Highlights -->
+                    <ul class="pricing-features-list">
+                      <li v-for="mainFeature in tier.highlights" :key="mainFeature" class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>{{ mainFeature }}</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 
-              <!-- Comparison Table Container -->
-              <div class="comparison-section-container">
+              <!-- Dataset Release Roadmap Container -->
+              <div class="roadmap-section-container"
+                style="padding-top: 2rem; border-top: 1px solid var(--border-color);">
 
-                <!-- Mobile Comparison Section -->
-                <section aria-labelledby="mobile-comparison-heading" class="lg:hidden">
-                  <h2 id="mobile-comparison-heading" class="sr-only">Feature comparison</h2>
-
-                  <div class="mobile-comparison-list">
-                    <div v-for="tier in tiers" :key="tier.id" class="mobile-comparison-tier"
-                      :class="{ featured: tier.featured }">
-                      <div class="mobile-tier-header">
-                        <h3 class="mobile-tier-title">{{ tier.name }}</h3>
-                        <p class="mobile-tier-desc">{{ tier.description }}</p>
-                      </div>
-
-                      <div class="mobile-sections-list">
-                        <div v-for="section in sections" :key="section.name" class="mobile-section-group">
-                          <h4 class="mobile-section-title">{{ section.name }}</h4>
-
-                          <div class="mobile-features-box" :class="{ featured: tier.featured }">
-                            <dl class="mobile-features-dl">
-                              <div v-for="feature in section.features" :key="feature.name" class="mobile-feature-row">
-                                <dt class="mobile-feature-name">{{ feature.name }}</dt>
-                                <dd class="mobile-feature-value">
-                                  <span v-if="typeof feature.tiers[tier.name] === 'string'" class="value-text"
-                                    :class="{ featured: tier.featured }">
-                                    {{ feature.tiers[tier.name] }}
-                                  </span>
-                                  <template v-else>
-                                    <i v-if="feature.tiers[tier.name] === true"
-                                      class="ph-fill ph-check-circle icon-check" aria-hidden="true"></i>
-                                    <i v-else class="ph-fill ph-x-circle icon-cross" aria-hidden="true"></i>
-                                    <span class="sr-only">{{ feature.tiers[tier.name] === true ? 'Yes' : 'No' }}</span>
-                                  </template>
-                                </dd>
-                              </div>
-                            </dl>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <!-- Desktop Comparison Section -->
-                <section aria-labelledby="comparison-heading" class="hidden lg:block">
-                  <h2 id="comparison-heading" class="sr-only">Feature comparison</h2>
-
-                  <div class="comparison-table-wrapper">
-                    <!-- Column Highlights (placed behind the table using absolute positioning) -->
-                    <div class="comparison-column-bg-container" aria-hidden="true">
-                      <div class="comparison-th-empty"></div>
-                      <div v-for="tier in tiers" :key="tier.id" class="comparison-column-bg"
-                        :class="{ featured: tier.featured }"></div>
-                    </div>
-
-                    <table class="comparison-table">
-                      <thead>
-                        <tr class="comparison-row-header">
-                          <th scope="col" class="comparison-th-empty">
-                            <span class="sr-only">Feature</span>
-                          </th>
-                          <th v-for="tier in tiers" :key="tier.id" scope="col" class="comparison-th-tier">
-                            <h3 class="pricing-tier-name"
-                              :class="{ 'text-[var(--color-accent-primary)]': tier.featured }">{{ tier.name
-                              }}</h3>
-                            <p class="card-desc-small">{{ tier.description }}</p>
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody v-for="section in sections" :key="section.name">
-                        <tr>
-                          <th colspan="4" scope="colgroup" class="comparison-section-title">
-                            {{ section.name }}
-                          </th>
-                        </tr>
-                        <tr v-for="(feature, featureIdx) in section.features" :key="feature.name"
-                          class="comparison-row">
-                          <th scope="row" class="comparison-cell-feature">
-                            {{ feature.name }}
-                            <div v-if="featureIdx !== section.features.length - 1" class="comparison-row-divider" />
-                          </th>
-                          <td v-for="tier in tiers" :key="tier.id" class="comparison-cell-value"
-                            :class="{ featured: tier.featured }">
-                            <span v-if="typeof feature.tiers[tier.name] === 'string'">
-                              {{ feature.tiers[tier.name] }}
-                            </span>
-                            <template v-else>
-                              <i v-if="feature.tiers[tier.name] === true" class="ph-fill ph-check-circle icon-check"
-                                aria-hidden="true"></i>
-                              <i v-else class="ph-fill ph-x-circle icon-cross" aria-hidden="true"></i>
-                              <span class="sr-only">{{ feature.tiers[tier.name] === true ? 'Yes' : 'No' }}</span>
-                            </template>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-
-              </div>
-
-            </div>
-          </div>
-        </div>
-        <!-- Request a Pipeline Section -->
-        <div class="request-pipeline-card reveal-item" id="request-pipeline" style="margin-top: 48px;">
-          <div class="bezel-card-outer col-span-12">
-            <div class="bezel-card-inner editorial-card"
-              style="padding: 40px; background: linear-gradient(180deg, #0b0e12 0%, #06080b 100%);">
-              <div class="editorial-left">
-                <div class="card-icon">
-                  <i class="ph-light ph-git-pull-request"></i>
+                <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+                  <h3 class="section-title" style="font-size: 1.5rem;">Dataset Release Roadmap</h3>
+                  <p class="section-subtitle">See what is currently available and what we are building next.</p>
                 </div>
-                <h3 class="card-title">
-                  Need a specific jurisdiction, registry, or regulatory dataset? Request a Pipeline.
-                </h3>
-                <p class="card-desc">
-                  We are actively expanding our public data catalog. If your firm requires a specific court registry,
-                  regulatory
-                  body, or public record database, submit a request. If it passes our viability check, we will build and
-                  maintain the pipeline at zero setup cost to you, making the structured feed available in our data
-                  store.
-                </p>
-                <button type="button" class="btn btn-primary contact-trigger-btn">
-                  <span>Submit a Source Request</span>
-                  <div class="btn-icon">
-                    <i class="ph-light ph-plus"></i>
+
+                <!-- Roadmap Grid -->
+                <div class="roadmap-grid"
+                  style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+
+                  <div v-for="item in roadmap" :key="item.title" class="roadmap-card"
+                    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden;">
+
+                    <!-- Status Badge -->
+                    <div class="roadmap-status-badge"
+                      style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
+                      <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
+                      <span>{{ item.status }} &bull; {{ item.date }}</span>
+                    </div>
+
+                    <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
+                      {{ item.title }}
+                    </h4>
+
+                    <p class="roadmap-desc"
+                      style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
+                      {{ item.description }}
+                    </p>
+
                   </div>
-                </button>
+
+                </div>
               </div>
+
             </div>
           </div>
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="consultancy" aria-label="IT Consultancy Section">
+      <section class="features-section container reveal-item" id="services2" aria-label="">
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">IT Consultancy</span>
+            <span class="eyebrow-text">Data Solutions and IT Consultancy</span>
           </div>
-          <h2 class="section-title">Offline-first, cloud connected, privacy-focused</h2>
+          <h2 class="section-title"></h2>
           <p class="section-subtitle">
-            We specialise in designing offline-first solutions, with a focus on privacy and data sovereignty. Ensuring
-            that
-            you stay in
-            control of your data, and only connect to the cloud when you need to.
+
           </p>
         </div>
         <div class="bento-grid">
@@ -515,33 +523,37 @@ onUnmounted(() => {
                 <i class="ph-light ph-shield-check"></i>
               </div>
               <h3 class="card-title">
-                Sovereign Data Infrastructure & Custom Engineering
+                Sovereign Data Infrastructure & Business Automation
               </h3>
               <p class="card-desc">
-                We design, build, and deploy high-performance on-premises networks, custom data pipelines, and local AI
-                systems. Keep your business-critical data and intellectual property under your own roof while
-                eliminating
-                external cloud dependencies.
+                We design, build, and deploy custom data pipelines, business , and local AI
+                automation systems using a combination of industry leading frameworks and custom software solutions.
+              </p>
+              <p class="card-desc">
+
               </p>
               <ul class="card-list">
                 <li class="card-list-item">
                   <i class="ph-light ph-brain card-list-icon"></i>
                   <div>
                     <strong>On-Premises AI Model Integration:</strong>
-                    Deploy secure, open-source LLMs (like Llama-3) on your own hardware. Process sensitive documents,
-                    conduct
-                    internal search, and automate workflows locally with sub-200ms response times and zero external API
-                    data
-                    leaks.
+                    Deploy secure, open-source LLMs (like Llama-3, Qwen) on your own hardware. Process sensitive
+                    documents,
+                    run
+                    internal document indexing and search, and automate workflows locally with zero external
+                    dependencies.
                   </div>
                 </li>
                 <li class="card-list-item">
                   <i class="ph-light ph-plug card-list-icon"></i>
                   <div>
-                    <strong>Legacy Systems & IoT Retrofitting:</strong>
-                    Safely bridge legacy machinery, older alarm panels, and analog sensors directly into your
-                    self-hosted
-                    network, extending hardware lifespan without compromising network isolation.
+                    <strong>Managed Data Acquisition & Pipelines:</strong>
+                    Build custom, automated extraction workflows tailored to your specific industry needs. Whether
+                    aggregating
+                    public web data, monitoring competitor pricing, or integrating fragmented internal databases, we
+                    handle
+                    the extraction, transformation, and secure routing of structured data directly into your private
+                    ecosystem.
                   </div>
                 </li>
               </ul>
@@ -556,16 +568,96 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="consumer" aria-label="Consumer Bento Grid">
+      <section class="features-section container reveal-item" id="philosophy" aria-label="Our Philosophy">
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Sovereign Tech Foundation</span>
+            <span class="eyebrow-text">Why Infinity Ohm?</span>
           </div>
-          <h2 class="section-title">Infinity Ohm Labs</h2>
+          <h2 class="section-title">Our Philosophy</h2>
           <p class="section-subtitle">
-            The enterprise data architectures we build are born from a radical philosophy: absolute digital sovereignty.
-            Explore our open-source blueprints and hardware store, designed to help individuals build their own
+            Strategic engineering, absolute data ownership, and open standards.
+          </p>
+        </div>
+        <div class="bento-grid">
+
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-cloud-check"></i>
+                Local-First Resilience
+              </h4>
+              <p class="card-desc-small">
+                Intelligence belongs at the edge. Our solutions prioritize local processing, privacy, and
+                offline
+                autonomy, ensuring that augmented systems remain fully operational, resilient, and independent of
+                fragile
+                cloud dependencies.
+              </p>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-git-merge"></i>
+                Ecosystem Interoperability
+              </h4>
+              <p class="card-desc-small">
+                We design and map technology infrastructure to break down the boundaries of rigid, isolated
+                tech stacks. By evaluating your complete operational footprint, we deliver custom blueprints
+                that tightly integrate legacy devices, edge intelligence, and modern cloud utilities.
+              </p>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-lock-key"></i>
+                Non-Invasive Evolution
+              </h4>
+              <p class="card-desc-small">
+                Progress shouldn't require destruction. We engineer smart retrofits that install seamlessly
+                alongside existing workflows, ensuring zero operational disruption and preserving the validated
+                mechanics of
+                proven hardware. Our translation layers ensure your legacy systems securely output the
+                structured
+                data of tomorrow.
+              </p>
+            </div>
+          </div>
+
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-recycle"></i>
+                Sustainability Through Retrofitting
+              </h4>
+              <p class="card-desc-small">
+                We actively combat the growing e-waste crisis by extending the operational lifespan of
+                existing mechanical and electrical machinery. Through modular, smart retrofitting, we
+                seamlessly inject modern digital capabilities into legacy hardware. This sustainable
+                approach eliminates the need for costly capital replacements, drastically reduces industrial
+                footprint, and proves that environmental responsibility directly drives operational
+                efficiency.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section container reveal-item" id="ohmbase" aria-label="Consumer Bento Grid">
+        <div class="section-header">
+          <div class="eyebrow-badge">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">DIY Smart Home Blueprints</span>
+          </div>
+          <h2 class="section-title">OhmBase</h2>
+          <p class="section-subtitle">
+            The business data architectures we build are born from our philosophy of absolute digital sovereignty.
+            Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build
+            their own
             self-hosted, cloud-free smart home ecosystems.
           </p>
         </div>
@@ -608,7 +700,7 @@ onUnmounted(() => {
                 </li>
               </ul>
               <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom">
-                <span>Go to Ohmbase</span>
+                <span>Launching Soon</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
                 </div>
@@ -623,7 +715,7 @@ onUnmounted(() => {
               </div>
               <h3 class="card-title">Smart Home & IoT Hardware Shop</h3>
               <p class="card-desc">
-                To support our blueprints, we are building an online shop, which will stock only open-standard, smart
+                To support our blueprints we are building an online shop, which will stock only open-standard, smart
                 home, IoT and other components.
               </p>
               <div
@@ -643,154 +735,6 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <section class="features-section container reveal-item" id="philosophy" aria-label="Our Philosophy">
-        <div class="section-header">
-          <div class="eyebrow-badge">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Why Infinity Ohm?</span>
-          </div>
-          <h2 class="section-title">Our Philosophy</h2>
-          <p class="section-subtitle">
-            Grounding both divisions in strategic engineering, absolute data ownership, and open standards.
-          </p>
-        </div>
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-6 reveal-item">
-            <div class="bezel-card-inner">
-              <h4 class="card-title-small">
-                <i class="ph-light ph-git-merge"></i>
-                Ecosystem Interoperability
-              </h4>
-              <p class="card-desc-small">
-                We design and map technology infrastructure to break down the boundaries of rigid, isolated
-                tech stacks. By evaluating your complete operational footprint, we deliver custom blueprints
-                that tightly integrate legacy devices, edge network intelligence, and modern cloud
-                utilities. By unifying these environments into a coherent, responsive system, we ensure your
-                data moves securely from local servers to the cloud, driving true operational continuity and
-                efficiency.
-              </p>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-6 reveal-item">
-            <div class="bezel-card-inner">
-              <h4 class="card-title-small">
-                <i class="ph-light ph-cloud-check"></i>
-                Diagnostic Strategic Planning
-              </h4>
-              <p class="card-desc-small">
-                Technology requires a visionary roadmap, not just superficial software installations. Every
-                engagement begins with an objective, comprehensive IT assessment designed to evaluate your
-                current digital ecosystem. We deliver highly actionable consulting reports that empower your
-                business to scale freely, protecting your operations from restrictive tech vendor lock-in.
-                Simultaneously, we fortify your digital infrastructure, ensuring your critical data is
-                completely secure, compliant, and resilient against evolving cyber threats.
-              </p>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-6 reveal-item">
-            <div class="bezel-card-inner">
-              <h4 class="card-title-small">
-                <i class="ph-light ph-lock-key"></i>
-                Enterprise Architecture & Advisory
-              </h4>
-              <p class="card-desc-small">
-                We act as your dedicated strategic engineering partner, moving far beyond high-level
-                consulting to seamlessly integrate technology directly into your business operations and
-                products. From deploying secure, on-premises enterprise AI models to conducting exhaustive
-                IT infrastructure assessments, we provide the definitive operational blueprints your
-                organization requires—and we stick around to execute them. Our hands-on advisory services
-                deliver absolute clarity on hidden technical overhead and establish long-term IT roadmaps
-                designed specifically to drive day-to-day efficiency, unlock product innovation, and
-                accelerate your commercial output.
-              </p>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-6 reveal-item">
-            <div class="bezel-card-inner">
-              <h4 class="card-title-small">
-                <i class="ph-light ph-recycle"></i>
-                Sustainability Through Retrofitting
-              </h4>
-              <p class="card-desc-small">
-                We actively combat the growing e-waste crisis by extending the operational lifespan of
-                existing mechanical and electrical machinery. Through modular, smart retrofitting, we
-                seamlessly inject modern digital capabilities into legacy hardware. This sustainable
-                approach eliminates the need for costly capital replacements, drastically reduces industrial
-                footprint, and proves that environmental responsibility directly drives operational
-                efficiency.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="features-section container reveal-item" id="roadmap" aria-label="Future Vision and Roadmap">
-        <div class="section-header">
-          <div class="eyebrow-badge secondary">
-            <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">The Infinity Roadmap</span>
-          </div>
-          <h2 class="section-title">
-            Building the Sovereign Future
-          </h2>
-          <p class="section-subtitle">
-            Our current DIY kits and enterprise data pipelines are
-            the foundation. Here is exactly where our technology is
-            heading next.
-          </p>
-        </div>
-
-        <div class="bento-grid">
-          <div class="bezel-card-outer col-span-6 reveal-item">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-cpu"></i>
-              </div>
-              <h3 class="card-title">
-                Hardware: The Sovereign Smart Home Controller
-              </h3>
-              <p class="card-desc">
-                Today, we supply hardware kits,
-                microcontrollers, and IoT components to support
-                our self-hosting guides.
-                <strong>Tomorrow, this foundation evolves into our
-                  own open-standard, all-in-one
-                  smart home controllers.</strong>
-                We are actively engineering smart devices
-                designed natively for absolute local autonomy and
-                seamless integration with your geyser, alarm system or gate motor
-                straight out of the box.
-              </p>
-            </div>
-          </div>
-
-          <div class="bezel-card-outer col-span-6 reveal-item accent-glow">
-            <div class="bezel-card-inner">
-              <div class="card-icon">
-                <i class="ph-light ph-brain"></i>
-              </div>
-              <h3 class="card-title">
-                Software: The South African Labour Law AI Assistant
-              </h3>
-              <p class="card-desc">
-                Our in-house data acquisition pipeline currently
-                ingests and structures complex South African
-                legal and labor records and court rolls.
-                <strong>Soon, this engine will power our first
-                  consumer SaaS.</strong>
-                A dedicated AI legal assistant designed
-                to empower the average South African—simplifying
-                labor laws, navigating CCMA procedures, and
-                democratizing access to justice.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="faq-section container reveal-item" id="faq" aria-label="Technical FAQs">
         <div class="section-header">
           <div class="eyebrow-badge">
@@ -802,18 +746,87 @@ onUnmounted(() => {
           </h2>
         </div>
 
-        <div class="faq-grid">
-          <div class="bezel-card-outer reveal-item">
+        <div class="bento-grid">
+          <!-- Row 1 -->
+          <div class="bezel-card-outer col-span-6 reveal-item">
             <div class="bezel-card-inner">
               <h4 class="card-title-small">
-                <i class="ph-light ph-recycle"></i>
-                How do Infinity Ohm Labs and the B2B divisions relate?
+                <i class="ph-light ph-database"></i>
+                What public data sources do you currently provide?
               </h4>
               <p class="faq-answer">
-                Both are built on the identical core philosophy: achieving true digital sovereignty through self-hosting
-                and on-premises control. Infinity Ohm Labs serves as our open-source R&D foundation, empowering
-                individuals to host their own secure ecosystems at home, while our B2B division delivers
-                enterprise-grade public data pipelines and custom data engineering.
+                Our primary focus is on South African legal and labour data. We currently provide comprehensive,
+                structured datasets from the CCMA and Labour Courts, with Bargaining Council resolutions and High Court
+                judgments on our roadmap.
+              </p>
+            </div>
+          </div>
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-shield-check"></i>
+                Is the dataset compliant with POPIA and privacy laws?
+              </h4>
+              <p class="faq-answer">
+                Yes. We apply rigorous sanitization, anonymization, and data cleaning processes to our ingestion
+                pipelines, ensuring that all structured legal datasets fully comply with the Protection of Personal
+                Information Act (POPIA).
+              </p>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-clock"></i>
+                How frequently is the API and Dashboard data updated?
+              </h4>
+              <p class="faq-answer">
+                Our data pipelines run continuously. As soon as new judgments or arbitration awards are published on
+                public portals, they are extracted, cleaned, and immediately made available through our Developer API
+                and Pro Dashboard.
+              </p>
+            </div>
+          </div>
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-code"></i>
+                Do I need to be a developer to access the datasets?
+              </h4>
+              <p class="faq-answer">
+                Not at all. While we offer a powerful Developer API for custom integrations, our Pro Dashboard provides
+                a complete no-code solution for HR and legal professionals to visually analyze trends and export data to
+                CSV or Excel.
+              </p>
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-factory"></i>
+                Can you extract custom data specific to our industry?
+              </h4>
+              <p class="faq-answer">
+                Absolutely. Through our Managed Data Pipeline tier, we design and build bespoke web scraping, data
+                extraction, and ETL workflows tailored to your operational needs, delivering structured data directly
+                into your private ecosystem.
+              </p>
+            </div>
+          </div>
+          <div class="bezel-card-outer col-span-6 reveal-item">
+            <div class="bezel-card-inner">
+              <h4 class="card-title-small">
+                <i class="ph-light ph-tree-structure"></i>
+                How do the consumer (OhmBase) and business divisions relate?
+              </h4>
+              <p class="faq-answer">
+                Both share our core philosophy of digital sovereignty. OhmBase is our open-source initiative empowering
+                individuals to self-host secure smart homes, while our business division delivers professional-grade
+                public data pipelines and IT consultancy.
               </p>
             </div>
           </div>
@@ -859,13 +872,12 @@ onUnmounted(() => {
                   </div>
 
                   <div class="form-group">
-                    <label for="division">What are you interested in?</label>
+                    <label for="division">What is it about?</label>
                     <select id="division" name="division" required v-model="form.division">
                       <option value="" disabled selected>Choose an option...</option>
-                      <option value="level3-pipeline">Request a Level 3 Custom Pipeline</option>
-                      <option value="dataset-request">Request a Level 1 & 2 Dataset</option>
-                      <option value="consumer-hardware">Consumer DIY Hardware & Labs</option>
-                      <option value="shop-waitlist">Join the Hardware Shop Waitlist</option>
+                      <option value="dataset-request">Level 1 & 2 Dataset</option>
+                      <option value="level3-pipeline">Level 3 Custom Pipeline</option>
+                      <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
                     </select>
                   </div>
@@ -943,9 +955,12 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
+:global(html.home-page-active) {
+  overflow-y: scroll;
+}
+
 :global(html.home-page-active),
 :global(body.home-page-active) {
-  overflow-y: scroll;
   scroll-snap-type: y proximity;
   scroll-padding-top: 100px;
 }
@@ -981,7 +996,7 @@ onUnmounted(() => {
 
 .section-subtitle {
   color: var(--color-text-secondary);
-  max-width: 600px;
+  max-width: 800px;
   margin: 8px auto 0;
 }
 
@@ -1174,7 +1189,7 @@ a:active {
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 8px 8px 28px;
+  padding: 25px 20px 25px 28px !important;
   border-radius: 100px;
   font-family: var(--font-body);
   font-size: 0.95rem;
@@ -1260,7 +1275,7 @@ a:active {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 24px;
-  margin-top: 48px;
+  margin-top: 2rem;
 }
 
 .col-span-12 {
@@ -1449,12 +1464,12 @@ a:active {
 
 
 
-/* --- Editorial Layout (B2B Structural Split) --- */
+/* --- Editorial Layout (Business Structural Split) --- */
 .editorial-card {
   flex-direction: row;
-  gap: 48px;
+  gap: 2rem;
   align-items: stretch;
-  padding: 48px;
+  padding: 2rem;
   background: linear-gradient(180deg, #0b0e12 0%, #06080b 100%);
 }
 
@@ -1689,18 +1704,6 @@ a:active {
   scroll-snap-stop: always;
 }
 
-.faq-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  text-align: left;
-  margin-top: 40px;
-}
-
-.faq-grid .bezel-card-inner {
-  padding: 32px;
-}
-
 .faq-answer {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
@@ -1727,9 +1730,9 @@ footer {
 
 /* --- Contact Section --- */
 .contact-section {
+  padding-top: 2rem;
   height: 100%;
   width: 100%;
-  padding-bottom: 6rem;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -1793,7 +1796,7 @@ footer {
   background-repeat: no-repeat;
   background-position: right 20px center;
   background-size: 14px;
-  padding-right: 48px;
+  padding-right: 2rem;
 }
 
 .form-group select option {
@@ -1894,11 +1897,6 @@ footer {
   .col-span-5,
   .col-span-4 {
     grid-column: span 1 !important;
-  }
-
-  .faq-grid {
-    grid-template-columns: 1fr !important;
-    gap: 24px !important;
   }
 
   .bezel-card-inner {
@@ -2358,6 +2356,73 @@ footer {
   font-size: 0.8rem;
 }
 
+/* ── Developer Pricing Sub-options ── */
+.developer-pricing-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.developer-pricing-option {
+  border: 1px solid var(--color-border-outer);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-premium);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  text-align: left;
+}
+
+.developer-pricing-option:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.developer-pricing-option.active {
+  border-color: var(--color-accent-primary);
+  background: rgba(255, 136, 0, 0.03);
+  box-shadow: 0 4px 20px rgba(255, 136, 0, 0.05);
+}
+
+.developer-pricing-option.active::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-accent-primary);
+}
+
+.developer-pricing-option .pricing-price-container {
+  margin-top: 0;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.developer-pricing-option .pricing-price-value {
+  font-size: 1.8rem;
+}
+
+.developer-pricing-option .pricing-price-period {
+  font-size: 0.65rem;
+}
+
+.developer-pricing-label {
+  font-size: 0.68rem;
+  color: var(--color-text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
 .pricing-features-list {
   list-style: none;
   padding: 0;
@@ -2393,7 +2458,7 @@ footer {
 /* ── Pricing Comparison Styles ── */
 .comparison-section-container {
   margin-top: 80px;
-  padding-top: 48px;
+  padding-top: 2rem;
   border-top: 1px solid var(--color-border-outer);
   width: 100%;
 }

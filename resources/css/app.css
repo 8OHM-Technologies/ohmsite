@@ -1,5 +1,17 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
+@plugin "flyonui";
+@import "flyonui/variants.css";
+@source "../node_modules/flyonui/flyonui.js";
+
+@import "flyonui/src/vendor/flatpickr.css";
+@import "flyonui/src/vendor/notyf.css";
+@import "flyonui/src/vendor/datatables.css";
+@import "flyonui/src/vendor/editor.css";
+@import "flyonui/src/vendor/fullcalendar.css";
+@import "flyonui/src/vendor/raty.css";
+@import "flyonui/src/vendor/waves.css";
+@import "flyonui/src/vendor/apexcharts.css";
 
 /* ── Font Face Declarations ── */
 @font-face {
