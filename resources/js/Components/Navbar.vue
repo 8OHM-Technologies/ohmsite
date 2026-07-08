@@ -162,20 +162,20 @@ const getHref = (link) => {
             <!-- Right Side: Search, Cart, Profile -->
             <div class="hidden md:flex nav:justify-self-end items-center space-x-2 sm:space-x-4">
                 <!-- Wishlist -->
-                <Link :href="route('favorites.index')"
+                <!-- <Link :href="route('favorites.index')"
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 group border border-transparent hover:border-white/5">
                     <Heart class="w-5 h-5 text-zinc-500 group-hover:text-rose-500 transition-colors"
                         :class="{ 'fill-rose-500 text-rose-500': route().current('favorites.index') }" />
-                </Link>
+                </Link> -->
 
                 <!-- Cart -->
-                <Link :href="route('cart.index')"
+                <!-- <Link :href="route('cart.index')"
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 relative group border border-transparent hover:border-white/5">
                     <ShoppingCart class="w-5 h-5 text-zinc-500 group-hover:text-white" />
                     <span v-if="$page.props.cart_count > 0"
                         class="absolute top-1 right-1 bg-white text-black text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
                             $page.props.cart_count }}</span>
-                </Link>
+                </Link> -->
 
                 <!-- Profile -->
                 <div class="flex items-center">

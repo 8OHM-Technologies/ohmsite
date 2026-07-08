@@ -47,7 +47,7 @@ const submit = () => {
                 <!-- Text Content -->
                 <div class="space-y-1">
                     <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">
-                        Log in to access...
+                        Log in to your account to continue...
                     </h1>
                     <p class="text-zinc-400 font-bold uppercase tracking-widest text-xs max-w-md">
 
@@ -63,7 +63,7 @@ const submit = () => {
                                 </svg>
                             </div>
                             <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
-                                Ohmshop</span>
+                                Manage your Subscription</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -73,7 +73,7 @@ const submit = () => {
                                 </svg>
                             </div>
                             <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
-                                Ohmbase</span>
+                                Access the Analytics Dashboard</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -82,8 +82,7 @@ const submit = () => {
                                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">B2B
-                                Dashboard</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80"></span>
                         </div>
                     </div>
                 </div>

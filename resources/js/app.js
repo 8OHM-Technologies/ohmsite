@@ -1,7 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
@@ -30,4 +30,15 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+});
+
+router.on('navigate', () => {
+    setTimeout(() => {
+        if (window.HSStaticMethods && typeof window.HSStaticMethods.autoInit === 'function') {
+            window.HSStaticMethods.autoInit();
+        }
+        if (window.IStaticMethods && typeof window.IStaticMethods.autoInit === 'function') {
+            window.IStaticMethods.autoInit();
+        }
+    }, 100);
 });

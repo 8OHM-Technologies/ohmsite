@@ -74,7 +74,7 @@ const roadmap = [
   {
     status: 'Beta',
     date: 'Q3 2026',
-    title: 'South African Labour Courts',
+    title: 'SA Labour Courts',
     description: 'Comprehensive judgments from the Labour Court and Labour Appeal Court.',
     icon: 'ph-spinner',
     iconClass: 'text-blue-500'
@@ -82,27 +82,27 @@ const roadmap = [
   {
     status: 'Upcoming',
     date: 'Q4 2026',
-    title: 'South African High Courts',
-    description: 'Comprehensive judgments from the High Court and Supreme Court of Appeal.',
+    title: 'SA High Courts and Constitutional Court',
+    description: 'Comprehensive judgments from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
     icon: 'ph-calendar-blank',
     iconClass: 'text-orange-500'
   },
   {
     status: 'Planned',
     date: 'Q1 2027',
-    title: 'Constitutional Court',
-    description: 'Comprehensive judgments from the Constitutional Court.',
+    title: 'Tribunals and Other Courts',
+    description: 'Comprehensive judgments from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
     icon: 'ph-rocket-launch',
-    iconClass: 'text-purple-500'
+    iconClass: 'text-yellow-500'
   },
   {
     status: 'Planned',
-    date: 'Q2 2027',
-    title: 'Tribunals and Other Courts',
-    description: 'Comprehensive judgments from the various SA Tribunals, as well as smaller courts like the Equality, Electoral and Tax Courts.',
+    date: '2027',
+    title: 'Legislative Expansion',
+    description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.',
     icon: 'ph-rocket-launch',
-    iconClass: 'text-purple-500'
-  }
+    iconClass: 'text-yellow-500'
+  },
 ];
 
 const frequency = ref(frequencies[0])
@@ -446,63 +446,56 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <!-- Dataset Release Roadmap Container -->
-              <div class="roadmap-section-container"
-                style="padding-top: 2rem; border-top: 1px solid var(--border-color);">
+              <div class="section-header" style="text-align: center;">
+                <h3 class="section-title" style="font-size: 1.5rem;">Product Release Roadmap</h3>
+                <p class="section-subtitle">See what is currently available and what we are building next.</p>
+              </div>
 
-                <div class="section-header" style="text-align: center; margin-bottom: 40px;">
-                  <h3 class="section-title" style="font-size: 1.5rem;">Dataset Release Roadmap</h3>
-                  <p class="section-subtitle">See what is currently available and what we are building next.</p>
-                </div>
+              <!-- Roadmap Carousel -->
+              <div id="multi-slide" data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 } }'
+                class="relative w-full mt-4">
+                <div class="carousel h-auto">
+                  <div class="carousel-body h-full opacity-0">
+                    <div v-for="item in roadmap" :key="item.title" class="carousel-slide">
+                      <div class="roadmap-card h-full mx-2"
+                        style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
 
-                <!-- Roadmap Carousel -->
-                <div id="multi-slide"
-                  data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 } }'
-                  class="relative w-full mt-8">
-                  <div class="carousel h-auto">
-                    <div class="carousel-body h-full opacity-0">
-                      <div v-for="item in roadmap" :key="item.title" class="carousel-slide">
-                        <div class="roadmap-card h-full mx-2"
-                          style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-
-                          <!-- Status Badge -->
-                          <div class="roadmap-status-badge"
-                            style="display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
-                            <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
-                            <span>{{ item.status }} &bull; {{ item.date }}</span>
-                          </div>
-
-                          <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
-                            {{ item.title }}
-                          </h4>
-
-                          <p class="roadmap-desc"
-                            style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
-                            {{ item.description }}
-                          </p>
-
+                        <!-- Status Badge -->
+                        <div class="roadmap-status-badge"
+                          style="display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
+                          <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
+                          <span>{{ item.status }} &bull; {{ item.date }}</span>
                         </div>
+
+                        <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
+                          {{ item.title }}
+                        </h4>
+
+                        <p class="roadmap-desc"
+                          style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
+                          {{ item.description }}
+                        </p>
+
                       </div>
                     </div>
                   </div>
-
-                  <!-- Previous Slide -->
-                  <button type="button"
-                    class="carousel-prev start-0 max-sm:start-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
-                    style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
-                    <i class="ph-light ph-caret-left" style="font-size: 3rem; color: var(--text-primary);"></i>
-                    <span class="sr-only">Previous</span>
-                  </button>
-                  <!-- Next Slide -->
-                  <button type="button"
-                    class="carousel-next end-1 max-sm:end-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
-                    style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
-                    <i class="ph-light ph-caret-right" style="font-size: 3rem; color: var(--text-primary);"></i>
-                    <span class="sr-only">Next</span>
-                  </button>
                 </div>
-              </div>
 
+                <!-- Previous Slide -->
+                <button type="button"
+                  class="carousel-prev start-0 max-sm:start-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
+                  style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                  <i class="ph-light ph-caret-left" style="font-size: 3rem; color: var(--text-primary);"></i>
+                  <span class="sr-only">Previous</span>
+                </button>
+                <!-- Next Slide -->
+                <button type="button"
+                  class="carousel-next end-1 max-sm:end-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
+                  style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                  <i class="ph-light ph-caret-right" style="font-size: 3rem; color: var(--text-primary);"></i>
+                  <span class="sr-only">Next</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -957,7 +950,6 @@ onUnmounted(() => {
 
 .section-header {
   text-align: center;
-  margin-bottom: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
