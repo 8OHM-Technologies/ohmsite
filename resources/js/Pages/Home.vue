@@ -38,7 +38,8 @@ const tiers = [
       'No-code Interactive Analytics Dashboard',
       'Visual trend analysis & CSV/Excel exports',
       'Expanded API Endpoint Catalogue',
-      'Access new Datasets as Add-ons to your Pro Dashboard',
+      'Increased rate limits (3000 req/month)',
+      'Discounted access to new Datasets as Add-ons to the Pro Dashboard',
       'Priority Helpdesk Ticket Support',
       'POPIA Compliant Data Entries',
     ],
@@ -423,14 +424,17 @@ onUnmounted(() => {
                     <div v-else class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span v-if="tier.name === 'Managed Data Pipeline'" style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">starting at</span>
+                          <span v-if="tier.name === 'Managed Data Pipeline'"
+                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">starting
+                            at</span>
                           <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
                           </div>
                         </div>
-                        <span class="developer-pricing-label">{{ tier.name === 'Pro Dashboard' ? 'Full Dashboard Access' : 'Custom Implementation' }}</span>
+                        <span class="developer-pricing-label">{{ tier.name === 'Pro Dashboard' ? 'Full Dashboard Access'
+                          : 'Custom Implementation' }}</span>
                       </div>
                     </div>
                   </div>
@@ -442,7 +446,7 @@ onUnmounted(() => {
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                        }}</span>
+                      }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
@@ -451,7 +455,8 @@ onUnmounted(() => {
                     <a v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
-                      <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name }}</span>
+                      <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
@@ -563,12 +568,12 @@ onUnmounted(() => {
                   </div>
                 </li>
               </ul>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+              <a href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
                 <span>Enquire Now</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
                 </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -705,12 +710,12 @@ onUnmounted(() => {
                   </div>
                 </li>
               </ul>
-              <button type="button" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+              <a href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
                 <span>Launching Soon</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
                 </div>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -730,12 +735,12 @@ onUnmounted(() => {
                   style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
                 Shop Launching Soon! Join the Waitlist to get notified...
               </div>
-              <button type="button" id="waitlist-submit" class="btn btn-secondary contact-trigger-btn btn-align-bottom">
+              <a href="#contact" class="btn btn-secondary contact-trigger-btn btn-align-bottom">
                 <span>Join the Waitlist</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-bell"></i>
                 </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
