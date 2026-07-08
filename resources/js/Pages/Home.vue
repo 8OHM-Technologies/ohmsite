@@ -52,7 +52,6 @@ const tiers = [
     description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
     price: { monthly: 'R14,999', annually: 'R140,990' },
     highlights: [
-      'Includes all Pro Dashboard features',
       'Deployed on your own on-premises or cloud infrastructure',
       'Custom web scraping and ETL data engineering',
       'Private AI models (LLMs) & secure processing for sensitive data',
@@ -92,7 +91,7 @@ const roadmap = [
     status: 'Planned',
     date: 'Q1 2027',
     title: 'Constitutional Court',
-    description: 'Comprehensive judgments from the Constitutional Court',
+    description: 'Comprehensive judgments from the Constitutional Court.',
     icon: 'ph-rocket-launch',
     iconClass: 'text-purple-500'
   },
@@ -105,33 +104,6 @@ const roadmap = [
     iconClass: 'text-purple-500'
   }
 ];
-const sections = [
-  {
-    name: 'Features',
-    features: [
-      { name: 'Historical CCMA/Labour Court Judgement Data', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Live CCMA/Labour Court Judgement Feed', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Analytics Dashboard', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Future Dataset Release Access', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Custom Domain & Branding', tiers: { 'Developer API': false, 'Pro Dashboard': false, 'Managed Data Pipeline': true } },
-    ],
-  },
-  {
-    name: 'Reporting',
-    features: [
-      { name: 'Data insights and Analytics', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Automated reports', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-    ],
-  },
-  {
-    name: 'Support',
-    features: [
-      { name: 'Standard Helpdesk Support', tiers: { 'Developer API': true, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: 'Priority Helpdesk Support', tiers: { 'Developer API': false, 'Pro Dashboard': true, 'Managed Data Pipeline': true } },
-      { name: '24/7 Telephonic Support', tiers: { 'Developer API': false, 'Pro Dashboard': false, 'Managed Data Pipeline': true } },
-    ],
-  },
-]
 
 const frequency = ref(frequencies[0])
 const developerOption = ref('subscription')
@@ -446,7 +418,7 @@ onUnmounted(() => {
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                      }}</span>
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
@@ -456,7 +428,7 @@ onUnmounted(() => {
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
-                        }}</span>
+                      }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
@@ -483,31 +455,51 @@ onUnmounted(() => {
                   <p class="section-subtitle">See what is currently available and what we are building next.</p>
                 </div>
 
-                <!-- Roadmap Grid -->
-                <div class="roadmap-grid"
-                  style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                <!-- Roadmap Carousel -->
+                <div id="multi-slide"
+                  data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 } }'
+                  class="relative w-full mt-8">
+                  <div class="carousel h-auto">
+                    <div class="carousel-body h-full opacity-0">
+                      <div v-for="item in roadmap" :key="item.title" class="carousel-slide">
+                        <div class="roadmap-card h-full mx-2"
+                          style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
 
-                  <div v-for="item in roadmap" :key="item.title" class="roadmap-card"
-                    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden;">
+                          <!-- Status Badge -->
+                          <div class="roadmap-status-badge"
+                            style="display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
+                            <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
+                            <span>{{ item.status }} &bull; {{ item.date }}</span>
+                          </div>
 
-                    <!-- Status Badge -->
-                    <div class="roadmap-status-badge"
-                      style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
-                      <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
-                      <span>{{ item.status }} &bull; {{ item.date }}</span>
+                          <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
+                            {{ item.title }}
+                          </h4>
+
+                          <p class="roadmap-desc"
+                            style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
+                            {{ item.description }}
+                          </p>
+
+                        </div>
+                      </div>
                     </div>
-
-                    <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
-                      {{ item.title }}
-                    </h4>
-
-                    <p class="roadmap-desc"
-                      style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
-                      {{ item.description }}
-                    </p>
-
                   </div>
 
+                  <!-- Previous Slide -->
+                  <button type="button"
+                    class="carousel-prev start-0 max-sm:start-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
+                    style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                    <i class="ph-light ph-caret-left" style="font-size: 3rem; color: var(--text-primary);"></i>
+                    <span class="sr-only">Previous</span>
+                  </button>
+                  <!-- Next Slide -->
+                  <button type="button"
+                    class="carousel-next end-1 max-sm:end-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
+                    style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                    <i class="ph-light ph-caret-right" style="font-size: 3rem; color: var(--text-primary);"></i>
+                    <span class="sr-only">Next</span>
+                  </button>
                 </div>
               </div>
 
@@ -933,15 +925,8 @@ onUnmounted(() => {
     <footer>
       <div class="container">
         <p class="footer-text">
-          &copy; 2026 Infinity Ohm Technologies (Pty) Ltd. All rights
+          &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights
           reserved.<br />
-          <strong>Regulatory Disclaimer:</strong> Infinity Ohm
-          Technologies is an educational publisher, components
-          supplier, and IT/AI consultancy. We are not a registered
-          private security service provider under the South African
-          PSIRA frameworks. Modifying primary security setups should
-          always be validated through your certified technician and
-          insurer.
         </p>
       </div>
     </footer>
