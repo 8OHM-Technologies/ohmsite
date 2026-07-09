@@ -297,6 +297,9 @@ jobs:
 
               docker compose -f docker-compose.prod.yml up -d
 
+              # Run composer install
+              docker exec ohmsite-app composer install --no-dev --optimize-autoloader --no-interaction
+
               # Run Laravel database migrations & optimizations
               docker exec ohmsite-app php artisan migrate --force
               docker exec ohmsite-app php artisan config:cache
