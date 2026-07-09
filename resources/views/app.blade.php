@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Projektii') }}</title>
+        <title inertia>{{ config('app.name', '8ohm.co.za') }}</title>
         <meta name="description" content="E-Commerce SaaS Platform for premium footwear. Shop the latest brands and exclusive collections.">
         <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" sizes="any">
         <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/svg+xml">
@@ -14,14 +14,14 @@
             <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="{{ config('app.name', 'Projektii') }}">
+        <meta property="og:title" content="{{ config('app.name', '8ohm.co.za') }}">
         <meta property="og:description" content="E-Commerce SaaS Platform for premium footwear.">
         <meta property="og:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
-        <meta property="twitter:title" content="{{ config('app.name', 'Projektii') }}">
+        <meta property="twitter:title" content="{{ config('app.name', '8ohm.co.za') }}">
         <meta property="twitter:description" content="E-Commerce SaaS Platform for premium footwear.">
         <meta property="twitter:image" content="{{ asset('assets/images/8OHM_Logo.webp') }}">
 

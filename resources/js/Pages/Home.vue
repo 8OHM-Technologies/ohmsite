@@ -14,8 +14,8 @@ const tiers = [
     href: '#',
     featured: false,
     description: 'Power your custom applications or train AI models with direct access to our structured legal dataset feed. Includes 20+ years of historical cases and active live updates.',
-    price: { monthly: 'R399', annually: 'R3,999' },
-    onceOffPrice: 'R4,999',
+    price: { monthly: 'R380', annually: 'R3,800' },
+    onceOffPrice: 'R5,000',
     highlights: [
       '20+ Years of Historical Legal Data',
       'Live API access to new court cases and decisions',
@@ -32,7 +32,7 @@ const tiers = [
     href: '#',
     featured: true,
     description: 'No code required. Access to the Legal Dataset through our interactive analytics dashboard. Includes standard API access and unlimited access to the archive dataset.',
-    price: { monthly: 'R3,499', annually: 'R34,990' },
+    price: { monthly: 'R3,500', annually: 'R35,000' },
     highlights: [
       'Includes all Developer API features',
       'No-code Interactive Analytics Dashboard',
@@ -50,7 +50,7 @@ const tiers = [
     href: '#',
     featured: false,
     description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
-    price: { monthly: 'R14,999', annually: 'R149,999' },
+    price: { monthly: 'R15,000', annually: 'R150,000' },
     highlights: [
       'Deployed on your own on-premises or cloud infrastructure',
       'Custom web scraping and ETL data engineering',
@@ -397,8 +397,8 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span v-if="tier.name === 'Managed Data Pipeline'"
-                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">starting
-                            at</span>
+                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">Retainer
+                            based</span>
                           <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>

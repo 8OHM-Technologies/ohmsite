@@ -80,6 +80,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [\App\Http\Controllers\UserOrderController::class, 'index'])->name('orders.index');
 });
 
+use App\Http\Controllers\SubscriberDashboardController;
+
+Route::middleware(['auth', 'verified'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {
+    Route::get('/', [SubscriberDashboardController::class, 'index'])->name('index');
+    Route::get('/products', [SubscriberDashboardController::class, 'products'])->name('products.index');
+    Route::get('/analytics', [SubscriberDashboardController::class, 'analytics'])->name('analytics.index');
+});
+
 require __DIR__.'/auth.php';
 
 Route::middleware('auth')->group(function () {
