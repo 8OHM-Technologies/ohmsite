@@ -21,6 +21,11 @@ class HomeController extends Controller
             return Inertia::render('Test');
         }
     }
+
+    public function privacyPolicy()
+    {
+        return view('privacy-policy');
+    }
     
     public function index()
     {

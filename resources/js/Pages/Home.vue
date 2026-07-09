@@ -47,10 +47,10 @@ const tiers = [
   {
     name: 'Managed Data Pipeline',
     id: 'tier-pipeline',
-    href: '#',
+    href: '#contact',
     featured: false,
     description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
-    price: { monthly: 'R15,000', annually: 'R150,000' },
+    price: { monthly: 'R16,500', annually: 'R165,000' },
     highlights: [
       'Deployed on your own on-premises or cloud infrastructure',
       'Custom web scraping and ETL data engineering',
@@ -74,24 +74,24 @@ const roadmap = [
   {
     status: 'Beta',
     date: 'Q3 2026',
-    title: 'SA Labour Courts',
-    description: 'Comprehensive judgments from the Labour Court and Labour Appeal Court.',
+    title: 'SA Labour Court Case Law',
+    description: 'Comprehensive case law from the Labour and Labour Appeal Courts.',
     icon: 'ph-spinner',
     iconClass: 'text-blue-500'
   },
   {
     status: 'Upcoming',
     date: 'Q4 2026',
-    title: 'SA High Courts and Constitutional Court',
-    description: 'Comprehensive judgments from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
+    title: 'SA High Court Case Law',
+    description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
     icon: 'ph-calendar-blank',
     iconClass: 'text-orange-500'
   },
   {
     status: 'Planned',
     date: 'Q1 2027',
-    title: 'Tribunals and Other Courts',
-    description: 'Comprehensive judgments from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
+    title: 'Tribunals and Other Courts Case Law',
+    description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
     icon: 'ph-rocket-launch',
     iconClass: 'text-yellow-500'
   },
@@ -397,8 +397,8 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span v-if="tier.name === 'Managed Data Pipeline'"
-                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">Retainer
-                            based</span>
+                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">20
+                            hours per month retainer</span>
                           <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
@@ -858,8 +858,9 @@ onUnmounted(() => {
                     <label for="division">What is it about?</label>
                     <select id="division" name="division" required v-model="form.division">
                       <option value="" disabled selected>Choose an option...</option>
-                      <option value="dataset-request">Level 1 & 2 Dataset</option>
-                      <option value="level3-pipeline">Level 3 Custom Pipeline</option>
+                      <option value="dataset-dump-request">Once-off Dataset Enquiry</option>
+                      <option value="pro-dashboard-request">Pro Dashboard Enquiry</option>
+                      <option value="custom-pipeline">Custom Managed Data Pipeline Enquiry</option>
                       <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
                     </select>
@@ -907,6 +908,7 @@ onUnmounted(() => {
         <p class="footer-text">
           &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights
           reserved.<br />
+          <a href="/privacy-policy" target="_blank">Privacy Policy</a>
         </p>
       </div>
     </footer>
