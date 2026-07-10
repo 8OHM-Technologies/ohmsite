@@ -298,7 +298,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Roadmap Carousel Wrapper -->
-        <div class="w-full max-w-5xl mx-auto mt-auto pb-1 relative z-25">
+        <div class="w-full max-w-5xl mx-auto mt-14 sm:mt-auto pb-1 relative z-25">
           <!-- Roadmap Carousel -->
           <div id="multi-slide" class="relative px-8 sm:px-10"
             data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 }, "isDraggable": true }'>
