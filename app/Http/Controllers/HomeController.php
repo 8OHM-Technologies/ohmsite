@@ -26,6 +26,12 @@ class HomeController extends Controller
     {
         return view('privacy-policy');
     }
+
+    public function refundCancellation()
+    {
+        return view('refund-and-cancellation');
+    }
+    
     
     public function index()
     {

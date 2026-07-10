@@ -11,12 +11,13 @@ import {
     TrendingUp,
     Building,
     AlertTriangle,
-    Search,
     FileText,
     RefreshCw,
     SlidersHorizontal,
+    Users,
     Layers,
-    Users
+    Code,
+    X
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -28,6 +29,8 @@ const props = defineProps({
 
 // Core active navigation tab
 const activeTab = ref('overview'); // overview, velocity, trends, employer-risk
+
+const isMetricsModalOpen = ref(false);
 
 // Interactive Filters State
 const filterProvince = ref('All');
@@ -563,18 +566,9 @@ const employerSignatureSeries = computed(() => {
 
     <DemoLayout>
         <div class="space-y-8 animate-in fade-in duration-700">
-            <!-- Header with Title & Tab Navigation -->
-            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6 pb-2">
-                <div>
-                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase">
-                        <span class="text-admin-modern">Analytics - Legal Dataset</span>
-                    </h1>
-                    <p class="text-zinc-500 mt-2 font-bold uppercase tracking-widest text-[10px]">
-                        South African CCMA Arbitration & Dispute Intelligence
-                    </p>
-                </div>
 
-                <!-- Tabs Navigation -->
+            <!-- Tabs Navigation -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div
                     class="flex items-center gap-1 bg-zinc-955 border border-white/5 p-1 rounded-2xl overflow-x-auto max-w-full">
                     <button v-for="tab in [
@@ -589,6 +583,12 @@ const employerSignatureSeries = computed(() => {
                         {{ tab.label }}
                     </button>
                 </div>
+
+                <button @click="isMetricsModalOpen = true"
+                    class="flex items-center gap-2 bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-zinc-300 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0">
+                    <Code class="w-4 h-4 text-admin-modern" />
+                    Metrics Logic
+                </button>
             </div>
 
             <!-- Global Collapsible / Sticky Interactive Filter Panel -->
@@ -910,7 +910,7 @@ const employerSignatureSeries = computed(() => {
                                 <span>System Upload Latency</span>
                                 <span class="text-emerald-400">
                                     {{(filteredCases.reduce((acc, c) => acc + c.systemLag, 0) / (filteredCases.length
-                                    || 1)).toFixed(1) }} Days
+                                        || 1)).toFixed(1)}} Days
                                 </span>
                             </div>
                             <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2.5 overflow-hidden">
@@ -1027,10 +1027,10 @@ const employerSignatureSeries = computed(() => {
                             class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-admin-modern/30 transition-all">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-black text-white uppercase tracking-tight">{{ ind.name
-                                    }}</span>
+                                }}</span>
                                 <span
                                     class="text-[9px] font-black text-admin-modern bg-admin-modern/10 px-2 py-0.5 rounded-lg">{{
-                                    ind.share }}% share</span>
+                                        ind.share }}% share</span>
                             </div>
                             <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-white/5 text-[10px]">
                                 <div>
@@ -1066,7 +1066,7 @@ const employerSignatureSeries = computed(() => {
                                 </span>
                                 <div>
                                     <span class="text-xs font-black text-white uppercase tracking-tight">{{ app.name
-                                        }}</span>
+                                    }}</span>
                                     <p class="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">{{ app.industry }} |
                                         {{ app.location }}</p>
                                 </div>
@@ -1111,7 +1111,7 @@ const employerSignatureSeries = computed(() => {
                         <div class="space-y-6 flex flex-col justify-between">
                             <div class="space-y-4">
                                 <h4 class="text-sm font-black text-white uppercase tracking-wider">{{ selectedEmployer
-                                    }}</h4>
+                                }}</h4>
 
                                 <div
                                     class="grid grid-cols-2 gap-4 text-xs font-bold uppercase tracking-wider text-zinc-500">
@@ -1183,6 +1183,275 @@ const employerSignatureSeries = computed(() => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Metrics Documentation Modal -->
+        <div v-if="isMetricsModalOpen"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
+            <div
+                class="bg-zinc-950 border border-white/10 rounded-[2rem] w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-white/5 bg-zinc-900/50">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-admin-modern/10 flex items-center justify-center text-admin-modern">
+                            <Code class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-black text-white uppercase tracking-tighter">Dashboard Metrics Logic
+                            </h2>
+                            <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Calculations
+                                & Variable Mapping Rules</p>
+                        </div>
+                    </div>
+                    <button @click="isMetricsModalOpen = false"
+                        class="text-zinc-500 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5">
+                        <X class="w-5 h-5" />
+                    </button>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                    <div class="space-y-8 text-sm text-zinc-400 font-medium">
+
+                        <!-- Section 1 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">1. Base Case
+                                Metrics (Computed per record)</h3>
+                            <p>When raw case data is loaded (either via props or from the fallback JSON), it is mapped
+                                over to calculate foundational metrics for each case in the <code
+                                    class="bg-white/10 px-1.5 py-0.5 rounded text-white">allCases</code> computed
+                                property.</p>
+
+                            <h4 class="text-xs font-black text-white uppercase tracking-widest mt-6 mb-2">Time-based
+                                Metrics (Calculated in Days):</h4>
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">hearingDuration (Hearing Duration):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    (hearing_end - hearing_start) + 1 day<br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Fallback:</span>
+                                    Defaults to 1 if the start or end dates are missing.
+                                </li>
+                                <li>
+                                    <strong class="text-white">timeToAward (Time to Award):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    (award_date - hearing_end)<br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Fallback:</span>
+                                    Defaults to 0 if either date is missing. Minimum value is clamped to 0.
+                                </li>
+                                <li>
+                                    <strong class="text-white">systemLag (System Processing Lag):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    (date_modified - award_date)<br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Fallback:</span>
+                                    Defaults to 0 if dates are missing. Minimum value is 0.
+                                </li>
+                                <li>
+                                    <strong class="text-white">scrapingLag (Publishing / Scraping Lag):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    (details_scraped_at - award_date)<br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Fallback:</span>
+                                    Defaults to 0 if dates are missing. Minimum value is 0.
+                                </li>
+                            </ul>
+
+                            <h4 class="text-xs font-black text-white uppercase tracking-widest mt-6 mb-2">Categorization
+                                Metrics:</h4>
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">province & region:</strong> Extracted from the
+                                    court_location field using a Regex <code
+                                        class="bg-white/10 px-1 py-0.5 rounded text-white text-[10px]">(^([^\[]+)\s*\[([^\]]+)\])</code>.
+                                    E.g., "Gauteng [Johannesburg]" splits into Province: "Gauteng", Region:
+                                    "Johannesburg".
+                                </li>
+                                <li>
+                                    <strong class="text-white">industry:</strong> Determined by checking the employer
+                                    string for specific keywords.<br>
+                                    E.g., Contains "woolworths", "shoprite" &rarr; Retail & Consumer Goods<br>
+                                    Contains "eskom", "transnet" &rarr; State Utilities & Transport<br>
+                                    If no keyword matches, defaults to Other Services.
+                                </li>
+                                <li>
+                                    <strong class="text-white">category (Dispute Nature):</strong> Determined by
+                                    checking the reason_for_dismissal string for keywords (e.g., "misconduct" &rarr;
+                                    Misconduct, "retrenchment" or "operational requirements" &rarr; Retrenchment).
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 2 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">2. High-Level
+                                KPI Statistics (Global Filters)</h3>
+                            <p>These metrics are displayed at the top of the dashboard and recalculate dynamically based
+                                on the active filters (Province, Dispute Nature, Timeframe, Employer) via the <code
+                                    class="bg-white/10 px-1.5 py-0.5 rounded text-white">filteredCases</code> computed
+                                property.</p>
+
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">Disputes Audited (totalCasesCount):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    filteredCases.length (Total count of cases matching current filters).
+                                </li>
+                                <li>
+                                    <strong class="text-white">Avg Hearing Duration (avgHearingDuration):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Sum of hearingDuration for all filtered cases &divide; total filtered cases
+                                    (formatted to 1 decimal place).
+                                </li>
+                                <li>
+                                    <strong class="text-white">Avg Time-to-Award (avgTimeToAward):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Sum of timeToAward for all filtered cases &divide; total filtered cases.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Avg Publishing Lag (avgDataLatency):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Sum of scrapingLag for all filtered cases &divide; total filtered cases.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Top Dispute Type (topDisputeType):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    The category (e.g., Misconduct, Retrenchment) with the highest frequency count among
+                                    the filtered cases.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Most Active Region (mostActiveRegion):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    The court_location with the highest frequency count among the filtered cases.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 3 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">3. Executive
+                                Overview (Tab 1)</h3>
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">Case Volumes & Macro Trends
+                                        (monthlyTrendData):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Groups cases by their awardMonthIdx. Tracks two lines:<br>
+                                    - Total number of labor disputes for that month.<br>
+                                    - Number of cases specifically categorized as Retrenchment (used as an economic risk
+                                    indicator).
+                                </li>
+                                <li>
+                                    <strong class="text-white">Dispute Typology (disputeTypeSeries):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    A frequency count of cases mapped to their category string, visualized as a Donut
+                                    chart.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 4 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">4. Procedural
+                                Velocity (Tab 2)</h3>
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">Velocity by Region (velocityByRegionData):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Groups all filtered cases by court_location. Sorts these locations by the highest
+                                    total case count and takes the Top 5.<br>
+                                    For these 5 regions, it calculates the Average Hearing Duration, Average Time to
+                                    Award, and Average Publishing Lag.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 5 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">5. Labor &
+                                Spatial Trends (Tab 3)</h3>
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">Seasonality & Monthly Breakdown
+                                        (monthlyCategoryData):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Groups cases by month and splits each month's total into specific categories:
+                                    Misconduct, Retrenchment, Incapacity, Unfair Labor Practice, and Other.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Provincial Case Density
+                                        (provincialDensityData):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Groups cases by their parsed province attribute, counts the totals, and sorts them
+                                    from highest to lowest volume.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Section 6 -->
+                        <div class="space-y-4">
+                            <h3 class="text-base font-black text-admin-modern uppercase tracking-tighter">6. Employer
+                                Risk Profiling (Tab 4)</h3>
+                            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-xs">
+                                <span class="text-admin-modern font-black uppercase tracking-widest">Note:</span> Some
+                                of these metrics bypass the global filters and run on <code
+                                    class="bg-black/30 px-1 py-0.5 rounded text-white">allCases</code> to provide
+                                macro-level benchmarks.
+                            </div>
+
+                            <ul class="space-y-3 list-disc pl-5">
+                                <li>
+                                    <strong class="text-white">Repeat Appellants Leaderboard
+                                        (repeatAppellants):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Looks at allCases, groups by employer, counts total disputes per employer, and
+                                    returns the Top 10 employers with the highest frequency.
+                                </li>
+                                <li>
+                                    <strong class="text-white">Industry Sector Benchmarking
+                                        (industryBenchmarking):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    Groups allCases by industry. For each industry, it calculates:<br>
+                                    - Total cases<br>
+                                    - Share percentage: (industry cases / total cases) * 100<br>
+                                    - Average Hearing Duration<br>
+                                    - Average Time to Award
+                                </li>
+                                <li>
+                                    <strong class="text-white">Employer Profiler (profileEmployerStats):</strong><br>
+                                    <span
+                                        class="text-zinc-500 uppercase text-[10px] tracking-wider font-bold">Logic:</span>
+                                    When an employer is selected from the dropdown (selectedEmployer), it filters the
+                                    dataset exactly for that employer and calculates:<br>
+                                    - Total case count<br>
+                                    - Average Hearing, Award, and Scraping lag metrics for that specific employer.<br>
+                                    - Employer Signature: A percentage breakdown of the types of disputes (category)
+                                    this employer specifically faces.
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

@@ -11,6 +11,7 @@ Route::get('/demo', [DemoController::class, 'index'])->name('demo');
 
 Route::get('/test', [HomeController::class, 'test'])->name('test');
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/refund-cancellation', [HomeController::class, 'refundCancellation'])->name('refund-cancellation');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');

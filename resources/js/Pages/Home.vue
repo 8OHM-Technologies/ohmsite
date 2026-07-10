@@ -446,7 +446,7 @@ onUnmounted(() => {
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                      }}</span>
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
@@ -456,7 +456,7 @@ onUnmounted(() => {
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
-                      }}</span>
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
@@ -840,6 +840,7 @@ onUnmounted(() => {
                       <option value="dataset-dump-request">Once-off Dataset Enquiry</option>
                       <option value="pro-dashboard-request">Pro Dashboard Enquiry</option>
                       <option value="custom-pipeline">Custom Managed Data Pipeline Enquiry</option>
+                      <option value="custom-pipeline">Once</option>
                       <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
                     </select>
@@ -888,6 +889,8 @@ onUnmounted(() => {
           &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights
           reserved.<br />
           <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+          <br>
+          <a href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</a>
         </p>
       </div>
     </footer>
@@ -1282,9 +1285,9 @@ a:active {
 
 .bezel-card-inner {
   background: var(--color-surface-inner);
-  padding: 20px;
   border-radius: 22px;
   border: 1px solid var(--color-border-inner);
+  padding: 20px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1292,8 +1295,6 @@ a:active {
   position: relative;
   overflow: hidden;
 }
-
-
 
 .card-icon {
   width: 52px;
@@ -1741,6 +1742,10 @@ footer {
   line-height: 1.8;
 }
 
+.footer-text>a {
+  font-size: 0.6rem;
+}
+
 /* --- Contact Section --- */
 .contact-section {
   padding-top: 2rem;
@@ -1910,10 +1915,6 @@ footer {
   .col-span-5,
   .col-span-4 {
     grid-column: span 1 !important;
-  }
-
-  .bezel-card-inner {
-    padding: 28px;
   }
 
   .editorial-card {
@@ -2297,7 +2298,7 @@ footer {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-border-outer);
   border-radius: 20px;
-  padding: 40px 32px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   transition: all 0.6s var(--ease-premium);

@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', '8ohm.co.za') }}</title>
-        
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title inertia>8ohm.co.za | Privacy Policy</title>
+
 </head>
+
 <body>
-<h1 id="privacy-policy">Privacy Policy</h1>
+    <h1 id="privacy-policy">Privacy Policy</h1>
     <h2 id="1-introduction">1. Introduction</h2>
     <p>This Privacy Policy explains how <strong>Infinity Ohm Technologies (Pty) Ltd t/a 8OHM</strong> collects, uses,
         and

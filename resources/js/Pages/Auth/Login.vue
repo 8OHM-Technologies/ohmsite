@@ -82,7 +82,8 @@ const submit = () => {
                                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80"></span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Get your API
+                                Key</span>
                         </div>
                     </div>
                 </div>
@@ -94,8 +95,8 @@ const submit = () => {
             <div class="max-w-md w-full space-y-10 py-10">
                 <div class="text-center lg:text-left">
                     <h2 class="text-4xl font-black uppercase tracking-tighter">Welcome back</h2>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Log in to your account
-                        to continue</p>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Log in to continue...
+                    </p>
                 </div>
 
                 <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
@@ -174,7 +175,7 @@ const submit = () => {
                     </div>
 
                     <button type="submit" :disabled="form.processing"
-                        class="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all active:scale-[0.98] shadow-2xl"
+                        class="w-full btn-primary text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all active:scale-[0.98] shadow-2xl"
                         :class="{ 'opacity-50 cursor-not-allowed': form.processing }">
                         Log In
                     </button>

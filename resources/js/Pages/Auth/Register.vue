@@ -38,13 +38,13 @@ const submit = () => {
                 <div class="h-10"></div>
 
                 <!-- Text Content -->
-                <div class="space-y-6">
+                <div class="space-y-1">
                     <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">
-                        Join the<br />Community.
+                        Register<br />an Account.
                     </h1>
                     <p class="text-zinc-400 font-bold uppercase tracking-widest text-xs max-w-md">
-                        Start your journey with us today and get exclusive access to limited-edition drops and member
-                        benefits.
+                        Start Turning
+                        Fragmented Data into Analytical Advantage.
                     </p>
 
                     <!-- Badges -->
@@ -56,8 +56,8 @@ const submit = () => {
                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">100%
-                                Authentic</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
+                                Subscribe Annually to save 17% off your Subscription</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -66,8 +66,8 @@ const submit = () => {
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Easy
-                                Returns</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
+                                Track Trends using the Analytics Dashboard</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -76,8 +76,8 @@ const submit = () => {
                                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Fast
-                                Delivery</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Get API
+                                Access</span>
                         </div>
                     </div>
                 </div>
@@ -89,8 +89,8 @@ const submit = () => {
             <div class="max-w-md w-full space-y-10 py-10">
                 <div class="text-center lg:text-left">
                     <h2 class="text-4xl font-black uppercase tracking-tighter">Create account</h2>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Start your journey
-                        towards digital sovereignty now</p>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Create an account to
+                        get started </p>
                 </div>
 
                 <form @submit.prevent="submit" class="space-y-6">

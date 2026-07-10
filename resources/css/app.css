@@ -58,8 +58,10 @@
     --color-admin-main: #09090B;
     --color-admin-accent: #ff8800;
     --color-admin-modern: #ff8800;
+}
 
-    --breakpoint-nav: 1436px;
+@theme {
+    --breakpoint-nav: 1236px;
 }
 
 @plugin "flyonui/theme" {
