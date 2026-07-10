@@ -32,6 +32,10 @@ class HomeController extends Controller
         return view('refund-and-cancellation');
     }
     
+        public function terms()
+    {
+        return view('terms');
+    }
     
     public function index()
     {

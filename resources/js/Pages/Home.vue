@@ -840,7 +840,7 @@ onUnmounted(() => {
                       <option value="dataset-dump-request">Once-off Dataset Enquiry</option>
                       <option value="pro-dashboard-request">Pro Dashboard Enquiry</option>
                       <option value="custom-pipeline">Custom Managed Data Pipeline Enquiry</option>
-                      <option value="custom-pipeline">Once</option>
+                      <option value="refund">Request a Refund (Once-off)</option>
                       <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
                     </select>
@@ -887,11 +887,13 @@ onUnmounted(() => {
       <div class="container">
         <p class="footer-text">
           &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights
-          reserved.<br />
-          <a href="/privacy-policy" target="_blank">Privacy Policy</a>
-          <br>
-          <a href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</a>
+          reserved.
         </p>
+        <div class="flex justify-center items-center gap-x-6 gap-y-2 flex-wrap text-sm">
+          <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+          <a href="/terms" target="_blank">Terms & Conditions</a>
+          <a href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</a>
+        </div>
       </div>
     </footer>
   </div>
@@ -1740,10 +1742,6 @@ footer {
   color: var(--color-text-muted);
   letter-spacing: 0.5px;
   line-height: 1.8;
-}
-
-.footer-text>a {
-  font-size: 0.6rem;
 }
 
 /* --- Contact Section --- */
