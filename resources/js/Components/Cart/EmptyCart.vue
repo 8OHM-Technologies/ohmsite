@@ -9,7 +9,7 @@ defineProps({
     },
     message: {
         type: String,
-        default: "Looks like you haven't added anything to your cart yet. Let's find something you love!"
+        default: "Looks like you haven't added anything to your cart yet."
     }
 });
 </script>

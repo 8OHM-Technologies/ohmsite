@@ -41,10 +41,10 @@ watch(() => props.summary, (newSummary) => {
             <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 space-y-4 sm:space-y-0">
                 <div>
-                    <Link :href="route('shop.index')"
+                    <Link href="/#services"
                         class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors mb-2">
                         <ChevronLeft class="w-4 h-4 mr-1" />
-                        Continue Shopping
+                        Go back
                     </Link>
                     <h1 class="text-4xl font-black uppercase tracking-tighter text-white">
                         Shopping Cart

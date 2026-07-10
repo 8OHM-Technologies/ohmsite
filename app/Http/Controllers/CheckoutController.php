@@ -4,18 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
 use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\User;
 use App\Notifications\OrderPlaced;
 use App\Services\CartService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Http\Requests\StoreOrderRequest;
 
 class CheckoutController extends Controller
 {
@@ -29,10 +28,10 @@ class CheckoutController extends Controller
     /**
      * Display the checkout page.
      */
-    public function index(): Response
+    public function index(): Response|RedirectResponse
     {
         $cart = $this->cartService->getCart();
-        
+
         if ($cart->items->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
@@ -49,7 +48,7 @@ class CheckoutController extends Controller
     /**
      * Process the checkout.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email|max:255',
@@ -94,7 +93,7 @@ class CheckoutController extends Controller
 
             foreach ($cart->items as $item) {
                 // Lock the product for update to prevent race conditions during stock decrement
-                $product = \App\Models\Product::where('id', $item->product_id)->lockForUpdate()->first();
+                $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
 
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
@@ -121,7 +120,8 @@ class CheckoutController extends Controller
             return redirect()->route('orders.index')->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Something went wrong: ' . $e->getMessage());
+
+            return back()->with('error', 'Something went wrong: '.$e->getMessage());
         }
     }
 

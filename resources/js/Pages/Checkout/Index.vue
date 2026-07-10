@@ -11,9 +11,9 @@ const props = defineProps({
 });
 
 const formattedPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-EU', {
         style: 'currency',
-        currency: 'EUR',
+        currency: 'ZAR',
     }).format(price || 0);
 };
 
@@ -25,7 +25,7 @@ const form = useForm({
     apartment: '',
     city: '',
     postal_code: '',
-    country: 'Kosovo',
+    country: 'South Africa',
     phone: '',
     save_info: false,
 });
@@ -58,74 +58,6 @@ const submit = () => {
                         </div>
                     </section>
 
-                    <!-- Delivery -->
-                    <section class="space-y-6">
-                        <h2 class="text-2xl font-black uppercase tracking-tighter">Delivery</h2>
-
-                        <div class="space-y-4">
-                            <div class="space-y-2">
-                                <label
-                                    class="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Country/Region</label>
-                                <select v-model="form.country"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white focus:border-white/20 focus:ring-1 focus:ring-white/20">
-                                    <option value="Kosovo">Kosovo</option>
-                                    <option value="Albania">Albania</option>
-                                    <option value="North Macedonia">North Macedonia</option>
-                                </select>
-                                <InputError :message="form.errors.country" />
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <TextInput v-model="form.first_name" placeholder="First name"
-                                        class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold"
-                                        required />
-                                    <InputError :message="form.errors.first_name" />
-                                </div>
-                                <div class="space-y-2">
-                                    <TextInput v-model="form.last_name" placeholder="Last name"
-                                        class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold"
-                                        required />
-                                    <InputError :message="form.errors.last_name" />
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <TextInput v-model="form.address" placeholder="Address"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold"
-                                    required />
-                                <InputError :message="form.errors.address" />
-                            </div>
-
-                            <div class="space-y-2">
-                                <TextInput v-model="form.apartment" placeholder="Apartment, suite, etc. (optional)"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold" />
-                                <InputError :message="form.errors.apartment" />
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="space-y-2">
-                                    <TextInput v-model="form.postal_code" placeholder="Postal code (optional)"
-                                        class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold" />
-                                    <InputError :message="form.errors.postal_code" />
-                                </div>
-                                <div class="space-y-2">
-                                    <TextInput v-model="form.city" placeholder="City"
-                                        class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold"
-                                        required />
-                                    <InputError :message="form.errors.city" />
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <TextInput v-model="form.phone" placeholder="Phone"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold"
-                                    required />
-                                <InputError :message="form.errors.phone" />
-                            </div>
-                        </div>
-                    </section>
-
                     <!-- Payment -->
                     <section class="space-y-6">
                         <h2 class="text-2xl font-black uppercase tracking-tighter">Payment</h2>
@@ -133,8 +65,7 @@ const submit = () => {
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
                                     <div class="w-5 h-5 rounded-full border-4 border-white"></div>
-                                    <span class="text-sm font-black uppercase tracking-widest">Cash on Delivery
-                                        (Kesh)</span>
+                                    <span class="text-sm font-black uppercase tracking-widest">Paystack</span>
                                 </div>
                                 <svg class="w-6 h-6 text-zinc-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -182,11 +113,6 @@ const submit = () => {
                                     class="flex justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
                                     <span>Subtotal</span>
                                     <span>{{ formattedPrice(summary.subtotal) }}</span>
-                                </div>
-                                <div
-                                    class="flex justify-between text-xs font-bold uppercase tracking-widest text-zinc-400">
-                                    <span>Shipping</span>
-                                    <span>{{ formattedPrice(summary.shipping) }}</span>
                                 </div>
                                 <div
                                     class="flex justify-between text-lg font-black uppercase tracking-widest pt-4 border-t border-white/10">
