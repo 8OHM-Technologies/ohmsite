@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\DemoController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShopController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/demo', [DemoController::class, 'index'])->name('demo');
 
 Route::get('/test', [HomeController::class, 'test'])->name('test');
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('privacy-policy');
@@ -15,9 +15,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
 
-use App\Http\Controllers\CouponController;
-
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CouponController;
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -32,20 +31,19 @@ Route::post('/cart/coupon', [CouponController::class, 'apply'])->name('cart.coup
 Route::delete('/cart/coupon', [CouponController::class, 'remove'])->name('cart.coupon.remove');
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });
 
 use App\Http\Controllers\Admin\AdminHomeController;
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InventoryController;
-use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingsController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -78,10 +76,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/orders', [\App\Http\Controllers\UserOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
 });
 
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubscriberDashboardController;
+use App\Http\Controllers\UserOrderController;
 
 Route::middleware(['auth', 'verified'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {
     Route::get('/', [SubscriberDashboardController::class, 'index'])->name('index');
@@ -92,6 +93,6 @@ Route::middleware(['auth', 'verified'])->prefix('pro-dashboard')->name('pro-dash
 require __DIR__.'/auth.php';
 
 Route::middleware('auth')->group(function () {
-    Route::post('/favorites/{product}/toggle', [\App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle');
-    Route::get('/favorites', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{product}/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
 });

@@ -9,7 +9,7 @@ import { createPinia } from 'pinia';
 import PhosphorIcons from "@phosphor-icons/vue"
 import "flyonui/flyonui"
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || '8OHM';
 const pinia = createPinia();
 
 createInertiaApp({

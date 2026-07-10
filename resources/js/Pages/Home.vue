@@ -17,10 +17,10 @@ const tiers = [
     price: { monthly: 'R380', annually: 'R3,800' },
     onceOffPrice: 'R5,000',
     highlights: [
-      '20+ Years of Historical Legal Data',
+      '20+ Years of Historical CCMA ',
       'Live API access to new court cases and decisions',
       'Structured JSON payloads & REST endpoints',
-      'Standard rate limits (1000 req/month)',
+      'Standard API rate limits (1000 req/month)',
       'Standard rates on new datasets',
       'Standard Helpdesk Ticket Support',
       'POPIA Compliant Data Entries',
@@ -31,15 +31,14 @@ const tiers = [
     id: 'tier-pro',
     href: '#',
     featured: true,
-    description: 'No code required. Access to the Legal Dataset through our interactive analytics dashboard. Includes standard API access and unlimited access to the archive dataset.',
+    description: 'No code required. Access to trends and insights through our analytics platform. Includes increased API rate limits. Subscribe before 31st December 2026 and get free access to all future release Datasets',
     price: { monthly: 'R3,500', annually: 'R35,000' },
     highlights: [
       'Includes all Developer API features',
       'No-code Interactive Analytics Dashboard',
       'Visual trend analysis & CSV/Excel exports',
       'Expanded API Endpoint Catalogue',
-      'Increased rate limits (3000 req/month)',
-      'Discounted access to new Datasets as Add-ons to the Pro Dashboard',
+      'Increased API rate limits (3000 req/month)',
       'Priority Helpdesk Ticket Support',
       'POPIA Compliant Data Entries',
     ],
@@ -72,7 +71,7 @@ const roadmap = [
     iconClass: 'text-green-500'
   },
   {
-    status: 'Beta',
+    status: 'Upcoming',
     date: 'Q3 2026',
     title: 'SA Labour Court Case Law',
     description: 'Comprehensive case law from the Labour and Labour Appeal Courts.',
@@ -246,7 +245,7 @@ onUnmounted(() => {
 
 <template>
 
-  <Head title="Host Your World. Own Your Data." />
+  <Head title="8OHM | End-to-end Data Solutions" />
 
   <div class="home-page-container">
     <div class="background-visuals">
@@ -261,57 +260,86 @@ onUnmounted(() => {
 
     <main>
       <section class="hero container" id="home">
-        <div class="eyebrow-badge reveal-item">
-          <span class="eyebrow-dot"></span>
-          <span class="eyebrow-text">End-to-end Data Solutions</span>
+        <!-- Hero main content grouped to minimize empty white space -->
+        <div class="flex flex-col items-center justify-center flex-grow gap-4 sm:gap-6 w-full">
+          <div class="eyebrow-badge reveal-item">
+            <span class="eyebrow-dot"></span>
+            <span class="eyebrow-text">End-to-end Data Solutions</span>
+          </div>
+
+          <h1 class="hero-title reveal-item">
+            Turn Fragmented Data<br />
+            <span class="gradient-text">into Analytical Advantage</span>
+          </h1>
+
+          <p class="hero-tagline reveal-item">
+            South African public data sources are notoriously unstable and difficult to extract. We handle the
+            extraction,
+            cleaning, and structuring of public records—starting with the CCMA and Labour Courts, and expanding soon to
+            High Courts and beyond. Get reliable,
+            POPIA-compliant data feeds directly via API, track judicial trends using our Analytics Dashboard, or let us
+            build custom data pipelines for your proprietary needs.
+          </p>
+
+          <div class="cta-group reveal-item">
+            <a href="#services" class="btn btn-primary">
+              <span>Explore Data Services</span>
+              <div class="btn-icon">
+                <i class="ph-light ph-database"></i>
+              </div>
+            </a>
+            <a href="/demo" class="btn btn-secondary">
+              <span>View Demo Dashboard</span>
+              <div class="btn-icon">
+                <i class="ph-light ph-presentation"></i>
+              </div>
+            </a>
+          </div>
         </div>
 
-        <h1 class="hero-title reveal-item">
-          Turn Fragmented Data<br />
-          <span class="gradient-text">into Analytical Advantage</span>
-        </h1>
+        <!-- Roadmap Carousel Wrapper -->
+        <div class="w-full max-w-5xl mx-auto mt-auto pb-1 relative z-25">
+          <!-- Roadmap Carousel -->
+          <div id="multi-slide" class="relative px-8 sm:px-10"
+            data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 }, "isDraggable": true }'>
+            <div class="carousel">
+              <div
+                class="carousel-body h-full carousel-dragging:transition-none carousel-dragging:cursor-grabbing cursor-grab opacity-0">
+                <div v-for="item in roadmap" :key="item.title" class="carousel-slide"
+                  style="padding-top: 1px !important">
+                  <div class="roadmap-card mx-1.5">
 
-        <p class="hero-tagline reveal-item">
-          South African public data sources are notoriously unstable and difficult to extract. We handle the extraction,
-          cleaning, and structuring of public records—starting with the CCMA and Labour Courts, and expanding soon to
-          High Courts and beyond. Get reliable,
-          POPIA-compliant data feeds directly via API, track judicial trends using our Analytics Dashboard, or let us
-          build custom data pipelines for your proprietary needs.
-        </p>
+                    <!-- Status Badge -->
+                    <div class="status-badge">
+                      <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
+                      <span>{{ item.status }} &bull; {{ item.date }}</span>
+                    </div>
 
-        <div class="cta-group reveal-item">
-          <a href="#services" class="btn btn-primary">
-            <span>Explore Data Services</span>
-            <div class="btn-icon">
-              <i class="ph-light ph-database"></i>
-            </div>
-          </a>
-          <a href="#demo" class="btn btn-secondary">
-            <span>View Demo Dashboard</span>
-            <div class="btn-icon">
-              <i class="ph-light ph-presentation"></i>
-            </div>
-          </a>
-        </div>
+                    <h4 class="card-title-small">
+                      {{ item.title }}
+                    </h4>
 
-        <!-- Trust & Provenance Banner -->
-        <div class="trust-banner container reveal-item" id="trust-banner">
-          <div class="trust-banner-inner">
-            <span class="trust-title">Ingesting From The Following Public Sources:</span>
-            <div class="trust-logos">
-              <div class="trust-logo-item">
-                <i class="ph-light ph-scales"></i>
-                <span>saflii.org</span>
-              </div>
-              <div class="trust-logo-item">
-                <i class="ph-light ph-briefcase"></i>
-                <span>judiciary.org.za</span>
-              </div>
-              <div class="trust-logo-item">
-                <i class="ph-light ph-scales"></i>
-                <span>statssa.gov.za</span>
+                    <p class="card-desc-small">
+                      {{ item.description }}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
+            <!-- Previous Slide -->
+            <button type="button"
+              class="carousel-prev inset-s-3 max-sm:inset-s-3 carousel-disabled:opacity-50 size-9.5 bg-base-100 flex items-center justify-center rounded-full shadow-base-300/20 shadow-sm"
+              style="background:var(--bg-tertiary);border:1px solid var(--border-color);">
+              <i class="carousel-arrow ph-caret-left"></i>
+              <span class="sr-only">Previous</span>
+            </button>
+            <!-- Next Slide -->
+            <button type="button"
+              class="carousel-next inset-e-5 max-sm:inset-e-3 carousel-disabled:opacity-50 size-9.5 bg-base-100 flex items-center justify-center rounded-full shadow-base-300/20 shadow-sm"
+              style="background:var(--bg-tertiary);border:1px solid var(--border-color);">
+              <i class="carousel-arrow ph-caret-right"></i>
+              <span class="sr-only">Next</span>
+            </button>
           </div>
         </div>
       </section>
@@ -358,7 +386,7 @@ onUnmounted(() => {
                         style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
                         Dataset:</label>
                       <select :id="'dataset-' + tier.id"
-                        style="width: 100%; padding: 10px 12px; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
+                        style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
                         <option value="ccma" selected>CCMA/Labour Court Judgments</option>
                       </select>
                     </div>
@@ -418,7 +446,7 @@ onUnmounted(() => {
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                        }}</span>
+                      }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
@@ -446,56 +474,7 @@ onUnmounted(() => {
                 </div>
               </div>
 
-              <div class="section-header" style="text-align: center;">
-                <h3 class="section-title" style="font-size: 1.5rem;">Product Release Roadmap</h3>
-                <p class="section-subtitle">See what is currently available and what we are building next.</p>
-              </div>
 
-              <!-- Roadmap Carousel -->
-              <div id="multi-slide" data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 } }'
-                class="relative w-full mt-4">
-                <div class="carousel h-auto">
-                  <div class="carousel-body h-full opacity-0">
-                    <div v-for="item in roadmap" :key="item.title" class="carousel-slide">
-                      <div class="roadmap-card h-full mx-2"
-                        style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; position: relative; overflow: hidden; display: flex; flex-direction: column;">
-
-                        <!-- Status Badge -->
-                        <div class="roadmap-status-badge"
-                          style="display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; padding: 4px 10px; border-radius: 9999px; background: var(--bg-tertiary);">
-                          <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
-                          <span>{{ item.status }} &bull; {{ item.date }}</span>
-                        </div>
-
-                        <h4 class="roadmap-title" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 8px;">
-                          {{ item.title }}
-                        </h4>
-
-                        <p class="roadmap-desc"
-                          style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
-                          {{ item.description }}
-                        </p>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Previous Slide -->
-                <button type="button"
-                  class="carousel-prev start-0 max-sm:start-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
-                  style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
-                  <i class="ph-light ph-caret-left" style="font-size: 3rem; color: var(--text-primary);"></i>
-                  <span class="sr-only">Previous</span>
-                </button>
-                <!-- Next Slide -->
-                <button type="button"
-                  class="carousel-next end-1 max-sm:end-1 carousel-disabled:opacity-50 w-10 h-10 flex items-center justify-center rounded-full shadow-sm"
-                  style="background: var(--bg-tertiary); border: 1px solid var(--border-color);">
-                  <i class="ph-light ph-caret-right" style="font-size: 3rem; color: var(--text-primary);"></i>
-                  <span class="sr-only">Next</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -924,6 +903,12 @@ onUnmounted(() => {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+
+  /* Fallback definitions for local variables */
+  --bg-secondary: rgba(255, 255, 255, 0.02);
+  --bg-tertiary: rgba(255, 255, 255, 0.04);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: var(--color-text-primary, #f0f0f5);
 }
 
 .home-page-container,
@@ -1069,14 +1054,15 @@ a:active {
   width: 100%;
   position: relative;
   z-index: 10;
-  padding-top: 8rem;
-  padding-bottom: 4rem;
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+  /* Minimized bottom padding to align to bottom of page */
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   box-sizing: border-box;
@@ -1239,9 +1225,7 @@ a:active {
 .features-section {
   position: relative;
   z-index: 10;
-  padding-bottom: 4rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding: 2rem 1rem 2rem 1rem;
   height: 100%;
   width: 100%;
   scroll-snap-align: start;
@@ -1298,7 +1282,7 @@ a:active {
 
 .bezel-card-inner {
   background: var(--color-surface-inner);
-  padding: 40px;
+  padding: 20px;
   border-radius: 22px;
   border: 1px solid var(--color-border-inner);
   width: 100%;
@@ -1439,7 +1423,59 @@ a:active {
   color: var(--color-text-primary);
 }
 
+.status-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
 
+.roadmap-card {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  text-align: left;
+  transition: all 0.3s var(--ease-premium);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.01);
+}
+
+.roadmap-card:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 136, 0, 0.15);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.02);
+  transform: translateY(-1px);
+}
+
+.roadmap-card .status-badge {
+  font-size: 0.625rem;
+  padding: 2px 6px;
+  margin-bottom: 2px;
+  gap: 4px;
+}
+
+.roadmap-card .card-title-small {
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+  gap: 8px;
+}
+
+.roadmap-card .card-desc-small {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
 
 /* --- Editorial Layout (Business Structural Split) --- */
 .editorial-card {
@@ -1692,7 +1728,7 @@ a:active {
 footer {
   position: relative;
   z-index: 10;
-  padding: 56px 0;
+  padding: 30px 0;
   border-top: 1px solid var(--color-border-outer);
   background: #050505;
   text-align: center;
@@ -1849,12 +1885,12 @@ footer {
     scroll-snap-stop: normal;
   }
 
-  .features-section,
+  /* .features-section,
   .faq-section,
   .contact-section {
     padding-top: 80px;
     padding-bottom: 80px;
-  }
+  } */
 
   .btn {
     width: 100%;
@@ -1991,8 +2027,8 @@ footer {
 
 /* --- Trust & Provenance Banner --- */
 .trust-banner {
-  /* margin-top: 1rem;
-  margin-bottom: 5rem; */
+  margin-top: 1rem;
+  margin-bottom: 5rem;
 }
 
 .trust-banner-inner {
@@ -2288,7 +2324,7 @@ footer {
 }
 
 .pricing-card-header {
-  margin-bottom: 24px;
+  margin-bottom: 12px;
 }
 
 .pricing-tier-name {
@@ -2674,7 +2710,6 @@ footer {
 @media (max-width: 1024px) {
   .pricing-grid {
     grid-template-columns: 1fr;
-    max-width: 450px;
     margin-left: auto;
     margin-right: auto;
   }

@@ -1,9 +1,9 @@
-@import "tailwindcss";
 @plugin "@tailwindcss/forms";
 @plugin "flyonui";
-@import "flyonui/variants.css";
 @source "../node_modules/flyonui/flyonui.js";
 
+@import "tailwindcss";
+@import "flyonui/variants.css";
 @import "flyonui/src/vendor/flatpickr.css";
 @import "flyonui/src/vendor/notyf.css";
 @import "flyonui/src/vendor/datatables.css";
@@ -12,6 +12,55 @@
 @import "flyonui/src/vendor/raty.css";
 @import "flyonui/src/vendor/waves.css";
 @import "flyonui/src/vendor/apexcharts.css";
+
+/* ── 8OHM.co.za Global Styles ── */
+:root {
+    --color-brand: #ff8800;
+
+    /* Typography — Using Satoshi for slick headings, Argentum for the body */
+    --font-display: 'Argentum Sans', 'Argentum Sans', 'Montserrat', sans-serif;
+    --font-body: 'Argentum Sans', 'Montserrat', sans-serif;
+
+    /* Core palette — dark theme */
+    --color-bg: #0a0a0f;
+    --color-text-primary: #f0f0f5;
+    --color-text-secondary: #a0a0b0;
+    --color-text-muted: #606070;
+
+    --color-primary: #ff8800;
+    --color-primary-50: #fff5e6;
+    --color-primary-100: #ffe8cc;
+    --color-primary-200: #ffd9b3;
+    --color-primary-300: #ffca99;
+    --color-primary-400: #ffbb80;
+    --color-primary-500: #ff8800;
+    --color-primary-600: #e67800;
+    --color-primary-700: #cc6900;
+    --color-primary-800: #b35a00;
+    --color-primary-900: #994b00;
+
+    /* Accents */
+    --color-accent-primary: #ff8800;
+    --color-accent-secondary: #8dd7da;
+
+    /* Surfaces (glass cards) */
+    --color-surface-outer: rgba(255, 255, 255, 0.04);
+    --color-surface-inner: rgba(255, 255, 255, 0.06);
+
+    /* Borders (glass cards) */
+    --color-border-outer: rgba(255, 255, 255, 0.08);
+    --color-border-inner: rgba(255, 255, 255, 0.10);
+
+    /* Motion */
+    --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --color-admin-sidebar: #0F0F10;
+    --color-admin-main: #09090B;
+    --color-admin-accent: #ff8800;
+    --color-admin-modern: #ff8800;
+
+    --breakpoint-nav: 1436px;
+}
 
 @plugin "flyonui/theme" {
     name: "8OHM Dashboard Dark";
@@ -65,63 +114,8 @@
     font-display: swap;
 }
 
-@theme {
-    /* Updated font-sans to lead with Argentum and use tighter geometric fallbacks */
-    --font-sans: "Argentum Sans", "Montserrat", "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-satoshi: "Satoshi", sans-serif;
-    --font-neue: "Neue Montreal", sans-serif;
-
-    --color-admin-sidebar: #0F0F10;
-    --color-admin-main: #09090B;
-    --color-admin-accent: #ff8800;
-    --color-admin-modern: #ff8800;
-
-    --breakpoint-nav: 1436px;
-}
-
 html {
     scroll-behavior: smooth;
-}
-
-/* ── 8OHM.co.za Global Styles ── */
-:root {
-    --color-brand: #ff8800;
-
-    /* Typography — Using Satoshi for slick headings, Argentum for the body */
-    --font-display: 'Argentum Sans', 'Argentum Sans', 'Montserrat', sans-serif;
-    --font-body: 'Argentum Sans', 'Montserrat', sans-serif;
-
-    /* Core palette — dark theme */
-    --color-bg: #0a0a0f;
-    --color-text-primary: #f0f0f5;
-    --color-text-secondary: #a0a0b0;
-    --color-text-muted: #606070;
-
-    --color-primary-50: #fff5e6;
-    --color-primary-100: #ffe8cc;
-    --color-primary-200: #ffd9b3;
-    --color-primary-300: #ffca99;
-    --color-primary-400: #ffbb80;
-    --color-primary-500: #ff8800;
-    --color-primary-600: #e67800;
-    --color-primary-700: #cc6900;
-    --color-primary-800: #b35a00;
-    --color-primary-900: #994b00;
-
-    /* Accents */
-    --color-accent-primary: #ff8800;
-    --color-accent-secondary: #8dd7da;
-
-    /* Surfaces (glass cards) */
-    --color-surface-outer: rgba(255, 255, 255, 0.04);
-    --color-surface-inner: rgba(255, 255, 255, 0.06);
-
-    /* Borders (glass cards) */
-    --color-border-outer: rgba(255, 255, 255, 0.08);
-    --color-border-inner: rgba(255, 255, 255, 0.10);
-
-    /* Motion */
-    --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .btn-primary {
