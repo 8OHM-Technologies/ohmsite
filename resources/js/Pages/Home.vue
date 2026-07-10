@@ -446,7 +446,7 @@ onUnmounted(() => {
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                        }}</span>
+                      }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
@@ -456,7 +456,7 @@ onUnmounted(() => {
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
-                        }}</span>
+                      }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
@@ -640,7 +640,7 @@ onUnmounted(() => {
                 servers and more. All without mandatory cloud
                 lock-in or ring-fenced ecosystems.
               </p>
-              <ul class="card-list">
+              <ul class="card-list" style="margin-bottom: 20px;">
                 <li class="card-list-item">
                   <i class="ph-light ph-brain card-list-icon"></i>
                   <div>
@@ -1722,7 +1722,7 @@ a:active {
   font-size: 0.9rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
-  padding-left: 32px;
+  padding-left: 10px;
 }
 
 /* --- Footer --- */
