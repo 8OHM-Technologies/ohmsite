@@ -27,24 +27,24 @@ const submit = () => {
         <!-- Left Side: Image & Info (Perfectly Matched with Login) -->
         <div class="hidden lg:flex lg:w-2/3 relative">
             <img src="/assets/images/Ohmsite_LoginBack.webp" alt="Auth Background"
-                class="absolute inset-0 w-full h-full object-cover opacity-60" style="object-fit: cover;" />
+                class="absolute inset-0 w-full h-full object-cover opacity-70" style="object-fit: cover;" />
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
 
             <div class="relative z-10 p-20 flex flex-col justify-between w-full h-full">
                 <!-- Logo -->
                 <Link :href="route('home')">
-                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-10" />
+                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-12" />
                 </Link>
                 <div class="h-10"></div>
 
                 <!-- Text Content -->
                 <div class="space-y-1">
-                    <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">
-                        Register<br />an Account.
+                    <h1 class="text-4xl font-black uppercase tracking-tight leading-none">
+                        Create<br />an Account
                     </h1>
-                    <p class="text-zinc-400 font-bold uppercase tracking-widest text-xs max-w-md">
-                        Start Turning
-                        Fragmented Data into Analytical Advantage.
+                    <p class="text-zinc-400 font-bold uppercase tracking-widest text-xs">
+                        and Start Turning
+                        Fragmented Data into Analytical Advantage
                     </p>
 
                     <!-- Badges -->
@@ -57,7 +57,7 @@ const submit = () => {
                                 </svg>
                             </div>
                             <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
-                                Subscribe Annually to save 17% off your Subscription</span>
+                                Access the Analytics Dashboard</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -66,8 +66,8 @@ const submit = () => {
                                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
-                                Track Trends using the Analytics Dashboard</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Download
+                                Historical Datasets</span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
@@ -76,8 +76,8 @@ const submit = () => {
                                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">Get API
-                                Access</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-white/80">
+                                Subscribe Annually to save 17%</span>
                         </div>
                     </div>
                 </div>
@@ -88,8 +88,9 @@ const submit = () => {
         <div class="w-full lg:w-1/3 flex items-center justify-center p-10 bg-zinc-950 overflow-y-auto h-screen">
             <div class="max-w-md w-full space-y-10 py-10">
                 <div class="text-center lg:text-left">
-                    <h2 class="text-4xl font-black uppercase tracking-tighter">Create account</h2>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Create an account to
+                    <h2 class="text-4xl font-black uppercase tracking-tighter">Account Registration</h2>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-2">Please provide your
+                        details to
                         get started </p>
                 </div>
 
@@ -208,7 +209,7 @@ const submit = () => {
                     </div>
 
                     <button type="submit" :disabled="form.processing"
-                        class="w-full bg-[#b89574] text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#a68465] transition-all active:scale-[0.98] shadow-2xl"
+                        class="w-full btn-primary text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#a68465] transition-all active:scale-[0.98] shadow-2xl"
                         :class="{ 'opacity-50 cursor-not-allowed': form.processing }">
                         Register
                     </button>
