@@ -284,18 +284,18 @@ onUnmounted(() => {
           </p>
 
           <div class="cta-group reveal-item">
-            <a href="#services" class="btn btn-primary">
+            <Link href="#services" class="btn btn-primary">
               <span>Explore Data Services</span>
               <div class="btn-icon">
                 <i class="ph-light ph-database"></i>
               </div>
-            </a>
-            <a href="/demo" class="btn btn-secondary">
+            </Link>
+            <Link href="/demo" class="btn btn-secondary">
               <span>View Demo Dashboard</span>
               <div class="btn-icon">
                 <i class="ph-light ph-presentation"></i>
               </div>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -443,27 +443,27 @@ onUnmounted(() => {
 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
-                    <a v-if="tier.name === 'Developer API'"
+                    <Link v-if="tier.name === 'Developer API'"
                       :href="developerOption === 'subscription' ? tier.href : tier.href + '-archive'"
                       :aria-describedby="tier.id" class="btn btn-secondary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                      }}</span>
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
                       </div>
-                    </a>
-                    <a v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
+                    </Link>
+                    <Link v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
                       :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
-                      }}</span>
+                        }}</span>
                       <div class="btn-icon">
                         <i class="ph-light"
                           :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
                       </div>
-                    </a>
+                    </Link>
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
@@ -521,12 +521,12 @@ onUnmounted(() => {
                   </div>
                 </li>
               </ul>
-              <a href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+              <Link href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
                 <span>Enquire Now</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -663,12 +663,12 @@ onUnmounted(() => {
                   </div>
                 </li>
               </ul>
-              <a href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+              <Link href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
                 <span>Launching Soon</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-arrow-right"></i>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -688,12 +688,12 @@ onUnmounted(() => {
                   style="width: 6px; height: 6px; background: var(--color-accent-secondary); border-radius: 50%; box-shadow: 0 0 6px var(--color-accent-secondary);"></span>
                 Shop Launching Soon! Join the Waitlist to get notified...
               </div>
-              <a href="#contact" class="btn btn-secondary contact-trigger-btn btn-align-bottom">
+              <Link href="#contact" class="btn btn-secondary contact-trigger-btn btn-align-bottom">
                 <span>Join the Waitlist</span>
                 <div class="btn-icon">
                   <i class="ph-light ph-bell"></i>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -892,9 +892,9 @@ onUnmounted(() => {
           reserved.
         </p>
         <div class="flex justify-center items-center gap-x-6 gap-y-2 flex-wrap text-sm">
-          <a href="/privacy-policy" target="_blank">Privacy Policy</a>
-          <a href="/terms" target="_blank">Terms & Conditions</a>
-          <a href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</a>
+          <Link href="/privacy-policy" target="_blank">Privacy Policy</Link>
+          <Link href="/terms" target="_blank">Terms & Conditions</Link>
+          <Link href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</Link>
         </div>
       </div>
     </footer>
