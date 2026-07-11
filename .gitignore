@@ -151,3 +151,4 @@ public/hot
 vendor/
 **/vendor/
 .agents
+.phpunit.result.cache

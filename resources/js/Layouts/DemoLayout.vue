@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import LoadingScreen from '@/Components/LoadingScreen.vue';
 import Toast from '@/Components/Toast.vue';
+import demoData from '@/Pages/Demo/Analytics/demo_data.json';
 import {
     LayoutDashboard,
     Home,
@@ -22,9 +23,64 @@ import {
     Layers,
     Clock,
     TrendingUp,
-    Building
+    Building,
+    Database,
+    Briefcase,
+    Calendar
 } from 'lucide-vue-next';
 
+const page = usePage();
+
+// Calculate dataset breakdown from cases prop or fallback to demoData
+const datasetStats = computed(() => {
+    const rawCases = page.props.cases && page.props.cases.length > 0 
+        ? page.props.cases 
+        : demoData;
+
+    if (!rawCases || rawCases.length === 0) {
+        return {
+            total: 0,
+            employers: 0,
+            dateRange: 'N/A'
+        };
+    }
+
+    const total = rawCases.length;
+
+    // Unique employers count
+    const employersSet = new Set();
+    rawCases.forEach(c => {
+        if (c.employer) {
+            employersSet.add(c.employer.trim().toLowerCase());
+        }
+    });
+    const employers = employersSet.size;
+
+    // Get min & max years from award_date or hearing dates
+    let minYear = null;
+    let maxYear = null;
+    rawCases.forEach(c => {
+        const dateStr = c.award_date || c.hearing_start;
+        if (dateStr) {
+            const year = new Date(dateStr.split('T')[0]).getFullYear();
+            if (!isNaN(year)) {
+                if (minYear === null || year < minYear) minYear = year;
+                if (maxYear === null || year > maxYear) maxYear = year;
+            }
+        }
+    });
+
+    let dateRange = 'Unknown';
+    if (minYear !== null && maxYear !== null) {
+        dateRange = minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
+    }
+
+    return {
+        total,
+        employers,
+        dateRange
+    };
+});
 </script>
 
 <template>
@@ -53,6 +109,48 @@ import {
                         <p class="text-zinc-500 mt-2 font-bold uppercase tracking-widest text-[10px]">
                             South African CCMA Arbitration & Dispute Intelligence
                         </p>
+                    </div>
+                </div>
+
+                <!-- Dataset Breakdown -->
+                <div class="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] w-full xl:w-auto shrink-0">
+                    <!-- Total Records -->
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Database class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total Records</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.total.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Unique Employers -->
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Briefcase class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.employers.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Date Range -->
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Calendar class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date Range</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.dateRange }}</span>
+                        </div>
                     </div>
                 </div>
 
