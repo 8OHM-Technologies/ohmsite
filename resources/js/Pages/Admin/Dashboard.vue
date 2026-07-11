@@ -21,7 +21,9 @@ const props = defineProps({
 
 <template>
 
-    <Head title="Admin Dashboard" />
+    <Head title="8OHM | End-to-end Data Solutions">
+        <meta name="robots" content="noindex, nofollow" />
+    </Head>
 
     <AdminLayout>
         <!-- Hero Section -->

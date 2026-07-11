@@ -33,8 +33,8 @@ const page = usePage();
 
 // Calculate dataset breakdown from cases prop or fallback to demoData
 const datasetStats = computed(() => {
-    const rawCases = page.props.cases && page.props.cases.length > 0 
-        ? page.props.cases 
+    const rawCases = page.props.cases && page.props.cases.length > 0
+        ? page.props.cases
         : demoData;
 
     if (!rawCases || rawCases.length === 0) {
@@ -113,15 +113,20 @@ const datasetStats = computed(() => {
                 </div>
 
                 <!-- Dataset Breakdown -->
-                <div class="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] w-full xl:w-auto shrink-0">
+                <div
+                    class="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] w-full xl:w-auto shrink-0">
                     <!-- Total Records -->
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
                             <Database class="w-4 h-4" />
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total Records</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.total.toLocaleString() }}</span>
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total
+                                Records</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.total.toLocaleString() }}</span>
                         </div>
                     </div>
 
@@ -130,12 +135,15 @@ const datasetStats = computed(() => {
 
                     <!-- Unique Employers -->
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
                             <Briefcase class="w-4 h-4" />
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.employers.toLocaleString() }}</span>
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.employers.toLocaleString() }}</span>
                         </div>
                     </div>
 
@@ -144,12 +152,16 @@ const datasetStats = computed(() => {
 
                     <!-- Date Range -->
                     <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
                             <Calendar class="w-4 h-4" />
                         </div>
                         <div class="flex flex-col">
-                            <span class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date Range</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{ datasetStats.dateRange }}</span>
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date
+                                Range</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.dateRange }}</span>
                         </div>
                     </div>
                 </div>

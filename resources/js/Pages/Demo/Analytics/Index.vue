@@ -562,7 +562,9 @@ const employerSignatureSeries = computed(() => {
 
 <template>
 
-    <Head title="Analytics" />
+    <Head title="8OHM | End-to-end Data Solutions">
+        <link rel="canonical" href="https://8ohm.co.za/demo" />
+    </Head>
 
     <DemoLayout>
         <div class="space-y-8 animate-in fade-in duration-700">
@@ -1027,7 +1029,7 @@ const employerSignatureSeries = computed(() => {
                             class="p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-admin-modern/30 transition-all">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-black text-white uppercase tracking-tight">{{ ind.name
-                                }}</span>
+                                    }}</span>
                                 <span
                                     class="text-[9px] font-black text-admin-modern bg-admin-modern/10 px-2 py-0.5 rounded-lg">{{
                                         ind.share }}% share</span>
@@ -1066,7 +1068,7 @@ const employerSignatureSeries = computed(() => {
                                 </span>
                                 <div>
                                     <span class="text-xs font-black text-white uppercase tracking-tight">{{ app.name
-                                    }}</span>
+                                        }}</span>
                                     <p class="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">{{ app.industry }} |
                                         {{ app.location }}</p>
                                 </div>
@@ -1111,7 +1113,7 @@ const employerSignatureSeries = computed(() => {
                         <div class="space-y-6 flex flex-col justify-between">
                             <div class="space-y-4">
                                 <h4 class="text-sm font-black text-white uppercase tracking-wider">{{ selectedEmployer
-                                }}</h4>
+                                    }}</h4>
 
                                 <div
                                     class="grid grid-cols-2 gap-4 text-xs font-bold uppercase tracking-wider text-zinc-500">

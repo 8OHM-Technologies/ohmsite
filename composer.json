@@ -13,6 +13,7 @@
         "laravel/socialite": "^5.28",
         "laravel/tinker": "^2.10.1",
         "predis/predis": "^3.4",
+        "spatie/laravel-sitemap": "^8.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

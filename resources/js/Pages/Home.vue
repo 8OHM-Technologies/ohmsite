@@ -245,7 +245,9 @@ onUnmounted(() => {
 
 <template>
 
-  <Head title="8OHM | End-to-end Data Solutions" />
+  <Head title="8OHM | End-to-end Data Solutions">
+    <link rel="canonical" href="https://8ohm.co.za" />
+  </Head>
 
   <div class="home-page-container">
     <div class="background-visuals">

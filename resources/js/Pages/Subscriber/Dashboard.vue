@@ -20,13 +20,15 @@ const props = defineProps({
 
 <template>
 
-    <Head title="Pro Dashboard" />
+    <Head title="8OHM | End-to-end Data Solutions | Analytics Dashboard">
+        <meta name="robots" content="noindex, nofollow" />
+    </Head>
 
     <SubscriberLayout>
         <!-- Hero Section -->
         <div
             class="relative w-full min-h-[300px] lg:h-80 rounded-[2rem] lg:rounded-[3rem] overflow-hidden mb-8 lg:mb-12 bg-black group shadow-2xl">
-            <img src="/assets/images/hero-bg-standard.png" alt="Pro Access"
+            <img src="/assets/images/hero-bg-standard.png" alt="Analytics Access"
                 class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" />
             <div class="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
 
@@ -34,7 +36,7 @@ const props = defineProps({
                 <div
                     class="inline-flex items-center px-3 py-1 bg-admin-modern text-black text-[10px] font-black uppercase tracking-widest rounded-full mb-6 self-start shadow-lg shadow-admin-modern/20">
                     <TrendingUp class="w-3 h-3 mr-2" />
-                    Pro Access
+                    Analytics Access
                 </div>
                 <h1
                     class="text-4xl sm:text-5xl lg:text-4xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
@@ -42,7 +44,7 @@ const props = defineProps({
                 </h1>
                 <p
                     class="text-zinc-400 text-sm sm:text-lg font-bold uppercase tracking-widest mb-8 max-w-md opacity-80">
-                    Access your exclusive analytics and track your premium acquisitions.
+                    Access your exclusive analytics and track your data acquisitions.
                 </p>
                 <div class="flex flex-wrap items-center gap-4">
                     <Link :href="route('pro-dashboard.products.index')"
@@ -56,7 +58,8 @@ const props = defineProps({
             <div
                 class="absolute right-0 lg:right-12 top-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 pointer-events-none opacity-40 sm:opacity-100 group-hover:opacity-100 transition-opacity">
                 <div class="relative w-full h-full">
-                    <img v-if="recentProducts && recentProducts.length > 0" :src="recentProducts[0].image" alt="Featured Item"
+                    <img v-if="recentProducts && recentProducts.length > 0" :src="recentProducts[0].image"
+                        alt="Featured Item"
                         class="w-full h-full object-contain drop-shadow-[0_45px_45px_rgba(0,0,0,0.8)] animate-float" />
                 </div>
             </div>
@@ -95,7 +98,7 @@ const props = defineProps({
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 lg:mb-12 gap-4">
                     <div class="flex items-center gap-4">
                         <div class="w-2 h-8 bg-admin-modern rounded-full shadow-lg shadow-admin-modern/20"></div>
-                        <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Your Premium Collection
+                        <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Your Data Collection
                         </h2>
                     </div>
                     <Link :href="route('pro-dashboard.products.index')"
@@ -115,7 +118,8 @@ const props = defineProps({
                         </div>
                         <div class="flex justify-between items-end">
                             <div class="flex-1 mr-4">
-                                <p class="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-1">Status: Active</p>
+                                <p class="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-1">Status:
+                                    Active</p>
                                 <h3 class="font-black text-lg text-white uppercase tracking-tighter leading-tight">{{
                                     product.name }}</h3>
                             </div>
