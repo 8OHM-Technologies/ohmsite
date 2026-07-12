@@ -125,7 +125,7 @@ const props = defineProps({
                             </div>
                             <p
                                 class="font-black text-2xl text-white uppercase tracking-tighter border-b-2 border-admin-modern">
-                                €{{ Math.round(product.price) }}</p>
+                                R{{ Math.round(product.price) }}</p>
                         </div>
 
                         <!-- Hover Actions -->
@@ -165,7 +165,7 @@ const props = defineProps({
                                     :style="`height: ${sale.height}%`">
                                     <div
                                         class="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-black px-2.5 py-1.5 rounded-lg text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all pointer-events-none shadow-2xl translate-y-2 group-hover:translate-y-0">
-                                        €{{ sale.amount }}
+                                        R{{ sale.amount }}
                                     </div>
                                 </div>
                                 <span

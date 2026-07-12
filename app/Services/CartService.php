@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\Coupon;
+use App\Models\Discount;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -87,36 +87,36 @@ class CartService
     }
 
     /**
-     * Apply a coupon to the cart.
+     * Apply a discount to the cart.
      */
-    public function applyCoupon(string $code): bool
+    public function applyDiscount(string $code): bool
     {
-        $coupon = Coupon::where('code', $code)->first();
+        $discount = Discount::where('code', $code)->first();
 
-        if (! $coupon || ! $coupon->isValid()) {
+        if (! $discount || ! $discount->isValid()) {
             return false;
         }
 
         $cart = $this->getCart();
         $subtotal = $this->calculateSubtotal($cart);
 
-        if ($subtotal < $coupon->min_order) {
+        if ($subtotal < $discount->min_order) {
             return false;
         }
 
-        $cart->update(['coupon_id' => $coupon->id]);
+        $cart->update(['discount_id' => $discount->id]);
 
         return true;
     }
 
     /**
-     * Remove coupon from cart.
+     * Remove discount from cart.
      */
-    public function removeCoupon(): bool
+    public function removeDiscount(): bool
     {
         $cart = $this->getCart();
 
-        return $cart->update(['coupon_id' => null]);
+        return $cart->update(['discount_id' => null]);
     }
 
     /**
@@ -137,10 +137,10 @@ class CartService
             'discount' => round($discount, 2),
             'shipping' => round($shipping, 2),
             'total' => round($total, 2),
-            'coupon' => $cart->coupon ? [
-                'code' => $cart->coupon->code,
-                'type' => $cart->coupon->type,
-                'value' => $cart->coupon->value,
+            'discount' => $cart->discount ? [
+                'code' => $cart->discount->code,
+                'type' => $cart->discount->type,
+                'value' => $cart->discount->value,
             ] : null,
             'free_shipping_progress' => min(100, ($subtotal / $freeShippingThreshold) * 100),
             'free_shipping_threshold' => $freeShippingThreshold,
@@ -154,15 +154,15 @@ class CartService
 
     private function calculateDiscount(Cart $cart, float $subtotal): float
     {
-        if (! $cart->coupon) {
+        if (! $cart->discount) {
             return 0;
         }
 
-        if ($cart->coupon->type === 'percentage') {
-            return $subtotal * ($cart->coupon->value / 100);
+        if ($cart->discount->type === 'percentage') {
+            return $subtotal * ($cart->discount->value / 100);
         }
 
-        return min($subtotal, $cart->coupon->value);
+        return min($subtotal, $cart->discount->value);
     }
 
     private function calculateShipping(float $amount, ?float $threshold = null): float

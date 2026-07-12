@@ -14,7 +14,7 @@ const emit = defineEmits(['move-to-cart']);
 const formattedPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'EUR',
+        currency: 'ZAR',
     }).format(price);
 };
 </script>

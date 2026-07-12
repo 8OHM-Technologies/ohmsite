@@ -19,7 +19,7 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
 
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CouponController;
+use App\Http\Controllers\DiscountController;
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -30,8 +30,8 @@ Route::delete('/cart-clear', [CartController::class, 'clear'])->name('cart.clear
 Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('throttle:checkout')->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout.store');
 
-Route::post('/cart/coupon', [CouponController::class, 'apply'])->name('cart.coupon.apply');
-Route::delete('/cart/coupon', [CouponController::class, 'remove'])->name('cart.coupon.remove');
+Route::post('/cart/discount', [DiscountController::class, 'apply'])->name('cart.discount.apply');
+Route::delete('/cart/discount', [DiscountController::class, 'remove'])->name('cart.discount.remove');
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');

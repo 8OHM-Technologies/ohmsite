@@ -54,7 +54,7 @@ const revenueChartOptions = {
     tooltip: {
         theme: 'dark',
         x: { show: true },
-        y: { formatter: (val) => `€${val.toLocaleString()}` }
+        y: { formatter: (val) => `R${val.toLocaleString()}` }
     }
 };
 
@@ -89,8 +89,8 @@ const trafficOptions = {
 const trafficSeries = props.trafficSources ? Object.values(props.trafficSources) : [];
 
 const formatCurrency = (val) => {
-    if (typeof val === 'string' && val.startsWith('€')) return val;
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(val || 0);
+    if (typeof val === 'string' && val.startsWith('R')) return val;
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ZAR' }).format(val || 0);
 };
 
 const getStatusIcon = (type) => {
@@ -191,7 +191,7 @@ const getStatusIcon = (type) => {
                                 <div class="w-2 h-2 rounded-full"
                                     :style="{ backgroundColor: trafficOptions.colors[i] }"></div>
                                 <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{ label
-                                    }}</span>
+                                }}</span>
                             </div>
                         </div>
                     </div>
@@ -270,12 +270,14 @@ const getStatusIcon = (type) => {
                         <div>
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Live Nodes
                             </p>
-                            <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats?.active_visitors || 0 }}
+                            <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats?.active_visitors ||
+                                0 }}
                             </p>
                         </div>
                         <div>
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Txs</p>
-                            <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats?.sales_today || 0 }}</p>
+                            <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats?.sales_today || 0 }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Rev</p>

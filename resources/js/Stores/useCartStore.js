@@ -11,10 +11,9 @@ export const useCartStore = defineStore('cart', {
         summary: {
             subtotal: 0,
             discount: 0,
-            shipping: 0,
+            // shipping: 0,
             total: 0,
-            free_shipping_progress: 0,
-            coupon: null,
+            // free_shipping_progress: 0,
         },
         loading: false,
     }),
@@ -97,23 +96,23 @@ export const useCartStore = defineStore('cart', {
         },
 
         /**
-         * Apply a coupon code.
+         * Apply a discount code.
          */
-        applyCoupon(code) {
-            router.post(route('cart.coupon.apply'), { code }, {
+        applyDiscount(code) {
+            router.post(route('cart.discount.apply'), { code }, {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Coupon applied'),
-                onError: (errors) => toast.error(errors.code || 'Invalid coupon'),
+                onSuccess: () => toast.success('Discount applied'),
+                onError: (errors) => toast.error(errors.code || 'Invalid discount'),
             });
         },
 
         /**
-         * Remove currently applied coupon.
+         * Remove currently applied discount.
          */
-        removeCoupon() {
-            router.delete(route('cart.coupon.remove'), {
+        removeDiscount() {
+            router.delete(route('cart.discount.remove'), {
                 preserveScroll: true,
-                onSuccess: () => toast.success('Coupon removed'),
+                onSuccess: () => toast.success('Discount removed'),
             });
         }
     }

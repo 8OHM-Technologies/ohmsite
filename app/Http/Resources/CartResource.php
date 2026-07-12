@@ -31,10 +31,10 @@ class CartResource extends JsonResource
                 'options' => $item->options,
                 'subtotal' => round($item->unit_price * $item->quantity, 2),
             ]),
-            'coupon' => $this->coupon ? [
-                'code' => $this->coupon->code,
-                'type' => $this->coupon->type,
-                'value' => $this->coupon->value,
+            'discount' => $this->discount ? [
+                'code' => $this->discount->code,
+                'type' => $this->discount->type,
+                'value' => $this->discount->value,
             ] : null,
         ];
     }

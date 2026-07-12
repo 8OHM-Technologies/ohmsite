@@ -133,7 +133,7 @@ const handleGalleryImages = (e) => {
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <div class="sm:col-span-1">
-                                <InputLabel for="price" value="Retail Price (€)"
+                                <InputLabel for="price" value="Retail Price (R)"
                                     class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
                                 <div class="relative">
                                     <input id="price" type="number" step="0.01" v-model="form.price"
@@ -142,7 +142,7 @@ const handleGalleryImages = (e) => {
                                 </div>
                             </div>
                             <div class="sm:col-span-1">
-                                <InputLabel for="sale_price" value="Offer Price (€)"
+                                <InputLabel for="sale_price" value="Offer Price (R)"
                                     class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
                                 <input id="sale_price" type="number" step="0.01" v-model="form.sale_price"
                                     class="w-full bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 font-black text-lg text-admin-modern" />

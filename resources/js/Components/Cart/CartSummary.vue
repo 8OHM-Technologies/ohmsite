@@ -16,23 +16,23 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['apply-coupon', 'remove-coupon']);
+const emit = defineEmits(['apply-discount', 'remove-discount']);
 
-const couponForm = useForm({
+const discountForm = useForm({
     code: '',
 });
 
 const formattedPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'EUR',
+        currency: 'ZAR',
     }).format(price);
 };
 
-const handleApplyCoupon = () => {
-    if (couponForm.code) {
-        emit('apply-coupon', couponForm.code);
-        couponForm.code = '';
+const handleApplyDiscount = () => {
+    if (discountForm.code) {
+        emit('apply-discount', discountForm.code);
+        discountForm.code = '';
     }
 };
 </script>
@@ -41,26 +41,27 @@ const handleApplyCoupon = () => {
     <div class="bg-zinc-900 rounded-[3rem] p-8 lg:p-10 sticky top-40 border border-white/5 shadow-2xl">
         <h2 class="text-2xl font-black uppercase tracking-tighter text-white mb-8">Order Summary</h2>
 
-        <!-- Coupon Input -->
+        <!-- Discount Input -->
         <div class="mb-10">
-            <label for="coupon" class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3">Have a
-                coupon code?</label>
-            <div v-if="summary.coupon"
+            <label for="discount" class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-3">Have
+                a
+                discount code?</label>
+            <div v-if="summary.discount"
                 class="flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
                 <div class="flex items-center">
                     <BadgeCheck class="w-5 h-5 text-emerald-500 mr-3" />
-                    <span class="text-sm font-black text-emerald-500 uppercase tracking-widest">{{ summary.coupon.code
-                        }}</span>
+                    <span class="text-sm font-black text-emerald-500 uppercase tracking-widest">{{ summary.discount.code
+                    }}</span>
                 </div>
-                <button @click="emit('remove-coupon')" class="text-emerald-500 hover:text-white transition-colors">
+                <button @click="emit('remove-discount')" class="text-emerald-500 hover:text-white transition-colors">
                     <X class="w-5 h-5" />
                 </button>
             </div>
             <div v-else class="relative">
-                <input v-model="couponForm.code" type="text" id="coupon" placeholder="Enter code"
+                <input v-model="discountForm.code" type="text" id="discount" placeholder="Enter code"
                     class="block w-full px-6 py-4 bg-black border border-white/5 rounded-2xl text-xs font-bold uppercase tracking-widest text-white focus:ring-1 focus:ring-white/20 transition-all placeholder:text-zinc-700 placeholder:normal-case"
-                    @keyup.enter="handleApplyCoupon" />
-                <button @click="handleApplyCoupon"
+                    @keyup.enter="handleApplyDiscount" />
+                <button @click="handleApplyDiscount"
                     class="absolute right-2 top-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-black bg-white rounded-xl hover:bg-zinc-200 transition-all">
                     Apply
                 </button>
@@ -79,7 +80,7 @@ const handleApplyCoupon = () => {
                 <span class="text-emerald-500">-{{ formattedPrice(summary.discount) }}</span>
             </div>
 
-            <div class="flex justify-between text-xs font-bold uppercase tracking-widest">
+            <!-- <div class="flex justify-between text-xs font-bold uppercase tracking-widest">
                 <span class="text-zinc-500 flex items-center">
                     Shipping
                     <Info class="w-4 h-4 ml-2 text-zinc-700 cursor-help" title="Standard shipping rate" />
@@ -87,10 +88,10 @@ const handleApplyCoupon = () => {
                 <span class="text-white">
                     {{ summary.shipping > 0 ? formattedPrice(summary.shipping) : 'FREE' }}
                 </span>
-            </div>
+            </div> -->
 
             <!-- Free Shipping Progress -->
-            <div v-if="summary.shipping > 0" class="pt-4">
+            <!-- <div v-if="summary.shipping > 0" class="pt-4">
                 <div class="flex justify-between text-[9px] font-black uppercase tracking-widest mb-2">
                     <span class="text-zinc-600">Spend {{ formattedPrice(summary.free_shipping_threshold -
                         summary.subtotal) }} more for free shipping</span>
@@ -105,8 +106,8 @@ const handleApplyCoupon = () => {
             <div class="pt-6 border-t border-white/5 flex justify-between items-end">
                 <span class="text-xl font-black uppercase tracking-tighter text-white">Total</span>
                 <span class="text-3xl font-black uppercase tracking-tighter text-white">{{ formattedPrice(summary.total)
-                    }}</span>
-            </div>
+                }}</span>
+            </div> -->
         </div>
 
         <!-- Checkout Button -->
@@ -119,8 +120,7 @@ const handleApplyCoupon = () => {
         <!-- Trust Badges -->
         <div class="mt-10">
             <p class="text-center text-[8px] font-black uppercase tracking-[0.2em] text-zinc-700 mt-6 leading-relaxed">
-                🔒 Secure Cash on Delivery<br>
-                Free 30-day returns on all orders
+                🔒 Secure Payments with PayStack
             </p>
         </div>
     </div>

@@ -55,7 +55,7 @@ class AnalyticsService
         $stats = [
             [
                 'name' => 'Total Sales',
-                'value' => '€' . number_format($totalSales, 0),
+                'value' => 'R' . number_format($totalSales, 0),
                 'change' => $salesGrowth['value'],
                 'trend' => $salesGrowth['trend'],
                 'icon' => 'M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12V6a2 2 0 114 0v.341C17.67 7.165 19 9.388 19 12v3.159c0 .538.214 1.055.595 1.436L21 17h-5M9 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'
@@ -69,7 +69,7 @@ class AnalyticsService
             ],
             [
                 'name' => 'Revenue',
-                'value' => '€' . number_format($totalSales, 0),
+                'value' => 'R' . number_format($totalSales, 0),
                 'change' => $revenueGrowth['value'],
                 'trend' => $revenueGrowth['trend'],
                 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'

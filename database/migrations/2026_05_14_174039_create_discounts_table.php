@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('coupons', function (Blueprint $header) {
+        Schema::create('discounts', function (Blueprint $header) {
             $header->id();
             $header->string('code')->unique();
             $header->enum('type', ['percentage', 'fixed']);
@@ -24,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('coupons');
+        Schema::dropIfExists('discounts');
     }
 };

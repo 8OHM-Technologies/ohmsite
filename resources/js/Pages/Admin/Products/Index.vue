@@ -116,13 +116,13 @@ const deleteProduct = (id) => {
                                     class="py-4 px-6 bg-black/20 border-y border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300">
                                     <div class="flex flex-col">
                                         <span class="font-black text-xl tracking-tighter text-white">
-                                            €{{ (product.sale_price && parseFloat(product.sale_price) > 0) ?
+                                            R{{ (product.sale_price && parseFloat(product.sale_price) > 0) ?
                                                 parseFloat(product.sale_price).toFixed(0) :
-                                            parseFloat(product.price).toFixed(0) }}
+                                                parseFloat(product.price).toFixed(0) }}
                                         </span>
                                         <span v-if="product.sale_price"
-                                            class="text-[10px] text-zinc-600 line-through font-bold">€{{
-                                            parseFloat(product.price).toFixed(0) }}</span>
+                                            class="text-[10px] text-zinc-600 line-through font-bold">R{{
+                                                parseFloat(product.price).toFixed(0) }}</span>
                                     </div>
                                 </td>
                                 <td
@@ -170,11 +170,11 @@ const deleteProduct = (id) => {
                                 <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-2">{{
                                     product.category?.name }}</p>
                                 <div class="flex items-center gap-2">
-                                    <span class="font-black text-xl text-admin-modern tracking-tighter">€{{
+                                    <span class="font-black text-xl text-admin-modern tracking-tighter">R{{
                                         Math.round(product.sale_price || product.price) }}</span>
                                     <span v-if="product.sale_price"
-                                        class="text-[10px] text-zinc-700 line-through font-bold">€{{
-                                        Math.round(product.price) }}</span>
+                                        class="text-[10px] text-zinc-700 line-through font-bold">R{{
+                                            Math.round(product.price) }}</span>
                                 </div>
                             </div>
                         </div>

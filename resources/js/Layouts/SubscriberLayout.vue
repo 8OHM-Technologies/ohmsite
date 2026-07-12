@@ -241,7 +241,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                                                 notification.created_at_human || 'Just now' }}</span>
                                                         <template v-if="notification.data.amount">
                                                             <span class="text-[8px] text-zinc-800">•</span>
-                                                            <span class="text-[9px] font-black text-emerald-400">€{{
+                                                            <span class="text-[9px] font-black text-emerald-400">R{{
                                                                 notification.data.amount }}</span>
                                                         </template>
                                                     </div>

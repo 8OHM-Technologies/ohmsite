@@ -54,7 +54,7 @@ const revenueChartOptions = {
     tooltip: {
         theme: 'dark',
         x: { show: true },
-        y: { formatter: (val) => `€${val.toLocaleString()}` }
+        y: { formatter: (val) => `R${val.toLocaleString()}` }
     }
 };
 
@@ -89,8 +89,8 @@ const trafficOptions = {
 const trafficSeries = Object.values(props.trafficSources);
 
 const formatCurrency = (val) => {
-    if (typeof val === 'string' && val.startsWith('€')) return val;
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(val);
+    if (typeof val === 'string' && val.startsWith('R')) return val;
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'ZAR' }).format(val);
 };
 
 const getStatusIcon = (type) => {

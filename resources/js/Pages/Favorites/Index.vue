@@ -83,11 +83,11 @@ const removeFavorite = async (productId) => {
                                         product.brands?.[0]?.name }}</p>
                                 </div>
                                 <div class="flex flex-col items-end">
-                                    <span class="text-2xl font-black tracking-tighter text-white">€{{
+                                    <span class="text-2xl font-black tracking-tighter text-white">R{{
                                         Math.round(product.sale_price || product.price) }}</span>
                                     <span v-if="product.sale_price"
-                                        class="text-[10px] text-zinc-700 line-through font-bold">€{{
-                                        Math.round(product.price) }}</span>
+                                        class="text-[10px] text-zinc-700 line-through font-bold">R{{
+                                            Math.round(product.price) }}</span>
                                 </div>
                             </div>
                         </div>

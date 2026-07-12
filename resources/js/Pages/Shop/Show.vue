@@ -138,7 +138,7 @@ onUnmounted(() => {
                                             brand.name }}</h4>
                                 </div>
                                 <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">{{ product.name
-                                }}</h1>
+                                    }}</h1>
                             </div>
                             <button @click="toggleFavorite"
                                 :class="product.is_favorited ? 'text-red-500 scale-110' : 'text-zinc-700 hover:text-white'"
@@ -151,11 +151,11 @@ onUnmounted(() => {
                             </button>
                         </div>
                         <div class="flex items-center space-x-6 pt-4">
-                            <span class="text-4xl font-black tracking-tighter">€{{ product.sale_price || product.price
-                            }}</span>
+                            <span class="text-4xl font-black tracking-tighter">R{{ product.sale_price || product.price
+                                }}</span>
                             <template
                                 v-if="product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price)">
-                                <span class="text-2xl text-zinc-700 line-through font-black tracking-tighter">€{{
+                                <span class="text-2xl text-zinc-700 line-through font-black tracking-tighter">R{{
                                     product.price }}</span>
                                 <span
                                     class="bg-white text-black px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-xl">
@@ -245,7 +245,7 @@ onUnmounted(() => {
                             <div class="px-2 mt-6 space-y-1 text-center">
                                 <h4 class="font-black text-lg text-white uppercase tracking-tighter">{{ related.name }}
                                 </h4>
-                                <p class="text-white/40 font-black text-base tracking-widest">€{{
+                                <p class="text-white/40 font-black text-base tracking-widest">R{{
                                     Math.round(related.sale_price ||
                                         related.price) }}</p>
                             </div>
@@ -260,62 +260,62 @@ onUnmounted(() => {
 <style scoped>
 /* --- Background Visuals --- */
 .background-visuals {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
 }
 
 .glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(130px);
-  opacity: 0.12;
-  mix-blend-mode: screen;
-  will-change: transform;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(130px);
+    opacity: 0.12;
+    mix-blend-mode: screen;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .orb-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, var(--color-accent-primary) 0%, rgba(255, 136, 0, 0) 70%);
-  top: -15%;
-  left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--color-accent-primary) 0%, rgba(255, 136, 0, 0) 70%);
+    top: -15%;
+    left: -10%;
 }
 
 .orb-2 {
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, var(--color-accent-secondary) 0%, rgba(141, 215, 218, 0) 70%);
-  bottom: -15%;
-  right: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, var(--color-accent-secondary) 0%, rgba(141, 215, 218, 0) 70%);
+    bottom: -15%;
+    right: -10%;
 }
 
 .orb-3 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #ff3c00 0%, rgba(255, 60, 0, 0) 70%);
-  top: 40%;
-  left: 35%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ff3c00 0%, rgba(255, 60, 0, 0) 70%);
+    top: 40%;
+    left: 35%;
 }
 
 .grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
 }
 
 .noise-overlay {
-  position: absolute;
-  inset: 0;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    position: absolute;
+    inset: 0;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 </style>

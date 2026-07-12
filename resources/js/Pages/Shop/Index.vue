@@ -199,7 +199,7 @@ onUnmounted(() => {
                                             class="text-[8px] font-black text-zinc-800 uppercase tracking-widest ml-1">Minimum</span>
                                         <div class="relative">
                                             <span
-                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700">€</span>
+                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700">R</span>
                                             <input type="number" v-model="activeFilters.min_price"
                                                 class="w-full bg-black/40 border-white/5 rounded-2xl py-4 pl-8 pr-4 text-xs font-black text-white focus:ring-1 focus:ring-white/10 transition-all" />
                                         </div>
@@ -209,7 +209,7 @@ onUnmounted(() => {
                                             class="text-[8px] font-black text-zinc-800 uppercase tracking-widest ml-1">Maximum</span>
                                         <div class="relative">
                                             <span
-                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700">€</span>
+                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-zinc-700">R</span>
                                             <input type="number" v-model="activeFilters.max_price"
                                                 class="w-full bg-black/40 border-white/5 rounded-2xl py-4 pl-8 pr-4 text-xs font-black text-white focus:ring-1 focus:ring-white/10 transition-all" />
                                         </div>
@@ -233,7 +233,7 @@ onUnmounted(() => {
                             <div class="flex items-center gap-6">
                                 <span
                                     class="bg-white text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-2xl">{{
-                                    products.total }} Silhouettes</span>
+                                        products.total }} Silhouettes</span>
                                 <div class="h-[1px] w-32 bg-white/5"></div>
                             </div>
                         </div>
@@ -308,11 +308,11 @@ onUnmounted(() => {
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                        <p class="text-white font-black text-lg tracking-widest">€{{
+                                        <p class="text-white font-black text-lg tracking-widest">R{{
                                             Math.round(product.sale_price || product.price) }}</p>
                                         <p v-if="product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price)"
-                                            class="text-zinc-700 line-through font-bold text-xs tracking-widest">€{{
-                                            Math.round(product.price) }}</p>
+                                            class="text-zinc-700 line-through font-bold text-xs tracking-widest">R{{
+                                                Math.round(product.price) }}</p>
                                     </div>
                                 </div>
                             </Link>
@@ -443,62 +443,62 @@ onUnmounted(() => {
 
 /* --- Background Visuals --- */
 .background-visuals {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
 }
 
 .glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(130px);
-  opacity: 0.12;
-  mix-blend-mode: screen;
-  will-change: transform;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(130px);
+    opacity: 0.12;
+    mix-blend-mode: screen;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .orb-1 {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, var(--color-accent-primary) 0%, rgba(255, 136, 0, 0) 70%);
-  top: -15%;
-  left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--color-accent-primary) 0%, rgba(255, 136, 0, 0) 70%);
+    top: -15%;
+    left: -10%;
 }
 
 .orb-2 {
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, var(--color-accent-secondary) 0%, rgba(141, 215, 218, 0) 70%);
-  bottom: -15%;
-  right: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, var(--color-accent-secondary) 0%, rgba(141, 215, 218, 0) 70%);
+    bottom: -15%;
+    right: -10%;
 }
 
 .orb-3 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #ff3c00 0%, rgba(255, 60, 0, 0) 70%);
-  top: 40%;
-  left: 35%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ff3c00 0%, rgba(255, 60, 0, 0) 70%);
+    top: 40%;
+    left: 35%;
 }
 
 .grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 95%);
 }
 
 .noise-overlay {
-  position: absolute;
-  inset: 0;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    position: absolute;
+    inset: 0;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 </style>

@@ -186,7 +186,7 @@ const submit = () => {
                                     <div>
                                         <label
                                             class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Price
-                                            (€)</label>
+                                            (R)</label>
                                         <input v-model="slide.price" type="text"
                                             class="w-full border-white/5 border rounded-2xl py-4 px-6 focus:ring-2 focus:ring-admin-modern focus:border-admin-modern transition-all bg-zinc-900 font-black text-lg text-white" />
                                     </div>

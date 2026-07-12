@@ -118,7 +118,7 @@ class AnalyticsController extends Controller
                     'type' => 'order',
                     'user' => $order->first_name . ' ' . $order->last_name,
                     'action' => 'placed a new order',
-                    'amount' => '€' . number_format($order->total_amount, 2),
+                    'amount' => 'R' . number_format($order->total_amount, 2),
                     'time' => $order->created_at->diffForHumans(),
                     'status' => $order->status
                 ];

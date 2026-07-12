@@ -26,7 +26,7 @@ Every business operation — from pricing rules to shipping thresholds — is ma
 This platform is not just an e-commerce store — it is a system designed as a real product, where business logic is decoupled from code and fully controlled through an administrative layer.
 
 - Guest and authenticated shopping with seamless cart merging
-- Dynamic coupon and discount system
+- Dynamic discount and discount system
 - Atomic checkout flow with full data integrity
 - VIP customer segmentation based on lifetime value (LTV)
 - Real-time inventory and stock management
@@ -75,7 +75,7 @@ app/
 │   ├── Product.php
 │   ├── Order.php / OrderItem.php
 │   ├── Cart.php / CartItem.php
-│   ├── Coupon.php
+│   ├── Discount.php
 │   ├── Category.php / Brand.php
 │   └── HomeSetting.php
 └── Services/
@@ -119,8 +119,8 @@ The frontend is designed with a strong focus on **Conversion Rate Optimization (
 - Guests use a `session_id` to persist the cart
 - On login, the guest cart automatically **merges** with the user's saved cart — no lost carts, better conversion
 
-### Coupon System
-- Two types: **percentage** (e.g. 20% off) and **fixed value** (e.g. 10€ off)
+### Discount System
+- Two types: **percentage** (e.g. 20% off) and **fixed value** (e.g. 10R off)
 - Validated against: expiry date, usage limit, minimum order value
 - Applied at cart level and recalculated on every change
 
@@ -163,7 +163,7 @@ Every time the cart is viewed or modified, `CartService` recalculates:
 ```
 subtotal = sum of (price × quantity) for all items
 
-discount = coupon applied?
+discount = discount applied?
     → percentage: subtotal × (discount% / 100)
     → fixed:      flat amount off
 
@@ -223,7 +223,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')
 ### Unit Tests (`tests/Unit/`)
 | Test | What it verifies |
 |---|---|
-| `CartServiceTest` | Subtotal calculation, coupon application, shipping threshold logic |
+| `CartServiceTest` | Subtotal calculation, discount application, shipping threshold logic |
 
 Tested directly against the service — no HTTP, no database, no framework overhead.
 

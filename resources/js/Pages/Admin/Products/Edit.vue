@@ -108,7 +108,7 @@ const handleGalleryImages = (e) => {
 
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <InputLabel for="price" value="Retail Price (€)"
+                                <InputLabel for="price" value="Retail Price (R)"
                                     class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
                                 <TextInput id="price" type="number" step="0.01"
                                     class="mt-1 block w-full bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern transition-all font-black text-lg"
@@ -116,7 +116,7 @@ const handleGalleryImages = (e) => {
                                 <InputError class="mt-2" :message="form.errors.price" />
                             </div>
                             <div>
-                                <InputLabel for="sale_price" value="Sale Price (€)"
+                                <InputLabel for="sale_price" value="Sale Price (R)"
                                     class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
                                 <TextInput id="sale_price" type="number" step="0.01"
                                     class="mt-1 block w-full bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern transition-all font-black text-lg"

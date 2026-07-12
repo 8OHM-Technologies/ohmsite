@@ -45,11 +45,11 @@ class CheckoutTest extends TestCase
         $mockCartService->shouldReceive('getSummary')->andReturn([
             'subtotal' => 100.00,
             'discount' => 0.00,
-            'shipping' => 0.00,
+            //'shipping' => 0.00,
             'total' => 100.00,
-            'coupon' => null,
-            'free_shipping_progress' => 100,
-            'free_shipping_threshold' => 150,
+            'discount' => null,
+            //'free_shipping_progress' => 100,
+            //'free_shipping_threshold' => 150,
         ]);
 
         $response = $this->get(route('checkout.index'));
@@ -125,7 +125,7 @@ class CheckoutTest extends TestCase
             'discount' => 0.00,
             'shipping' => 0.00,
             'total' => 150.00,
-            'coupon' => null,
+            'discount' => null,
             'free_shipping_progress' => 100,
             'free_shipping_threshold' => 150,
         ]);

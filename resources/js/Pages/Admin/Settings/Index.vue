@@ -218,8 +218,7 @@ const tabs = [
                                             Currency</label>
                                         <select v-model="storeForm.currency"
                                             class="w-full bg-black/40 border-white/5 rounded-2xl py-4 px-6 text-white focus:ring-1 focus:ring-admin-modern/40 transition-all font-bold uppercase text-[10px]">
-                                            <option>USD</option>
-                                            <option>EUR</option>
+                                            <option>ZAR</option>
                                             <option>ALL</option>
                                         </select>
                                     </div>

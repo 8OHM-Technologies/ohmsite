@@ -26,7 +26,8 @@ const props = defineProps({
                     <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">My Collection
                     </h1>
                 </div>
-                <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Access and manage your premium acquisitions</p>
+                <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Access and manage your premium
+                    acquisitions</p>
             </div>
         </div>
 
@@ -98,16 +99,17 @@ const props = defineProps({
                                     class="py-4 px-6 bg-black/20 border-y border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300">
                                     <div class="flex flex-col">
                                         <span class="font-black text-xl tracking-tighter text-white">
-                                            €{{ (product.sale_price && parseFloat(product.sale_price) > 0) ?
+                                            R{{ (product.sale_price && parseFloat(product.sale_price) > 0) ?
                                                 parseFloat(product.sale_price).toFixed(0) :
-                                            parseFloat(product.price).toFixed(0) }}
+                                                parseFloat(product.price).toFixed(0) }}
                                         </span>
                                     </div>
                                 </td>
                                 <td
                                     class="py-4 px-6 bg-black/20 border-y border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full animate-pulse bg-admin-modern shadow-[0_0_10px_rgba(159,232,112,0.4)]">
+                                        <div
+                                            class="w-2 h-2 rounded-full animate-pulse bg-admin-modern shadow-[0_0_10px_rgba(159,232,112,0.4)]">
                                         </div>
                                         <span class="text-[10px] font-black uppercase tracking-[0.1em] text-zinc-400">
                                             Active
@@ -143,7 +145,7 @@ const props = defineProps({
                                 <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-2">{{
                                     product.category?.name }}</p>
                                 <div class="flex items-center gap-2">
-                                    <span class="font-black text-xl text-admin-modern tracking-tighter">€{{
+                                    <span class="font-black text-xl text-admin-modern tracking-tighter">R{{
                                         Math.round(product.sale_price || product.price) }}</span>
                                 </div>
                             </div>
@@ -155,7 +157,8 @@ const props = defineProps({
                                     class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Access</span>
                                 <div class="flex items-center gap-2">
                                     <div class="w-1.5 h-1.5 rounded-full bg-admin-modern"></div>
-                                    <span class="text-[10px] font-black text-white uppercase tracking-widest">Active</span>
+                                    <span
+                                        class="text-[10px] font-black text-white uppercase tracking-widest">Active</span>
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1">
@@ -180,7 +183,8 @@ const props = defineProps({
                         <Package class="w-8 h-8 text-zinc-600" />
                     </div>
                     <h3 class="text-2xl font-black uppercase tracking-tighter text-zinc-700 mb-2">No items found</h3>
-                    <p class="text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Your collection will appear here once you acquire products</p>
+                    <p class="text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Your collection will appear
+                        here once you acquire products</p>
                 </div>
             </div>
         </div>

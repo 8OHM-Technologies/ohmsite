@@ -70,7 +70,7 @@ const getStatusColor = (status) => {
                             <div>
                                 <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-1">Total
                                 </p>
-                                <p class="text-sm font-bold text-white">€{{ parseFloat(order.total_amount).toFixed(2) }}
+                                <p class="text-sm font-bold text-white">R{{ parseFloat(order.total_amount).toFixed(2) }}
                                 </p>
                             </div>
                         </div>
@@ -91,8 +91,8 @@ const getStatusColor = (status) => {
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-bold text-white truncate">{{ item.product.name }}</h4>
                                 <p class="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">Qty: {{ item.quantity
-                                    }} • Size: {{ (item.options || {}).size || 'N/A' }}</p>
-                                <p class="text-sm font-bold text-white">€{{ parseFloat(item.unit_price).toFixed(2) }}
+                                }} • Size: {{ (item.options || {}).size || 'N/A' }}</p>
+                                <p class="text-sm font-bold text-white">R{{ parseFloat(item.unit_price).toFixed(2) }}
                                 </p>
                             </div>
                         </div>

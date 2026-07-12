@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('session_id')->nullable()->index();
-            $table->foreignId('coupon_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('discount_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

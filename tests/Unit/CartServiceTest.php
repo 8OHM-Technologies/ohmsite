@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\Coupon;
+use App\Models\Discount;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,12 +34,12 @@ class CartServiceTest extends TestCase
         $this->assertEquals(130, $summary['subtotal']);
     }
 
-    public function test_apply_percentage_coupon()
+    public function test_apply_percentage_discount()
     {
         $product = Product::factory()->create(['price' => 100]);
         $this->cartService->addItem($product->id, 1);
 
-        $coupon = Coupon::factory()->create([
+        $discount = Discount::factory()->create([
             'code' => 'SAVE10',
             'type' => 'percentage',
             'value' => 10,
@@ -48,7 +48,7 @@ class CartServiceTest extends TestCase
             'expires_at' => now()->addDay(),
         ]);
 
-        $this->cartService->applyCoupon('SAVE10');
+        $this->cartService->applyDiscount('SAVE10');
         $summary = $this->cartService->getSummary();
 
         $this->assertEquals(10, $summary['discount']);

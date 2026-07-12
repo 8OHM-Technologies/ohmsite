@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $used_count
  * @property \Illuminate\Support\Carbon|null $expires_at
  */
-class Coupon extends Model
+class Discount extends Model
 {
     use HasFactory;
 

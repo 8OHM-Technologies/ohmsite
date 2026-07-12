@@ -55,7 +55,7 @@ const formatDate = (dateString) => {
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem]">
                     <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Lifetime Value</p>
-                    <p class="text-3xl font-black text-admin-modern mt-2">€{{ parseFloat(customer.total_spent ||
+                    <p class="text-3xl font-black text-admin-modern mt-2">R{{ parseFloat(customer.total_spent ||
                         0).toFixed(2) }}</p>
                 </div>
                 <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem]">
@@ -95,12 +95,12 @@ const formatDate = (dateString) => {
                                     <td class="p-6 font-bold text-white">#{{ order.id }}</td>
                                     <td class="p-6 text-zinc-400">{{ formatDate(order.created_at) }}</td>
                                     <td class="p-6 text-zinc-400">{{ order.items.length }} Items</td>
-                                    <td class="p-6 text-white font-black">€{{ parseFloat(order.total_amount).toFixed(2)
-                                        }}</td>
+                                    <td class="p-6 text-white font-black">R{{ parseFloat(order.total_amount).toFixed(2)
+                                    }}</td>
                                     <td class="p-6">
                                         <span
                                             class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">{{
-                                            order.status }}</span>
+                                                order.status }}</span>
                                     </td>
                                 </tr>
                                 <tr v-if="customer.orders.length === 0">
@@ -125,7 +125,7 @@ const formatDate = (dateString) => {
                             </div>
                             <div>
                                 <p class="text-sm font-bold text-white leading-tight">{{ product.name }}</p>
-                                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mt-1">€{{
+                                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mt-1">R{{
                                     product.price }}</p>
                             </div>
                         </div>

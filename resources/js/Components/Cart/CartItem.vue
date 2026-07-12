@@ -20,7 +20,7 @@ const emit = defineEmits(['update:quantity', 'remove', 'toggle-favorite']);
 const formattedPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'EUR',
+        currency: 'ZAR',
     }).format(price);
 };
 
