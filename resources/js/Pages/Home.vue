@@ -488,7 +488,7 @@ onUnmounted(() => {
                 <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
                   <div class="pricing-card-header">
-                    <h3 id="tier-analytics" class="pricing-tier-name">Analytics Dashboard</h3>
+                    <h3 id="tier-analytics" class="pricing-tier-name">Pro Analytics</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">No code required. Access to trends and
                       insights through our analytics platform. <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
@@ -500,13 +500,13 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
                           </div>
                         </div>
-                        <span class="developer-pricing-label">Full Dashboard Access</span>
+                        <span class="developer-pricing-label">Full Dashboard & API Access</span>
                       </div>
                     </div>
                   </div>
@@ -533,7 +533,7 @@ onUnmounted(() => {
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Visual trend analysis & CSV/Excel exports</span>
+                        <span>Automated Reports & CSV/JSON exports</span>
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
@@ -568,7 +568,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
-                          }}</span>
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -609,7 +609,7 @@ onUnmounted(() => {
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>24/7 Dedicated Priority Support & SLA</span>
+                        <span>24/7 Priority Helpdesk Support</span>
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
