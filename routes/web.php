@@ -87,10 +87,9 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SubscriberDashboardController;
 use App\Http\Controllers\UserOrderController;
 
-Route::middleware(['auth', 'verified'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {
+Route::middleware(['auth', 'verified', 'subscribed'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {
     Route::get('/', [SubscriberDashboardController::class, 'index'])->name('index');
     Route::get('/products', [SubscriberDashboardController::class, 'products'])->name('products.index');
-    Route::get('/analytics', [SubscriberDashboardController::class, 'analytics'])->name('analytics.index');
 });
 
 require __DIR__.'/auth.php';

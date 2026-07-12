@@ -78,4 +78,37 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Check if the user has subscribed to the Pro Analytics package.
+     */
+    public function isSubscribed(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->orders()
+            ->where('payment_status', 'paid')
+            ->whereHas('items.product', function ($query) {
+                $query->where('name', 'Analytics Dashboard');
+            })
+            ->exists();
+    }
+
+    /**
+     * Get the redirect URL after login or verification.
+     */
+    public function getRedirectUrl(): string
+    {
+        if ($this->isAdmin()) {
+            return route('dashboard');
+        }
+
+        if ($this->isSubscribed()) {
+            return route('pro-dashboard.index');
+        }
+
+        return route('profile.edit');
+    }
 }

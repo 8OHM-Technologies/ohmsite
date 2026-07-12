@@ -585,32 +585,27 @@ const employerSignatureSeries = computed(() => {
                 <div class="relative lg:hidden w-full">
                     <!-- Click Away Overlay -->
                     <div v-if="isTabDropdownOpen" class="fixed inset-0 z-40" @click="isTabDropdownOpen = false"></div>
-                    
+
                     <!-- Selected Tab Button -->
-                    <button 
-                        @click="isTabDropdownOpen = !isTabDropdownOpen"
+                    <button @click="isTabDropdownOpen = !isTabDropdownOpen"
                         class="flex items-center justify-between w-full bg-white text-black font-black px-5 py-2.5 rounded-xl text-[10px] uppercase tracking-widest transition-all relative z-50">
                         <span class="flex items-center gap-2">
                             <component :is="tabs.find(t => t.id === activeTab)?.icon" class="w-3.5 h-3.5" />
-                            {{ tabs.find(t => t.id === activeTab)?.label }}
+                            {{tabs.find(t => t.id === activeTab)?.label}}
                         </span>
-                        <ChevronDown class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': isTabDropdownOpen }" />
+                        <ChevronDown class="w-4 h-4 transition-transform duration-200"
+                            :class="{ 'rotate-180': isTabDropdownOpen }" />
                     </button>
 
                     <!-- Dropdown Options Menu -->
-                    <transition
-                        enter-active-class="transition ease-out duration-100"
-                        enter-from-class="transform opacity-0 scale-95"
-                        enter-to-class="transform opacity-100 scale-100"
+                    <transition enter-active-class="transition ease-out duration-100"
+                        enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100"
                         leave-active-class="transition ease-in duration-75"
                         leave-from-class="transform opacity-100 scale-100"
-                        leave-to-class="transform opacity-0 scale-95"
-                    >
-                        <div v-if="isTabDropdownOpen" 
+                        leave-to-class="transform opacity-0 scale-95">
+                        <div v-if="isTabDropdownOpen"
                             class="absolute left-0 right-0 mt-2 bg-zinc-955 border border-white/10 p-2 rounded-2xl shadow-2xl z-50 space-y-1 backdrop-blur-xl">
-                            <button 
-                                v-for="tab in tabs" 
-                                :key="tab.id"
+                            <button v-for="tab in tabs" :key="tab.id"
                                 @click="activeTab = tab.id; isTabDropdownOpen = false"
                                 :class="[activeTab === tab.id ? 'bg-white text-black font-black' : 'text-zinc-400 hover:text-white hover:bg-white/5']"
                                 class="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-[10px] uppercase tracking-widest transition-all">
@@ -622,8 +617,7 @@ const employerSignatureSeries = computed(() => {
                 </div>
 
                 <!-- Desktop Tabs Navigation -->
-                <div
-                    class="hidden lg:flex items-center gap-1 bg-zinc-955 border border-white/5 p-1 rounded-2xl">
+                <div class="hidden lg:flex items-center gap-1 bg-zinc-955 border border-white/5 p-1 rounded-2xl">
                     <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
                         :class="[activeTab === tab.id ? 'bg-white text-black font-black' : 'text-zinc-500 hover:text-white hover:bg-white/[0.02]']"
                         class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0">
@@ -826,8 +820,9 @@ const employerSignatureSeries = computed(() => {
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full"
                                     :style="{ backgroundColor: disputeTypeChartOptions.colors[i] }"></div>
-                                <span class="font-black text-zinc-500 uppercase tracking-wider truncate max-w-[80px]">{{
-                                    label }}</span>
+                                <span
+                                    class="font-black text-zinc-500 uppercase tracking-wider truncate max-w-[150px]">{{
+                                        label }}</span>
                             </div>
                             <span class="font-black text-zinc-300">{{ disputeTypeSeries[i] }}</span>
                         </div>
@@ -848,7 +843,7 @@ const employerSignatureSeries = computed(() => {
                                 </div>
                                 <div class="min-w-0">
                                     <p
-                                        class="text-xs font-black text-white uppercase tracking-tight truncate max-w-[320px]">
+                                        class="text-xs font-black text-white uppercase tracking-tight truncate max-w-[500px]">
                                         {{ c.employee }} v {{ c.employer }}</p>
                                     <p class="text-[9px] font-black text-zinc-500 uppercase tracking-widest mt-1">
                                         {{ c.court_location }} | {{ c.category }}
@@ -878,7 +873,7 @@ const employerSignatureSeries = computed(() => {
                                 <MapPin class="w-4 h-4 text-admin-modern" />
                                 <span class="text-xs font-black uppercase text-zinc-400">Peak Region</span>
                             </div>
-                            <span class="text-xs font-black text-white text-right max-w-[120px] truncate">{{
+                            <span class="text-xs font-black text-white text-right max-w-[200px] truncate">{{
                                 mostActiveRegion }}</span>
                         </div>
                         <div class="flex items-center justify-between border-b border-white/5 pb-3">

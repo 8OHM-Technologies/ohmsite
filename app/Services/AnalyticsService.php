@@ -14,6 +14,8 @@ class AnalyticsService
      */
     public function getDashboardPayload(): array
     {
+        $this->enforceAdmin();
+
         $statsData = $this->getStatsData();
 
         return [
@@ -94,6 +96,8 @@ class AnalyticsService
      */
     public function getWeeklySales(): array
     {
+        $this->enforceAdmin();
+
         $weeklySales = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
@@ -124,6 +128,8 @@ class AnalyticsService
      */
     public function getRecentProducts(int $limit = 4)
     {
+        $this->enforceAdmin();
+
         return Product::with(['brands', 'category'])
             ->latest()
             ->take($limit)
@@ -176,5 +182,15 @@ class AnalyticsService
             ->count();
 
         return round(($returningUsersCount / $totalUsersWithOrders) * 100);
+    }
+
+    /**
+     * Enforce that the user is an authenticated admin.
+     */
+    private function enforceAdmin(): void
+    {
+        if (! auth()->check() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
     }
 }

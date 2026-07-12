@@ -6,7 +6,6 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import LoadingScreen from '@/Components/LoadingScreen.vue';
 import Toast from '@/Components/Toast.vue';
 import {
-    LayoutDashboard,
     Package,
     BarChart3,
     Menu,
@@ -41,9 +40,8 @@ const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
 const searchItems = [
-    { name: 'Dashboard', href: route('pro-dashboard.index'), keywords: ['home', 'overview', 'main', 'stats'] },
+    { name: 'Analytics', href: route('pro-dashboard.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
     { name: 'Products', href: route('pro-dashboard.products.index'), keywords: ['catalog', 'drops', 'sneakers'] },
-    { name: 'Analytics', href: route('pro-dashboard.analytics.index'), keywords: ['charts', 'revenue', 'performance', 'reports', 'trend'] },
 ];
 
 const handleSearch = () => {
@@ -62,9 +60,8 @@ const handleSearch = () => {
 };
 
 const navigation = [
-    { name: 'Dashboard', href: route('pro-dashboard.index'), icon: LayoutDashboard },
+    { name: 'Analytics', href: route('pro-dashboard.index'), icon: BarChart3 },
     { name: 'Products', href: route('pro-dashboard.products.index'), icon: Package },
-    { name: 'Analytics', href: route('pro-dashboard.analytics.index'), icon: BarChart3 },
 ];
 
 const isUrl = (url) => {
@@ -85,12 +82,44 @@ const handleResize = () => {
     }
 };
 
-onMounted(() => window.addEventListener('resize', handleResize));
-onUnmounted(() => window.removeEventListener('resize', handleResize));
+const orb1 = ref(null);
+const orb2 = ref(null);
+const orb3 = ref(null);
+
+const handleMouseMove = (e) => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+
+    const list = [orb1.value, orb2.value, orb3.value];
+    list.forEach((orb, index) => {
+        if (!orb) return;
+        const speed = (index + 1) * 20;
+        const dx = (x - 0.5) * speed;
+        const dy = (y - 0.5) * speed;
+        orb.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('mousemove', handleMouseMove);
+});
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('mousemove', handleMouseMove);
+});
 </script>
 
 <template>
-    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black">
+    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
+        <!-- Background Visuals -->
+        <div class="background-visuals">
+            <div class="glow-orb orb-1" ref="orb1"></div>
+            <div class="glow-orb orb-2" ref="orb2"></div>
+            <div class="glow-orb orb-3" ref="orb3"></div>
+            <div class="grid-overlay"></div>
+            <div class="noise-overlay"></div>
+        </div>
         <LoadingScreen />
         <Toast />
 

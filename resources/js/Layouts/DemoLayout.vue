@@ -81,10 +81,44 @@ const datasetStats = computed(() => {
         dateRange
     };
 });
+
+const orb1 = ref(null);
+const orb2 = ref(null);
+const orb3 = ref(null);
+
+const handleMouseMove = (e) => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+
+    const list = [orb1.value, orb2.value, orb3.value];
+    list.forEach((orb, index) => {
+        if (!orb) return;
+        const speed = (index + 1) * 20;
+        const dx = (x - 0.5) * speed;
+        const dy = (y - 0.5) * speed;
+        orb.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+};
+
+onMounted(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('mousemove', handleMouseMove);
+});
 </script>
 
 <template>
-    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black">
+    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
+        <!-- Background Visuals -->
+        <div class="background-visuals">
+            <div class="glow-orb orb-1" ref="orb1"></div>
+            <div class="glow-orb orb-2" ref="orb2"></div>
+            <div class="glow-orb orb-3" ref="orb3"></div>
+            <div class="grid-overlay"></div>
+            <div class="noise-overlay"></div>
+        </div>
         <LoadingScreen />
         <Toast />
 

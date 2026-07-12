@@ -19,8 +19,6 @@ const getStatusColor = (status) => {
     switch (status) {
         case 'pending': return 'text-amber-500 bg-amber-500/10';
         case 'processing': return 'text-blue-500 bg-blue-500/10';
-        case 'shipped': return 'text-purple-500 bg-purple-500/10';
-        case 'delivered': return 'text-green-500 bg-green-500/10';
         case 'cancelled': return 'text-red-500 bg-red-500/10';
         default: return 'text-zinc-500 bg-zinc-500/10';
     }
@@ -47,9 +45,9 @@ const getStatusColor = (status) => {
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2">No orders found</h3>
                 <p class="text-zinc-500 mb-8">You haven't placed any orders yet.</p>
-                <Link :href="route('shop.index')"
+                <Link :href="route('home')"
                     class="inline-block bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all">
-                    Start Shopping
+                    Browse Data Solutions
                 </Link>
             </div>
 
@@ -94,6 +92,32 @@ const getStatusColor = (status) => {
                                 }} • Size: {{ (item.options || {}).size || 'N/A' }}</p>
                                 <p class="text-sm font-bold text-white">R{{ parseFloat(item.unit_price).toFixed(2) }}
                                 </p>
+
+                                <!-- Product Specific Action Links -->
+                                <div v-if="item.product.name.toLowerCase().includes('once-off dataset')" class="mt-3">
+                                    <a href="#" class="inline-flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-500 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        Download Dataset
+                                    </a>
+                                </div>
+                                <div v-else-if="item.product.name.toLowerCase().includes('developer api')" class="mt-3">
+                                    <a href="#" class="inline-flex items-center gap-1.5 bg-sky-400/10 hover:bg-sky-400 hover:text-black text-sky-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                        API Documentation
+                                    </a>
+                                </div>
+                                <div v-else-if="item.product.name.toLowerCase().includes('analytics dashboard') || item.product.name.toLowerCase().includes('pro analytics')" class="mt-3">
+                                    <Link :href="route('pro-dashboard.index')" class="inline-flex items-center gap-1.5 bg-emerald-400/10 hover:bg-emerald-400 hover:text-black text-emerald-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                                        </svg>
+                                        Access Pro Analytics
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
