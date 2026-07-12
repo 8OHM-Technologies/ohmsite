@@ -48,7 +48,7 @@ class CartServiceTest extends TestCase
             'expires_at' => now()->addDay(),
         ]);
 
-        $this->cartService->applyDiscount($discount['value']);
+        $this->cartService->applyDiscount($discount['code']);
         $summary = $this->cartService->getSummary();
 
         $this->assertEquals(10, $summary['discount']);
