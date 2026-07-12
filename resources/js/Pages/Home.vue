@@ -541,7 +541,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -556,7 +556,7 @@ onUnmounted(() => {
                     <!-- Tier Action Button -->
                     <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
                       class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 16px;">
-                      <span>Subscribe to Analytics Dashboard</span>
+                      <span>Subscribe to Pro Analytics</span>
                       <div class="btn-icon">
                         <i class="ph-light ph-credit-card"></i>
                       </div>
@@ -608,14 +608,14 @@ onUnmounted(() => {
                     <div class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
-                          }}</span>
+                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R19,500' : 'R195,000'
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
                           </div>
                         </div>
-                        <span class="developer-pricing-label">Custom Implementation (Retainer @ 20 hours p/m)</span>
+                        <span class="developer-pricing-label">Custom Implementation <br>(Retainer @ 20 hours p/m)</span>
                       </div>
                     </div>
                   </div>
