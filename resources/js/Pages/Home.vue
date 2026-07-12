@@ -72,7 +72,7 @@ const onceOffPrice = computed(() => {
 const developerPrice = computed(() => {
   const isMonthly = frequency.value.value === 'monthly'
   const basePrice = isMonthly ? 380 : 3800
-  
+
   if (developerDataset.value === 'all') {
     const extraDatasets = datasets.length - 1
     const addOnRate = isMonthly ? 100 : 1000
@@ -471,7 +471,7 @@ onUnmounted(() => {
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Add-on Datasets at R100 per dataset</span>
+                        <span>Add-on Datasets at Reduced Prices</span>
                       </li>
                       <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
@@ -500,7 +500,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,500' : 'R35,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -568,7 +568,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
-                          }}</span>
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -619,8 +619,6 @@ onUnmounted(() => {
                   </div>
                 </div>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -1039,6 +1037,7 @@ onUnmounted(() => {
           <Link href="/privacy-policy" target="_blank">Privacy Policy</Link>
           <Link href="/terms" target="_blank">Terms & Conditions</Link>
           <Link href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</Link>
+          <Link href="/fair-usage" target="_blank">Fair Usage Policy</Link>
         </div>
       </div>
     </footer>

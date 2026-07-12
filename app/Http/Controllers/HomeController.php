@@ -36,6 +36,11 @@ class HomeController extends Controller
     {
         return view('terms');
     }
+
+    public function fairUsage()
+    {
+        return view('fair-usage');
+    }
     
     public function index()
     {

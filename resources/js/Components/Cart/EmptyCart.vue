@@ -23,7 +23,7 @@ defineProps({
         <p class="text-gray-600 dark:text-gray-400 max-w-sm mb-8">
             {{ message }}
         </p>
-        <Link :href="route('shop.index')"
+        <Link :href="route('home')"
             class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm btn-primary">
             Explore Shop
         </Link>
