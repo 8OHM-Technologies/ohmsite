@@ -15,8 +15,8 @@ Route::get('/refund-cancellation', [HomeController::class, 'refundCancellation']
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/fair-usage', [HomeController::class, 'fairUsage'])->name('fair-usage');
 Route::get('/', [HomeController::class, 'index'])->name('home');
-// Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-// Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CouponController;

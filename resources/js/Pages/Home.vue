@@ -1022,12 +1022,13 @@ onUnmounted(() => {
                     <label for="division">What is it about?</label>
                     <select id="division" name="division" required v-model="form.division">
                       <option value="" disabled selected>Choose an option...</option>
-                      <option value="dataset-dump-request">Once-off Dataset Enquiry</option>
-                      <option value="pro-dashboard-request">Pro Dashboard Enquiry</option>
-                      <option value="custom-pipeline">Custom Managed Data Pipeline Enquiry</option>
-                      <option value="refund">Request a Refund (Once-off)</option>
-                      <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
                       <option value="general">General Enquiry</option>
+                      <option value="custom-pipeline">Custom Managed Data Pipeline Enquiry</option>
+                      <option value="shop-waitlist">Join the OhmBase/Hardware Shop Waitlist</option>
+                      <option value="dataset-dump-request">Once-off Dataset Enquiry</option>
+                      <option value="dataset-dump-request">Developer API Enquiry</option>
+                      <option value="pro-dashboard-request">Pro Analytics Enquiry</option>
+                      <option value="refund">Request a Refund (Have you read the Refund Policy?)</option>
                     </select>
                   </div>
 
