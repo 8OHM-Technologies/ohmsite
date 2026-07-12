@@ -127,23 +127,12 @@ class CartService
         $cart = $this->getCart();
         $subtotal = $this->calculateSubtotal($cart);
         $discount = $this->calculateDiscount($cart, $subtotal);
-        $shipping = $this->calculateShipping($subtotal - $discount);
-        $total = $subtotal - $discount + $shipping;
-
-        $freeShippingThreshold = config('shop.shipping.free_threshold');
+        $total = $subtotal - $discount;
 
         return [
             'subtotal' => round($subtotal, 2),
             'discount' => round($discount, 2),
-            'shipping' => round($shipping, 2),
             'total' => round($total, 2),
-            'discount' => $cart->discount ? [
-                'code' => $cart->discount->code,
-                'type' => $cart->discount->type,
-                'value' => $cart->discount->value,
-            ] : null,
-            'free_shipping_progress' => min(100, ($subtotal / $freeShippingThreshold) * 100),
-            'free_shipping_threshold' => $freeShippingThreshold,
         ];
     }
 
@@ -163,13 +152,6 @@ class CartService
         }
 
         return min($subtotal, $cart->discount->value);
-    }
-
-    private function calculateShipping(float $amount, ?float $threshold = null): float
-    {
-        $threshold = $threshold ?? config('shop.shipping.free_threshold');
-
-        return $amount >= $threshold ? 0 : config('shop.shipping.cost');
     }
 
     /**

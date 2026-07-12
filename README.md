@@ -110,8 +110,6 @@ Protected by `['auth', 'verified', 'admin']` middleware. Every business rule is 
 The frontend is designed with a strong focus on **Conversion Rate Optimization (CRO)**:
 
 - **Smart filtering and sorting** in the shop for faster product discovery
-- **Wishlist** persisted in the database — available across devices and sessions
-- **Free-shipping progress indicator** in the cart — a psychological nudge to increase Average Order Value (AOV)
 - **Atomic checkout flow** using database transactions — order creation, stock updates, cart cleanup, and admin notifications all happen atomically
 
 ### Cart System
@@ -167,9 +165,7 @@ discount = discount applied?
     → percentage: subtotal × (discount% / 100)
     → fixed:      flat amount off
 
-shipping = subtotal > threshold (configurable) ? FREE : standard rate
-
-total = subtotal - discount + shipping
+total = subtotal - discount
 ```
 
 ### Step 3 — Checkout
