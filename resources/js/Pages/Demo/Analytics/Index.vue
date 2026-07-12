@@ -17,7 +17,8 @@ import {
     Users,
     Layers,
     Code,
-    X
+    X,
+    ChevronDown
 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -29,6 +30,15 @@ const props = defineProps({
 
 // Core active navigation tab
 const activeTab = ref('overview'); // overview, velocity, trends, employer-risk
+
+const tabs = [
+    { id: 'overview', label: 'Executive Overview', icon: Layers },
+    { id: 'velocity', label: 'Procedural Velocity', icon: Clock },
+    { id: 'trends', label: 'Labor & Spatial Trends', icon: TrendingUp },
+    { id: 'employer-risk', label: 'Employer Risk Profiling', icon: Building }
+];
+
+const isTabDropdownOpen = ref(false);
 
 const isMetricsModalOpen = ref(false);
 
@@ -571,15 +581,51 @@ const employerSignatureSeries = computed(() => {
 
             <!-- Tabs Navigation -->
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <!-- Mobile Tab Dropdown -->
+                <div class="relative lg:hidden w-full">
+                    <!-- Click Away Overlay -->
+                    <div v-if="isTabDropdownOpen" class="fixed inset-0 z-40" @click="isTabDropdownOpen = false"></div>
+                    
+                    <!-- Selected Tab Button -->
+                    <button 
+                        @click="isTabDropdownOpen = !isTabDropdownOpen"
+                        class="flex items-center justify-between w-full bg-white text-black font-black px-5 py-2.5 rounded-xl text-[10px] uppercase tracking-widest transition-all relative z-50">
+                        <span class="flex items-center gap-2">
+                            <component :is="tabs.find(t => t.id === activeTab)?.icon" class="w-3.5 h-3.5" />
+                            {{ tabs.find(t => t.id === activeTab)?.label }}
+                        </span>
+                        <ChevronDown class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': isTabDropdownOpen }" />
+                    </button>
+
+                    <!-- Dropdown Options Menu -->
+                    <transition
+                        enter-active-class="transition ease-out duration-100"
+                        enter-from-class="transform opacity-0 scale-95"
+                        enter-to-class="transform opacity-100 scale-100"
+                        leave-active-class="transition ease-in duration-75"
+                        leave-from-class="transform opacity-100 scale-100"
+                        leave-to-class="transform opacity-0 scale-95"
+                    >
+                        <div v-if="isTabDropdownOpen" 
+                            class="absolute left-0 right-0 mt-2 bg-zinc-955 border border-white/10 p-2 rounded-2xl shadow-2xl z-50 space-y-1 backdrop-blur-xl">
+                            <button 
+                                v-for="tab in tabs" 
+                                :key="tab.id"
+                                @click="activeTab = tab.id; isTabDropdownOpen = false"
+                                :class="[activeTab === tab.id ? 'bg-white text-black font-black' : 'text-zinc-400 hover:text-white hover:bg-white/5']"
+                                class="flex items-center gap-2 w-full px-5 py-3 rounded-xl text-[10px] uppercase tracking-widest transition-all">
+                                <component :is="tab.icon" class="w-3.5 h-3.5" />
+                                {{ tab.label }}
+                            </button>
+                        </div>
+                    </transition>
+                </div>
+
+                <!-- Desktop Tabs Navigation -->
                 <div
-                    class="flex items-center gap-1 bg-zinc-955 border border-white/5 p-1 rounded-2xl overflow-x-auto max-w-full">
-                    <button v-for="tab in [
-                        { id: 'overview', label: 'Executive Overview', icon: Layers },
-                        { id: 'velocity', label: 'Procedural Velocity', icon: Clock },
-                        { id: 'trends', label: 'Labor & Spatial Trends', icon: TrendingUp },
-                        { id: 'employer-risk', label: 'Employer Risk Profiling', icon: Building }
-                    ]" :key="tab.id" @click="activeTab = tab.id"
-                        :class="[activeTab === tab.id ? 'bg-white text-black font-black' : 'text-zinc-500 hover:text-white']"
+                    class="hidden lg:flex items-center gap-1 bg-zinc-955 border border-white/5 p-1 rounded-2xl">
+                    <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
+                        :class="[activeTab === tab.id ? 'bg-white text-black font-black' : 'text-zinc-500 hover:text-white hover:bg-white/[0.02]']"
                         class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0">
                         <component :is="tab.icon" class="w-3.5 h-3.5" />
                         {{ tab.label }}
