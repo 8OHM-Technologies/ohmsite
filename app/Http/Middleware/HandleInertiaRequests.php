@@ -38,11 +38,7 @@ class HandleInertiaRequests extends Middleware
                 'unread_notifications_count' => $user ? ($user->unreadNotifications()->count() ?? 0) : 0,
                 'notifications' => $user ? $user->notifications()->take(5)->get() : [],
             ],
-            'cart_count' => function () use ($user) {
-                if (!$user) {
-                    return 0;
-                }
-
+            'cart_count' => function () {
                 try {
                     return app(\App\Services\CartService::class)
                         ->getCart()

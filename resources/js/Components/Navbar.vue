@@ -137,7 +137,7 @@ const getHref = (link) => {
                     ]">
                         <span class="relative z-10">{{ link.name }}</span>
                         <div v-if="isLinkActive(link)"
-                            class="absolute inset-0 bg-white rounded-full z-0 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+                            class="absolute inset-0 bg-primary rounded-full z-0 shadow-[0_0_20px_rgba(255,136,0,0.4)]">
                         </div>
                     </Link>
                     <a v-else :href="'#' + link.id" :class="[
@@ -146,7 +146,7 @@ const getHref = (link) => {
                     ]">
                         <span class="relative z-10">{{ link.name }}</span>
                         <div v-if="isLinkActive(link)"
-                            class="absolute inset-0 bg-white rounded-full z-0 shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+                            class="absolute inset-0 bg-primary rounded-full z-0 shadow-[0_0_20px_rgba(255,136,0,0.4)]">
                         </div>
                     </a>
                 </template>
@@ -174,7 +174,7 @@ const getHref = (link) => {
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 relative group border border-transparent hover:border-white/5">
                     <ShoppingCart class="w-5 h-5 text-zinc-500 group-hover:text-white" />
                     <span v-if="$page.props.cart_count > 0"
-                        class="absolute top-1 right-1 bg-white text-black text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
+                        class="absolute top-1 right-1 bg-primary text-black text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
                             $page.props.cart_count }}</span>
                 </Link>
 
@@ -210,7 +210,7 @@ const getHref = (link) => {
                     </template>
                     <template v-else>
                         <Link :href="route('login')"
-                            class="text-[11px] font-black tracking-[0.2em] uppercase bg-white text-black px-6 py-3 rounded-full hover:bg-zinc-200 transition-all shadow-xl active:scale-95">
+                            class="text-[11px] font-black tracking-[0.2em] uppercase bg-primary text-black px-6 py-3 rounded-full hover:bg-primary-600 transition-all shadow-xl active:scale-95">
                             Login</Link>
                     </template>
                 </div>
@@ -250,7 +250,7 @@ const getHref = (link) => {
                         <template v-for="link in navLinks" :key="link.name">
                             <Link v-if="link.type === 'route' || !route().current('home')" :href="getHref(link)"
                                 class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                :class="[isLinkActive(link) ? 'bg-primary text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
@@ -260,7 +260,7 @@ const getHref = (link) => {
                             </Link>
                             <a v-else :href="'#' + link.id" @click="isMobileMenuOpen = false"
                                 class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                                :class="[isLinkActive(link) ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                                :class="[isLinkActive(link) ? 'bg-primary text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
@@ -275,7 +275,7 @@ const getHref = (link) => {
                         <!-- Favorites -->
                         <Link :href="route('favorites.index')"
                             class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                            :class="[route().current('favorites.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                            :class="[route().current('favorites.index') ? 'bg-primary text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                             <div class="flex items-center gap-4">
                                 <Heart class="w-5 h-5"
                                     :class="{ 'fill-rose-500 text-rose-500': route().current('favorites.index') }" />
@@ -287,12 +287,12 @@ const getHref = (link) => {
                         <!-- Cart -->
                         <Link :href="route('cart.index')"
                             class="flex items-center justify-between p-4 rounded-2xl transition-all"
-                            :class="[route().current('cart.index') ? 'bg-white text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
+                            :class="[route().current('cart.index') ? 'bg-primary text-black' : 'text-zinc-500 hover:text-white hover:bg-white/5']">
                             <div class="flex items-center gap-4">
                                 <div class="relative">
                                     <ShoppingCart class="w-5 h-5" />
                                     <span v-if="$page.props.cart_count > 0"
-                                        class="absolute -top-1.5 -right-1.5 bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.3)] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{
+                                        class="absolute -top-1.5 -right-1.5 bg-black text-white shadow-[0_0_10px_rgba(0,0,0,0.3)] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">{{
                                             $page.props.cart_count }}</span>
                                 </div>
                                 <span class="text-xs font-black uppercase tracking-widest">Cart</span>

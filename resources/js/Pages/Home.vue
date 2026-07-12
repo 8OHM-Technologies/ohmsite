@@ -1352,7 +1352,7 @@ a:active {
   text-decoration: none;
   transition: all 0.5s var(--ease-premium);
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent;
   outline: none;
 }
 
@@ -1369,7 +1369,9 @@ a:active {
 }
 
 .btn-primary:hover {
-  background: #ffa133;
+  background: rgba(255, 136, 0, 0.15);
+  color: var(--color-accent-primary) !important;
+  border-color: var(--color-accent-primary);
   transform: translateY(-2px);
   box-shadow: 0 15px 40px rgba(255, 136, 0, 0.35);
 }
@@ -1387,7 +1389,8 @@ a:active {
 
 .btn-primary:hover .btn-icon {
   transform: translate(2px, -2px);
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 136, 0, 0.25);
+  color: var(--color-accent-primary);
 }
 
 .btn-secondary {
@@ -1399,7 +1402,8 @@ a:active {
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary) !important;
   transform: translateY(-2px);
 }
 
