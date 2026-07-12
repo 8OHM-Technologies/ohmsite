@@ -13,7 +13,7 @@ const roadmap = [
     status: 'Live',
     date: 'Current',
     title: 'CCMA Arbitration Awards',
-    description: 'Over 20 years of sanitized, structured CCMA awards with daily live updates.',
+    description: 'Comprehensive CCMA Awards & Judgment records.',
     icon: 'ph-check-circle',
     iconClass: 'text-green-500'
   },
@@ -48,6 +48,14 @@ const roadmap = [
     description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.',
     icon: 'ph-rocket-launch',
     iconClass: 'text-yellow-500'
+  },
+  {
+    status: 'Ultimate Goal',
+    date: '2027',
+    title: 'LaybaLaw AI',
+    description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
+    icon: 'ph-robot',
+    iconClass: 'text-red-500'
   },
 ];
 
@@ -545,7 +553,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -613,7 +621,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R19,500' : 'R195,000'
-                          }}</span>
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
