@@ -17,7 +17,8 @@
     <p>This Fair Usage Policy ("<strong>Policy</strong>") sets out the acceptable standards of resource consumption for
         all subscribers and users of the SaaS analytics platform, including the web-based analytics dashboard
         ("<strong>Dashboard</strong>") and Application Programming Interfaces ("<strong>API</strong>"), provided by
-        <strong>Infinity Ohm Technologies (Pty) Ltd t/a 8OHM</strong> ("we," "us," or "our").</p>
+        <strong>Infinity Ohm Technologies (Pty) Ltd t/a 8OHM</strong> ("we," "us," or "our").
+    </p>
     <p>Our platform operates on a shared, multi-tenant cloud infrastructure. This Policy is designed to ensure that the
         activity of a small number of high-volume users does not compromise the security, responsiveness, availability,
         or performance of the platform for all other customers.</p>
@@ -62,9 +63,9 @@
     <blockquote>
         <p><strong>⚠️ Key Terms Notice:</strong></p>
         <p><strong>1. Subscription Tier Adjustment &amp; Price Increases:</strong> If your usage regularly exceeds fair
-            limits, you may choose to upgrade to a higher subscription tier or enterprise plan suitable for your volume.
-            Continued sustained high-volume usage without a formal tier upgrade will result in an automatic price
-            adjustment or overage charges billed on your next invoicing cycle, as permitted under your agreement.</p>
+            limits, you may choose to upgrade to a higher subscription tier or contact us for assistance.
+            Continued sustained high-volume usage without a formal tier upgrade will result in active enforcement of
+            rate limitations which may drastically influence your quality of service.</p>
         <p><strong>2. Service Restriction or Disabling:</strong> We reserve the right to immediately throttle API
             response rates, restrict dashboard functions, or <strong>disable/suspend your service access
                 entirely</strong> if high usage degrades system performance for other users or if you decline to adjust
@@ -77,14 +78,12 @@
             outlining the excessive resource usage and suggesting suitable tier upgrades.</li>
         <li><strong>Grace Period:</strong> You will be granted a <strong>7 to 14 day grace period</strong> from notice
             delivery to optimize your resource calls or execute an upgraded subscription agreement.</li>
-        <li><strong>Price Revision or Service Disabling:</strong>
+        <li><strong>Service Throttling:</strong>
             <ul>
-                <li><strong>Option A (Continued Service):</strong> If you choose to continue operating at elevated usage
-                    levels, your subscription pricing will be automatically adjusted to the corresponding usage tier.
-                </li>
-                <li><strong>Option B (Throttling / Suspension):</strong> If you do not optimize usage, upgrade your
-                    plan, or pay revised subscription fees, we reserve the right to apply API rate-limiting (throttling)
-                    or temporarily/permanently disable account access without further notice.</li>
+                <li><strong>Throttling / Suspension:</strong> If you do not optimize usage or upgrade your
+                    subscription, we reserve the right to apply API rate-limiting (throttling) and/or
+                    temporarily/permanently
+                    disabling your account access.</li>
             </ul>
         </li>
     </ol>

@@ -66,7 +66,9 @@
         shared with trusted third-party service providers ("Operators") essential to running the application:</p>
     <ul>
         <li><strong>Payment Processing:</strong> Online subscription payments are securely processed via our authorized
-            payment gateway provider. Your financial inputs are encrypted directly by them, and we do not store raw
+            payment gateway provider, PayStack <a href="https://www.paystack.com"
+                target="_blank">https://www.paystack.com</a>. Your financial inputs are encrypted directly by them, and
+            we do not store raw
             credit card information.</li>
     </ul>
 
