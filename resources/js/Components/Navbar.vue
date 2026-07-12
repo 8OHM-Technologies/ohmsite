@@ -170,13 +170,13 @@ const getHref = (link) => {
                 </Link> -->
 
                 <!-- Cart -->
-                <!-- <Link :href="route('cart.index')"
+                <Link :href="route('cart.index')"
                     class="p-2.5 hover:bg-zinc-800 rounded-full transition-all duration-300 relative group border border-transparent hover:border-white/5">
                     <ShoppingCart class="w-5 h-5 text-zinc-500 group-hover:text-white" />
                     <span v-if="$page.props.cart_count > 0"
                         class="absolute top-1 right-1 bg-white text-black text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg">{{
                             $page.props.cart_count }}</span>
-                </Link> -->
+                </Link>
 
                 <!-- Profile -->
                 <div class="flex items-center">
@@ -190,7 +190,7 @@ const getHref = (link) => {
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
                                         <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
@@ -254,7 +254,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </Link>
@@ -264,7 +264,7 @@ const getHref = (link) => {
                                 <div class="flex items-center gap-4">
                                     <component :is="link.icon" class="w-5 h-5" />
                                     <span class="text-xs font-black uppercase tracking-widest">{{ link.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <ChevronRight class="w-4 h-4 opacity-50" />
                             </a>
