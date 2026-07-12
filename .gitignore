@@ -152,4 +152,3 @@ vendor/
 **/vendor/
 .agents
 .phpunit.result.cache
-.phpunit.result.cache

@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeSetting;
-use Inertia\Inertia;
+use App\Models\Product;
 use Illuminate\Support\Carbon;
+use Inertia\Inertia;
 
 class HomeController extends Controller
 {
@@ -31,8 +29,8 @@ class HomeController extends Controller
     {
         return view('refund-and-cancellation');
     }
-    
-        public function terms()
+
+    public function terms()
     {
         return view('terms');
     }
@@ -41,7 +39,7 @@ class HomeController extends Controller
     {
         return view('fair-usage');
     }
-    
+
     public function index()
     {
         try {
@@ -57,7 +55,7 @@ class HomeController extends Controller
                     if (isset($slide['brand_ids'])) {
                         $slideBrands = Brand::whereIn('id', $slide['brand_ids'])->get();
                     }
-                    
+
                     $isFavorited = false;
                     if ($user && isset($slide['product_id'])) {
                         $isFavorited = $user->favorites()->where('product_id', $slide['product_id'])->exists();
@@ -70,19 +68,25 @@ class HomeController extends Controller
                         'category' => $slide['category'] ?? '',
                         'image' => $slide['image'] ?? '',
                         'brands' => $slideBrands,
-                        'is_favorited' => $isFavorited
+                        'is_favorited' => $isFavorited,
                     ];
                 }
             }
 
             $brands = Brand::all();
             $categories = Category::all();
-            
+
             $popularProducts = Product::with('brands')->where('clicks', '>', 0)->orderBy('clicks', 'desc')->take(10)->get();
-            
+
             $newArrivals = Product::with('brands')->where('created_at', '>=', Carbon::now()->subWeek())->orderBy('created_at', 'desc')->get();
-            
+
             $aboutUs = HomeSetting::where('key', 'about_us')->first();
+
+            $products = Product::whereIn('name', [
+                'Once-off Dataset',
+                'Developer API',
+                'Analytics Dashboard',
+            ])->get();
 
             return Inertia::render('Home', [
                 'heroProducts' => $heroProducts,
@@ -91,6 +95,7 @@ class HomeController extends Controller
                 'popularProducts' => $popularProducts,
                 'newArrivals' => $newArrivals,
                 'aboutUs' => $aboutUs ? $aboutUs->value : null,
+                'products' => $products,
             ]);
         } catch (\Throwable $e) {
             return Inertia::render('Home', [
@@ -100,6 +105,7 @@ class HomeController extends Controller
                 'popularProducts' => [],
                 'newArrivals' => [],
                 'aboutUs' => null,
+                'products' => [],
             ]);
         }
     }

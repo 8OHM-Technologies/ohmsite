@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Category;
-use App\Models\Brand;
-use App\Models\User;
 use App\Models\HomeSetting;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class InitialSeeder extends Seeder
@@ -32,45 +32,65 @@ class InitialSeeder extends Seeder
         ]);
 
         // 3. Categories (Persistent)
-        $men = Category::firstOrCreate(['name' => 'Men'], ['image' => '/assets/images/categories/men.png']);
-        $women = Category::firstOrCreate(['name' => 'Women'], ['image' => '/assets/images/categories/women.png']);
+        $dataSolutions = Category::firstOrCreate(['name' => 'Data Solutions'], ['image' => '/assets/images/categories/data.png']);
 
-        // 4. Brands (Persistent - these will always be there)
-        $brands = [
-            ['name' => 'Nike', 'logo' => '/assets/images/brands/Nike.png'],
-            ['name' => 'Jordan', 'logo' => '/assets/images/brands/Jordan.png'],
-            ['name' => 'Adidas', 'logo' => '/assets/images/brands/Adidas.png'],
-            ['name' => 'Gucci', 'logo' => '/assets/images/brands/Gucci.png'],
-            ['name' => 'Hermes', 'logo' => '/assets/images/brands/Hermes.png'],
-            ['name' => 'Chanel', 'logo' => '/assets/images/brands/Chanel.png'],
-        ];
+        // 3.1 Digital Products (Persistent)
+        Product::firstOrCreate(
+            ['name' => 'Once-off Dataset'],
+            [
+                'description' => 'Get the raw data without analytics or insights and use it for your own purposes. Ideal for AI training or researchers who just want the data.',
+                'price' => 5000.00,
+                'image' => '/assets/images/products/dataset.png',
+                'stock' => 9999,
+                'category_id' => $dataSolutions->id,
+            ]
+        );
 
-        foreach ($brands as $brand) {
-            Brand::firstOrCreate(['name' => $brand['name']], ['logo' => $brand['logo']]);
-        }
+        Product::firstOrCreate(
+            ['name' => 'Developer API'],
+            [
+                'description' => 'Power your custom applications with direct access to our structured legal dataset API.',
+                'price' => 380.00,
+                'image' => '/assets/images/products/api.png',
+                'stock' => 9999,
+                'category_id' => $dataSolutions->id,
+            ]
+        );
 
+        Product::firstOrCreate(
+            ['name' => 'Analytics Dashboard'],
+            [
+                'description' => 'No code required. Access to trends and insights through our analytics platform.',
+                'price' => 3800.00,
+                'image' => '/assets/images/products/analytics.png',
+                'stock' => 9999,
+                'category_id' => $dataSolutions->id,
+            ]
+        );
+
+        
         // 5. Home Settings (Persistent)
         HomeSetting::firstOrCreate(['key' => 'hero_slider'], ['value' => [
             [
-                'product_id' => null,
-                'title' => '*TITEL OF THE PRODUKT*',
-                'price' => '*PRICE*',
-                'category' => '*CATEGORIES MEN/WOMEN*',
-                'image' => null,
-                'brand_ids' => [],
-                'is_active' => true,
-            ]
+                // 'product_id' => null,
+                // 'title' => '*TITEL OF THE PRODUKT*',
+                // 'price' => '*PRICE*',
+                // 'category' => '*CATEGORIES MEN/WOMEN*',
+                // 'image' => null,
+                // 'brand_ids' => [],
+                // 'is_active' => true,
+            ],
         ]]);
 
         HomeSetting::firstOrCreate(['key' => 'about_us'], ['value' => [
-            'title_line_1' => '*WRITE YOUR',
-            'title_line_2' => 'STORY LINE*',
-            'description' => '*WRITE YOUR STORY OF YOUR BRAND BE YOURSELF*',
-            'image' => null,
-            'stats' => [
-                ['label' => 'Years in treg', 'value' => '*00*'],
-                ['label' => 'Pleasing Costumers', 'value' => '*00*'],
-            ]
+            // 'title_line_1' => '*WRITE YOUR',
+            // 'title_line_2' => 'STORY LINE*',
+            // 'description' => '*WRITE YOUR STORY OF YOUR BRAND BE YOURSELF*',
+            // 'image' => null,
+            // 'stats' => [
+            //     ['label' => 'Years in treg', 'value' => '*00*'],
+            //     ['label' => 'Pleasing Costumers', 'value' => '*00*'],
+            // ],
         ]]);
     }
 }

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import Navbar from '@/Components/Navbar.vue'
 
 const frequencies = [
@@ -87,7 +87,48 @@ const formatZAR = (amount) => {
 
 const props = defineProps({
   auth: Object,
+  products: Array,
 });
+
+const getProductId = (name) => {
+  const p = props.products?.find(product => product.name === name);
+  return p ? p.id : null;
+};
+
+const addToCart = (productId, options) => {
+  router.post(route('cart.store'), {
+    product_id: productId,
+    quantity: 1,
+    options,
+  }, {
+    onSuccess: () => {
+      router.visit(route('cart.index'));
+    }
+  });
+};
+
+const handlePurchaseOnceOff = () => {
+  const id = getProductId('Once-off Dataset');
+  if (!id) return;
+  addToCart(id, { dataset: onceOffDataset.value });
+};
+
+const handleSubscribeDeveloper = () => {
+  const id = getProductId('Developer API');
+  if (!id) return;
+  addToCart(id, {
+    dataset: developerDataset.value,
+    frequency: frequency.value.value
+  });
+};
+
+const handleSubscribeAnalytics = () => {
+  const id = getProductId('Analytics Dashboard');
+  if (!id) return;
+  addToCart(id, {
+    frequency: frequency.value.value
+  });
+};
 
 const showSuccess = ref(false)
 const isSending = ref(false)
@@ -393,13 +434,13 @@ onUnmounted(() => {
 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
-                    <Link href="#" aria-describedby="tier-dataset" class="btn btn-secondary"
-                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <button type="button" @click="handlePurchaseOnceOff" aria-describedby="tier-dataset"
+                      class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>Purchase Dataset</span>
                       <div class="btn-icon">
                         <i class="ph-light ph-download-simple"></i>
                       </div>
-                    </Link>
+                    </button>
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
@@ -451,13 +492,13 @@ onUnmounted(() => {
 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
-                    <Link href="#" aria-describedby="tier-developer" class="btn btn-secondary"
-                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <button type="button" @click="handleSubscribeDeveloper" aria-describedby="tier-developer"
+                      class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>Subscribe to Basic API</span>
                       <div class="btn-icon">
                         <i class="ph-light ph-credit-card"></i>
                       </div>
-                    </Link>
+                    </button>
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
@@ -500,7 +541,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
-                          }}</span>
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -513,13 +554,13 @@ onUnmounted(() => {
 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
-                    <Link href="#" aria-describedby="tier-analytics" class="btn btn-primary"
-                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
+                      class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 16px;">
                       <span>Subscribe to Analytics Dashboard</span>
                       <div class="btn-icon">
                         <i class="ph-light ph-credit-card"></i>
                       </div>
-                    </Link>
+                    </button>
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
@@ -568,7 +609,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>

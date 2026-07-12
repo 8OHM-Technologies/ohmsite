@@ -24,6 +24,7 @@ class CartService
         }
 
         $sessionId = Session::getId();
+
         return Cart::firstOrCreate(['session_id' => $sessionId]);
     }
 
@@ -35,9 +36,9 @@ class CartService
         $cart = $this->getCart();
         $product = Product::findOrFail($productId);
 
-        $item = $cart->items()->where('product_id', $productId)
-            ->where('options', json_encode($options))
-            ->first();
+        $item = $cart->items()->where('product_id', $productId)->get()->first(function ($item) use ($options) {
+            return $item->options === $options;
+        });
 
         if ($item) {
             $item->increment('quantity', $quantity);
@@ -45,7 +46,7 @@ class CartService
             $item = $cart->items()->create([
                 'product_id' => $productId,
                 'quantity' => $quantity,
-                'unit_price' => $product->sale_price ?? $product->price,
+                'unit_price' => $this->resolveUnitPrice($product, $options),
                 'options' => $options,
             ]);
         }
@@ -59,7 +60,7 @@ class CartService
     public function updateItemQuantity(int $itemId, int $quantity): bool
     {
         $item = CartItem::findOrFail($itemId);
-        
+
         if ($quantity <= 0) {
             return $item->delete();
         }
@@ -81,6 +82,7 @@ class CartService
     public function clearCart(): bool
     {
         $cart = $this->getCart();
+
         return $cart->items()->delete() >= 0;
     }
 
@@ -90,8 +92,8 @@ class CartService
     public function applyCoupon(string $code): bool
     {
         $coupon = Coupon::where('code', $code)->first();
-        
-        if (!$coupon || !$coupon->isValid()) {
+
+        if (! $coupon || ! $coupon->isValid()) {
             return false;
         }
 
@@ -103,6 +105,7 @@ class CartService
         }
 
         $cart->update(['coupon_id' => $coupon->id]);
+
         return true;
     }
 
@@ -112,6 +115,7 @@ class CartService
     public function removeCoupon(): bool
     {
         $cart = $this->getCart();
+
         return $cart->update(['coupon_id' => null]);
     }
 
@@ -145,12 +149,14 @@ class CartService
 
     private function calculateSubtotal(Cart $cart): float
     {
-        return $cart->items->sum(fn($item) => $item->unit_price * $item->quantity);
+        return $cart->items->sum(fn ($item) => $item->unit_price * $item->quantity);
     }
 
     private function calculateDiscount(Cart $cart, float $subtotal): float
     {
-        if (!$cart->coupon) return 0;
+        if (! $cart->coupon) {
+            return 0;
+        }
 
         if ($cart->coupon->type === 'percentage') {
             return $subtotal * ($cart->coupon->value / 100);
@@ -162,6 +168,44 @@ class CartService
     private function calculateShipping(float $amount, ?float $threshold = null): float
     {
         $threshold = $threshold ?? config('shop.shipping.free_threshold');
+
         return $amount >= $threshold ? 0 : config('shop.shipping.cost');
+    }
+
+    /**
+     * Resolve the unit price of a product dynamically based on its options.
+     */
+    private function resolveUnitPrice(Product $product, array $options): float
+    {
+        // Once-off Dataset
+        if ($product->name === 'Once-off Dataset') {
+            $dataset = $options['dataset'] ?? 'ccma';
+            if ($dataset === 'all') {
+                return 9000.00;
+            }
+
+            return 5000.00;
+        }
+
+        // Developer API
+        if ($product->name === 'Developer API') {
+            $frequency = $options['frequency'] ?? 'monthly';
+            $dataset = $options['dataset'] ?? 'ccma';
+
+            if ($frequency === 'monthly') {
+                return $dataset === 'all' ? 480.00 : 380.00;
+            } else { // annually
+                return $dataset === 'all' ? 4800.00 : 3800.00;
+            }
+        }
+
+        // Analytics Dashboard
+        if ($product->name === 'Analytics Dashboard') {
+            $frequency = $options['frequency'] ?? 'monthly';
+
+            return $frequency === 'monthly' ? 3800.00 : 38000.00;
+        }
+
+        return $product->sale_price ?? $product->price;
     }
 }
