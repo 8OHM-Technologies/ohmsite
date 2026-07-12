@@ -492,15 +492,15 @@ onUnmounted(() => {
                     <p class="card-desc-small" style="margin-bottom: 20px;">No code required. Access to trends and
                       insights through our analytics platform. <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
-                      before 31
+                      Annually before 31
                       December 2026 and get full access to all current and future released Datasets!</div>
                     </p>
                     <!-- Pricing Value & Period -->
                     <div class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,500' : 'R35,000'
-                          }}</span>
+                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -568,7 +568,7 @@ onUnmounted(() => {
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
                           <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
-                            }}</span>
+                          }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
