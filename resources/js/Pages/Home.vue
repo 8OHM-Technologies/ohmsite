@@ -92,6 +92,10 @@ const props = defineProps({
 
 const getProductId = (name) => {
   const p = props.products?.find(product => product.name === name);
+  if (!p) {
+    console.error(`[Error] Product "${name}" was not found in the database. Please ensure your database is seeded on the VPS by running: php artisan db:seed --class=InitialSeeder`);
+    alert(`Product "${name}" is not configured in the database. Please ensure the database has been seeded on the server.`);
+  }
   return p ? p.id : null;
 };
 

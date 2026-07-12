@@ -119,8 +119,8 @@ const handleApplyDiscount = () => {
 
         <!-- Trust Badges -->
         <div class="mt-10">
-            <p class="text-center text-[8px] font-black uppercase tracking-[0.2em] text-zinc-700 mt-6 leading-relaxed">
-                🔒 Secure Payments with PayStack
+            <p class="text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-700 mt-6 leading-relaxed">
+                🔒 Secure Payments using PayStack
             </p>
         </div>
     </div>
