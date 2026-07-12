@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Navbar from '@/Components/Navbar.vue'
 
@@ -7,59 +7,6 @@ const frequencies = [
   { value: 'monthly', label: 'Monthly' },
   { value: 'annually', label: 'Annually (Save 17%)' },
 ]
-const tiers = [
-  {
-    name: 'Developer API',
-    id: 'tier-developer',
-    href: '#',
-    featured: false,
-    description: 'Power your custom applications or train AI models with direct access to our structured legal dataset feed. Includes 20+ years of historical cases and active live updates.',
-    price: { monthly: 'R380', annually: 'R3,800' },
-    onceOffPrice: 'R5,000',
-    highlights: [
-      '20+ Years of Historical CCMA ',
-      'Live API access to new court cases and decisions',
-      'Structured JSON payloads & REST endpoints',
-      'Standard API rate limits (1000 req/month)',
-      'Standard rates on new datasets',
-      'Standard Helpdesk Ticket Support',
-      'POPIA Compliant Data Entries',
-    ],
-  },
-  {
-    name: 'Pro Dashboard',
-    id: 'tier-pro',
-    href: '#',
-    featured: true,
-    description: 'No code required. Access to trends and insights through our analytics platform. Includes increased API rate limits. Subscribe before 31st December 2026 and get free access to all future release Datasets',
-    price: { monthly: 'R3,500', annually: 'R35,000' },
-    highlights: [
-      'Includes all Developer API features',
-      'No-code Interactive Analytics Dashboard',
-      'Visual trend analysis & CSV/Excel exports',
-      'Expanded API Endpoint Catalogue',
-      'Increased API rate limits (3000 req/month)',
-      'Priority Helpdesk Ticket Support',
-      'POPIA Compliant Data Entries',
-    ],
-  },
-  {
-    name: 'Managed Data Pipeline',
-    id: 'tier-pipeline',
-    href: '#contact',
-    featured: false,
-    description: 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
-    price: { monthly: 'R16,500', annually: 'R165,000' },
-    highlights: [
-      'Deployed on your own on-premises or cloud infrastructure',
-      'Custom web scraping and ETL data engineering',
-      'Private AI models (LLMs) & secure processing for sensitive data',
-      'Direct influence over our data product roadmap',
-      '24/7 Dedicated Priority Support & SLA',
-      'POPIA Compliant Data Entries',
-    ],
-  },
-];
 
 const roadmap = [
   {
@@ -105,7 +52,38 @@ const roadmap = [
 ];
 
 const frequency = ref(frequencies[0])
-const developerOption = ref('subscription')
+
+const datasets = [
+  { value: 'ccma', label: 'CCMA Awards (20+ Years)' },
+  { value: 'labour-court', label: 'Labour Court Judgments (20+ Years)' },
+]
+
+const onceOffDataset = ref('ccma')
+const developerDataset = ref('ccma')
+
+const onceOffPrice = computed(() => {
+  if (onceOffDataset.value === 'all') {
+    const n = datasets.length
+    return n * 5000 - (n - 1) * 500
+  }
+  return 5000
+})
+
+const developerPrice = computed(() => {
+  const isMonthly = frequency.value.value === 'monthly'
+  const basePrice = isMonthly ? 380 : 3800
+  
+  if (developerDataset.value === 'all') {
+    const extraDatasets = datasets.length - 1
+    const addOnRate = isMonthly ? 100 : 1000
+    return basePrice + extraDatasets * addOnRate
+  }
+  return basePrice
+})
+
+const formatZAR = (amount) => {
+  return 'R' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+}
 
 const props = defineProps({
   auth: Object,
@@ -376,30 +354,91 @@ onUnmounted(() => {
 
               <!-- Pricing Tiers Grid -->
               <div class="pricing-grid">
-                <div v-for="tier in tiers" :key="tier.id" class="pricing-card" :class="{ featured: tier.featured }">
+                <!-- Card 1: Once-off Dataset -->
+                <div class="pricing-card" id="card-dataset">
                   <div class="pricing-card-header">
-                    <h3 :id="tier.id" class="pricing-tier-name">{{ tier.name }}</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ tier.description }}</p>
+                    <h3 id="tier-dataset" class="pricing-tier-name">Once-off Dataset</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">Get the raw data without analytics or
+                      insights and use it for your own purposes. Ideal for AI training or researchers who just want the
+                      data.</p>
 
                     <!-- Dataset Selection -->
-                    <div v-if="tier.name === 'Developer API' || tier.name === 'Pro Dashboard'" class="form-group"
-                      style="margin-bottom: 20px; text-align: left;">
-                      <label :for="'dataset-' + tier.id"
+                    <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                      <label for="dataset-tier-dataset"
                         style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
                         Dataset:</label>
-                      <select :id="'dataset-' + tier.id"
+                      <select id="dataset-tier-dataset" v-model="onceOffDataset"
                         style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
-                        <option value="ccma" selected>CCMA/Labour Court Judgments</option>
+                        <option v-for="ds in datasets" :key="ds.value" :value="ds.value">{{ ds.label }}</option>
+                        <option value="all">All Datasets</option>
                       </select>
                     </div>
 
                     <!-- Pricing Value & Period -->
-                    <div v-if="tier.name === 'Developer API'" class="developer-pricing-options">
-                      <!-- Subscription Option -->
-                      <div class="developer-pricing-option" :class="{ active: developerOption === 'subscription' }"
-                        @click="developerOption = 'subscription'">
+                    <div class="developer-pricing-options">
+                      <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
+                          <span class="pricing-price-value">{{ formatZAR(onceOffPrice) }}</span>
+                          <div class="pricing-price-period">
+                            <span class="pricing-price-currency">ZAR</span>
+                            <span>Once-off</span>
+                          </div>
+                        </div>
+                        <span class="developer-pricing-label">
+                          {{ onceOffDataset === 'all' ? 'All datasets download' : 'Single dataset download' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: auto;">
+                    <!-- Tier Action Button -->
+                    <Link href="#" aria-describedby="tier-dataset" class="btn btn-secondary"
+                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                      <span>Purchase Dataset</span>
+                      <div class="btn-icon">
+                        <i class="ph-light ph-download-simple"></i>
+                      </div>
+                    </Link>
+
+                    <!-- Tier Highlights -->
+                    <ul class="pricing-features-list">
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>20+ Years of Historical Legal Data</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>POPIA Compliant Data Entries</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Card 2: Basic API -->
+                <div class="pricing-card" id="card-developer">
+                  <div class="pricing-card-header">
+                    <h3 id="tier-developer" class="pricing-tier-name">Developer API</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">Power your custom applications with direct
+                      access to our structured legal dataset API.</p>
+
+                    <!-- Dataset Selection -->
+                    <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                      <label for="dataset-tier-developer"
+                        style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
+                        Dataset:</label>
+                      <select id="dataset-tier-developer" v-model="developerDataset"
+                        style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
+                        <option v-for="ds in datasets" :key="ds.value" :value="ds.value">{{ ds.label }}</option>
+                        <option value="all">All Datasets</option>
+                      </select>
+                    </div>
+
+                    <!-- Pricing Value & Period -->
+                    <div class="developer-pricing-options">
+                      <div class="developer-pricing-option active" style="cursor: default;">
+                        <div class="pricing-price-container">
+                          <span class="pricing-price-value">{{ formatZAR(developerPrice) }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -407,69 +446,174 @@ onUnmounted(() => {
                         </div>
                         <span class="developer-pricing-label">Live API & Updates</span>
                       </div>
-
-                      <!-- Once-off Option -->
-                      <div class="developer-pricing-option" :class="{ active: developerOption === 'once-off' }"
-                        @click="developerOption = 'once-off'">
-                        <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ tier.onceOffPrice }}</span>
-                          <div class="pricing-price-period">
-                            <span class="pricing-price-currency">ZAR</span>
-                            <span>Once-off fee</span>
-                          </div>
-                        </div>
-                        <span class="developer-pricing-label">20y Archive Download</span>
-                      </div>
                     </div>
+                  </div>
 
-                    <!-- Default for Pro & Managed Data Pipeline -->
-                    <div v-else class="developer-pricing-options">
+                  <div style="margin-top: auto;">
+                    <!-- Tier Action Button -->
+                    <Link href="#" aria-describedby="tier-developer" class="btn btn-secondary"
+                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                      <span>Subscribe to Basic API</span>
+                      <div class="btn-icon">
+                        <i class="ph-light ph-credit-card"></i>
+                      </div>
+                    </Link>
+
+                    <!-- Tier Highlights -->
+                    <ul class="pricing-features-list">
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Structured OpenAPI-standard REST endpoints</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Standard API rate limits (1000 req/month)</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Add-on Datasets at R100 per dataset</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Standard Helpdesk Ticket Support</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>POPIA Compliant Data Entries</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Card 3: Analytics Dashboard -->
+                <div class="pricing-card featured" id="card-analytics">
+                  <div class="pricing-card-header">
+                    <h3 id="tier-analytics" class="pricing-tier-name">Analytics Dashboard</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">No code required. Access to trends and
+                      insights through our analytics platform. <br><br>
+                    <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
+                      before 31
+                      December 2026 and get full access to all current and future released Datasets!</div>
+                    </p>
+                    <!-- Pricing Value & Period -->
+                    <div class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span v-if="tier.name === 'Managed Data Pipeline'"
-                            style="font-size: 0.875rem; color: var(--text-secondary); margin-right: 8px; align-self: center; font-weight: 500;">20
-                            hours per month retainer</span>
-                          <span class="pricing-price-value">{{ tier.price[frequency.value] }}</span>
+                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,500' : 'R35,000'
+                            }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
                           </div>
                         </div>
-                        <span class="developer-pricing-label">{{ tier.name === 'Pro Dashboard' ? 'Full Dashboard Access'
-                          : 'Custom Implementation' }}</span>
+                        <span class="developer-pricing-label">Full Dashboard Access</span>
                       </div>
                     </div>
                   </div>
 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
-                    <Link v-if="tier.name === 'Developer API'"
-                      :href="developerOption === 'subscription' ? tier.href : tier.href + '-archive'"
-                      :aria-describedby="tier.id" class="btn btn-secondary"
+                    <Link href="#" aria-describedby="tier-analytics" class="btn btn-primary"
                       style="width: 100%; justify-content: center; margin-top: 16px;">
-                      <span>{{ developerOption === 'subscription' ? 'Subscribe to Live API' : 'Buy Historical Archive'
-                        }}</span>
+                      <span>Subscribe to Analytics Dashboard</span>
                       <div class="btn-icon">
-                        <i class="ph-light"
-                          :class="developerOption === 'subscription' ? 'ph-rss' : 'ph-download-simple'"></i>
-                      </div>
-                    </Link>
-                    <Link v-else :href="tier.href" :aria-describedby="tier.id" class="btn"
-                      :class="[tier.featured ? 'btn-primary' : 'btn-secondary']"
-                      style="width: 100%; justify-content: center; margin-top: 16px;">
-                      <span>{{ tier.name === 'Managed Data Pipeline' ? 'Enquire Now' : 'Subscribe to ' + tier.name
-                        }}</span>
-                      <div class="btn-icon">
-                        <i class="ph-light"
-                          :class="tier.name === 'Managed Data Pipeline' ? 'ph-chat-circle-dots' : 'ph-credit-card'"></i>
+                        <i class="ph-light ph-credit-card"></i>
                       </div>
                     </Link>
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
-                      <li v-for="mainFeature in tier.highlights" :key="mainFeature" class="pricing-feature-item">
+                      <li class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>{{ mainFeature }}</span>
+                        <span>Includes all Developer API features</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>No-code Interactive Analytics Dashboard</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Visual trend analysis & CSV/Excel exports</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Expanded API Endpoint Catalogue</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Increased API rate limits (3000 req/month)</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Priority Helpdesk Ticket Support</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>POPIA Compliant Data Entries</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Card 4: Managed Data Pipeline -->
+                <div class="pricing-card" id="card-pipeline">
+                  <div class="pricing-card-header">
+                    <h3 id="tier-pipeline" class="pricing-tier-name">Managed Data Pipeline</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">Build custom, automated extraction workflows
+                      tailored to your specific industry needs. We handle the extraction, transformation, and secure
+                      routing of structured data directly into your private ecosystem.</p>
+
+                    <!-- Pricing Value & Period -->
+                    <div class="developer-pricing-options">
+                      <div class="developer-pricing-option active" style="cursor: default;">
+                        <div class="pricing-price-container">
+                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R16,500' : 'R165,000'
+                          }}</span>
+                          <div class="pricing-price-period">
+                            <span class="pricing-price-currency">ZAR</span>
+                            <span>Billed {{ frequency.value }}</span>
+                          </div>
+                        </div>
+                        <span class="developer-pricing-label">Custom Implementation (Retainer @ 20 hours p/m)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: auto;">
+                    <!-- Tier Action Button -->
+                    <Link href="#contact" aria-describedby="tier-pipeline" class="btn btn-secondary"
+                      style="width: 100%; justify-content: center; margin-top: 16px;">
+                      <span>Enquire Now</span>
+                      <div class="btn-icon">
+                        <i class="ph-light ph-chat-circle-dots"></i>
+                      </div>
+                    </Link>
+
+                    <!-- Tier Highlights -->
+                    <ul class="pricing-features-list">
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Deployed on your own on-premises or cloud infrastructure</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Custom web scraping and ETL data engineering</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Private AI models (LLMs) & secure processing for sensitive data</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>Direct influence over our data product roadmap</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>24/7 Dedicated Priority Support & SLA</span>
+                      </li>
+                      <li class="pricing-feature-item">
+                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                        <span>POPIA Compliant Data Entries</span>
                       </li>
                     </ul>
                   </div>
@@ -2286,8 +2430,8 @@ footer {
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
   margin-top: 40px;
   width: 100%;
   position: relative;
@@ -2298,7 +2442,7 @@ footer {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-border-outer);
   border-radius: 20px;
-  padding: 40px 20px;
+  padding: 32px 16px;
   display: flex;
   flex-direction: column;
   transition: all 0.6s var(--ease-premium);
@@ -2350,7 +2494,7 @@ footer {
 
 .pricing-price-value {
   font-family: var(--font-display);
-  font-size: 3rem;
+  font-size: 2.25rem;
   font-weight: 800;
   color: var(--color-text-primary);
   line-height: 1;

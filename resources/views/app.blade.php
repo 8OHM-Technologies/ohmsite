@@ -35,6 +35,7 @@
     <meta name="twitter:description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">
     <meta name="twitter:image" content="{{ asset('assets/images/8OHM_Logo_border.webp') }}">
+
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" sizes="any">
     <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('assets/images/apple-touch-icon.png') }}">
