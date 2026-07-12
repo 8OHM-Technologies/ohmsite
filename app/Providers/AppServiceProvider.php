@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Http\Request;
-use Illuminate\Cache\RateLimiting\Limit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (!app()->environment('local')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+        if (! app()->environment('local')) {
+            URL::forceScheme('https');
         }
 
         Vite::prefetch(concurrency: 3);

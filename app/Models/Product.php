@@ -10,18 +10,18 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 
-        'description', 
-        'price', 
-        'sale_price', 
-        'image', 
+        'name',
+        'description',
+        'price',
+        'sale_price',
+        'image',
         'images',
         'colors',
         'sizes',
         'stock',
-        'category_id', 
-        'brand_id', 
-        'clicks'
+        'category_id',
+        'brand_id',
+        'clicks',
     ];
 
     protected $casts = [

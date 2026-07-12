@@ -243,7 +243,7 @@ const updateOrderStatus = (newStatus) => {
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total
                                     Amount</p>
                                 <p class="text-2xl font-black text-white">{{ formatCurrency(selectedOrder.total_amount)
-                                    }}</p>
+                                }}</p>
                             </div>
                             <div class="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5">
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Order

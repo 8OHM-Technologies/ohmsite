@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
-use App\Services\CustomerService;
 
 class CustomerController extends Controller
 {
@@ -23,14 +22,14 @@ class CustomerController extends Controller
         return Inertia::render('Admin/Customers/Index', [
             'customers' => $this->customerService->getCustomers($request->all()),
             'stats' => $this->customerService->getCustomerStats(),
-            'filters' => $request->all(['search', 'status'])
+            'filters' => $request->all(['search', 'status']),
         ]);
     }
 
     public function show(User $customer)
     {
         return Inertia::render('Admin/Customers/Show', [
-            'customer' => $customer->load(['orders.items.product', 'favorites'])
+            'customer' => $customer->load(['orders.items.product', 'favorites']),
         ]);
     }
 
@@ -49,8 +48,8 @@ class CustomerController extends Controller
 
     public function toggleVip(User $customer)
     {
-        $this->customerService->markAsVip($customer, !$customer->is_vip);
-        
+        $this->customerService->markAsVip($customer, ! $customer->is_vip);
+
         return back()->with('success', 'Customer VIP status updated.');
     }
 }

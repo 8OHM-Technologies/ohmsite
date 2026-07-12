@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\HomeSetting;
 use App\Models\Product;
-use App\Models\Brand;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -32,14 +32,14 @@ class AdminHomeController extends Controller
 
         if ($request->has('hero_slider')) {
             $heroSlider = $request->hero_slider;
-            
+
             // Handle slide image uploads
             if ($request->hasFile('hero_images')) {
                 foreach ($request->file('hero_images') as $index => $file) {
                     if (isset($heroSlider[$index])) {
                         // Store in 'public' disk under 'home/hero'
                         $path = $file->store('home/hero', 'public');
-                        $heroSlider[$index]['image'] = '/storage/' . $path;
+                        $heroSlider[$index]['image'] = '/storage/'.$path;
                     }
                 }
             }
@@ -52,11 +52,11 @@ class AdminHomeController extends Controller
 
         if ($request->has('about_us')) {
             $aboutUsData = $request->about_us;
-            
+
             if ($request->hasFile('about_us_image')) {
                 // Store in 'public' disk under 'home'
                 $path = $request->file('about_us_image')->store('home', 'public');
-                $aboutUsData['image'] = '/storage/' . $path;
+                $aboutUsData['image'] = '/storage/'.$path;
             } else {
                 $existing = HomeSetting::where('key', 'about_us')->first();
                 if ($existing && isset($existing->value['image'])) {

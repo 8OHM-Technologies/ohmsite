@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Product;
+use Inertia\Inertia;
 
 class SubscriberDashboardController extends Controller
 {
@@ -27,7 +26,7 @@ class SubscriberDashboardController extends Controller
                 ['day' => 'Sat', 'amount' => 400, 'height' => 100],
                 ['day' => 'Sun', 'amount' => 350, 'height' => 90],
             ],
-            'growthRate' => '+15.2%'
+            'growthRate' => '+15.2%',
         ]);
     }
 
@@ -35,8 +34,9 @@ class SubscriberDashboardController extends Controller
     {
         // For demonstration, fetch some products to show in the collection
         $products = Product::with(['category', 'brands'])->latest()->take(5)->get();
+
         return Inertia::render('Subscriber/Products/Index', [
-            'products' => $products
+            'products' => $products,
         ]);
     }
 
@@ -47,29 +47,29 @@ class SubscriberDashboardController extends Controller
                 'revenue' => [
                     'total' => 4250,
                     'growth' => 12.5,
-                    'chart' => [1200, 1500, 1300, 1800, 2100, 1900, 2400, 2600, 3100, 2900, 3500, 4250]
+                    'chart' => [1200, 1500, 1300, 1800, 2100, 1900, 2400, 2600, 3100, 2900, 3500, 4250],
                 ],
                 'orders' => [
                     'total' => 12,
-                    'growth' => 5.2
+                    'growth' => 5.2,
                 ],
                 'conversion_rate' => [
                     'value' => 8.5,
-                    'growth' => 1.2
+                    'growth' => 1.2,
                 ],
                 'returning_customers' => [
                     'value' => 100,
-                    'growth' => 0
-                ]
+                    'growth' => 0,
+                ],
             ],
-            'topProducts' => Product::with('brands')->take(3)->get()->map(function($product) {
+            'topProducts' => Product::with('brands')->take(3)->get()->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'image' => $product->image,
                     'sales' => rand(1, 5),
                     'revenue' => $product->price,
-                    'brand' => $product->brands->first()?->name ?? 'Premium'
+                    'brand' => $product->brands->first()?->name ?? 'Premium',
                 ];
             }),
             'recentActivity' => [
@@ -79,16 +79,16 @@ class SubscriberDashboardController extends Controller
             'liveStats' => [
                 'active_visitors' => 1,
                 'sales_today' => 0,
-                'revenue_today' => 0
+                'revenue_today' => 0,
             ],
             'trafficSources' => [
                 'Direct' => 40,
                 'Social' => 30,
                 'Organic' => 20,
-                'Referral' => 10
+                'Referral' => 10,
             ],
             'chartLabels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            'currentTimeframe' => '30 Days'
+            'currentTimeframe' => '30 Days',
         ]);
     }
 }

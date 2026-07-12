@@ -127,6 +127,7 @@ class CartService
         $cart = $this->getCart();
         $subtotal = $this->calculateSubtotal($cart);
         $discount = $this->calculateDiscount($cart, $subtotal);
+
         $total = $subtotal - $discount;
 
         return [

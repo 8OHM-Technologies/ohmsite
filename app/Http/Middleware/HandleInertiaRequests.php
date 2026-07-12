@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,7 +41,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'cart_count' => function () {
                 try {
-                    return app(\App\Services\CartService::class)
+                    return app(CartService::class)
                         ->getCart()
                         ->items
                         ->sum('quantity');

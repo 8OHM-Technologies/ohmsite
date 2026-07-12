@@ -5,20 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class AnalyticsController extends Controller
 {
     public function index(Request $request)
     {
         $timeframe = $request->get('timeframe', '30 Days');
-        
-        $startDate = match($timeframe) {
+
+        $startDate = match ($timeframe) {
             'Today' => Carbon::today(),
             '7 Days' => Carbon::now()->subDays(7),
             '12 Months' => Carbon::now()->subMonths(12),
@@ -36,7 +34,7 @@ class AnalyticsController extends Controller
                 ->whereYear('created_at', $month->year)
                 ->where('status', '!=', 'cancelled')
                 ->sum('total_amount');
-            
+
             $ordersChart[] = Order::whereMonth('created_at', $month->month)
                 ->whereYear('created_at', $month->year)
                 ->count();
@@ -49,7 +47,7 @@ class AnalyticsController extends Controller
 
         $revThisPeriod = Order::where('status', '!=', 'cancelled')->where('created_at', '>=', $startDate)->sum('total_amount');
         $revLastPeriod = Order::where('status', '!=', 'cancelled')->whereBetween('created_at', [$prevStartDate, $prevEndDate])->sum('total_amount');
-        
+
         $ordThisPeriod = Order::where('created_at', '>=', $startDate)->count();
         $ordLastPeriod = Order::whereBetween('created_at', [$prevStartDate, $prevEndDate])->count();
 
@@ -61,49 +59,49 @@ class AnalyticsController extends Controller
             ->having(DB::raw('count(id)'), '>', 1)
             ->get()
             ->count();
-            
+
         $returningRate = $totalUsersWithOrders > 0 ? round(($returningUsersCount / $totalUsersWithOrders) * 100, 1) : 0;
 
         $stats = [
             'revenue' => [
                 'total' => (float) $revThisPeriod,
                 'growth' => $this->calculateGrowthPercent($revThisPeriod, $revLastPeriod),
-                'chart' => $revenueChart
+                'chart' => $revenueChart,
             ],
             'orders' => [
                 'total' => $ordThisPeriod,
                 'growth' => $this->calculateGrowthPercent($ordThisPeriod, $ordLastPeriod),
-                'chart' => $ordersChart
+                'chart' => $ordersChart,
             ],
             'conversion_rate' => [
-                'value' => 3.2, 
+                'value' => 3.2,
                 'growth' => +0.4,
             ],
             'returning_customers' => [
                 'value' => $returningRate,
                 'growth' => +1.2,
-            ]
+            ],
         ];
 
         // Top Products by Sales
         $topProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'), DB::raw('SUM(unit_price * quantity) as total_revenue'))
             ->where('created_at', '>=', $startDate)
-            ->with(['product' => function($q) {
+            ->with(['product' => function ($q) {
                 $q->with('brands');
             }])
             ->groupBy('product_id')
             ->orderBy('total_sold', 'desc')
             ->take(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'id' => $item->product_id,
                     'name' => $item->product->name ?? 'Deleted Product',
                     'brand' => $item->product->brands->pluck('name')->first() ?? 'N/A',
-                    'sales' => (int)$item->total_sold,
-                    'revenue' => (float)$item->total_revenue,
-                    'growth' => '+15%', 
-                    'image' => $item->product->image ?? null
+                    'sales' => (int) $item->total_sold,
+                    'revenue' => (float) $item->total_revenue,
+                    'growth' => '+15%',
+                    'image' => $item->product->image ?? null,
                 ];
             });
 
@@ -112,15 +110,15 @@ class AnalyticsController extends Controller
             ->latest()
             ->take(6)
             ->get()
-            ->map(function($order) {
+            ->map(function ($order) {
                 return [
                     'id' => $order->id,
                     'type' => 'order',
-                    'user' => $order->first_name . ' ' . $order->last_name,
+                    'user' => $order->first_name.' '.$order->last_name,
                     'action' => 'placed a new order',
-                    'amount' => 'R' . number_format($order->total_amount, 2),
+                    'amount' => 'R'.number_format($order->total_amount, 2),
                     'time' => $order->created_at->diffForHumans(),
-                    'status' => $order->status
+                    'status' => $order->status,
                 ];
             });
 
@@ -130,7 +128,7 @@ class AnalyticsController extends Controller
             'sales_today' => Order::whereDate('created_at', Carbon::today())->count(),
             'revenue_today' => (float) Order::whereDate('created_at', Carbon::today())
                 ->where('status', '!=', 'cancelled')
-                ->sum('total_amount')
+                ->sum('total_amount'),
         ];
 
         // Traffic Sources Calculation (Mocked logic for visualization)
@@ -148,13 +146,16 @@ class AnalyticsController extends Controller
             'liveStats' => $liveStats,
             'trafficSources' => $trafficSources,
             'chartLabels' => $labels,
-            'currentTimeframe' => $timeframe
+            'currentTimeframe' => $timeframe,
         ]);
     }
 
     private function calculateGrowthPercent($current, $previous): float
     {
-        if ($previous == 0) return $current > 0 ? 100.0 : 0.0;
+        if ($previous == 0) {
+            return $current > 0 ? 100.0 : 0.0;
+        }
+
         return (float) round((($current - $previous) / $previous) * 100, 1);
     }
 }

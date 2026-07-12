@@ -16,11 +16,11 @@ class OrderController extends Controller
         // Search by ID or Customer Name
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($qu) use ($search) {
-                      $qu->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('user', function ($qu) use ($search) {
+                        $qu->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -39,7 +39,7 @@ class OrderController extends Controller
 
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,
-            'filters' => $request->only(['search', 'status', 'payment_status'])
+            'filters' => $request->only(['search', 'status', 'payment_status']),
         ]);
     }
 

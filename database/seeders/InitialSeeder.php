@@ -68,7 +68,6 @@ class InitialSeeder extends Seeder
             ]
         );
 
-        
         // 5. Home Settings (Persistent)
         HomeSetting::firstOrCreate(['key' => 'hero_slider'], ['value' => [
             [

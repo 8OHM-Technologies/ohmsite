@@ -84,11 +84,9 @@ class CheckoutController extends Controller
                 'country' => $request->country,
                 'phone' => $request->phone,
                 'total_amount' => $summary['total'],
-                'shipping_fee' => $summary['shipping'],
                 'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => 'cash',
-                'shipping_address' => $this->formatShippingAddress($request->all()),
             ]);
 
             foreach ($cart->items as $item) {
@@ -127,10 +125,5 @@ class CheckoutController extends Controller
 
             return back()->with('error', 'Something went wrong: '.$e->getMessage());
         }
-    }
-
-    private function formatShippingAddress(array $data): string
-    {
-        return "{$data['address']}, {$data['apartment']}, {$data['city']}, {$data['postal_code']}, {$data['country']}";
     }
 }

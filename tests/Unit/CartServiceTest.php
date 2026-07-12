@@ -2,8 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Discount;
 use App\Models\Product;
 use App\Services\CartService;
@@ -19,7 +17,7 @@ class CartServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->cartService = new CartService();
+        $this->cartService = new CartService;
     }
 
     public function test_calculate_subtotal_correctly()
@@ -52,6 +50,6 @@ class CartServiceTest extends TestCase
         $summary = $this->cartService->getSummary();
 
         $this->assertEquals(10, $summary['discount']);
-        $this->assertEquals(93, $summary['total']); // 100 - 10 + 3 (shipping)
+        $this->assertEquals(90, $summary['total']); // 100 - 10
     }
 }

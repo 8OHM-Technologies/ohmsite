@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('city')->nullable()->after('apartment');
             $table->string('postal_code')->nullable()->after('city');
             $table->string('country')->default('Kosovo')->after('postal_code');
-            $table->decimal('shipping_fee', 8, 2)->default(0)->after('total_amount');
             $table->string('payment_method')->default('cash')->after('payment_status');
         });
     }
@@ -41,8 +40,7 @@ return new class extends Migration
                 'city',
                 'postal_code',
                 'country',
-                'shipping_fee',
-                'payment_method'
+                'payment_method',
             ]);
         });
     }

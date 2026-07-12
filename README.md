@@ -2,7 +2,7 @@
 
 A full-stack e-commerce platform built with **Laravel 12** and **Inertia.js (Vue.js)**, designed around one core principle: **zero hardcoded business logic**.
 
-Every business operation — from pricing rules to shipping thresholds — is managed entirely through a dynamic admin dashboard. Updates to the business do not require redeployments or code changes. The application is a control layer over a clean backend/frontend architecture.
+Every business operation is managed entirely through a dynamic admin dashboard. Updates to the business do not require redeployments or code changes. The application is a control layer over a clean backend/frontend architecture.
 
 ---
 
@@ -101,7 +101,7 @@ Protected by `['auth', 'verified', 'admin']` middleware. Every business rule is 
 | 📈 **Analytics** | Behavioral insights and impact analysis of changes on sales performance |
 | 🛒 **Orders** | Full lifecycle order management and status tracking |
 | 👥 **Customers & VIP** | Basic CRM with automatic segmentation based on customer LTV |
-| ⚙️ **Settings** | Global configuration: taxes, currency, shipping thresholds, time zone |
+| ⚙️ **Settings** | Global configuration: taxes, currency, time zone |
 
 ---
 
@@ -136,12 +136,12 @@ The schema is optimized for read-heavy shop operations. Key relationships are in
 
 ### 🧠 Separated Services
 Business logic is separated from HTTP concerns:
-- `CartService` — single source of truth for all cart math (subtotal, discounts, shipping)
+- `CartService` — single source of truth for all cart math (subtotal, discounts)
 - `CustomerService` — VIP recalculation based on cumulative spend
 - `AnalyticsService` — revenue trends, growth rates, behavioral insights
 
 ### 🚫 No Hardcoded Business Rules
-Thresholds like free shipping limits, VIP qualification amounts, tax rates, and currency are stored in the database and managed through the Settings panel. Changing them requires no code modification.
+VIP qualification amounts, tax rates, and currency are stored in the database and managed through the Settings panel. Changing them requires no code modification.
 
 ---
 
@@ -219,7 +219,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')
 ### Unit Tests (`tests/Unit/`)
 | Test | What it verifies |
 |---|---|
-| `CartServiceTest` | Subtotal calculation, discount application, shipping threshold logic |
+| `CartServiceTest` | Subtotal calculation, discount application |
 
 Tested directly against the service — no HTTP, no database, no framework overhead.
 
@@ -291,7 +291,7 @@ MAIL_MAILER=smtp
 | `lockForUpdate` in checkout | Prevents overselling under concurrent load |
 | `CartService` as a class | Single source of truth for cart math — reused across controllers and tests |
 | `DB::transaction` in checkout | Atomicity — no partial state if any step fails |
-| Dynamic settings via DB | Shipping thresholds, VIP levels, taxes — all configurable without redeployment |
+| Dynamic settings via DB | VIP levels, taxes — all configurable without redeployment |
 | Role column vs. Spatie | Simpler for two roles; easy to extend later if needed |
 | Inertia.js over REST API | Server-side routing and auth; no separate API authentication layer |
 | SQLite for tests | No MySQL required in CI; in-memory teardown keeps tests fast |

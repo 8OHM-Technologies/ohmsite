@@ -16,7 +16,7 @@ class CartResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'items' => $this->items->map(fn($item) => [
+            'items' => $this->items->map(fn ($item) => [
                 'id' => $item->id,
                 'product' => [
                     'id' => $item->product->id,

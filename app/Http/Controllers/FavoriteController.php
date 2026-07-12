@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
@@ -11,8 +10,8 @@ class FavoriteController extends Controller
     public function toggle(Product $product)
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return back()->with('error', 'You must be logged in to favorite products.');
         }
 
@@ -28,8 +27,8 @@ class FavoriteController extends Controller
 
         if (request()->wantsJson()) {
             return response()->json([
-                'is_favorite' => !$isFavorite,
-                'message' => $message
+                'is_favorite' => ! $isFavorite,
+                'message' => $message,
             ]);
         }
 
@@ -40,9 +39,9 @@ class FavoriteController extends Controller
     {
         $user = Auth::user();
         $favorites = $user->favorites()->with(['brands', 'category'])->get();
-        
+
         return inertia('Favorites/Index', [
-            'favorites' => $favorites
+            'favorites' => $favorites,
         ]);
     }
 }

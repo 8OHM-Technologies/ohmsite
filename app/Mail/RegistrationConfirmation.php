@@ -16,6 +16,6 @@ class RegistrationConfirmation extends Mailable implements ShouldQueue
     public function build()
     {
         return $this->subject('Confirm Your Account')
-                    ->markdown('emails.confirm-account');
+            ->markdown('emails.confirm-account');
     }
 }

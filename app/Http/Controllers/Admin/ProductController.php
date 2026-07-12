@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
     public function index()
     {
         return Inertia::render('Admin/Products/Index', [
-            'products' => Product::with(['brands', 'category'])->latest()->get()
+            'products' => Product::with(['brands', 'category'])->latest()->get(),
         ]);
     }
 
@@ -23,7 +23,7 @@ class ProductController extends Controller
     {
         return Inertia::render('Admin/Products/Create', [
             'brands' => Brand::all(),
-            'categories' => Category::all()
+            'categories' => Category::all(),
         ]);
     }
 
@@ -47,14 +47,14 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('products/main', 'public');
-            $validated['image'] = '/storage/' . $path;
+            $validated['image'] = '/storage/'.$path;
         }
 
         $gallery = [];
         if ($request->hasFile('gallery_images')) {
             foreach ($request->file('gallery_images') as $file) {
                 $path = $file->store('products/gallery', 'public');
-                $gallery[] = '/storage/' . $path;
+                $gallery[] = '/storage/'.$path;
             }
         }
         $validated['images'] = $gallery;
@@ -70,7 +70,7 @@ class ProductController extends Controller
         return Inertia::render('Admin/Products/Edit', [
             'product' => $product->load('brands'),
             'brands' => Brand::all(),
-            'categories' => Category::all()
+            'categories' => Category::all(),
         ]);
     }
 
@@ -102,7 +102,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete(str_replace('/storage/', '', $product->image));
             }
             $path = $request->file('image')->store('products/main', 'public');
-            $validated['image'] = '/storage/' . $path;
+            $validated['image'] = '/storage/'.$path;
         }
 
         if ($request->hasFile('gallery_images')) {
@@ -115,7 +115,7 @@ class ProductController extends Controller
             $gallery = [];
             foreach ($request->file('gallery_images') as $file) {
                 $path = $file->store('products/gallery', 'public');
-                $gallery[] = '/storage/' . $path;
+                $gallery[] = '/storage/'.$path;
             }
             $validated['images'] = $gallery;
         }
@@ -137,7 +137,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete(str_replace('/storage/', '', $img));
             }
         }
-        
+
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');

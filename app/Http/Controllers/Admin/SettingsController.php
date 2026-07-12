@@ -15,28 +15,24 @@ class SettingsController extends Controller
                 'name' => 'Store Name',
                 'logo' => '/assets/images/LOGO.png',
                 'currency' => 'USD',
-                'timezone' => 'UTC+1'
+                'timezone' => 'UTC+1',
             ],
             'appearance' => [
                 'mode' => 'dark',
                 'accent_color' => '#E5FF45',
-                'sidebar_style' => 'glass'
+                'sidebar_style' => 'glass',
             ],
             'notifications' => [
                 'email_orders' => true,
                 'email_stock' => true,
                 'sms_orders' => false,
-                'marketing' => true
+                'marketing' => true,
             ],
             'payment' => [
                 'stripe_enabled' => true,
                 'paypal_enabled' => true,
-                'tax_rate' => 18
+                'tax_rate' => 18,
             ],
-            'shipping' => [
-                'free_threshold' => 150,
-                'standard_rate' => 15
-            ]
         ];
 
         $team = [
@@ -46,7 +42,7 @@ class SettingsController extends Controller
 
         return Inertia::render('Admin/Settings/Index', [
             'settings' => $settings,
-            'team' => $team
+            'team' => $team,
         ]);
     }
 

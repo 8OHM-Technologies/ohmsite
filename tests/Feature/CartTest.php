@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,13 +17,13 @@ class CartTest extends TestCase
 
         $response = $this->post(route('cart.store'), [
             'product_id' => $product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $product->id,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
     }
 
@@ -32,10 +32,10 @@ class CartTest extends TestCase
         $product = Product::factory()->create();
         $this->post(route('cart.store'), [
             'product_id' => $product->id,
-            'quantity' => 1
+            'quantity' => 1,
         ]);
 
-        $cartItem = \App\Models\CartItem::first();
+        $cartItem = CartItem::first();
 
         $response = $this->delete(route('cart.destroy', $cartItem->id));
 

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,25 +13,25 @@ class ShopController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['category', 'brand', 'min_price', 'max_price', 'sort', 'search']);
-        $cacheKey = 'products_page_' . md5(json_encode($filters) . $request->get('page', 1) . auth()->id());
+        $cacheKey = 'products_page_'.md5(json_encode($filters).$request->get('page', 1).auth()->id());
 
-        $products = cache()->remember($cacheKey, 300, function() use ($request) {
+        $products = cache()->remember($cacheKey, 300, function () use ($request) {
             $query = Product::with(['brands', 'category']);
 
             // Search
             if ($request->filled('search')) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+                $query->where('name', 'like', '%'.$request->search.'%');
             }
 
             // Filtering
             if ($request->filled('category')) {
-                $query->whereHas('category', function($q) use ($request) {
+                $query->whereHas('category', function ($q) use ($request) {
                     $q->where('name', $request->category);
                 });
             }
 
             if ($request->filled('brand')) {
-                $query->whereHas('brands', function($q) use ($request) {
+                $query->whereHas('brands', function ($q) use ($request) {
                     $q->where('name', $request->brand);
                 });
             }
@@ -71,20 +71,21 @@ class ShopController extends Controller
         $user = auth()->user();
         if ($user) {
             $favorites = $user->favorites()->pluck('product_id')->toArray();
-            $products->getCollection()->transform(function($product) use ($favorites) {
+            $products->getCollection()->transform(function ($product) use ($favorites) {
                 $product->is_favorited = in_array($product->id, $favorites);
+
                 return $product;
             });
         }
 
-        $categories = cache()->remember('categories_all', 3600, fn() => Category::all());
-        $brands = cache()->remember('brands_all', 3600, fn() => Brand::all());
+        $categories = cache()->remember('categories_all', 3600, fn () => Category::all());
+        $brands = cache()->remember('brands_all', 3600, fn () => Brand::all());
 
         return Inertia::render('Shop/Index', [
             'products' => $products,
             'categories' => $categories,
             'brands' => $brands,
-            'filters' => $filters
+            'filters' => $filters,
         ]);
     }
 
@@ -94,7 +95,7 @@ class ShopController extends Controller
         $product->increment('clicks');
 
         $product->load(['brands', 'category']);
-        
+
         $user = auth()->user();
         $product->is_favorited = $user ? $user->favorites()->where('product_id', $product->id)->exists() : false;
 
@@ -105,7 +106,7 @@ class ShopController extends Controller
 
         return Inertia::render('Shop/Show', [
             'product' => $product,
-            'relatedProducts' => $relatedProducts
+            'relatedProducts' => $relatedProducts,
         ]);
     }
 }

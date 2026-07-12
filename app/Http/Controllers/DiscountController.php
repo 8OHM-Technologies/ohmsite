@@ -28,7 +28,7 @@ class DiscountController extends Controller
 
         $applied = $this->cartService->applyDiscount($request->code);
 
-        if (!$applied) {
+        if (! $applied) {
             return back()->withErrors(['code' => 'Invalid or expired discount code, or minimum order not met.']);
         }
 

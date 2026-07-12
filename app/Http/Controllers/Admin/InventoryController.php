@@ -16,7 +16,7 @@ class InventoryController extends Controller
         // Search
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('description', 'like', "%{$request->search}%");
+                ->orWhere('description', 'like', "%{$request->search}%");
         }
 
         // Filters
@@ -40,13 +40,13 @@ class InventoryController extends Controller
             'total_products' => Product::count(),
             'low_stock' => Product::where('stock', '>', 0)->where('stock', '<=', 10)->count(),
             'out_of_stock' => Product::where('stock', '<=', 0)->count(),
-            'total_value' => Product::sum(\DB::raw('COALESCE(sale_price, price) * stock'))
+            'total_value' => Product::sum(\DB::raw('COALESCE(sale_price, price) * stock')),
         ];
 
         return Inertia::render('Admin/Inventory/Index', [
             'products' => $products,
             'stats' => $stats,
-            'filters' => $request->only(['search', 'category', 'stock_status'])
+            'filters' => $request->only(['search', 'category', 'stock_status']),
         ]);
     }
 

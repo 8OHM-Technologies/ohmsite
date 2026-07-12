@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
@@ -12,26 +15,25 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = \App\Models\User::where('role', 'user')->get();
-        $products = \App\Models\Product::all();
+        $users = User::where('role', 'user')->get();
+        $products = Product::all();
 
         if ($users->isEmpty() || $products->isEmpty()) {
             return;
         }
 
-        $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+        $statuses = ['pending', 'confirmed', 'cancelled'];
         $paymentStatuses = ['paid', 'pending', 'failed'];
 
         for ($i = 0; $i < 30; $i++) {
             $user = $users->random();
-            $order = \App\Models\Order::create([
+            $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => 0,
                 'status' => $statuses[array_rand($statuses)],
                 'payment_status' => $paymentStatuses[array_rand($paymentStatuses)],
-                'shipping_address' => 'Rruga ' . rand(1, 100) . ', Prishtine, Kosove',
-                'phone' => '+383 49 ' . rand(100000, 999999),
-                'tracking_number' => 'SHK-' . strtoupper(bin2hex(random_bytes(4))),
+                'phone' => '+383 49 '.rand(100000, 999999),
+                'tracking_number' => 'SHK-'.strtoupper(bin2hex(random_bytes(4))),
                 'created_at' => now()->subDays(rand(0, 30)),
             ]);
 
@@ -41,8 +43,8 @@ class OrderSeeder extends Seeder
                 $product = $products->random();
                 $quantity = rand(1, 2);
                 $price = $product->price;
-                
-                \App\Models\OrderItem::create([
+
+                OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'quantity' => $quantity,

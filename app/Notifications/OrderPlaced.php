@@ -3,8 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class OrderPlaced extends Notification
@@ -28,9 +26,9 @@ class OrderPlaced extends Notification
         return [
             'order_id' => $this->order->id,
             'amount' => $this->order->total_amount,
-            'customer_name' => $this->order->first_name . ' ' . $this->order->last_name,
-            'message' => 'New order received from ' . $this->order->first_name,
-            'type' => 'order'
+            'customer_name' => $this->order->first_name.' '.$this->order->last_name,
+            'message' => 'New order received from '.$this->order->first_name,
+            'type' => 'order',
         ];
     }
 }

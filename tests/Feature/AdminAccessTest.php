@@ -19,7 +19,7 @@ class AdminAccessTest extends TestCase
     public function test_user_cannot_access_admin_routes()
     {
         $user = User::factory()->create(['role' => 'user']);
-        
+
         $response = $this->actingAs($user)->get(route('dashboard'));
         $response->assertRedirect('/');
         $response->assertSessionHas('error');
@@ -31,7 +31,7 @@ class AdminAccessTest extends TestCase
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
-        
+
         $response = $this->actingAs($admin)->get(route('dashboard'));
         $response->assertStatus(200);
     }
