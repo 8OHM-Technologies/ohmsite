@@ -33,10 +33,10 @@ const roadmap = [
   {
     status: 'Upcoming',
     date: 'Q4 2026',
-    title: 'SA CCMA Awards & Judgments',
-    description: 'Power your workflows with direct API access to our structured legal dataset.',
-    icon: 'ph-rocket-launch',
-    iconClass: 'text-yellow-500'
+    title: 'SA High Court Case Law',
+    description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
+    icon: 'ph-calendar-blank',
+    iconClass: 'text-orange-500'
   },
   {
     status: 'Planned',
@@ -450,8 +450,8 @@ onUnmounted(() => {
                 <div class="pricing-card" id="card-dataset">
                   <div class="pricing-card-header">
                     <h3 id="tier-dataset" class="pricing-tier-name">Once-off Dataset</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ onceOffProduct.description || "Get the raw data without analytics or insights and use it for your own purposes." }}</p>
-
+                    <p class="card-desc-small" style="margin-bottom: 20px;">
+                      {{ onceOffProduct.description || "Get the raw data without analytics or insights and use it for your own purposes." }}</p>
                     <!-- Dataset Selection -->
                     <div class="form-group" style="margin-bottom: 20px; text-align: left;">
                       <label for="dataset-tier-dataset"
@@ -552,7 +552,7 @@ onUnmounted(() => {
                       </li>
                     </ul>
                   </div>
-                </div>                <!-- Card 3: Analytics Dashboard -->
+                </div> <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
                   <div class="pricing-card- header">
                     <h3 id="tier-analytics" class="pricing-tier-name">Pro Analytics</h3>
@@ -575,7 +575,7 @@ onUnmounted(() => {
                       </div>
                     </div>
                   </div>
- 
+
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
                     <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
@@ -585,7 +585,7 @@ onUnmounted(() => {
                         <i class="ph-light ph-credit-card"></i>
                       </div>
                     </button>
- 
+
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
                       <li v-for="(feature, idx) in analyticsProduct.features" :key="idx" class="pricing-feature-item">
