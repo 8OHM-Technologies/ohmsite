@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
 import MainLayout from '@/Layouts/MainLayout.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
@@ -16,6 +16,27 @@ const formattedPrice = (price) => {
         style: 'currency',
         currency: 'ZAR',
     }).format(price || 0);
+};
+
+const getDatasetLabel = (value) => {
+    const datasets = usePage().props.datasets || [];
+    const dataset = datasets.find(d => d.slug === value);
+    if (dataset) return dataset.name;
+
+    switch (value) {
+        case 'ccma': return 'CCMA Awards';
+        case 'labour-court': return 'Labour Court Judgments';
+        case 'all': return 'All Datasets';
+        default: return value || 'CCMA Awards';
+    }
+};
+
+const getFrequencyLabel = (value) => {
+    switch (value) {
+        case 'monthly': return 'Monthly';
+        case 'annually': return 'Annually';
+        default: return value || 'Monthly';
+    }
 };
 
 const form = useForm({
@@ -171,7 +192,10 @@ const submit = () => {
                                         <h4 class="text-xs font-black uppercase tracking-widest truncate">{{
                                             item.product.name }}</h4>
                                         <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
-                                            Qty: {{ item.quantity }}</p>
+                                            Qty: {{ item.quantity }}
+                                            <span v-if="item.options?.dataset"> • Dataset: {{ getDatasetLabel(item.options.dataset) }}</span>
+                                            <span v-if="item.options?.frequency"> • Billing: {{ getFrequencyLabel(item.options.frequency) }}</span>
+                                        </p>
                                         <p class="text-xs font-black mt-2">{{ formattedPrice(item.subtotal) }}</p>
                                     </div>
                                 </div>

@@ -41,11 +41,11 @@ const props = defineProps({
                 </div>
                 <h1
                     class="text-4xl sm:text-5xl lg:text-4xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
-                    Elevating the <br class="hidden sm:block" /> sneaker game.
+                    End-to-End <br class="hidden sm:block" /> Data Solutions.
                 </h1>
                 <p
                     class="text-zinc-400 text-sm sm:text-lg font-bold uppercase tracking-widest mb-8 max-w-md opacity-80">
-                    Manage your inventory, track sales, and grow your sneaker empire.
+                    Manage your catalog, track subscriptions, and scale your data empire.
                 </p>
                 <div class="flex flex-wrap items-center gap-4">
                     <Link :href="route('admin.products.index')"
@@ -55,11 +55,11 @@ const props = defineProps({
                 </div>
             </div>
 
-            <!-- Floating Sneaker Image - Responsive handling -->
+            <!-- Floating Product Image - Responsive handling -->
             <div
                 class="absolute right-0 lg:right-12 top-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 pointer-events-none opacity-40 sm:opacity-100 group-hover:opacity-100 transition-opacity">
                 <div class="relative w-full h-full">
-                    <img v-if="recentProducts.length > 0" :src="recentProducts[0].image" alt="Featured Sneaker"
+                    <img v-if="recentProducts.length > 0" :src="recentProducts[0].image" alt="Featured Product"
                         class="w-full h-full object-contain drop-shadow-[0_45px_45px_rgba(0,0,0,0.8)] animate-float" />
                 </div>
             </div>

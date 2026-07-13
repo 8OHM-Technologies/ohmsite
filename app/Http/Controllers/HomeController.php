@@ -86,6 +86,7 @@ class HomeController extends Controller
                 'Once-off Dataset',
                 'Developer API',
                 'Analytics Dashboard',
+                'Managed Data Pipeline',
             ])->get();
 
             return Inertia::render('Home', [

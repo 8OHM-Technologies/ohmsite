@@ -1,7 +1,12 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import Navbar from '@/Components/Navbar.vue'
+
+const props = defineProps({
+  auth: Object,
+  products: Array,
+});
 
 const frequencies = [
   { value: 'monthly', label: 'Monthly' },
@@ -28,10 +33,10 @@ const roadmap = [
   {
     status: 'Upcoming',
     date: 'Q4 2026',
-    title: 'SA High Court Case Law',
-    description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
-    icon: 'ph-calendar-blank',
-    iconClass: 'text-orange-500'
+    title: 'SA CCMA Awards & Judgments',
+    description: 'Power your workflows with direct API access to our structured legal dataset.',
+    icon: 'ph-rocket-launch',
+    iconClass: 'text-yellow-500'
   },
   {
     status: 'Planned',
@@ -61,42 +66,76 @@ const roadmap = [
 
 const frequency = ref(frequencies[0])
 
-const datasets = [
-  { value: 'ccma', label: 'CCMA Awards (20+ Years)' },
-  { value: 'labour-court', label: 'Labour Court Judgments (20+ Years)' },
-]
+const datasets = computed(() => {
+  const list = usePage().props.datasets || [];
+  if (list.length > 0) {
+    return list.map(d => ({
+      value: d.slug,
+      label: `${d.name} (20+ Years)`,
+    }));
+  }
+  return [
+    { value: 'ccma', label: 'CCMA Awards (20+ Years)' },
+    { value: 'labour-court', label: 'Labour Court Judgments (20+ Years)' },
+  ];
+});
 
 const onceOffDataset = ref('ccma')
 const developerDataset = ref('ccma')
 
+const onceOffProduct = computed(() => {
+  return props.products?.find(p => p.name === 'Once-off Dataset') || {};
+});
+
+const developerProduct = computed(() => {
+  return props.products?.find(p => p.name === 'Developer API') || {};
+});
+
+const analyticsProduct = computed(() => {
+  return props.products?.find(p => p.name === 'Analytics Dashboard') || {};
+});
+
+const pipelineProduct = computed(() => {
+  return props.products?.find(p => p.name === 'Managed Data Pipeline') || {};
+});
+
 const onceOffPrice = computed(() => {
+  const base = onceOffProduct.value.price || 5000;
   if (onceOffDataset.value === 'all') {
-    const n = datasets.length
-    return n * 5000 - (n - 1) * 500
+    const n = datasets.value.length;
+    return n * base - (n - 1) * 500;
   }
-  return 5000
-})
+  return base;
+});
 
 const developerPrice = computed(() => {
-  const isMonthly = frequency.value.value === 'monthly'
-  const basePrice = isMonthly ? 380 : 3800
+  const isMonthly = frequency.value.value === 'monthly';
+  const base = developerProduct.value.price || 380;
+  const basePrice = isMonthly ? base : base * 10;
 
   if (developerDataset.value === 'all') {
-    const extraDatasets = datasets.length - 1
-    const addOnRate = isMonthly ? 100 : 1000
-    return basePrice + extraDatasets * addOnRate
+    const extraDatasets = datasets.value.length - 1;
+    const addOnRate = isMonthly ? 100 : 1000;
+    return basePrice + extraDatasets * addOnRate;
   }
-  return basePrice
-})
+  return basePrice;
+});
+
+const analyticsPrice = computed(() => {
+  const isMonthly = frequency.value.value === 'monthly';
+  const base = analyticsProduct.value.price || 3800;
+  return isMonthly ? base : base * 10;
+});
+
+const pipelinePrice = computed(() => {
+  const isMonthly = frequency.value.value === 'monthly';
+  const base = pipelineProduct.value.price || 19500;
+  return isMonthly ? base : base * 10;
+});
 
 const formatZAR = (amount) => {
   return 'R' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
-
-const props = defineProps({
-  auth: Object,
-  products: Array,
-});
 
 const getProductId = (name) => {
   const p = props.products?.find(product => product.name === name);
@@ -411,9 +450,7 @@ onUnmounted(() => {
                 <div class="pricing-card" id="card-dataset">
                   <div class="pricing-card-header">
                     <h3 id="tier-dataset" class="pricing-tier-name">Once-off Dataset</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">Get the raw data without analytics or
-                      insights and use it for your own purposes. Ideal for AI training or researchers who just want the
-                      data.</p>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ onceOffProduct.description || "Get the raw data without analytics or insights and use it for your own purposes." }}</p>
 
                     <!-- Dataset Selection -->
                     <div class="form-group" style="margin-bottom: 20px; text-align: left;">
@@ -456,13 +493,9 @@ onUnmounted(() => {
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
-                      <li class="pricing-feature-item">
+                      <li v-for="(feature, idx) in onceOffProduct.features" :key="idx" class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>20+ Years of Historical Legal Data</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>POPIA Compliant Data Entries</span>
+                        <span>{{ feature }}</span>
                       </li>
                     </ul>
                   </div>
@@ -472,8 +505,7 @@ onUnmounted(() => {
                 <div class="pricing-card" id="card-developer">
                   <div class="pricing-card-header">
                     <h3 id="tier-developer" class="pricing-tier-name">Developer API</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">Power your custom applications with direct
-                      access to our structured legal dataset API.</p>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ developerProduct.description || "Power your custom applications with direct access to our structured legal dataset API." }}</p>
 
                     <!-- Dataset Selection -->
                     <div class="form-group" style="margin-bottom: 20px; text-align: left;">
@@ -514,36 +546,17 @@ onUnmounted(() => {
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
-                      <li class="pricing-feature-item">
+                      <li v-for="(feature, idx) in developerProduct.features" :key="idx" class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Structured OpenAPI-standard REST endpoints</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Standard API rate limits (1000 req/month)</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Add-on Datasets at Reduced Prices</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Standard Helpdesk Ticket Support</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>POPIA Compliant Data Entries</span>
+                        <span>{{ feature }}</span>
                       </li>
                     </ul>
                   </div>
-                </div>
-
-                <!-- Card 3: Analytics Dashboard -->
+                </div>                <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
                   <div class="pricing-card-header">
                     <h3 id="tier-analytics" class="pricing-tier-name">Pro Analytics</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">No code required. Access to trends and
-                      insights through our analytics platform. <br><br>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description || "No code required. Access to trends and insights through our analytics platform." }} <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
                       Annually before 31
                       December 2026 and get full access to all current and future released Datasets!</div>
@@ -552,8 +565,7 @@ onUnmounted(() => {
                     <div class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R3,800' : 'R38,000'
-                          }}</span>
+                          <span class="pricing-price-value">{{ formatZAR(analyticsPrice) }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -563,7 +575,7 @@ onUnmounted(() => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div style="margin-top: auto;">
                     <!-- Tier Action Button -->
                     <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
@@ -573,36 +585,12 @@ onUnmounted(() => {
                         <i class="ph-light ph-credit-card"></i>
                       </div>
                     </button>
-
+ 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
-                      <li class="pricing-feature-item">
+                      <li v-for="(feature, idx) in analyticsProduct.features" :key="idx" class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Includes all Developer API features</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>No-code Interactive Analytics Dashboard</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Automated Reports & CSV/JSON exports</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Expanded API Endpoint Catalogue</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Increased API rate limits (3000 req/month)</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Priority Helpdesk Ticket Support</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>POPIA Compliant Data Entries</span>
+                        <span>{{ feature }}</span>
                       </li>
                     </ul>
                   </div>
@@ -612,16 +600,13 @@ onUnmounted(() => {
                 <div class="pricing-card" id="card-pipeline">
                   <div class="pricing-card-header">
                     <h3 id="tier-pipeline" class="pricing-tier-name">Managed Data Pipeline</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">Build custom, automated extraction workflows
-                      tailored to your specific industry needs. We handle the extraction, transformation, and secure
-                      routing of structured data directly into your private ecosystem.</p>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ pipelineProduct.description || "Build custom, automated extraction workflows tailored to your specific industry needs." }}</p>
 
                     <!-- Pricing Value & Period -->
                     <div class="developer-pricing-options">
                       <div class="developer-pricing-option active" style="cursor: default;">
                         <div class="pricing-price-container">
-                          <span class="pricing-price-value">{{ frequency.value === 'monthly' ? 'R19,500' : 'R195,000'
-                            }}</span>
+                          <span class="pricing-price-value">{{ formatZAR(pipelinePrice) }}</span>
                           <div class="pricing-price-period">
                             <span class="pricing-price-currency">ZAR</span>
                             <span>Billed {{ frequency.value }}</span>
@@ -644,29 +629,9 @@ onUnmounted(() => {
 
                     <!-- Tier Highlights -->
                     <ul class="pricing-features-list">
-                      <li class="pricing-feature-item">
+                      <li v-for="(feature, idx) in pipelineProduct.features" :key="idx" class="pricing-feature-item">
                         <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Deployed on your own on-premises or cloud infrastructure</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Custom web scraping and ETL data engineering</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Private AI models (LLMs) & secure processing for sensitive data</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>Direct influence over our data product roadmap</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>24/7 Priority Helpdesk Support</span>
-                      </li>
-                      <li class="pricing-feature-item">
-                        <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                        <span>POPIA Compliant Data Entries</span>
+                        <span>{{ feature }}</span>
                       </li>
                     </ul>
                   </div>

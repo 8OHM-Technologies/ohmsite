@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Dataset;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -47,6 +48,17 @@ class HandleInertiaRequests extends Middleware
                         ->sum('quantity');
                 } catch (\Throwable $e) {
                     return 0;
+                }
+            },
+            'datasets' => function () {
+                try {
+                    return Dataset::where('is_active', true)->get()->map(fn ($d) => [
+                        'name' => $d->name,
+                        'slug' => $d->slug,
+                        'description' => $d->description,
+                    ]);
+                } catch (\Throwable $e) {
+                    return [];
                 }
             },
             'app_url' => config('app.url'),

@@ -1,6 +1,6 @@
 <script setup>
 import MainLayout from '@/Layouts/MainLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 
 defineProps({
     orders: Array,
@@ -21,6 +21,27 @@ const getStatusColor = (status) => {
         case 'processing': return 'text-blue-500 bg-blue-500/10';
         case 'cancelled': return 'text-red-500 bg-red-500/10';
         default: return 'text-zinc-500 bg-zinc-500/10';
+    }
+};
+
+const getDatasetLabel = (value) => {
+    const datasets = usePage().props.datasets || [];
+    const dataset = datasets.find(d => d.slug === value);
+    if (dataset) return dataset.name;
+
+    switch (value) {
+        case 'ccma': return 'CCMA Awards';
+        case 'labour-court': return 'Labour Court Judgments';
+        case 'all': return 'All Datasets';
+        default: return value || 'CCMA Awards';
+    }
+};
+
+const getFrequencyLabel = (value) => {
+    switch (value) {
+        case 'monthly': return 'Monthly';
+        case 'annually': return 'Annually';
+        default: return value || 'Monthly';
     }
 };
 </script>
@@ -88,8 +109,15 @@ const getStatusColor = (status) => {
                             </div>
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-bold text-white truncate">{{ item.product.name }}</h4>
-                                <p class="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">Qty: {{ item.quantity
-                                }} • Size: {{ (item.options || {}).size || 'N/A' }}</p>
+                                <p class="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">
+                                    Qty: {{ item.quantity }}
+                                    <template v-if="item.options?.dataset">
+                                        • Dataset: {{ getDatasetLabel(item.options.dataset) }}
+                                    </template>
+                                    <template v-if="item.options?.frequency">
+                                        • Billing: {{ getFrequencyLabel(item.options.frequency) }}
+                                    </template>
+                                </p>
                                 <p class="text-sm font-bold text-white">R{{ parseFloat(item.unit_price).toFixed(2) }}
                                 </p>
 

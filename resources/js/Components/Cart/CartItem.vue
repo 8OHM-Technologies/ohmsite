@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { 
     Plus, 
     Minus, 
@@ -22,6 +22,27 @@ const formattedPrice = (price) => {
         style: 'currency',
         currency: 'ZAR',
     }).format(price);
+};
+
+const getDatasetLabel = (value) => {
+    const datasets = usePage().props.datasets || [];
+    const dataset = datasets.find(d => d.slug === value);
+    if (dataset) return dataset.name;
+
+    switch (value) {
+        case 'ccma': return 'CCMA Awards';
+        case 'labour-court': return 'Labour Court Judgments';
+        case 'all': return 'All Datasets';
+        default: return value || 'CCMA Awards';
+    }
+};
+
+const getFrequencyLabel = (value) => {
+    switch (value) {
+        case 'monthly': return 'Monthly';
+        case 'annually': return 'Annually';
+        default: return value || 'Monthly';
+    }
 };
 
 const hasSale = computed(() => props.item.product.sale_price !== null);
@@ -57,8 +78,11 @@ const handleQuantityChange = (newQty) => {
                     <h3 class="hover:text-indigo-600 transition-colors">
                         <Link :href="route('shop.show', item.product.id)">{{ item.product.name }}</Link>
                     </h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {{ item.options?.color || 'Standard' }} | {{ item.options?.size || 'One Size' }}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tight">
+                        <span v-if="item.options?.dataset">Dataset: {{ getDatasetLabel(item.options.dataset) }}</span>
+                        <span v-if="item.options?.dataset && item.options?.frequency"> • </span>
+                        <span v-if="item.options?.frequency">Billing: {{ getFrequencyLabel(item.options.frequency) }}</span>
+                        <span v-if="!item.options?.dataset && !item.options?.frequency">Standard</span>
                     </p>
                 </div>
                 <div class="text-right">

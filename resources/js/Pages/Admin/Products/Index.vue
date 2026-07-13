@@ -44,7 +44,7 @@ const deleteProduct = (id) => {
             <Link :href="route('admin.products.create')"
                 class="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-admin-modern transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2">
                 <Plus class="w-4 h-4" />
-                Add New Drop
+                Add New Product
             </Link>
         </div>
 
@@ -215,9 +215,9 @@ const deleteProduct = (id) => {
                         class="w-20 h-20 bg-zinc-800/50 rounded-full flex items-center justify-center mb-6 border border-white/5">
                         <Package class="w-8 h-8 text-zinc-600" />
                     </div>
-                    <h3 class="text-2xl font-black uppercase tracking-tighter text-zinc-700 mb-2">No drops found</h3>
+                    <h3 class="text-2xl font-black uppercase tracking-tighter text-zinc-700 mb-2">No products found</h3>
                     <p class="text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Start by adding your first
-                        sneaker drop to the catalog</p>
+                        data solution to the catalog</p>
                 </div>
             </div>
         </div>

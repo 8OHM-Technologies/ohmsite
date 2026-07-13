@@ -24,32 +24,20 @@ const form = useForm({
     stock: props.product.stock,
     colors: props.product.colors || [],
     sizes: props.product.sizes || [],
+    features: props.product.features || [],
     image: null,
     gallery_images: []
 });
 
-const newColor = ref('');
-const addColor = () => {
-    if (newColor.value && !form.colors.includes(newColor.value)) {
-        form.colors.push(newColor.value);
-        newColor.value = '';
+const newFeature = ref('');
+const addFeature = () => {
+    if (newFeature.value && !form.features.includes(newFeature.value)) {
+        form.features.push(newFeature.value);
+        newFeature.value = '';
     }
 };
-const removeColor = (index) => {
-    form.colors.splice(index, 1);
-};
-
-const newSize = ref('');
-const addSize = () => {
-    if (newSize.value && !form.sizes.includes(newSize.value)) {
-        form.sizes.push(newSize.value);
-        // Auto-sort sizes numerically
-        form.sizes.sort((a, b) => parseFloat(a) - parseFloat(b));
-        newSize.value = '';
-    }
-};
-const removeSize = (index) => {
-    form.sizes.splice(index, 1);
+const removeFeature = (index) => {
+    form.features.splice(index, 1);
 };
 
 const submit = () => {
@@ -162,63 +150,43 @@ const handleGalleryImages = (e) => {
                         </div>
 
                         <div>
-                            <InputLabel for="stock" value="Initial Inventory"
+                            <InputLabel for="stock" value="Initial Stock Level"
                                 class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
                             <TextInput id="stock" type="number"
                                 class="mt-1 block w-full bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern transition-all font-bold"
                                 v-model="form.stock" required />
                             <InputError class="mt-2" :message="form.errors.stock" />
                         </div>
+
+                        <!-- Features / Highlights Section -->
+                        <div class="bg-zinc-900 border border-white/5 rounded-2xl p-6">
+                            <h2 class="text-lg font-black uppercase tracking-tight text-white mb-6 flex items-center gap-2">
+                                <i class="ph-light ph-check-square text-admin-modern"></i>
+                                Highlights & Features
+                            </h2>
+
+                            <div class="space-y-4">
+                                <div class="flex space-x-2">
+                                    <TextInput v-model="newFeature" @keydown.enter.prevent="addFeature"
+                                        placeholder="e.g. 24/7 Priority Helpdesk Support"
+                                        class="flex-1 bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern" />
+                                    <button type="button" @click="addFeature"
+                                        class="bg-admin-modern text-black px-6 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
+                                </div>
+                                <div class="flex flex-col gap-2 mt-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                    <div v-for="(feature, index) in form.features" :key="index"
+                                        class="flex items-center justify-between bg-zinc-800 border border-white/10 px-4 py-3 rounded-xl text-xs font-bold text-white">
+                                        <span>{{ feature }}</span>
+                                        <button type="button" @click="removeFeature(index)"
+                                            class="text-zinc-500 hover:text-red-500 transition-colors">&times;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Attributes & Media -->
+                    <!-- Media -->
                     <div class="space-y-8">
-                        <!-- Colors -->
-                        <div>
-                            <InputLabel value="Available Colorways"
-                                class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
-                            <div class="flex mt-1 space-x-2">
-                                <TextInput v-model="newColor" @keydown.enter.prevent="addColor"
-                                    placeholder="#000000 or Red"
-                                    class="flex-1 bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern" />
-                                <button type="button" @click="addColor"
-                                    class="bg-admin-modern text-black px-8 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
-                            </div>
-                            <div class="flex flex-wrap gap-3 mt-4">
-                                <div v-for="(color, index) in form.colors" :key="index"
-                                    class="flex items-center bg-zinc-800 border border-white/10 pl-2 pr-4 py-2 rounded-xl text-xs font-bold shadow-sm group text-white">
-                                    <div v-if="color.startsWith('#')"
-                                        class="w-6 h-6 rounded-lg mr-3 border border-white/10"
-                                        :style="{ backgroundColor: color }"></div>
-                                    <span>{{ color }}</span>
-                                    <button type="button" @click="removeColor(index)"
-                                        class="ml-3 text-zinc-500 hover:text-red-500 transition-colors">&times;</button>
-                                </div>
-                            </div>
-                            <InputError class="mt-2" :message="form.errors.colors" />
-                        </div>
-
-                        <!-- Sizes -->
-                        <div>
-                            <InputLabel value="Size Run"
-                                class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
-                            <div class="flex mt-1 space-x-2">
-                                <TextInput v-model="newSize" @keydown.enter.prevent="addSize" placeholder="e.g. 42"
-                                    class="flex-1 bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern" />
-                                <button type="button" @click="addSize"
-                                    class="bg-admin-modern text-black px-8 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
-                            </div>
-                            <div class="flex flex-wrap gap-3 mt-4">
-                                <div v-for="(size, index) in form.sizes" :key="index"
-                                    class="flex items-center bg-zinc-800 border border-white/10 px-4 py-2 rounded-xl text-xs font-black uppercase shadow-sm text-white">
-                                    <span>EU {{ size }}</span>
-                                    <button type="button" @click="removeSize(index)"
-                                        class="ml-3 text-zinc-500 hover:text-red-500 transition-colors">&times;</button>
-                                </div>
-                            </div>
-                            <InputError class="mt-2" :message="form.errors.sizes" />
-                        </div>
-
                         <!-- Images -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                             <div>
@@ -278,7 +246,7 @@ const handleGalleryImages = (e) => {
                 <div class="flex justify-end pt-10 border-t border-white/5">
                     <button type="submit" :disabled="form.processing"
                         class="bg-admin-modern hover:bg-admin-modern/90 text-black px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-admin-modern/20 disabled:opacity-50">
-                        Update Inventory Item
+                        Update Product
                     </button>
                 </div>
             </form>

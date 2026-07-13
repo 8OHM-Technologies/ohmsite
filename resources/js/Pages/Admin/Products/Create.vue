@@ -33,31 +33,20 @@ const form = useForm({
     stock: '',
     colors: [],
     sizes: [],
+    features: [],
     image: null,
     gallery_images: []
 });
 
-const newColor = ref('');
-const addColor = () => {
-    if (newColor.value && !form.colors.includes(newColor.value)) {
-        form.colors.push(newColor.value);
-        newColor.value = '';
+const newFeature = ref('');
+const addFeature = () => {
+    if (newFeature.value && !form.features.includes(newFeature.value)) {
+        form.features.push(newFeature.value);
+        newFeature.value = '';
     }
 };
-const removeColor = (index) => {
-    form.colors.splice(index, 1);
-};
-
-const newSize = ref('');
-const addSize = () => {
-    if (newSize.value && !form.sizes.includes(newSize.value)) {
-        form.sizes.push(newSize.value);
-        form.sizes.sort((a, b) => parseFloat(a) - parseFloat(b));
-        newSize.value = '';
-    }
-};
-const removeSize = (index) => {
-    form.sizes.splice(index, 1);
+const removeFeature = (index) => {
+    form.features.splice(index, 1);
 };
 
 const submit = () => {
@@ -88,10 +77,9 @@ const handleGalleryImages = (e) => {
                     <ChevronLeft class="w-5 h-5" />
                 </Link>
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Create New Drop
+                    <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Create New Product
                     </h1>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Introduce a new sneaker
-                        silhouette to your global catalog</p>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Introduce a new data solution or dataset to your catalog</p>
                 </div>
             </div>
 
@@ -118,15 +106,15 @@ const handleGalleryImages = (e) => {
                                 class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
                             <input id="name" type="text" v-model="form.name"
                                 class="w-full bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 focus:ring-1 focus:ring-admin-modern/40 focus:border-admin-modern/40 transition-all font-bold"
-                                placeholder="Jordan 4 Retro 'Military Blue'" required />
+                                placeholder="e.g. Once-off Dataset" required />
                             <InputError class="mt-2" :message="form.errors.name" />
                         </div>
 
                         <div>
-                            <InputLabel for="description" value="Product Narrative"
+                            <InputLabel for="description" value="Product Description"
                                 class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
                             <textarea id="description" v-model="form.description" rows="6"
-                                placeholder="Detail the materials, heritage, and unique design features..."
+                                placeholder="Detail the features, coverage, and contents of this dataset/solution..."
                                 class="w-full bg-black/40 border border-white/5 text-white rounded-xl p-6 focus:ring-1 focus:ring-admin-modern/40 transition-all font-medium text-sm leading-relaxed"></textarea>
                             <InputError class="mt-2" :message="form.errors.description" />
                         </div>
@@ -158,61 +146,34 @@ const handleGalleryImages = (e) => {
                     </div>
                 </div>
 
-                <!-- Attributes Section -->
+                <!-- Features / Highlights Section -->
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
                     <h2 class="text-xl font-black uppercase tracking-tight text-white mb-10 flex items-center gap-3">
-                        <Palette class="w-5 h-5 text-admin-modern" />
-                        Variant Mapping
+                        <CheckCircle2 class="w-5 h-5 text-admin-modern" />
+                        Highlights & Features
                     </h2>
 
-                    <div class="space-y-10">
-                        <div>
-                            <InputLabel value="Available Colorways"
-                                class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-4 ml-1" />
-                            <div class="flex gap-2">
-                                <input v-model="newColor" @keydown.enter.prevent="addColor"
-                                    placeholder="e.g. #FFFFFF or OG Red"
-                                    class="flex-1 bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 focus:ring-1 focus:ring-admin-modern/40" />
-                                <button type="button" @click="addColor"
-                                    class="bg-white text-black px-8 rounded-xl font-black uppercase text-[10px] tracking-widest">Add</button>
-                            </div>
-                            <div class="flex flex-wrap gap-3 mt-6">
-                                <div v-for="(color, index) in form.colors" :key="index"
-                                    class="group flex items-center bg-zinc-800 border border-white/10 pl-2 pr-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all hover:border-white/20">
-                                    <div v-if="color.startsWith('#')"
-                                        class="w-6 h-6 rounded-lg mr-3 border border-white/10"
-                                        :style="{ backgroundColor: color }"></div>
-                                    <span>{{ color }}</span>
-                                    <button type="button" @click="removeColor(index)"
-                                        class="ml-3 text-zinc-600 hover:text-rose-500 transition-colors">
-                                        <X class="w-3 h-3" />
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="space-y-6">
+                        <div class="flex gap-2">
+                            <input v-model="newFeature" @keydown.enter.prevent="addFeature"
+                                placeholder="e.g. 24/7 Priority Helpdesk Support"
+                                class="flex-1 bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 focus:ring-1 focus:ring-admin-modern/40 focus:border-admin-modern/40 transition-all font-bold" />
+                            <button type="button" @click="addFeature"
+                                class="bg-white text-black px-8 rounded-xl font-black uppercase text-[10px] tracking-widest">Add</button>
                         </div>
-
-                        <div>
-                            <InputLabel value="Size Run (EU)"
-                                class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-4 ml-1" />
-                            <div class="flex gap-2">
-                                <input v-model="newSize" @keydown.enter.prevent="addSize" placeholder="e.g. 42.5"
-                                    class="flex-1 bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 focus:ring-1 focus:ring-admin-modern/40" />
-                                <button type="button" @click="addSize"
-                                    class="bg-white text-black px-8 rounded-xl font-black uppercase text-[10px] tracking-widest">Add</button>
-                            </div>
-                            <div class="flex flex-wrap gap-3 mt-6">
-                                <div v-for="(size, index) in form.sizes" :key="index"
-                                    class="flex items-center bg-zinc-800 border border-white/10 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-zinc-700">
-                                    <span>EU {{ size }}</span>
-                                    <button type="button" @click="removeSize(index)"
-                                        class="ml-3 text-zinc-600 hover:text-rose-500 transition-colors">
-                                        <X class="w-3 h-3" />
-                                    </button>
-                                </div>
+                        <div class="flex flex-col gap-3 mt-6">
+                            <div v-for="(feature, index) in form.features" :key="index"
+                                class="group flex items-center justify-between bg-zinc-800 border border-white/10 px-6 py-4 rounded-xl text-xs font-bold text-white transition-all">
+                                <span>{{ feature }}</span>
+                                <button type="button" @click="removeFeature(index)"
+                                    class="text-zinc-500 hover:text-rose-500 transition-colors">
+                                    <X class="w-4 h-4" />
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- Right Side: Taxonomy & Media -->
@@ -245,7 +206,7 @@ const handleGalleryImages = (e) => {
                             <select id="category" v-model="form.category_id"
                                 class="w-full bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 focus:ring-1 focus:ring-admin-modern appearance-none font-bold text-xs uppercase tracking-widest"
                                 required>
-                                <option value="">Select Genre</option>
+                                <option value="">Select Category</option>
                                 <option v-for="category in categories" :key="category.id" :value="category.id">{{
                                     category.name }}</option>
                             </select>

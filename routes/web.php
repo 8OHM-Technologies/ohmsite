@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DatasetController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
@@ -60,6 +61,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('products', ProductController::class);
     Route::resource('brands', BrandController::class);
     Route::resource('categories', CategoryController::class);
+    Route::resource('datasets', DatasetController::class);
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::patch('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');

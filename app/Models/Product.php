@@ -12,6 +12,7 @@ class Product extends Model
     protected $fillable = [
         'name',
         'description',
+        'features',
         'price',
         'sale_price',
         'image',
@@ -28,6 +29,7 @@ class Product extends Model
         'images' => 'array',
         'colors' => 'array',
         'sizes' => 'array',
+        'features' => 'array',
         'price' => 'float',
         'sale_price' => 'float',
     ];

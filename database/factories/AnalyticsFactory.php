@@ -79,7 +79,7 @@ class AnalyticsFactory extends Factory
             'court_location' => $courtLocation,
             'reason_for_dismissal' => $reason,
             'preview_image_url' => null,
-            'details_scraped_at' => fake()->dateTimeBetween($awardDate, 'now'),
+            'details_scraped_at' => fake()->dateTimeBetween($awardDate, (clone $awardDate)->modify('+15 days')),
         ];
     }
 }
