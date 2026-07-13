@@ -15,7 +15,10 @@ class SubscriberAnalyticsTest extends TestCase
 
     protected function subscribeUser(User $user): void
     {
-        $product = Product::factory()->create(['name' => 'Analytics Dashboard']);
+        $product = Product::factory()->create([
+            'name' => 'Analytics Dashboard',
+            'slug' => 'analytics-dashboard',
+        ]);
         $order = Order::create([
             'user_id' => $user->id,
             'email' => $user->email,

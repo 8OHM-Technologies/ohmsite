@@ -84,19 +84,19 @@ const onceOffDataset = ref('ccma')
 const developerDataset = ref('ccma')
 
 const onceOffProduct = computed(() => {
-  return props.products?.find(p => p.name === 'Once-off Dataset') || {};
+  return props.products?.find(p => p.slug === 'once-off-dataset') || {};
 });
 
 const developerProduct = computed(() => {
-  return props.products?.find(p => p.name === 'Developer API') || {};
+  return props.products?.find(p => p.slug === 'developer-api') || {};
 });
 
 const analyticsProduct = computed(() => {
-  return props.products?.find(p => p.name === 'Analytics Dashboard') || {};
+  return props.products?.find(p => p.slug === 'analytics-dashboard') || {};
 });
 
 const pipelineProduct = computed(() => {
-  return props.products?.find(p => p.name === 'Managed Data Pipeline') || {};
+  return props.products?.find(p => p.slug === 'managed-data-pipeline') || {};
 });
 
 const onceOffPrice = computed(() => {
@@ -137,11 +137,11 @@ const formatZAR = (amount) => {
   return 'R' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-const getProductId = (name) => {
-  const p = props.products?.find(product => product.name === name);
+const getProductId = (slug) => {
+  const p = props.products?.find(product => product.slug === slug);
   if (!p) {
-    console.error(`[Error] Product "${name}" was not found in the database. Please ensure your database is seeded on the VPS by running: php artisan db:seed --class=InitialSeeder`);
-    alert(`Product "${name}" is not configured in the database. Please ensure the database has been seeded on the server.`);
+    console.error(`[Error] Product with slug "${slug}" was not found in the database. Please ensure your database is seeded on the VPS by running: php artisan db:seed --class=InitialSeeder`);
+    alert(`Product with slug "${slug}" is not configured in the database. Please ensure the database has been seeded on the server.`);
   }
   return p ? p.id : null;
 };
@@ -159,13 +159,13 @@ const addToCart = (productId, options) => {
 };
 
 const handlePurchaseOnceOff = () => {
-  const id = getProductId('Once-off Dataset');
+  const id = getProductId('once-off-dataset');
   if (!id) return;
   addToCart(id, { dataset: onceOffDataset.value });
 };
 
 const handleSubscribeDeveloper = () => {
-  const id = getProductId('Developer API');
+  const id = getProductId('developer-api');
   if (!id) return;
   addToCart(id, {
     dataset: developerDataset.value,
@@ -174,7 +174,7 @@ const handleSubscribeDeveloper = () => {
 };
 
 const handleSubscribeAnalytics = () => {
-  const id = getProductId('Analytics Dashboard');
+  const id = getProductId('analytics-dashboard');
   if (!id) return;
   addToCart(id, {
     frequency: frequency.value.value
@@ -268,6 +268,14 @@ const checkHashAndParams = () => {
 }
 
 onMounted(() => {
+  if (datasets.value.length > 0) {
+    const hasCcma = datasets.value.some(d => d.value === 'ccma');
+    if (!hasCcma) {
+      onceOffDataset.value = datasets.value[0].value;
+      developerDataset.value = datasets.value[0].value;
+    }
+  }
+
   // Add body class for scroll snapping
   document.body.classList.add('home-page-active')
   document.documentElement.classList.add('home-page-active')
@@ -449,7 +457,7 @@ onUnmounted(() => {
                 <!-- Card 1: Once-off Dataset -->
                 <div class="pricing-card" id="card-dataset">
                   <div class="pricing-card-header">
-                    <h3 id="tier-dataset" class="pricing-tier-name">Once-off Dataset</h3>
+                    <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name || "Once-off Dataset" }}</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">
                       {{ onceOffProduct.description || "Get the raw data without analytics or insights and use it for your own purposes." }}</p>
                     <!-- Dataset Selection -->
@@ -504,7 +512,7 @@ onUnmounted(() => {
                 <!-- Card 2: Basic API -->
                 <div class="pricing-card" id="card-developer">
                   <div class="pricing-card-header">
-                    <h3 id="tier-developer" class="pricing-tier-name">Developer API</h3>
+                    <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || "Developer API" }}</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">{{ developerProduct.description || "Power your custom applications with direct access to our structured legal dataset API." }}</p>
 
                     <!-- Dataset Selection -->
@@ -555,7 +563,7 @@ onUnmounted(() => {
                 </div> <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
                   <div class="pricing-card- header">
-                    <h3 id="tier-analytics" class="pricing-tier-name">Pro Analytics</h3>
+                    <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || "Pro Analytics" }}</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description || "No code required. Access to trends and insights through our analytics platform." }} <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
                       Annually before 31
@@ -599,7 +607,7 @@ onUnmounted(() => {
                 <!-- Card 4: Managed Data Pipeline -->
                 <div class="pricing-card" id="card-pipeline">
                   <div class="pricing-card-header">
-                    <h3 id="tier-pipeline" class="pricing-tier-name">Managed Data Pipeline</h3>
+                    <h3 id="tier-pipeline" class="pricing-tier-name">{{ pipelineProduct.name || "Managed Data Pipeline" }}</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">{{ pipelineProduct.description || "Build custom, automated extraction workflows tailored to your specific industry needs." }}</p>
 
                     <!-- Pricing Value & Period -->
