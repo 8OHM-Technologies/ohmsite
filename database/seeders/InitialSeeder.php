@@ -64,9 +64,8 @@ class InitialSeeder extends Seeder
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
-                    'Sanitized, structured CCMA awards',
+                    '20+ Years of Sanitized, structured CCMA award data',
                     'Available in JSON or CSV formats',
-                    'Includes complete metadata fields',
                     'POPIA Compliant Data Entries',
                 ],
             ]
@@ -83,6 +82,7 @@ class InitialSeeder extends Seeder
                 'features' => [
                     'Structured OpenAPI-standard REST endpoints',
                     'Standard API rate limits (1000 req/month)',
+                    'Add-ons available to increase rate limits',
                     'Add-on Datasets at Reduced Prices',
                     'Standard Helpdesk Ticket Support',
                     'POPIA Compliant Data Entries',
@@ -120,11 +120,10 @@ class InitialSeeder extends Seeder
                 'category_id' => $dataSolutions->id,
                 'features' => [
                     'Deployed on your own on-premises or cloud infrastructure',
-                    'Custom API integrations (Slack, Teams, Webhooks)',
-                    'Custom schema modeling and column mapping',
-                    'Dedicated Data Engineer (10 hours support p/m)',
-                    'Dedicated Slack channel for real-time support',
-                    '99.9% Pipeline Uptime SLA',
+                    'Custom web scraping and ETL data engineering',
+                    'Private AI models (LLMs) & secure processing for sensitive data',
+                    '24/7 Priority Helpdesk Support',
+                    'POPIA Compliant Data Entries'
                 ],
             ]
         );
