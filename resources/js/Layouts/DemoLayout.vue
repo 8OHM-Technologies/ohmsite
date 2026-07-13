@@ -5,25 +5,7 @@ import LoadingScreen from '@/Components/LoadingScreen.vue';
 import Toast from '@/Components/Toast.vue';
 import demoData from '@/Pages/Demo/Analytics/demo_data.json';
 import {
-    LayoutDashboard,
-    Home,
-    Package,
-    ShoppingCart,
-    Users,
-    BarChart3,
-    Boxes,
-    Settings,
-    Menu,
-    X,
-    Search,
-    Bell,
-    Plus,
     LogOut,
-    UserCircle,
-    Layers,
-    Clock,
-    TrendingUp,
-    Building,
     Database,
     Briefcase,
     Calendar
@@ -110,7 +92,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
+    <div
+        class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
         <!-- Background Visuals -->
         <div class="background-visuals">
             <div class="glow-orb orb-1" ref="orb1"></div>
@@ -138,10 +121,11 @@ onUnmounted(() => {
                     <div class="h-8 w-px bg-white/10"></div>
                     <div>
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tighter uppercase">
-                            <span class="text-admin-modern">Analytics - Legal Dataset</span>
+                            <span class="text-admin-modern">Analytics - Demo Legal Dataset</span>
                         </h1>
-                        <p class="text-zinc-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest text-[8px] sm:text-[10px]">
-                            South African CCMA Arbitration & Dispute Intelligence
+                        <p
+                            class="text-zinc-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest text-[8px] sm:text-[10px]">
+                            South African CCMA Arbitration & Dispute Intelligence (Demo)
                         </p>
                     </div>
                 </div>
