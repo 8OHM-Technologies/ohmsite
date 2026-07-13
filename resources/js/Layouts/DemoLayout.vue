@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import LoadingScreen from '@/Components/LoadingScreen.vue';
 import Toast from '@/Components/Toast.vue';
