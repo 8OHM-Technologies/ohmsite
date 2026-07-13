@@ -111,7 +111,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
+    <div
+        class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black relative">
         <!-- Background Visuals -->
         <div class="background-visuals">
             <div class="glow-orb orb-1" ref="orb1"></div>

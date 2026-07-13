@@ -78,7 +78,7 @@ const formatDate = (dateString) => {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Order History -->
                 <div class="lg:col-span-2 space-y-6">
-                    <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Order History</h2>
+                    <h2 class="text-2xl font-black uppercase tracking-tighter text-primary">Order History</h2>
                     <div class="bg-zinc-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden">
                         <table class="w-full text-left">
                             <thead>
@@ -115,7 +115,7 @@ const formatDate = (dateString) => {
 
                 <!-- Favorites -->
                 <div class="space-y-6">
-                    <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Wishlist</h2>
+                    <h2 class="text-2xl font-black uppercase tracking-tighter text-primary">Wishlist</h2>
                     <div class="bg-zinc-900/40 border border-white/5 rounded-[2.5rem] p-8 space-y-6">
                         <div v-for="product in customer.favorites" :key="product.id"
                             class="flex items-center gap-4 group">

@@ -19,6 +19,7 @@ class DatasetAccessMiddleware
             return $next($request);
         }
 
-        return redirect()->route('orders.index')->with('error', 'You must purchase the Once-off Dataset to access this download.');
+        $productName = \App\Models\Product::where('slug', 'once-off-dataset')->value('name') ?? 'Once-off Dataset';
+        return redirect()->route('orders.index')->with('error', "You must purchase the {$productName} to access this download.");
     }
 }

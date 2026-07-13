@@ -130,7 +130,7 @@ class AnalyticsService
     {
         $this->enforceAdmin();
 
-        return Product::with(['brands', 'category'])
+        return Product::with(['category'])
             ->latest()
             ->take($limit)
             ->get()

@@ -74,12 +74,13 @@ const handleGalleryImages = (e) => {
                 <div>
                     <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Create New Product
                     </h1>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Introduce a new data solution or dataset to your catalog</p>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Introduce a new data
+                        solution or dataset to your catalog</p>
                 </div>
             </div>
 
             <button @click="submit" :disabled="form.processing"
-                class="bg-admin-modern text-black px-10 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                class="btn-primary text-black px-10 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/20 disabled:opacity-50 flex items-center justify-center gap-2">
                 <CheckCircle2 class="w-4 h-4" />
                 Finalize & Publish
             </button>
@@ -90,7 +91,7 @@ const handleGalleryImages = (e) => {
             <div class="lg:col-span-2 space-y-8">
                 <!-- Core Details Section -->
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
-                    <h2 class="text-xl font-black uppercase tracking-tight text-white mb-10 flex items-center gap-3">
+                    <h2 class="text-xl font-black uppercase tracking-tight text-primary mb-10 flex items-center gap-3">
                         <Box class="w-5 h-5 text-admin-modern" />
                         Core Specifications
                     </h2>
@@ -136,7 +137,7 @@ const handleGalleryImages = (e) => {
 
                 <!-- Features / Highlights Section -->
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
-                    <h2 class="text-xl font-black uppercase tracking-tight text-white mb-10 flex items-center gap-3">
+                    <h2 class="text-xl font-black uppercase tracking-tight text-primary mb-10 flex items-center gap-3">
                         <CheckCircle2 class="w-5 h-5 text-admin-modern" />
                         Highlights & Features
                     </h2>
@@ -186,7 +187,7 @@ const handleGalleryImages = (e) => {
 
                 <!-- Media Assets Sidebar -->
                 <div class="bg-black border border-white/5 rounded-[2.5rem] p-6 sm:p-10 shadow-2xl">
-                    <h2 class="text-xl font-black uppercase tracking-tight text-white mb-10 flex items-center gap-3">
+                    <h2 class="text-xl font-black uppercase tracking-tight text-primary mb-10 flex items-center gap-3">
                         <Images class="w-5 h-5 text-admin-modern" />
                         Assets
                     </h2>

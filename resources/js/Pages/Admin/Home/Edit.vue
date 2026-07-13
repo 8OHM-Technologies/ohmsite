@@ -113,7 +113,7 @@ const submit = () => {
                     and featured collections</p>
             </div>
             <button @click="submit"
-                class="bg-admin-modern text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/10"
+                class="btn-primary text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/10"
                 :disabled="form.processing">
                 {{ form.processing ? 'Saving...' : 'Save All Changes' }}
             </button>

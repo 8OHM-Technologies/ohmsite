@@ -223,7 +223,7 @@ const updateOrderStatus = (newStatus) => {
                 <div class="h-full flex flex-col p-10 overflow-y-auto custom-scrollbar" v-if="selectedOrder">
                     <div class="flex items-center justify-between mb-10">
                         <div>
-                            <h2 class="text-2xl font-black text-white uppercase tracking-tighter">Order Detail</h2>
+                            <h2 class="text-2xl font-black text-primary uppercase tracking-tighter">Order Detail</h2>
                             <p class="text-admin-modern font-bold text-sm">#ORD-{{ selectedOrder.id }}</p>
                         </div>
                         <button @click="closeDrawer"
@@ -242,7 +242,7 @@ const updateOrderStatus = (newStatus) => {
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total
                                     Amount</p>
                                 <p class="text-2xl font-black text-white">{{ formatCurrency(selectedOrder.total_amount)
-                                }}</p>
+                                    }}</p>
                             </div>
                             <div class="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5">
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Order

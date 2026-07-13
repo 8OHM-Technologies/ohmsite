@@ -49,7 +49,7 @@ const props = defineProps({
                 </p>
                 <div class="flex flex-wrap items-center gap-4">
                     <Link :href="route('admin.products.index')"
-                        class="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern transition-all shadow-xl active:scale-95">
+                        class="w-full sm:w-auto btn-primary text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern transition-all shadow-xl active:scale-95">
                         Manage Catalog
                     </Link>
                 </div>
@@ -98,7 +98,7 @@ const props = defineProps({
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 lg:mb-12 gap-4">
                     <div class="flex items-center gap-4">
                         <div class="w-2 h-8 bg-admin-modern rounded-full shadow-lg shadow-admin-modern/20"></div>
-                        <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Recent Catalog Additions
+                        <h2 class="text-2xl font-black uppercase tracking-tighter text-primary">Recent Catalog Additions
                         </h2>
                     </div>
                     <Link :href="route('admin.products.index')"
@@ -132,7 +132,7 @@ const props = defineProps({
                         <div
                             class="absolute top-8 right-8 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
                             <Link :href="route('admin.products.edit', product.id)"
-                                class="p-3 bg-white text-black rounded-xl shadow-2xl hover:bg-admin-modern transition-all">
+                                class="p-3 btn-primary text-black rounded-xl shadow-2xl hover:bg-admin-modern transition-all">
                                 <Edit3 class="w-4 h-4" />
                             </Link>
                             <Link :href="route('services.show', product.id)"
@@ -151,7 +151,7 @@ const props = defineProps({
                     class="absolute -top-24 -right-24 w-64 h-64 bg-admin-modern opacity-[0.03] blur-[100px] pointer-events-none transition-opacity group-hover:opacity-5 group-hover:scale-150 duration-1000">
                 </div>
 
-                <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 text-white flex items-center">
+                <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 text-primary flex items-center">
                     <TrendingUp class="w-5 h-5 mr-3 text-admin-modern" />
                     Growth Analytics
                 </h2>
@@ -164,7 +164,7 @@ const props = defineProps({
                                 <div class="w-full bg-zinc-900 border border-white/5 rounded-t-xl transition-all duration-700 hover:bg-admin-modern/80 hover:shadow-[0_0_20px_rgba(159,232,112,0.2)]"
                                     :style="`height: ${sale.height}%`">
                                     <div
-                                        class="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-black px-2.5 py-1.5 rounded-lg text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all pointer-events-none shadow-2xl translate-y-2 group-hover:translate-y-0">
+                                        class="absolute -top-12 left-1/2 -translate-x-1/2 btn-primary text-black px-2.5 py-1.5 rounded-lg text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all pointer-events-none shadow-2xl translate-y-2 group-hover:translate-y-0">
                                         R{{ sale.amount }}
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ const props = defineProps({
                     </div>
 
                     <button
-                        class="w-full py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all hover:bg-zinc-200 shadow-2xl flex items-center justify-center gap-3 group/btn active:scale-95">
+                        class="w-full py-5 btn-primary text-black rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all hover:bg-zinc-200 shadow-2xl flex items-center justify-center gap-3 group/btn active:scale-95">
                         <Download class="w-4 h-4 transition-transform group-hover/btn:-translate-y-1" />
                         Export Insights
                     </button>

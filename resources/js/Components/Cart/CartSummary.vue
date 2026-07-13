@@ -39,7 +39,7 @@ const handleApplyDiscount = () => {
 
 <template>
     <div class="bg-zinc-900 rounded-[3rem] p-8 lg:p-10 sticky top-40 border border-white/5 shadow-2xl">
-        <h2 class="text-2xl font-black uppercase tracking-tighter text-white mb-8">Order Summary</h2>
+        <h2 class="text-2xl font-black uppercase tracking-tighter text-primary mb-8">Order Summary</h2>
 
         <!-- Discount Input -->
         <div class="mb-10">
@@ -51,7 +51,7 @@ const handleApplyDiscount = () => {
                 <div class="flex items-center">
                     <BadgeCheck class="w-5 h-5 text-emerald-500 mr-3" />
                     <span class="text-sm font-black text-emerald-500 uppercase tracking-widest">{{ summary.discount.code
-                    }}</span>
+                        }}</span>
                 </div>
                 <button @click="emit('remove-discount')" class="text-emerald-500 hover:text-white transition-colors">
                     <X class="w-5 h-5" />
@@ -83,7 +83,7 @@ const handleApplyDiscount = () => {
             <div class="pt-6 border-t border-white/5 flex justify-between items-end">
                 <span class="text-xl font-black uppercase tracking-tighter text-white">Total</span>
                 <span class="text-3xl font-black uppercase tracking-tighter text-white">{{ formattedPrice(summary.total)
-                }}</span>
+                    }}</span>
             </div>
         </div>
 

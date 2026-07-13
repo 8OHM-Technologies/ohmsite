@@ -109,6 +109,15 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
 <template>
     <div class="min-h-screen bg-admin-main text-white font-sans selection:bg-admin-modern selection:text-black">
+        <!-- Background Visuals -->
+        <div class="background-visuals">
+            <div class="glow-orb orb-1" ref="orb1"></div>
+            <div class="glow-orb orb-2" ref="orb2"></div>
+            <div class="glow-orb orb-3" ref="orb3"></div>
+            <div class="grid-overlay"></div>
+            <div class="noise-overlay"></div>
+        </div>
+
         <LoadingScreen />
         <Toast />
 

@@ -24,12 +24,13 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('admin.datasets.update', props.dataset.id), {
-        onSuccess: () => {},
+        onSuccess: () => { },
     });
 };
 </script>
 
 <template>
+
     <Head :title="`Admin - Edit ${dataset.name}`" />
 
     <AdminLayout>
@@ -41,13 +42,15 @@ const submit = () => {
                     <ChevronLeft class="w-5 h-5" />
                 </Link>
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Refine Dataset</h1>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Editing: {{ dataset.name }}</p>
+                    <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Refine Dataset
+                    </h1>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Editing: {{ dataset.name }}
+                    </p>
                 </div>
             </div>
 
             <button @click="submit" :disabled="form.processing"
-                class="bg-admin-modern text-black px-10 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/20 disabled:opacity-50 flex items-center justify-center gap-2">
+                class="btn-primary text-black px-10 py-4 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/20 disabled:opacity-50 flex items-center justify-center gap-2">
                 <CheckCircle2 class="w-4 h-4" />
                 Save Changes
             </button>
@@ -58,7 +61,7 @@ const submit = () => {
             <div class="lg:col-span-2 space-y-8">
                 <!-- Core Details Section -->
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
-                    <h2 class="text-xl font-black uppercase tracking-tight text-white mb-10 flex items-center gap-3">
+                    <h2 class="text-xl font-black uppercase tracking-tight text-primary mb-10 flex items-center gap-3">
                         <Database class="w-5 h-5 text-admin-modern" />
                         Dataset Specifications
                     </h2>
@@ -100,14 +103,19 @@ const submit = () => {
             <!-- Right Side: Status Sidebar -->
             <div class="space-y-8">
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
-                    <h2 class="text-lg font-black uppercase tracking-tight text-white mb-6">Status</h2>
+                    <h2 class="text-lg font-black uppercase tracking-tight text-primary mb-6">Status</h2>
                     <div>
                         <label class="flex items-center cursor-pointer gap-3">
                             <input type="checkbox" v-model="form.is_active" class="sr-only peer" />
-                            <div class="relative w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-modern peer-checked:after:bg-black peer-checked:after:border-black"></div>
-                            <span class="text-xs font-black uppercase tracking-widest text-zinc-400 peer-checked:text-white">Active & Searchable</span>
+                            <div
+                                class="relative w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-zinc-400 after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-modern peer-checked:after:bg-black peer-checked:after:border-black">
+                            </div>
+                            <span
+                                class="text-xs font-black uppercase tracking-widest text-zinc-400 peer-checked:text-white">Active
+                                & Searchable</span>
                         </label>
-                        <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-wide mt-3 ml-1">If disabled, this dataset won't show in pricing tiers or checkout options.</p>
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-wide mt-3 ml-1">If disabled,
+                            this dataset won't show in pricing tiers or checkout options.</p>
                     </div>
                 </div>
             </div>

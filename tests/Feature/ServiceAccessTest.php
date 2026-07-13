@@ -14,7 +14,18 @@ class ServiceAccessTest extends TestCase
 
     protected function purchaseProduct(User $user, string $productName): void
     {
-        $product = Product::factory()->create(['name' => $productName]);
+        $slug = match ($productName) {
+            'Once-off Dataset' => 'once-off-dataset',
+            'Developer API' => 'developer-api',
+            'Analytics Dashboard' => 'analytics-dashboard',
+            'Managed Data Pipeline' => 'managed-data-pipeline',
+            default => str($productName)->slug()->toString(),
+        };
+
+        $product = Product::factory()->create([
+            'name' => $productName,
+            'slug' => $slug,
+        ]);
         $order = Order::create([
             'user_id' => $user->id,
             'email' => $user->email,

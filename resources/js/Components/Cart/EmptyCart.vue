@@ -19,7 +19,7 @@ defineProps({
         <div class="bg-gray-100 dark:bg-gray-800 p-6 rounded-full mb-6">
             <ShoppingBag class="w-16 h-16 text-gray-400" />
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ title }}</h2>
+        <h2 class="text-2xl font-bold text-primary mb-2">{{ title }}</h2>
         <p class="text-gray-600 dark:text-gray-400 max-w-sm mb-8">
             {{ message }}
         </p>

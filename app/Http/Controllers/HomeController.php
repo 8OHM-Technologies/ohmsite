@@ -73,11 +73,11 @@ class HomeController extends Controller
 
             $aboutUs = HomeSetting::where('key', 'about_us')->first();
 
-            $products = Product::whereIn('name', [
-                'Once-off Dataset',
-                'Developer API',
-                'Analytics Dashboard',
-                'Managed Data Pipeline',
+            $products = Product::whereIn('slug', [
+                'once-off-dataset',
+                'developer-api',
+                'analytics-dashboard',
+                'managed-data-pipeline',
             ])->get();
 
             return Inertia::render('Home', [

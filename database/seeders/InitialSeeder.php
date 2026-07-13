@@ -40,7 +40,7 @@ class InitialSeeder extends Seeder
             ['slug' => 'ccma'],
             [
                 'name' => 'CCMA Arbitration Awards',
-                'description' => 'Over 20 years of sanitized, structured CCMA awards with daily live updates.',
+                'description' => 'Over 20 years of sanitized, structured CCMA arbitration awards.',
                 'is_active' => true,
             ]
         );
@@ -56,8 +56,9 @@ class InitialSeeder extends Seeder
 
         // 3.2 Digital Products (Persistent)
         Product::updateOrCreate(
-            ['name' => 'Once-off Dataset'],
+            ['slug' => 'once-off-dataset'],
             [
+                'name' => 'Once-off Dataset',
                 'description' => 'Get the raw data without analytics or insights and use it for your own purposes. Ideal for AI training or researchers who just want the data.',
                 'price' => 5000.00,
                 'image' => '/assets/images/products/dataset.png',
@@ -72,8 +73,9 @@ class InitialSeeder extends Seeder
         );
 
         Product::updateOrCreate(
-            ['name' => 'Developer API'],
+            ['slug' => 'developer-api'],
             [
+                'name' => 'Developer API',
                 'description' => 'Power your custom applications with direct access to our structured legal dataset API.',
                 'price' => 380.00,
                 'image' => '/assets/images/products/api.png',
@@ -91,8 +93,9 @@ class InitialSeeder extends Seeder
         );
 
         Product::updateOrCreate(
-            ['name' => 'Analytics Dashboard'],
+            ['slug' => 'analytics-dashboard'],
             [
+                'name' => 'Analytics Dashboard',
                 'description' => 'No code required. Access to trends and insights through our analytics platform.',
                 'price' => 3800.00,
                 'image' => '/assets/images/products/analytics.png',
@@ -111,8 +114,9 @@ class InitialSeeder extends Seeder
         );
 
         Product::updateOrCreate(
-            ['name' => 'Managed Data Pipeline'],
+            ['slug' => 'managed-data-pipeline'],
             [
+                'name' => 'Managed Data Pipeline',
                 'description' => 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
                 'price' => 19500.00,
                 'image' => '/assets/images/products/pipeline.png',

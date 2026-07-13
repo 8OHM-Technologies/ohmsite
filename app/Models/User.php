@@ -91,7 +91,7 @@ class User extends Authenticatable
         return $this->orders()
             ->where('payment_status', 'paid')
             ->whereHas('items.product', function ($query) {
-                $query->where('name', 'Analytics Dashboard');
+                $query->where('slug', 'analytics-dashboard');
             })
             ->exists();
     }
@@ -108,7 +108,7 @@ class User extends Authenticatable
         return $this->orders()
             ->where('payment_status', 'paid')
             ->whereHas('items.product', function ($query) {
-                $query->where('name', 'Once-off Dataset');
+                $query->where('slug', 'once-off-dataset');
             })
             ->exists();
     }
@@ -125,7 +125,7 @@ class User extends Authenticatable
         return $this->orders()
             ->where('payment_status', 'paid')
             ->whereHas('items.product', function ($query) {
-                $query->where('name', 'Developer API');
+                $query->where('slug', 'developer-api');
             })
             ->exists();
     }

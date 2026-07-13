@@ -161,32 +161,46 @@ class CartService
     private function resolveUnitPrice(Product $product, array $options): float
     {
         // Once-off Dataset
-        if ($product->name === 'Once-off Dataset') {
+        if ($product->slug === 'once-off-dataset') {
             $dataset = $options['dataset'] ?? 'ccma';
+            $base = (float) $product->price;
             if ($dataset === 'all') {
-                return 9000.00;
+                $n = \App\Models\Dataset::where('is_active', true)->count();
+                return $n > 0 ? ($n * $base - ($n - 1) * 500.00) : $base;
             }
 
-            return 5000.00;
+            return $base;
         }
 
         // Developer API
-        if ($product->name === 'Developer API') {
+        if ($product->slug === 'developer-api') {
             $frequency = $options['frequency'] ?? 'monthly';
             $dataset = $options['dataset'] ?? 'ccma';
+            $base = (float) $product->price;
+            $isMonthly = $frequency === 'monthly';
+            $basePrice = $isMonthly ? $base : $base * 10;
 
-            if ($frequency === 'monthly') {
-                return $dataset === 'all' ? 480.00 : 380.00;
-            } else { // annually
-                return $dataset === 'all' ? 4800.00 : 3800.00;
+            if ($dataset === 'all') {
+                $n = \App\Models\Dataset::where('is_active', true)->count();
+                $extraDatasets = max(0, $n - 1);
+                $addOnRate = $isMonthly ? 100.00 : 1000.00;
+                return $basePrice + $extraDatasets * $addOnRate;
             }
+            return $basePrice;
         }
 
         // Analytics Dashboard
-        if ($product->name === 'Analytics Dashboard') {
+        if ($product->slug === 'analytics-dashboard') {
             $frequency = $options['frequency'] ?? 'monthly';
+            $base = (float) $product->price;
+            return $frequency === 'monthly' ? $base : $base * 10;
+        }
 
-            return $frequency === 'monthly' ? 3800.00 : 38000.00;
+        // Managed Data Pipeline
+        if ($product->slug === 'managed-data-pipeline') {
+            $frequency = $options['frequency'] ?? 'monthly';
+            $base = (float) $product->price;
+            return $frequency === 'monthly' ? $base : $base * 10;
         }
 
         return $product->sale_price ?? $product->price;

@@ -125,7 +125,8 @@ const handleGalleryImages = (e) => {
 
                         <!-- Features / Highlights Section -->
                         <div class="bg-zinc-900 border border-white/5 rounded-2xl p-6">
-                            <h2 class="text-lg font-black uppercase tracking-tight text-white mb-6 flex items-center gap-2">
+                            <h2
+                                class="text-lg font-black uppercase tracking-tight text-white mb-6 flex items-center gap-2">
                                 <i class="ph-light ph-check-square text-admin-modern"></i>
                                 Highlights & Features
                             </h2>
@@ -136,7 +137,7 @@ const handleGalleryImages = (e) => {
                                         placeholder="e.g. 24/7 Priority Helpdesk Support"
                                         class="flex-1 bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern" />
                                     <button type="button" @click="addFeature"
-                                        class="bg-admin-modern text-black px-6 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
+                                        class="btn-primary text-black px-6 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
                                 </div>
                                 <div class="flex flex-col gap-2 mt-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                                     <div v-for="(feature, index) in form.features" :key="index"
@@ -210,7 +211,7 @@ const handleGalleryImages = (e) => {
 
                 <div class="flex justify-end pt-10 border-t border-white/5">
                     <button type="submit" :disabled="form.processing"
-                        class="bg-admin-modern hover:bg-admin-modern/90 text-black px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-admin-modern/20 disabled:opacity-50">
+                        class="btn-primary hover:bg-admin-modern/90 text-black px-12 py-5 rounded-[2rem] font-black uppercase tracking-widest text-sm transition-all shadow-lg shadow-admin-modern/20 disabled:opacity-50">
                         Update Product
                     </button>
                 </div>
