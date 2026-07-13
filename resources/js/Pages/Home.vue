@@ -554,7 +554,7 @@ onUnmounted(() => {
                   </div>
                 </div>                <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
-                  <div class="pricing-card-header">
+                  <div class="pricing-card- header">
                     <h3 id="tier-analytics" class="pricing-tier-name">Pro Analytics</h3>
                     <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description || "No code required. Access to trends and insights through our analytics platform." }} <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe

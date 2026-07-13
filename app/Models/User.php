@@ -97,6 +97,40 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user has purchased the Once-off Dataset.
+     */
+    public function hasOnceOffDatasetAccess(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->orders()
+            ->where('payment_status', 'paid')
+            ->whereHas('items.product', function ($query) {
+                $query->where('name', 'Once-off Dataset');
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if the user has an active Developer API subscription.
+     */
+    public function hasApiSubscriptionAccess(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->orders()
+            ->where('payment_status', 'paid')
+            ->whereHas('items.product', function ($query) {
+                $query->where('name', 'Developer API');
+            })
+            ->exists();
+    }
+
+    /**
      * Get the redirect URL after login or verification.
      */
     public function getRedirectUrl(): string

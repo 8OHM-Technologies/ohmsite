@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\ApiAccessMiddleware;
+use App\Http\Middleware\DatasetAccessMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SubscribedMiddleware;
 use Illuminate\Foundation\Application;
@@ -25,6 +27,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'subscribed' => SubscribedMiddleware::class,
+            'has.dataset.access' => DatasetAccessMiddleware::class,
+            'has.api.access' => ApiAccessMiddleware::class,
         ]);
 
         // Security Headers
