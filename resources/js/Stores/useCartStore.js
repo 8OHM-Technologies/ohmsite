@@ -11,9 +11,7 @@ export const useCartStore = defineStore('cart', {
         summary: {
             subtotal: 0,
             discount: 0,
-            // shipping: 0,
             total: 0,
-            // free_shipping_progress: 0,
         },
         loading: false,
     }),

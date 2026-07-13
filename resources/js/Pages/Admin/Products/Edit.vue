@@ -9,7 +9,6 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 const props = defineProps({
     product: Object,
-    brands: Array,
     categories: Array
 });
 
@@ -19,11 +18,7 @@ const form = useForm({
     description: props.product.description || '',
     price: props.product.price,
     sale_price: props.product.sale_price || '',
-    brand_ids: props.product.brands.map(b => b.id),
     category_id: props.product.category_id,
-    stock: props.product.stock,
-    colors: props.product.colors || [],
-    sizes: props.product.sizes || [],
     features: props.product.features || [],
     image: null,
     gallery_images: []
@@ -115,27 +110,6 @@ const handleGalleryImages = (e) => {
 
                         <div class="space-y-6">
                             <div>
-                                <InputLabel value="Brand Identity"
-                                    class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-4" />
-                                <div class="grid grid-cols-2 gap-3 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                                    <label v-for="brand in brands" :key="brand.id" :class="[
-                                        'flex items-center space-x-3 p-3 rounded-xl border transition-all cursor-pointer group',
-                                        form.brand_ids.includes(brand.id)
-                                            ? 'bg-admin-modern border-admin-modern text-black shadow-lg shadow-admin-modern/20'
-                                            : 'bg-zinc-900 border-white/5 text-zinc-500 hover:border-white/20'
-                                    ]">
-                                        <input type="checkbox" :value="brand.id" v-model="form.brand_ids"
-                                            class="hidden" />
-                                        <img :src="brand.logo"
-                                            class="h-4 w-8 object-contain grayscale group-hover:grayscale-0"
-                                            :class="{ 'grayscale-0 invert': form.brand_ids.includes(brand.id) }" />
-                                        <span class="text-[10px] font-black uppercase tracking-widest truncate">{{
-                                            brand.name }}</span>
-                                    </label>
-                                </div>
-                                <InputError class="mt-2" :message="form.errors.brand_ids" />
-                            </div>
-                            <div>
                                 <InputLabel for="category" value="Style Category"
                                     class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
                                 <select id="category" v-model="form.category_id"
@@ -147,15 +121,6 @@ const handleGalleryImages = (e) => {
                                 </select>
                                 <InputError class="mt-2" :message="form.errors.category_id" />
                             </div>
-                        </div>
-
-                        <div>
-                            <InputLabel for="stock" value="Initial Stock Level"
-                                class="text-zinc-500 font-black uppercase tracking-widest text-[10px] mb-2" />
-                            <TextInput id="stock" type="number"
-                                class="mt-1 block w-full bg-zinc-900 border-white/5 text-white rounded-2xl py-4 px-6 focus:ring-admin-modern focus:border-admin-modern transition-all font-bold"
-                                v-model="form.stock" required />
-                            <InputError class="mt-2" :message="form.errors.stock" />
                         </div>
 
                         <!-- Features / Highlights Section -->

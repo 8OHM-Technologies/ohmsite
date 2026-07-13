@@ -32,7 +32,7 @@ const activeSection = ref('home');
 
 const performSearch = () => {
     if (searchQuery.value.trim()) {
-        router.get(route('shop.index'), { search: searchQuery.value });
+        router.get(route('services.index'), { search: searchQuery.value });
         isMobileMenuOpen.value = false;
     }
 };

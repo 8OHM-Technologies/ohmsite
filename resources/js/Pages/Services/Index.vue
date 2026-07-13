@@ -17,7 +17,6 @@ import {
 const props = defineProps({
     products: Object,
     categories: Array,
-    brands: Array,
     filters: Object,
     auth: Object
 });
@@ -28,14 +27,13 @@ const isFilterDrawerOpen = ref(false);
 const activeFilters = ref({
     search: props.filters.search || '',
     category: props.filters.category || '',
-    brand: props.filters.brand || '',
     min_price: props.filters.min_price || '',
     max_price: props.filters.max_price || '',
     sort: props.filters.sort || 'newest'
 });
 
 const applyFilters = () => {
-    router.get(route('shop.index'), activeFilters.value, {
+    router.get(route('services.index'), activeFilters.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -66,7 +64,7 @@ watch(isFilterDrawerOpen, (val) => {
 </script>
 
 <template>
-    <MainLayout :auth="auth" title="Shop">
+    <MainLayout :auth="auth" title="Services">
 
 
         <div class="relative z-10">
@@ -137,27 +135,6 @@ watch(isFilterDrawerOpen, (val) => {
                             </div>
                         </div>
 
-                        <!-- Brands -->
-                        <div class="space-y-8 mb-16">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-700">The Houses</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <button v-for="brand in brands" :key="brand.id"
-                                    @click="activeFilters.brand = brand.name; applyFilters()"
-                                    :class="activeFilters.brand === brand.name ? 'border-white bg-white/[0.03] shadow-2xl shadow-white/5 scale-95' : 'border-white/5 hover:border-white/10 bg-zinc-900/20'"
-                                    class="border p-5 rounded-[2rem] transition-all duration-500 group aspect-square flex items-center justify-center relative overflow-hidden">
-                                    <div v-if="activeFilters.brand === brand.name"
-                                        class="absolute top-2 right-2 w-1.5 h-1.5 bg-admin-modern rounded-full"></div>
-                                    <img :src="brand.logo"
-                                        class="w-full h-full object-contain transition-all duration-700 brightness-200"
-                                        :class="activeFilters.brand === brand.name ? 'opacity-100' : 'opacity-20 grayscale group-hover:opacity-50 group-hover:grayscale-0'" />
-                                </button>
-                            </div>
-                            <button v-if="activeFilters.brand" @click="activeFilters.brand = ''; applyFilters()"
-                                class="w-full py-3 bg-zinc-900/50 rounded-xl text-[9px] font-black uppercase tracking-[0.3em] text-zinc-600 hover:text-white border border-white/5 transition-all">
-                                Reset Brands
-                            </button>
-                        </div>
-
                         <!-- Price Range -->
                         <div class="space-y-8">
                             <h4 class="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-700">Valuation</h4>
@@ -198,11 +175,11 @@ watch(isFilterDrawerOpen, (val) => {
                     <!-- Desktop Header -->
                     <div class="hidden lg:flex justify-between items-end mb-16">
                         <div>
-                            <h2 class="text-8xl font-black uppercase tracking-tighter leading-none mb-6">The Vault</h2>
+                            <h2 class="text-8xl font-black uppercase tracking-tighter leading-none mb-6">Our Services</h2>
                             <div class="flex items-center gap-6">
                                 <span
                                     class="bg-white text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-2xl">{{
-                                        products.total }} Silhouettes</span>
+                                        products.total }} Services</span>
                                 <div class="h-[1px] w-32 bg-white/5"></div>
                             </div>
                         </div>
@@ -249,7 +226,7 @@ watch(isFilterDrawerOpen, (val) => {
                             </button>
 
                             <!-- Product Link -->
-                            <Link :href="route('shop.show', product.id)" class="flex-1 flex flex-col">
+                            <Link :href="route('services.show', product.id)" class="flex-1 flex flex-col">
                                 <div
                                     class="aspect-[4/5] bg-zinc-900 rounded-[2rem] sm:rounded-[3rem] p-8 flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-white/20 transition-all duration-700 shadow-2xl">
                                     <!-- Dynamic BG Gradient based on brand color or static -->
@@ -273,7 +250,7 @@ watch(isFilterDrawerOpen, (val) => {
                                             {{ product.name }}</h4>
                                         <span
                                             class="text-[8px] font-black uppercase tracking-widest text-zinc-600 border border-white/10 px-2 py-1 rounded-md shrink-0">
-                                            {{ product.brands?.[0]?.name || 'Premium' }}
+                                            {{ product.category?.name || 'Service' }}
                                         </span>
                                     </div>
                                     <div class="flex items-center gap-3">
@@ -288,9 +265,9 @@ watch(isFilterDrawerOpen, (val) => {
 
                             <!-- Quick Action Area -->
                             <div class="mt-6 px-4">
-                                <Link :href="route('shop.show', product.id)"
+                                <Link :href="route('services.show', product.id)"
                                     class="w-full bg-white text-black py-4 rounded-2xl flex items-center justify-center font-black uppercase text-[10px] tracking-[0.2em] hover:bg-admin-modern transition-all duration-300 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 shadow-2xl">
-                                    Select Size
+                                    View Details
                                 </Link>
                             </div>
                         </div>
@@ -319,7 +296,7 @@ watch(isFilterDrawerOpen, (val) => {
                         <p class="text-zinc-600 font-bold uppercase tracking-widest text-xs">Try adjusting your filters
                             or search query</p>
                         <button
-                            @click="activeFilters = { search: '', category: '', brand: '', min_price: '', max_price: '', sort: 'newest' }; applyFilters()"
+                            @click="activeFilters = { search: '', category: '', min_price: '', max_price: '', sort: 'newest' }; applyFilters()"
                             class="mt-8 text-white border-b border-white/20 pb-1 text-[10px] font-black uppercase tracking-widest hover:border-white transition-all">Clear
                             All Filters</button>
                     </div>
@@ -346,7 +323,7 @@ watch(isFilterDrawerOpen, (val) => {
                     <div class="flex-1 overflow-y-auto p-8 space-y-12 pb-40">
                         <!-- Categories -->
                         <div class="space-y-6">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Shop by Category
+                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Services by Category
                             </h4>
                             <div class="flex flex-wrap gap-2">
                                 <button
@@ -355,20 +332,6 @@ watch(isFilterDrawerOpen, (val) => {
                                     :class="activeFilters.category === cat.val ? 'bg-white text-black' : 'bg-zinc-800 text-zinc-400 border border-white/5'"
                                     class="px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                                     {{ cat.name }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Brands -->
-                        <div class="space-y-6">
-                            <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Brands</h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button v-for="brand in brands" :key="brand.id"
-                                    @click="activeFilters.brand = brand.name"
-                                    :class="activeFilters.brand === brand.name ? 'bg-white/10 border-white' : 'bg-black/40 border-white/5'"
-                                    class="border rounded-2xl transition-all flex items-center justify-center p-6 aspect-square">
-                                    <img :src="brand.logo" class="h-6 w-full object-contain"
-                                        :class="activeFilters.brand === brand.name ? 'opacity-100 grayscale-0' : 'opacity-40 grayscale'" />
                                 </button>
                             </div>
                         </div>

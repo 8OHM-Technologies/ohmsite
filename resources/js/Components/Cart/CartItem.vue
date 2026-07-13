@@ -76,7 +76,7 @@ const handleQuantityChange = (newQty) => {
             <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
                 <div>
                     <h3 class="hover:text-indigo-600 transition-colors">
-                        <Link :href="route('shop.show', item.product.id)">{{ item.product.name }}</Link>
+                        <Link :href="route('services.show', item.product.id)">{{ item.product.name }}</Link>
                     </h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tight">
                         <span v-if="item.options?.dataset">Dataset: {{ getDatasetLabel(item.options.dataset) }}</span>

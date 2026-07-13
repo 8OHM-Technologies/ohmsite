@@ -75,19 +75,7 @@ watch(() => props.summary, (newSummary) => {
                         @update:quantity="(qty) => cartStore.updateQuantity(item.id, qty)"
                         @remove="cartStore.removeItem(item.id)" @toggle-favorite="() => { }" />
 
-                    <!-- Extra Info -->
-                    <!-- <div
-                        class="mt-10 p-8 bg-zinc-900 rounded-[2.5rem] border border-white/5 flex items-start space-x-6">
-                        <div class="p-3 bg-zinc-800 rounded-2xl">
-                            🚚
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black uppercase tracking-widest text-white">Fast & Free Shipping
-                            </h4>
-                            <p class="text-sm text-zinc-500 font-bold uppercase mt-1">Free shipping on orders over R150.
-                                Standard delivery in 2-4 business days.</p>
-                        </div>
-                    </div> -->
+
                 </div>
 
                 <!-- Summary Sidebar -->

@@ -41,9 +41,9 @@ watch([search, status, payment_status], () => {
 });
 
 const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-ZA', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'ZAR'
     }).format(value);
 };
 
@@ -60,10 +60,9 @@ const formatDate = (date) => {
 const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
         case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
-        case 'confirmed': return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-        case 'packed': return 'bg-purple-400/10 text-purple-400 border-purple-400/20';
-        case 'shipped': return 'bg-cyan-400/10 text-cyan-400 border-cyan-400/20';
-        case 'delivered': return 'bg-green-400/10 text-green-400 border-green-400/20';
+        case 'active': return 'bg-green-400/10 text-green-400 border-green-400/20';
+        case 'completed': return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
+        case 'expired': return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
         case 'cancelled': return 'bg-red-400/10 text-red-400 border-red-400/20';
         default: return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
     }
@@ -268,10 +267,6 @@ const updateOrderStatus = (newStatus) => {
                                     </p>
                                 </div>
                             </div>
-                            <!-- <div class="space-y-4">
-                                <h4 class="text-xs font-black text-white uppercase tracking-widest border-b border-white/5 pb-2">Shipping Address</h4>
-                                <p class="text-xs text-zinc-400 leading-relaxed">{{ selectedOrder.shipping_address || 'No address provided' }}</p>
-                            </div> -->
                         </div>
 
                         <!-- Order Items -->
@@ -303,8 +298,8 @@ const updateOrderStatus = (newStatus) => {
                         <div class="space-y-6 pt-6 border-t border-white/5">
                             <h4 class="text-xs font-black text-white uppercase tracking-widest">Update Order Status</h4>
                             <div class="grid grid-cols-3 gap-2">
-                                <button v-for="s in ['Confirmed', 'Shipped', 'Delivered']" :key="s"
-                                    @click="updateOrderStatus(s)"
+                                <button v-for="s in ['Active', 'Completed', 'Expired']" :key="s"
+                                    @click="updateOrderStatus(s.toLowerCase())"
                                     class="py-3 px-4 bg-white/5 hover:bg-admin-modern hover:text-black rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all border border-white/5">
                                     {{ s }}
                                 </button>

@@ -19,7 +19,6 @@ import {
 } from 'lucide-vue-next';
 
 const props = defineProps({
-    brands: Array,
     categories: Array
 });
 
@@ -28,11 +27,7 @@ const form = useForm({
     description: '',
     price: '',
     sale_price: '',
-    brand_ids: [],
     category_id: '',
-    stock: '',
-    colors: [],
-    sizes: [],
     features: [],
     image: null,
     gallery_images: []
@@ -119,7 +114,7 @@ const handleGalleryImages = (e) => {
                             <InputError class="mt-2" :message="form.errors.description" />
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="sm:col-span-1">
                                 <InputLabel for="price" value="Retail Price (R)"
                                     class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
@@ -134,13 +129,6 @@ const handleGalleryImages = (e) => {
                                     class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
                                 <input id="sale_price" type="number" step="0.01" v-model="form.sale_price"
                                     class="w-full bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 font-black text-lg text-admin-modern" />
-                            </div>
-                            <div class="sm:col-span-1">
-                                <InputLabel for="stock" value="Stock Count"
-                                    class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-3 ml-1" />
-                                <input id="stock" type="number" v-model="form.stock"
-                                    class="w-full bg-black/40 border border-white/5 text-white rounded-xl py-4 px-6 font-bold"
-                                    required />
                             </div>
                         </div>
                     </div>
@@ -181,24 +169,6 @@ const handleGalleryImages = (e) => {
                 <!-- Taxonomy Sidebar -->
                 <div class="bg-zinc-900/40 rounded-[2.5rem] border border-white/5 p-6 sm:p-10">
                     <div class="space-y-8">
-                        <div>
-                            <InputLabel value="Brand Partnership"
-                                class="text-zinc-600 font-black uppercase tracking-widest text-[10px] mb-4 ml-1" />
-                            <div class="grid grid-cols-2 gap-3 max-h-56 overflow-y-auto custom-scrollbar pr-2">
-                                <label v-for="brand in brands" :key="brand.id" :class="[
-                                    'flex flex-col items-center justify-center p-4 rounded-2xl border transition-all cursor-pointer text-center gap-3',
-                                    form.brand_ids.includes(brand.id)
-                                        ? 'bg-white border-white text-black shadow-2xl'
-                                        : 'bg-black/20 border-white/5 text-zinc-500 hover:border-white/10'
-                                ]">
-                                    <input type="checkbox" :value="brand.id" v-model="form.brand_ids" class="hidden" />
-                                    <img :src="brand.logo" class="h-5 w-full object-contain transition-all"
-                                        :class="{ 'grayscale-0 invert': form.brand_ids.includes(brand.id), 'grayscale opacity-40': !form.brand_ids.includes(brand.id) }" />
-                                    <span class="text-[8px] font-black uppercase tracking-[0.2em] truncate w-full">{{
-                                        brand.name }}</span>
-                                </label>
-                            </div>
-                        </div>
 
                         <div>
                             <InputLabel for="category" value="Classification"

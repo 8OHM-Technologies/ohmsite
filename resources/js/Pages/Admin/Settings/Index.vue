@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { Head, usePage, useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { User, Shield, Store, Lock, Save, Camera } from 'lucide-vue-next';
+import { User, Shield, Sliders, Lock, Save, Camera, Globe } from 'lucide-vue-next';
 
 const props = defineProps({
     settings: Object,
@@ -15,7 +15,7 @@ const user = usePage().props.auth.user;
 const profileForm = useForm({
     name: user.name,
     email: user.email,
-    language: props.settings.store.language || 'English',
+    language: props.settings.platform?.language || 'English',
 });
 
 const securityForm = useForm({
@@ -25,9 +25,9 @@ const securityForm = useForm({
 });
 
 const storeForm = useForm({
-    store_name: props.settings.store.name,
-    currency: props.settings.store.currency,
-    timezone: props.settings.store.timezone,
+    platform_name: props.settings.platform?.name || '8OHM Technologies',
+    currency: props.settings.platform?.currency || 'ZAR',
+    timezone: props.settings.platform?.timezone || 'Africa/Johannesburg',
 });
 
 const updateProfile = () => {
@@ -52,7 +52,7 @@ const updateStore = () => {
 const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'security', name: 'Security', icon: Shield },
-    { id: 'store', name: 'Store', icon: Store },
+    { id: 'store', name: 'Platform', icon: Sliders },
 ];
 </script>
 
@@ -197,7 +197,7 @@ const tabs = [
                             </form>
                         </div>
 
-                        <!-- Store Settings -->
+                        <!-- Platform Settings -->
                         <div v-if="activeTab === 'store'"
                             class="space-y-10 animate-in slide-in-from-right-4 duration-500">
                             <h3 class="text-2xl font-black text-white uppercase tracking-tighter mb-8">Platform
@@ -207,9 +207,9 @@ const tabs = [
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div class="space-y-3">
                                         <label
-                                            class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] ml-1">Store
+                                            class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] ml-1">Platform
                                             Name</label>
-                                        <input type="text" v-model="storeForm.store_name"
+                                        <input type="text" v-model="storeForm.platform_name"
                                             class="w-full bg-black/40 border-white/5 rounded-2xl py-4 px-6 text-white focus:ring-1 focus:ring-admin-modern/40 transition-all font-bold" />
                                     </div>
                                     <div class="space-y-3">
@@ -219,7 +219,6 @@ const tabs = [
                                         <select v-model="storeForm.currency"
                                             class="w-full bg-black/40 border-white/5 rounded-2xl py-4 px-6 text-white focus:ring-1 focus:ring-admin-modern/40 transition-all font-bold uppercase text-[10px]">
                                             <option>ZAR</option>
-                                            <option>ALL</option>
                                         </select>
                                     </div>
                                 </div>
@@ -227,7 +226,7 @@ const tabs = [
                                 <div class="pt-8 border-t border-white/5">
                                     <button type="submit" :disabled="storeForm.processing"
                                         class="bg-white text-black px-12 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-admin-modern transition-all shadow-xl disabled:opacity-50">
-                                        Update Store
+                                        Update Platform
                                     </button>
                                 </div>
                             </form>

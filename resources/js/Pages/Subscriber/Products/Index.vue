@@ -56,7 +56,7 @@ const props = defineProps({
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
                                     Product Details</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
-                                    Brand / Category</th>
+                                    Category</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
                                     Purchased For</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
@@ -81,7 +81,7 @@ const props = defineProps({
                                                 class="font-black text-white uppercase tracking-tight leading-none mb-1.5 group-hover:text-admin-modern transition-colors">
                                                 {{ product.name }}</p>
                                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">
-                                                SKU: SH-{{ 1000 + product.id }}</p>
+                                                SKU: 8OHM-{{ 1000 + product.id }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -89,10 +89,8 @@ const props = defineProps({
                                     class="py-4 px-6 bg-black/20 border-y border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300">
                                     <div class="flex flex-col gap-1">
                                         <span class="text-xs font-black text-zinc-300 uppercase tracking-wide">
-                                            {{ product.brands?.length ? product.brands[0].name : 'Essential' }}
+                                            {{ product.category?.name || 'Main' }}
                                         </span>
-                                        <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{
-                                            product.category?.name || 'Main' }}</span>
                                     </div>
                                 </td>
                                 <td
@@ -119,7 +117,7 @@ const props = defineProps({
                                 <td
                                     class="py-4 px-6 bg-black/20 rounded-r-3xl border-y border-r border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <Link :href="route('shop.show', product.id)"
+                                        <Link :href="route('services.show', product.id)"
                                             class="p-3 bg-zinc-900 border border-white/5 text-zinc-400 hover:text-admin-modern hover:border-admin-modern/30 rounded-xl transition-all flex items-center justify-center gap-2">
                                             <Eye class="w-4 h-4" />
                                         </Link>
@@ -162,14 +160,13 @@ const props = defineProps({
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1">
-                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Brand</span>
-                                <span class="text-[10px] font-black text-white uppercase tracking-widest truncate">{{
-                                    product.brands?.[0]?.name || 'Premium' }}</span>
+                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Pricing Model</span>
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest truncate">SaaS</span>
                             </div>
                         </div>
 
                         <div class="flex gap-2 pt-2">
-                            <Link :href="route('shop.show', product.id)"
+                            <Link :href="route('services.show', product.id)"
                                 class="flex-1 bg-white text-black py-4 rounded-xl font-black uppercase text-[10px] tracking-widest text-center">
                                 View Product</Link>
                         </div>

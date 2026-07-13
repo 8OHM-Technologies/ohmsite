@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -15,14 +14,13 @@ class ProductController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Products/Index', [
-            'products' => Product::with(['brands', 'category'])->latest()->get(),
+            'products' => Product::with('category')->latest()->get(),
         ]);
     }
 
     public function create()
     {
         return Inertia::render('Admin/Products/Create', [
-            'brands' => Brand::all(),
             'categories' => Category::all(),
         ]);
     }
@@ -34,12 +32,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'brand_ids' => 'required|array|min:1',
-            'brand_ids.*' => 'exists:brands,id',
             'category_id' => 'required|exists:categories,id',
-            'stock' => 'required|integer|min:0',
-            'colors' => 'nullable|array',
-            'sizes' => 'nullable|array',
             'features' => 'nullable|array',
             'image' => 'required|image|max:2048',
             'gallery_images' => 'nullable|array|max:4',
@@ -59,9 +52,9 @@ class ProductController extends Controller
             }
         }
         $validated['images'] = $gallery;
+        $validated['stock'] = 9999;
 
-        $product = Product::create($validated);
-        $product->brands()->sync($request->brand_ids);
+        Product::create($validated);
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
     }
@@ -69,8 +62,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         return Inertia::render('Admin/Products/Edit', [
-            'product' => $product->load('brands'),
-            'brands' => Brand::all(),
+            'product' => $product,
             'categories' => Category::all(),
         ]);
     }
@@ -82,12 +74,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'brand_ids' => 'required|array|min:1',
-            'brand_ids.*' => 'exists:brands,id',
             'category_id' => 'required|exists:categories,id',
-            'stock' => 'required|integer|min:0',
-            'colors' => 'nullable|array',
-            'sizes' => 'nullable|array',
             'features' => 'nullable|array',
             'image' => 'nullable|image|max:2048',
             'gallery_images' => 'nullable|array|max:4',
@@ -123,7 +110,6 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
-        $product->brands()->sync($request->brand_ids);
 
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
     }

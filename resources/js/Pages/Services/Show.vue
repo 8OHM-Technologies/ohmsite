@@ -14,8 +14,7 @@ const props = defineProps({
 const cartStore = useCartStore();
 
 const activeImage = ref(props.product.image);
-const selectedColor = ref(props.product.colors?.[0] || '');
-const selectedSize = ref('');
+// No colors/sizes needed for digital services
 
 const allImages = computed(() => {
     const images = [props.product.image];
@@ -25,10 +24,7 @@ const allImages = computed(() => {
     return images.slice(0, 5);
 });
 
-const sortedSizes = computed(() => {
-    if (!props.product.sizes) return [];
-    return [...props.product.sizes].sort((a, b) => parseFloat(a) - parseFloat(b));
-});
+// No sizes needed for digital services
 
 const toggleFavorite = () => {
     if (!props.auth.user) {
@@ -45,15 +41,7 @@ const toggleFavorite = () => {
 };
 
 const addToCart = () => {
-    if (props.product.sizes?.length && !selectedSize.value) {
-        alert('Please select a size');
-        return;
-    }
-
-    cartStore.addItem(props.product.id, 1, {
-        size: selectedSize.value,
-        color: selectedColor.value
-    });
+    cartStore.addItem(props.product.id, 1, {});
 };
 
 
@@ -67,7 +55,7 @@ const addToCart = () => {
             <!-- Breadcrumbs -->
             <div
                 class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-10">
-                <Link :href="route('shop.index')" class="hover:text-white transition-colors">Shop</Link>
+                <Link :href="route('services.index')" class="hover:text-white transition-colors">Services</Link>
                 <span>/</span>
                 <span class="text-zinc-400">{{ product.category?.name }}</span>
                 <span>/</span>
@@ -102,9 +90,9 @@ const addToCart = () => {
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex flex-wrap gap-2 mb-2">
-                                    <h4 v-for="brand in product.brands" :key="brand.id"
-                                        class="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">{{
-                                            brand.name }}</h4>
+                                    <h4 class="text-zinc-500 font-black uppercase tracking-[0.3em] text-[10px]">
+                                        {{ product.category?.name || 'Service' }}
+                                    </h4>
                                 </div>
                                 <h1 class="text-4xl font-black uppercase tracking-tighter leading-none">{{ product.name
                                     }}</h1>
@@ -148,37 +136,7 @@ const addToCart = () => {
 
                     <!-- Selectors -->
                     <div class="space-y-10">
-                        <!-- Colors -->
-                        <div v-if="product.colors?.length" class="space-y-4">
-                            <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Color</h5>
-                            <div class="flex gap-4">
-                                <button v-for="color in product.colors" :key="color" @click="selectedColor = color"
-                                    :class="selectedColor === color ? 'border-white scale-110 ring-4 ring-white/10' : 'border-white/5 hover:border-white/20'"
-                                    class="w-10 h-10 rounded-full border-2 transition-all overflow-hidden shadow-inner flex items-center justify-center"
-                                    :style="{ backgroundColor: color }" :title="color">
-                                    <span v-if="!color.startsWith('#') && color.length > 5"
-                                        class="text-[6px] font-black uppercase leading-tight">{{ color.substring(0, 3)
-                                        }}</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Sizes -->
-                        <div v-if="product.sizes?.length" class="space-y-4">
-                            <div class="flex justify-between items-end">
-                                <h5 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Size</h5>
-                                <button
-                                    class="text-[10px] font-black uppercase tracking-widest text-zinc-700 hover:text-white underline">Size
-                                    Guide</button>
-                            </div>
-                            <div class="grid grid-cols-5 gap-3">
-                                <button v-for="size in sortedSizes" :key="size" @click="selectedSize = size"
-                                    :class="selectedSize === size ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-500 border border-white/5 hover:border-white/20'"
-                                    class="py-4 rounded-xl text-xs font-black transition-all">
-                                    {{ size }}
-                                </button>
-                            </div>
-                        </div>
+                        <!-- No options needed for digital services -->
                     </div>
 
                     <!-- Action Button -->
@@ -195,15 +153,15 @@ const addToCart = () => {
             <section class="mt-40 space-y-16">
                 <div class="flex justify-between items-end">
                     <h2 class="text-4xl font-black uppercase tracking-tighter leading-none">You might also like</h2>
-                    <Link :href="route('shop.index')"
+                    <Link :href="route('services.index')"
                         class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
-                        See all products</Link>
+                        See all services</Link>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                     <div v-for="related in relatedProducts" :key="related.id"
                         class="group cursor-pointer relative space-y-6">
-                        <Link :href="route('shop.show', related.id)" class="block">
+                        <Link :href="route('services.show', related.id)" class="block">
                             <div
                                 class="aspect-square bg-zinc-900 rounded-[2.5rem] p-10 flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-white/20 transition-all duration-700 shadow-2xl">
                                 <img src="/assets/images/popular-bg.png"

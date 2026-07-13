@@ -15,17 +15,12 @@ class Order extends Model
         'email',
         'first_name',
         'last_name',
-        'address',
-        'apartment',
-        'city',
-        'postal_code',
         'country',
         'total_amount',
         'status',
         'phone',
         'payment_status',
         'payment_method',
-        'tracking_number',
         'admin_notes',
     ];
 

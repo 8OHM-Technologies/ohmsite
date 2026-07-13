@@ -43,10 +43,7 @@ const form = useForm({
     email: props.auth?.user?.email || '',
     first_name: '',
     last_name: '',
-    address: '',
-    apartment: '',
-    city: '',
-    postal_code: '',
+    company_name: '',
     country: 'South Africa',
     phone: '',
     save_info: false,
@@ -84,9 +81,9 @@ const submit = () => {
                         </div>
                     </section>
 
-                    <!-- Billing Details -->
+                    <!-- Account Details -->
                     <section class="space-y-6">
-                        <h2 class="text-2xl font-black uppercase tracking-tighter">Billing Details</h2>
+                        <h2 class="text-2xl font-black uppercase tracking-tighter">Account Details</h2>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="space-y-2">
@@ -103,41 +100,12 @@ const submit = () => {
                             </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <TextInput id="address" type="text" v-model="form.address"
-                                class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
-                                placeholder="Address" required />
-                            <InputError :message="form.errors.address" />
-                        </div>
-
-                        <div class="space-y-2">
-                            <TextInput id="apartment" type="text" v-model="form.apartment"
-                                class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
-                                placeholder="Apartment, suite, etc. (optional)" />
-                            <InputError :message="form.errors.apartment" />
-                        </div>
-
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="space-y-2">
-                                <TextInput id="city" type="text" v-model="form.city"
+                                <TextInput id="company_name" type="text" v-model="form.company_name"
                                     class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
-                                    placeholder="City" required />
-                                <InputError :message="form.errors.city" />
-                            </div>
-                            <div class="space-y-2">
-                                <TextInput id="postal_code" type="text" v-model="form.postal_code"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
-                                    placeholder="Postal Code" />
-                                <InputError :message="form.errors.postal_code" />
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div class="space-y-2">
-                                <TextInput id="country" type="text" v-model="form.country"
-                                    class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
-                                    placeholder="Country" required />
-                                <InputError :message="form.errors.country" />
+                                    placeholder="Company Name (Optional)" />
+                                <InputError :message="form.errors.company_name" />
                             </div>
                             <div class="space-y-2">
                                 <TextInput id="phone" type="text" v-model="form.phone"
@@ -145,6 +113,13 @@ const submit = () => {
                                     placeholder="Phone" required />
                                 <InputError :message="form.errors.phone" />
                             </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <TextInput id="country" type="text" v-model="form.country"
+                                class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
+                                placeholder="Country (Optional)" />
+                            <InputError :message="form.errors.country" />
                         </div>
                     </section>
 

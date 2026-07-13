@@ -87,7 +87,7 @@ class AnalyticsController extends Controller
         $topProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_sold'), DB::raw('SUM(unit_price * quantity) as total_revenue'))
             ->where('created_at', '>=', $startDate)
             ->with(['product' => function ($q) {
-                $q->with('brands');
+                $q->with('category');
             }])
             ->groupBy('product_id')
             ->orderBy('total_sold', 'desc')
@@ -97,7 +97,7 @@ class AnalyticsController extends Controller
                 return [
                     'id' => $item->product_id,
                     'name' => $item->product->name ?? 'Deleted Product',
-                    'brand' => $item->product->brands->pluck('name')->first() ?? 'N/A',
+                    'category' => $item->product->category->name ?? 'N/A',
                     'sales' => (int) $item->total_sold,
                     'revenue' => (float) $item->total_revenue,
                     'growth' => '+15%',

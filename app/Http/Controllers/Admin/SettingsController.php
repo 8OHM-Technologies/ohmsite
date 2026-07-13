@@ -11,11 +11,11 @@ class SettingsController extends Controller
     public function index()
     {
         $settings = [
-            'store' => [
-                'name' => 'Store Name',
+            'platform' => [
+                'name' => '8OHM Technologies',
                 'logo' => '/assets/images/LOGO.png',
-                'currency' => 'USD',
-                'timezone' => 'UTC+1',
+                'currency' => 'ZAR',
+                'timezone' => 'Africa/Johannesburg',
             ],
             'appearance' => [
                 'mode' => 'dark',
@@ -24,14 +24,13 @@ class SettingsController extends Controller
             ],
             'notifications' => [
                 'email_orders' => true,
-                'email_stock' => true,
+                'email_subscriptions' => true,
                 'sms_orders' => false,
                 'marketing' => true,
             ],
             'payment' => [
-                'stripe_enabled' => true,
-                'paypal_enabled' => true,
-                'tax_rate' => 18,
+                'paystack_enabled' => true,
+                'tax_rate' => 15,
             ],
         ];
 

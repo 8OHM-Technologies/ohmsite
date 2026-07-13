@@ -80,34 +80,11 @@ const handleApplyDiscount = () => {
                 <span class="text-emerald-500">-{{ formattedPrice(summary.discount) }}</span>
             </div>
 
-            <!-- <div class="flex justify-between text-xs font-bold uppercase tracking-widest">
-                <span class="text-zinc-500 flex items-center">
-                    Shipping
-                    <Info class="w-4 h-4 ml-2 text-zinc-700 cursor-help" title="Standard shipping rate" />
-                </span>
-                <span class="text-white">
-                    {{ summary.shipping > 0 ? formattedPrice(summary.shipping) : 'FREE' }}
-                </span>
-            </div> -->
-
-            <!-- Free Shipping Progress -->
-            <!-- <div v-if="summary.shipping > 0" class="pt-4">
-                <div class="flex justify-between text-[9px] font-black uppercase tracking-widest mb-2">
-                    <span class="text-zinc-600">Spend {{ formattedPrice(summary.free_shipping_threshold -
-                        summary.subtotal) }} more for free shipping</span>
-                    <span class="text-white">{{ Math.round(summary.free_shipping_progress) }}%</span>
-                </div>
-                <div class="w-full bg-black rounded-full h-1">
-                    <div class="bg-white h-1 rounded-full transition-all duration-1000"
-                        :style="{ width: summary.free_shipping_progress + '%' }"></div>
-                </div>
-            </div>
-
             <div class="pt-6 border-t border-white/5 flex justify-between items-end">
                 <span class="text-xl font-black uppercase tracking-tighter text-white">Total</span>
                 <span class="text-3xl font-black uppercase tracking-tighter text-white">{{ formattedPrice(summary.total)
                 }}</span>
-            </div> -->
+            </div>
         </div>
 
         <!-- Checkout Button -->

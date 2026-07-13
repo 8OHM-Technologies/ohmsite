@@ -7,15 +7,11 @@ const props = defineProps({
     heroSlider: Object,
     aboutUs: Object,
     products: Array,
-    brands: Array,
 });
 
 const form = useForm({
     _method: 'POST',
-    hero_slider: props.heroSlider?.value?.map(s => ({
-        ...s,
-        brand_ids: s.brand_ids || []
-    })) || [],
+    hero_slider: props.heroSlider?.value || [],
     hero_images: {}, // Store files here with index as key
     about_us: props.aboutUs?.value || {
         title_line_1: '',
@@ -47,10 +43,6 @@ const updateSlideFromProduct = (index, productId) => {
         form.hero_slider[index].price = product.sale_price || product.price;
         form.hero_slider[index].image = product.image;
         heroPreviews.value[index] = product.image;
-        // Optionally auto-select brand if product has one
-        if (product.brand_id && !form.hero_slider[index].brand_ids.includes(product.brand_id)) {
-            form.hero_slider[index].brand_ids.push(product.brand_id);
-        }
     }
 };
 
@@ -72,7 +64,6 @@ const addHeroSlide = () => {
             price: '',
             category: '',
             image: '',
-            brand_ids: [],
             is_active: true
         });
         heroPreviews.value.push(null);
@@ -96,17 +87,7 @@ const removeHeroSlide = (index) => {
     form.hero_images = newHeroImages;
 };
 
-const toggleBrand = (slideIndex, brandId) => {
-    const slide = form.hero_slider[slideIndex];
-    if (!slide.brand_ids) slide.brand_ids = [];
-
-    const idx = slide.brand_ids.indexOf(brandId);
-    if (idx > -1) {
-        slide.brand_ids.splice(idx, 1);
-    } else {
-        slide.brand_ids.push(brandId);
-    }
-};
+// toggleBrand removed
 
 const submit = () => {
     form.post(route('admin.home.update'), {
@@ -195,23 +176,6 @@ const submit = () => {
                                             class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Label</label>
                                         <input v-model="slide.category" type="text"
                                             class="w-full border-white/5 border rounded-2xl py-4 px-6 focus:ring-2 focus:ring-admin-modern focus:border-admin-modern transition-all bg-zinc-900 font-bold text-sm text-white" />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Associated
-                                        Brands</label>
-                                    <div class="flex flex-wrap gap-2">
-                                        <button v-for="brand in brands" :key="brand.id"
-                                            @click="toggleBrand(index, brand.id)" type="button" :class="[
-                                                'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border',
-                                                slide.brand_ids?.includes(brand.id)
-                                                    ? 'bg-admin-modern text-black border-admin-modern shadow-lg shadow-admin-modern/10'
-                                                    : 'bg-zinc-900 text-zinc-500 border-white/5 hover:border-white/10'
-                                            ]">
-                                            {{ brand.name }}
-                                        </button>
                                     </div>
                                 </div>
                             </div>

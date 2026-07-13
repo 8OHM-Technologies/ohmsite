@@ -30,9 +30,9 @@ const removeFavorite = async (productId) => {
                     <p class="text-zinc-500 font-black uppercase tracking-widest text-xs mt-4">{{ favorites.length }}
                         Items Saved</p>
                 </div>
-                <Link :href="route('shop.index')"
+                <Link :href="route('services.index')"
                     class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors underline underline-offset-8">
-                    Back to Shop
+                    Back to Services
                 </Link>
             </div>
 
@@ -45,11 +45,11 @@ const removeFavorite = async (productId) => {
                     </svg>
                 </div>
                 <h3 class="text-4xl font-black text-white uppercase tracking-tighter mb-4">Your wishlist is empty</h3>
-                <p class="text-zinc-500 mb-12 font-bold uppercase tracking-widest text-xs">Browse our collection and
-                    save the styles you love!</p>
-                <Link :href="route('shop.index')"
+                <p class="text-zinc-500 mb-12 font-bold uppercase tracking-widest text-xs">Browse our services and
+                    save the ones you want to track!</p>
+                <Link :href="route('services.index')"
                     class="inline-block bg-white text-black px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all shadow-2xl active:scale-95">
-                    Go Shopping
+                    Explore Services
                 </Link>
             </div>
 
@@ -64,7 +64,7 @@ const removeFavorite = async (productId) => {
                         </svg>
                     </button>
 
-                    <Link :href="route('shop.show', product.id)" class="block">
+                    <Link :href="route('services.show', product.id)" class="block">
                         <div
                             class="aspect-square bg-zinc-900 rounded-[3rem] p-12 flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-white/20 transition-all duration-700 shadow-2xl">
                             <img src="/assets/images/popular-bg.png"
@@ -80,7 +80,7 @@ const removeFavorite = async (productId) => {
                                         class="font-black text-2xl text-white uppercase tracking-tighter leading-tight group-hover:text-white transition-colors">
                                         {{ product.name }}</h4>
                                     <p class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mt-1">{{
-                                        product.brands?.[0]?.name }}</p>
+                                        product.category?.name || 'Service' }}</p>
                                 </div>
                                 <div class="flex flex-col items-end">
                                     <span class="text-2xl font-black tracking-tighter text-white">R{{
@@ -93,9 +93,9 @@ const removeFavorite = async (productId) => {
                         </div>
                     </Link>
 
-                    <Link :href="route('shop.show', product.id)"
+                    <Link :href="route('services.show', product.id)"
                         class="w-full bg-white text-black py-5 rounded-[1.5rem] flex items-center justify-center font-black uppercase tracking-widest text-xs hover:bg-admin-modern transition-all shadow-xl opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 duration-500 active:scale-95">
-                        View Product
+                        View Service
                     </Link>
                 </div>
             </div>

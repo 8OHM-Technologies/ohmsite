@@ -12,7 +12,7 @@ import {
     ShoppingCart,
     Users,
     BarChart3,
-    Boxes,
+    KeyRound,
     Settings,
     Menu,
     X,
@@ -20,7 +20,8 @@ import {
     Bell,
     Plus,
     LogOut,
-    UserCircle
+    UserCircle,
+    Database
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -47,14 +48,14 @@ const searchQuery = ref('');
 
 const searchItems = [
     { name: 'Dashboard', href: route('dashboard'), keywords: ['home', 'overview', 'main', 'stats'] },
-    { name: 'Inventory', href: route('admin.inventory.index'), keywords: ['stock', 'items', 'warehouse', 'products'] },
-    { name: 'Products', href: route('admin.products.index'), keywords: ['catalog', 'drops', 'sneakers'] },
+    { name: 'Licenses', href: route('admin.licenses.index'), keywords: ['subscriptions', 'access', 'customers', 'active'] },
+    { name: 'Products', href: route('admin.products.index'), keywords: ['catalog', 'services', 'plans'] },
     { name: 'Datasets', href: route('admin.datasets.index'), keywords: ['database', 'dataset', 'ccma', 'courts'] },
-    { name: 'Orders', href: route('admin.orders.index'), keywords: ['sales', 'history', 'shipments', 'cash'] },
+    { name: 'Orders', href: route('admin.orders.index'), keywords: ['sales', 'history', 'subscriptions', 'purchases'] },
     { name: 'Customers', href: route('admin.customers.index'), keywords: ['users', 'clients', 'members'] },
     { name: 'Analytics', href: route('admin.analytics.index'), keywords: ['charts', 'revenue', 'performance', 'reports', 'trend'] },
     { name: 'Live Stream', href: route('admin.analytics.index'), keywords: ['live', 'active', 'visitors', 'real-time', 'realtime'] },
-    { name: 'Settings', href: route('admin.settings.index'), keywords: ['config', 'profile', 'security', 'password', 'store'] },
+    { name: 'Settings', href: route('admin.settings.index'), keywords: ['config', 'profile', 'security', 'password', 'platform'] },
 ];
 
 const handleSearch = () => {
@@ -80,7 +81,7 @@ const navigation = [
     { name: 'Orders', href: route('admin.orders.index'), icon: ShoppingCart },
     { name: 'Customers', href: route('admin.customers.index'), icon: Users },
     { name: 'Analytics', href: route('admin.analytics.index'), icon: BarChart3 },
-    { name: 'Inventory', href: route('admin.inventory.index'), icon: Boxes },
+    { name: 'Licenses', href: route('admin.licenses.index'), icon: KeyRound },
     { name: 'Settings', href: route('admin.settings.index'), icon: Settings },
 ];
 

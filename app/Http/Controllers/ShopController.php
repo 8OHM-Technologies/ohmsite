@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -12,11 +11,11 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->only(['category', 'brand', 'min_price', 'max_price', 'sort', 'search']);
+        $filters = $request->only(['category', 'min_price', 'max_price', 'sort', 'search']);
         $cacheKey = 'products_page_'.md5(json_encode($filters).$request->get('page', 1).auth()->id());
 
         $products = cache()->remember($cacheKey, 300, function () use ($request) {
-            $query = Product::with(['brands', 'category']);
+            $query = Product::with('category');
 
             // Search
             if ($request->filled('search')) {
@@ -27,12 +26,6 @@ class ShopController extends Controller
             if ($request->filled('category')) {
                 $query->whereHas('category', function ($q) use ($request) {
                     $q->where('name', $request->category);
-                });
-            }
-
-            if ($request->filled('brand')) {
-                $query->whereHas('brands', function ($q) use ($request) {
-                    $q->where('name', $request->brand);
                 });
             }
 
@@ -63,7 +56,6 @@ class ShopController extends Controller
 
             $paginated = $query->paginate(12)->withQueryString();
 
-            // Handle favorites inside the cached closure if needed, or better, outside
             return $paginated;
         });
 
@@ -79,12 +71,10 @@ class ShopController extends Controller
         }
 
         $categories = cache()->remember('categories_all', 3600, fn () => Category::all());
-        $brands = cache()->remember('brands_all', 3600, fn () => Brand::all());
 
-        return Inertia::render('Shop/Index', [
+        return Inertia::render('Services/Index', [
             'products' => $products,
             'categories' => $categories,
-            'brands' => $brands,
             'filters' => $filters,
         ]);
     }
@@ -94,17 +84,17 @@ class ShopController extends Controller
         // Increment click count
         $product->increment('clicks');
 
-        $product->load(['brands', 'category']);
+        $product->load('category');
 
         $user = auth()->user();
         $product->is_favorited = $user ? $user->favorites()->where('product_id', $product->id)->exists() : false;
 
-        $relatedProducts = Product::with('brands')->where('category_id', $product->category_id)
+        $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->take(4)
             ->get();
 
-        return Inertia::render('Shop/Show', [
+        return Inertia::render('Services/Show', [
             'product' => $product,
             'relatedProducts' => $relatedProducts,
         ]);

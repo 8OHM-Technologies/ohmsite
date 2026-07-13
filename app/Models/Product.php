@@ -17,18 +17,13 @@ class Product extends Model
         'sale_price',
         'image',
         'images',
-        'colors',
-        'sizes',
         'stock',
         'category_id',
-        'brand_id',
         'clicks',
     ];
 
     protected $casts = [
         'images' => 'array',
-        'colors' => 'array',
-        'sizes' => 'array',
         'features' => 'array',
         'price' => 'float',
         'sale_price' => 'float',
@@ -37,11 +32,6 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function brands()
-    {
-        return $this->belongsToMany(Brand::class);
     }
 
     public function orderItems()

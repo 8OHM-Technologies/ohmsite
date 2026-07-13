@@ -73,7 +73,7 @@ const deleteProduct = (id) => {
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
                                     Product Details</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
-                                    Brand / Category</th>
+                                    Category</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
                                     Pricing</th>
                                 <th class="pb-2 px-6 font-black uppercase text-[10px] tracking-[0.2em] text-zinc-600">
@@ -98,7 +98,7 @@ const deleteProduct = (id) => {
                                                 class="font-black text-white uppercase tracking-tight leading-none mb-1.5 group-hover:text-admin-modern transition-colors">
                                                 {{ product.name }}</p>
                                             <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">
-                                                SKU: SH-{{ 1000 + product.id }}</p>
+                                                SKU: 8OHM-{{ 1000 + product.id }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -106,10 +106,8 @@ const deleteProduct = (id) => {
                                     class="py-4 px-6 bg-black/20 border-y border-white/5 group-hover:bg-zinc-800/40 transition-all duration-300">
                                     <div class="flex flex-col gap-1">
                                         <span class="text-xs font-black text-zinc-300 uppercase tracking-wide">
-                                            {{ product.brands?.length ? product.brands[0].name : 'Essential' }}
+                                            {{ product.category?.name || 'Main' }}
                                         </span>
-                                        <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{
-                                            product.category?.name || 'Main' }}</span>
                                     </div>
                                 </td>
                                 <td
@@ -191,9 +189,8 @@ const deleteProduct = (id) => {
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1">
-                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Brand</span>
-                                <span class="text-[10px] font-black text-white uppercase tracking-widest truncate">{{
-                                    product.brands?.[0]?.name || 'Premium' }}</span>
+                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Pricing Model</span>
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest truncate">SaaS</span>
                             </div>
                         </div>
 

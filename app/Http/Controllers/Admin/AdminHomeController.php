@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
 use App\Models\HomeSetting;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -17,7 +16,6 @@ class AdminHomeController extends Controller
             'heroSlider' => HomeSetting::where('key', 'hero_slider')->first(),
             'aboutUs' => HomeSetting::where('key', 'about_us')->first(),
             'products' => Product::all(),
-            'brands' => Brand::all(),
         ]);
     }
 

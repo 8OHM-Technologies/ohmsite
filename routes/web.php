@@ -15,8 +15,8 @@ Route::get('/refund-cancellation', [HomeController::class, 'refundCancellation']
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/fair-usage', [HomeController::class, 'fairUsage'])->name('fair-usage');
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/shop/{product}', [ShopController::class, 'show'])->name('shop.show');
+Route::get('/services', [ShopController::class, 'index'])->name('services.index');
+Route::get('/services/{product}', [ShopController::class, 'show'])->name('services.show');
 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiscountController;
@@ -40,7 +40,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 use App\Http\Controllers\Admin\AdminHomeController;
 use App\Http\Controllers\Admin\AnalyticsController;
-use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -59,7 +58,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/home', [AdminHomeController::class, 'update'])->name('home.update');
 
     Route::resource('products', ProductController::class);
-    Route::resource('brands', BrandController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('datasets', DatasetController::class);
 
@@ -68,11 +66,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     Route::post('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
-    // Change to POST or PATCH for toggle-vip
     Route::post('/customers/{customer}/toggle-vip', [CustomerController::class, 'toggleVip'])->name('customers.toggle-vip');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    Route::patch('/inventory/{product}/update-stock', [InventoryController::class, 'updateStock'])->name('inventory.update-stock');
+    Route::get('/licenses', [InventoryController::class, 'index'])->name('licenses.index');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });

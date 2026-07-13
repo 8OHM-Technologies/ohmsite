@@ -48,10 +48,9 @@ class OrderController extends Controller
         $request->validate([
             'status' => 'required|string',
             'payment_status' => 'nullable|string',
-            'tracking_number' => 'nullable|string',
         ]);
 
-        $order->update($request->only(['status', 'payment_status', 'tracking_number']));
+        $order->update($request->only(['status', 'payment_status']));
 
         return back()->with('success', 'Order updated successfully.');
     }

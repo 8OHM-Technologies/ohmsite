@@ -135,7 +135,7 @@ const props = defineProps({
                                 class="p-3 bg-white text-black rounded-xl shadow-2xl hover:bg-admin-modern transition-all">
                                 <Edit3 class="w-4 h-4" />
                             </Link>
-                            <Link :href="route('shop.show', product.id)"
+                            <Link :href="route('services.show', product.id)"
                                 class="p-3 bg-zinc-900 text-white rounded-xl shadow-2xl hover:bg-zinc-800 transition-all">
                                 <Eye class="w-4 h-4" />
                             </Link>

@@ -70,10 +70,6 @@ class CheckoutTest extends TestCase
             'email' => 'customer@example.com',
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'address' => '123 Main St',
-            'apartment' => 'Apt 4B',
-            'city' => 'Cape Town',
-            'postal_code' => '8001',
             'country' => 'South Africa',
             'phone' => '0211234567',
         ]);
@@ -89,9 +85,6 @@ class CheckoutTest extends TestCase
             'total_amount' => 200.00,
             'status' => 'pending',
         ]);
-
-        // Verify stock is decremented
-        $this->assertEquals(8, $product->fresh()->stock);
 
         // Verify cart is cleared
         $this->assertTrue($this->cartService->getCart()->items->isEmpty());
@@ -126,10 +119,6 @@ class CheckoutTest extends TestCase
             'email' => 'guest@example.com',
             'first_name' => 'Jane',
             'last_name' => 'Smith',
-            'address' => '456 Oak Rd',
-            'apartment' => '',
-            'city' => 'Johannesburg',
-            'postal_code' => '2000',
             'country' => 'South Africa',
             'phone' => '0119876543',
         ]);
@@ -144,8 +133,5 @@ class CheckoutTest extends TestCase
             'last_name' => 'Smith',
             'total_amount' => 150.00,
         ]);
-
-        // Verify stock is decremented
-        $this->assertEquals(4, $product->fresh()->stock);
     }
 }

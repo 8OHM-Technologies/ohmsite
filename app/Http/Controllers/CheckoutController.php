@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\User;
 use App\Notifications\OrderPlaced;
 use App\Services\CartService;
@@ -54,11 +53,7 @@ class CheckoutController extends Controller
             'email' => 'required|email|max:255',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'apartment' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'required|string|max:100',
+            'country' => 'nullable|string|max:100',
             'phone' => 'required|string|max:20',
         ]);
 
@@ -77,22 +72,15 @@ class CheckoutController extends Controller
                 'email' => $request->email,
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
-                'address' => $request->address,
-                'apartment' => $request->apartment,
-                'city' => $request->city,
-                'postal_code' => $request->postal_code,
                 'country' => $request->country,
                 'phone' => $request->phone,
                 'total_amount' => $summary['total'],
                 'status' => 'pending',
                 'payment_status' => 'pending',
-                'payment_method' => 'cash',
+                'payment_method' => 'paystack',
             ]);
 
             foreach ($cart->items as $item) {
-                // Lock the product for update to prevent race conditions during stock decrement
-                $product = Product::where('id', $item->product_id)->lockForUpdate()->first();
-
                 DB::table('order_items')->insert([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
@@ -102,9 +90,6 @@ class CheckoutController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-
-                // Decrement product stock
-                $product->decrement('stock', $item->quantity);
             }
 
             $this->cartService->clearCart();

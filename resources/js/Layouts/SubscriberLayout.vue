@@ -41,7 +41,7 @@ const searchQuery = ref('');
 
 const searchItems = [
     { name: 'Analytics', href: route('pro-dashboard.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
-    { name: 'Products', href: route('pro-dashboard.products.index'), keywords: ['catalog', 'drops', 'sneakers'] },
+    { name: 'Products', href: route('pro-dashboard.products.index'), keywords: ['catalog', 'services', 'plans', 'datasets'] },
 ];
 
 const handleSearch = () => {
