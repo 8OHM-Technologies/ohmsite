@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Product;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,8 @@ class ApiAccessMiddleware
             return $next($request);
         }
 
-        $productName = \App\Models\Product::where('slug', 'developer-api')->value('name') ?? 'Developer API';
+        $productName = Product::where('slug', 'developer-api')->value('name') ?? 'Developer API';
+
         return redirect()->route('orders.index')->with('error', "You must have an active {$productName} subscription to access the API documentation.");
     }
 }

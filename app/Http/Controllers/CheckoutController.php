@@ -53,8 +53,10 @@ class CheckoutController extends Controller
             'email' => 'required|email|max:255',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'company_name' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:100',
             'phone' => 'required|string|max:20',
+            'save_info' => 'nullable|boolean',
         ]);
 
         $cart = $this->cartService->getCart();
@@ -66,6 +68,17 @@ class CheckoutController extends Controller
 
         try {
             DB::beginTransaction();
+
+            if ($request->save_info && Auth::check()) {
+                Auth::user()->update([
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'company_name' => $request->company_name,
+                    'phone' => $request->phone,
+                    'country' => $request->country,
+                    'name' => $request->first_name.' '.$request->last_name,
+                ]);
+            }
 
             $order = Order::create([
                 'user_id' => Auth::id(),

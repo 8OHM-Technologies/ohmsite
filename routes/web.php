@@ -19,6 +19,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubscriberDashboardController;
@@ -82,8 +83,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
-    Route::get('/payment/checkout/{order}', [\App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
-    Route::get('/payment/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
+    Route::get('/payment/checkout/{order}', [PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 });
 
 Route::middleware(['auth', 'verified', 'subscribed'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {

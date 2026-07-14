@@ -127,7 +127,7 @@ class InitialSeeder extends Seeder
                     'Custom web scraping and ETL data engineering',
                     'Private AI models (LLMs) & secure processing for sensitive data',
                     '24/7 Priority Helpdesk Support',
-                    'POPIA Compliant Data Entries'
+                    'POPIA Compliant Data Entries',
                 ],
             ]
         );

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Cart;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CartService;
@@ -82,7 +83,7 @@ class CheckoutTest extends TestCase
         ]);
 
         // Redirects to payment checkout
-        $order = \App\Models\Order::latest()->first();
+        $order = Order::latest()->first();
         $response->assertRedirect(route('payment.checkout', $order));
 
         $this->assertDatabaseHas('orders', [
@@ -96,6 +97,43 @@ class CheckoutTest extends TestCase
 
         // Verify cart is cleared
         $this->assertTrue($this->cartService->getCart()->items->isEmpty());
+    }
+
+    public function test_can_process_checkout_and_save_profile_info()
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'role' => 'customer',
+            'first_name' => '',
+            'last_name' => '',
+            'phone' => '',
+        ]);
+        $product = Product::factory()->create(['price' => 100]);
+
+        $this->actingAs($user);
+        $this->cartService->addItem($product->id, 1);
+
+        $response = $this->post(route('checkout.store'), [
+            'email' => 'customer@example.com',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'company_name' => 'Acme Inc',
+            'country' => 'South Africa',
+            'phone' => '0211234567',
+            'save_info' => true,
+        ]);
+
+        $order = Order::latest()->first();
+        $response->assertRedirect(route('payment.checkout', $order));
+
+        $user->refresh();
+        $this->assertSame('John', $user->first_name);
+        $this->assertSame('Doe', $user->last_name);
+        $this->assertSame('John Doe', $user->name);
+        $this->assertSame('Acme Inc', $user->company_name);
+        $this->assertSame('0211234567', $user->phone);
+        $this->assertSame('South Africa', $user->country);
     }
 
     public function test_guest_checkout_redirects_to_login()

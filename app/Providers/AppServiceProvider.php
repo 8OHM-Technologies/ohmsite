@@ -2,13 +2,15 @@
 
 namespace App\Providers;
 
+use App\Listeners\PaystackWebhookListener;
+use Binkode\Paystack\Events\Hook;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,8 +34,8 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
 
         Event::listen(
-            \Binkode\Paystack\Events\Hook::class,
-            \App\Listeners\PaystackWebhookListener::class
+            Hook::class,
+            PaystackWebhookListener::class
         );
 
         RateLimiter::for('login', function (Request $request) {

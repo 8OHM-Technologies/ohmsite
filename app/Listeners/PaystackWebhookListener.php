@@ -2,10 +2,8 @@
 
 namespace App\Listeners;
 
-use Binkode\Paystack\Events\Hook;
 use App\Models\Order;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
+use Binkode\Paystack\Events\Hook;
 use Illuminate\Support\Facades\Log;
 
 class PaystackWebhookListener
@@ -48,7 +46,7 @@ class PaystackWebhookListener
                                 $user->update([
                                     'subscription_status' => 'active',
                                     'subscribed_at' => now(),
-                                    'subscription_code' => $data['subscription'] ?? 'sub_mock_' . time(),
+                                    'subscription_code' => $data['subscription'] ?? 'sub_mock_'.time(),
                                 ]);
                             }
                         }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Dataset;
 use App\Models\Discount;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
@@ -165,7 +166,8 @@ class CartService
             $dataset = $options['dataset'] ?? 'ccma';
             $base = (float) $product->price;
             if ($dataset === 'all') {
-                $n = \App\Models\Dataset::where('is_active', true)->count();
+                $n = Dataset::where('is_active', true)->count();
+
                 return $n > 0 ? ($n * $base - ($n - 1) * 500.00) : $base;
             }
 
@@ -181,11 +183,13 @@ class CartService
             $basePrice = $isMonthly ? $base : $base * 10;
 
             if ($dataset === 'all') {
-                $n = \App\Models\Dataset::where('is_active', true)->count();
+                $n = Dataset::where('is_active', true)->count();
                 $extraDatasets = max(0, $n - 1);
                 $addOnRate = $isMonthly ? 100.00 : 1000.00;
+
                 return $basePrice + $extraDatasets * $addOnRate;
             }
+
             return $basePrice;
         }
 
@@ -193,6 +197,7 @@ class CartService
         if ($product->slug === 'analytics-dashboard') {
             $frequency = $options['frequency'] ?? 'monthly';
             $base = (float) $product->price;
+
             return $frequency === 'monthly' ? $base : $base * 10;
         }
 
@@ -200,6 +205,7 @@ class CartService
         if ($product->slug === 'managed-data-pipeline') {
             $frequency = $options['frequency'] ?? 'monthly';
             $base = (float) $product->price;
+
             return $frequency === 'monthly' ? $base : $base * 10;
         }
 

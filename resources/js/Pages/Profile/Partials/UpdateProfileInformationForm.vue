@@ -17,7 +17,11 @@ defineProps({
 const user = usePage().props.auth.user;
 
 const form = useForm({
-    name: user.name,
+    first_name: user.first_name || '',
+    last_name: user.last_name || '',
+    company_name: user.company_name || '',
+    phone: user.phone || '',
+    country: user.country || 'South Africa',
     email: user.email,
 });
 </script>
@@ -35,13 +39,53 @@ const form = useForm({
         </header>
 
         <form @submit.prevent="form.patch(route('profile.update'))" class="mt-10 space-y-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <InputLabel for="first_name" value="First Name" />
+
+                    <TextInput id="first_name" type="text" class="mt-1 block w-full" v-model="form.first_name" required autofocus
+                        autocomplete="given-name" />
+
+                    <InputError class="mt-2" :message="form.errors.first_name" />
+                </div>
+
+                <div>
+                    <InputLabel for="last_name" value="Last Name" />
+
+                    <TextInput id="last_name" type="text" class="mt-1 block w-full" v-model="form.last_name" required
+                        autocomplete="family-name" />
+
+                    <InputError class="mt-2" :message="form.errors.last_name" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <InputLabel for="company_name" value="Company Name" />
+
+                    <TextInput id="company_name" type="text" class="mt-1 block w-full" v-model="form.company_name"
+                        autocomplete="organization" />
+
+                    <InputError class="mt-2" :message="form.errors.company_name" />
+                </div>
+
+                <div>
+                    <InputLabel for="phone" value="Phone" />
+
+                    <TextInput id="phone" type="text" class="mt-1 block w-full" v-model="form.phone" required
+                        autocomplete="tel" />
+
+                    <InputError class="mt-2" :message="form.errors.phone" />
+                </div>
+            </div>
+
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="country" value="Country" />
 
-                <TextInput id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus
-                    autocomplete="name" />
+                <TextInput id="country" type="text" class="mt-1 block w-full" v-model="form.country"
+                    autocomplete="country-name" />
 
-                <InputError class="mt-2" :message="form.errors.name" />
+                <InputError class="mt-2" :message="form.errors.country" />
             </div>
 
             <div>

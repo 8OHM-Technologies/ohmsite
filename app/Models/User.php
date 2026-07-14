@@ -35,6 +35,11 @@ class User extends Authenticatable
         'subscription_code',
         'subscription_status',
         'subscribed_at',
+        'first_name',
+        'last_name',
+        'company_name',
+        'phone',
+        'country',
     ];
 
     public function isAdmin()

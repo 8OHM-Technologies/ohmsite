@@ -14,7 +14,7 @@ class BillingService
     public function subscribeUserToPlan(User $user, string $planCode): array
     {
         // 1. Ensure user has a Paystack customer code
-        if (!$user->paystack_customer_code) {
+        if (! $user->paystack_customer_code) {
             $nameParts = explode(' ', $user->name, 2);
             $firstName = $nameParts[0] ?? '';
             $lastName = $nameParts[1] ?? '';

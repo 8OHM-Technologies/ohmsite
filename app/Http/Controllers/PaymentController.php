@@ -31,7 +31,7 @@ class PaymentController extends Controller
         $params = [
             'email' => $order->email ?? auth()->user()->email,
             'amount' => (int) ($order->total_amount * 100), // convert to cents (kobo)
-            'reference' => 'ORD-' . $order->id . '-' . time(),
+            'reference' => 'ORD-'.$order->id.'-'.time(),
             'callback_url' => route('payment.callback'),
             'metadata' => [
                 'order_id' => $order->id,
@@ -67,7 +67,7 @@ class PaymentController extends Controller
     {
         $reference = $request->query('reference');
 
-        if (!$reference) {
+        if (! $reference) {
             return redirect()->route('orders.index')->with('error', 'No reference returned.');
         }
 
@@ -75,7 +75,7 @@ class PaymentController extends Controller
 
         if (isset($response['data']['status']) && $response['data']['status'] === 'success') {
             $order = Order::where('payment_reference', $reference)->firstOrFail();
-            
+
             // Avoid double processing (idempotency check)
             if ($order->status !== 'completed') {
                 $order->update([
@@ -93,12 +93,12 @@ class PaymentController extends Controller
                             $user->update([
                                 'subscription_status' => 'active',
                                 'subscribed_at' => now(),
-                                'subscription_code' => $response['data']['subscription'] ?? 'sub_mock_' . time(),
+                                'subscription_code' => $response['data']['subscription'] ?? 'sub_mock_'.time(),
                             ]);
                         }
                     }
                 }
-                
+
                 // Trigger any order success events / mailers here
             }
 

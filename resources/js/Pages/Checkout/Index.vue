@@ -41,11 +41,11 @@ const getFrequencyLabel = (value) => {
 
 const form = useForm({
     email: props.auth?.user?.email || '',
-    first_name: '',
-    last_name: '',
-    company_name: '',
-    country: 'South Africa',
-    phone: '',
+    first_name: props.auth?.user?.first_name || '',
+    last_name: props.auth?.user?.last_name || '',
+    company_name: props.auth?.user?.company_name || '',
+    country: props.auth?.user?.country || 'South Africa',
+    phone: props.auth?.user?.phone || '',
     save_info: false,
 });
 
@@ -120,6 +120,14 @@ const submit = () => {
                                 class="w-full bg-zinc-900/50 border-white/5 py-4 px-6 rounded-xl text-sm font-bold text-white placeholder-zinc-500"
                                 placeholder="Country (Optional)" />
                             <InputError :message="form.errors.country" />
+                        </div>
+
+                        <div v-if="auth?.user" class="flex items-center space-x-3 pt-2">
+                            <input id="save_info" type="checkbox" v-model="form.save_info"
+                                class="w-5 h-5 rounded border-white/10 bg-zinc-900/50 text-white focus:ring-0 focus:ring-offset-0 checked:bg-white checked:border-white" />
+                            <label for="save_info" class="text-xs font-bold uppercase tracking-widest text-zinc-400 select-none cursor-pointer">
+                                Save this information to my profile
+                            </label>
                         </div>
                     </section>
 
