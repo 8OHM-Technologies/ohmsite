@@ -197,8 +197,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-admin-modern transition-colors">
                             <Search class="h-4 w-4" />
                         </div>
-                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
-                            placeholder="Type 'Inventory' or 'Live Stream'..."
+                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text" placeholder="Search"
                             class="block w-full pl-11 pr-4 py-2.5 bg-zinc-900/50 border border-white/5 text-sm text-white placeholder:text-zinc-600 rounded-xl focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50 transition-all outline-none" />
                     </div>
                 </div>
