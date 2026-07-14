@@ -39,6 +39,7 @@ class PopulateAnalytics extends Command
 
             // Fetch a chunk of unprocessed records
             $records = ExtractedData::whereNull('processed_at')
+                ->whereNotNull('cleaned_at')
                 ->limit($chunkSize)
                 ->get();
 

@@ -28,7 +28,7 @@ class PopulateAnalyticsCommandTest extends TestCase
         $db = DB::connection('pgsql_coeus');
         $db->statement('CREATE TABLE entities (id VARCHAR(36) PRIMARY KEY, name VARCHAR(255) UNIQUE, identifier VARCHAR(50), created_at TIMESTAMP)');
         $db->statement('CREATE TABLE targets (id VARCHAR(36) PRIMARY KEY, entity_id VARCHAR(36), target_name VARCHAR(255), location VARCHAR(255), created_at TIMESTAMP)');
-        $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, extracted_at TIMESTAMP, processed_at TIMESTAMP)');
+        $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, extracted_at TIMESTAMP, processed_at TIMESTAMP, cleaned_at TIMESTAMP)');
     }
 
     private function createTarget(): string
@@ -78,6 +78,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
+            'cleaned_at' => now(),
         ]);
 
         $this->artisan('analytics:populate')
@@ -142,6 +143,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
+            'cleaned_at' => now(),
         ]);
 
         $this->artisan('analytics:populate')
@@ -194,6 +196,37 @@ class PopulateAnalyticsCommandTest extends TestCase
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => now(), // Already processed
+        ]);
+
+        $this->artisan('analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 0 records.')
+            ->assertExitCode(0);
+
+        // Verify analytics table remains empty
+        $this->assertEquals(0, Analytics::count());
+    }
+
+    public function test_skips_records_without_cleaned_at(): void
+    {
+        $targetId = $this->createTarget();
+        $id = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2000-07-01',
+            'record_type' => 'sabinet_ccma',
+            'data' => json_encode([
+                'court' => 'CCMA',
+                'title' => 'Gumede v Mastercraft, KN39790',
+                'award_date' => '2000-07-01',
+                'award_number' => 'KN39790',
+            ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => null,
         ]);
 
         $this->artisan('analytics:populate')

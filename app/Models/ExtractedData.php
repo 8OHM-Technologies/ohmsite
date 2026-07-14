@@ -59,6 +59,7 @@ class ExtractedData extends Model
             'data' => 'array',
             'processed_at' => 'datetime',
             'extracted_at' => 'datetime',
+            'cleaned_at' => 'datetime',
             'document_date' => 'date',
             'requires_human_review' => 'boolean',
         ];
