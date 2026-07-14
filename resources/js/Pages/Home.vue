@@ -494,9 +494,8 @@ onUnmounted(() => {
                 <!-- Card 1: Once-off Dataset -->
                 <div class="pricing-card" id="card-dataset">
                   <div class="pricing-card-header">
-                    <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name || "Once-off Dataset" }}</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">
-                      {{ onceOffProduct.description || "Get the raw data without analytics or insights and use it for your own purposes." }}</p>
+                    <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name }}</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ onceOffProduct.description }}</p>
                     <!-- Dataset Selection -->
                     <div class="form-group" style="margin-bottom: 20px; text-align: left;">
                       <label for="dataset-tier-dataset"
@@ -549,8 +548,8 @@ onUnmounted(() => {
                 <!-- Card 2: Basic API -->
                 <div class="pricing-card" id="card-developer">
                   <div class="pricing-card-header">
-                    <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || "Developer API" }}</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ developerProduct.description || "Power your custom applications with direct access to our structured legal dataset API." }}</p>
+                    <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name }}</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ developerProduct.description }}</p>
 
                     <!-- Dataset Selection -->
                     <div class="form-group" style="margin-bottom: 20px; text-align: left;">
@@ -600,8 +599,8 @@ onUnmounted(() => {
                 </div> <!-- Card 3: Analytics Dashboard -->
                 <div class="pricing-card featured" id="card-analytics">
                   <div class="pricing-card- header">
-                    <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || "Pro Analytics" }}</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description || "No code required. Access to trends and insights through our analytics platform." }} <br><br>
+                    <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name }}</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description }} <br><br>
                     <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
                       Annually before 31
                       December 2026 and get full access to all current and future released Datasets!</div>
@@ -644,8 +643,8 @@ onUnmounted(() => {
                 <!-- Card 4: Managed Data Pipeline -->
                 <div class="pricing-card" id="card-pipeline">
                   <div class="pricing-card-header">
-                    <h3 id="tier-pipeline" class="pricing-tier-name">{{ pipelineProduct.name || "Managed Data Pipeline" }}</h3>
-                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ pipelineProduct.description || "Build custom, automated extraction workflows tailored to your specific industry needs." }}</p>
+                    <h3 id="tier-pipeline" class="pricing-tier-name">{{ pipelineProduct.name }}</h3>
+                    <p class="card-desc-small" style="margin-bottom: 20px;">{{ pipelineProduct.description }}</p>
 
                     <!-- Pricing Value & Period -->
                     <div class="developer-pricing-options">
@@ -1086,19 +1085,16 @@ onUnmounted(() => {
         </div>
       </section>
     </main>
-
-    <footer>
-      <div class="container">
-        <p class="footer-text">
-          &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights
-          reserved.
-        </p>
-        <div class="flex justify-center items-center gap-x-6 gap-y-2 flex-wrap text-sm">
-          <Link href="/privacy-policy" target="_blank">Privacy Policy</Link>
-          <Link href="/terms" target="_blank">Terms & Conditions</Link>
-          <Link href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</Link>
-          <Link href="/fair-usage" target="_blank">Fair Usage Policy</Link>
-        </div>
+    <footer class="pt-20 pb-10 border-t border-white/5 text-center relative z-10">
+      <img src="/assets/images/8OHM_Logo.webp" class="h-8 mx-auto opacity-20 mb-8" />
+      <div class="text-zinc-700 text-[10px] font-black uppercase tracking-[0.5em]">
+        © 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights reserved.
+      </div>
+      <div class="flex justify-center items-center gap-x-6 gap-y-2 flex-wrap text-sm">
+        <Link href="/privacy-policy" target="_blank">Privacy Policy</Link>
+        <Link href="/terms" target="_blank">Terms & Conditions</Link>
+        <Link href="/refund-cancellation" target="_blank">Cancellation & Refund Policy</Link>
+        <Link href="/fair-usage" target="_blank">Fair Usage Policy</Link>
       </div>
     </footer>
   </div>

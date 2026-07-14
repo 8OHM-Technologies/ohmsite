@@ -38,7 +38,7 @@ class FavoriteController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $favorites = $user->favorites()->with(['brands', 'category'])->get();
+        $favorites = $user->favorites()->with(['category'])->get();
 
         return inertia('Favorites/Index', [
             'favorites' => $favorites,

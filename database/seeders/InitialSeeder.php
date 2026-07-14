@@ -16,18 +16,36 @@ class InitialSeeder extends Seeder
     {
         // 1. Admin User
         User::updateOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => env('ADMIN_EMAIL')],
             [
-                'name' => 'Admin',
-                'password' => Hash::make('password'),
+                'first_name' => 'Tiaan',
+                'last_name' => 'Fourie',
+                'password' => Hash::make(env('ADMIN_EMAIL')),
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ]
         );
 
         // 2. Regular User
-        User::firstOrCreate(['email' => 'client@gmail.com'], [
-            'name' => 'Test Client',
+        User::firstOrCreate(['email' => 'client@8ohm.co.za'], [
+            'first_name' => 'Test',
+            'last_name' => 'Client',
+            'password' => Hash::make('password'),
+            'role' => 'customer',
+        ]);
+
+        // 2.1 Subscribed User
+        User::firstOrCreate(['email'=> 'subscriber@8ohm.co.za'], [
+            'first_name' => 'Test',
+            'last_name' => 'Subscriber',
+            'password' => Hash::make('password'),
+            'role' => 'customer',
+        ]);
+
+        // 2.2 Managed Pipeline User
+        User::firstOrCreate(['email'=> 'pipeline@8ohm.co.za'], [
+            'first_name' => 'Test',
+            'last_name' => 'Pipeline',
             'password' => Hash::make('password'),
             'role' => 'customer',
         ]);
@@ -95,7 +113,7 @@ class InitialSeeder extends Seeder
         Product::updateOrCreate(
             ['slug' => 'analytics-dashboard'],
             [
-                'name' => 'Analytics Dashboard',
+                'name' => 'Pro Analytics',
                 'description' => 'No code required. Access to trends and insights through our analytics platform.',
                 'price' => 3800.00,
                 'image' => '/assets/images/products/analytics.png',

@@ -23,7 +23,7 @@ class SubscriberDashboardController extends Controller
 
     public function products(): Response
     {
-        $products = Product::with(['category', 'brands'])->latest()->take(5)->get();
+        $products = Product::with(['category'])->latest()->take(5)->get();
 
         return Inertia::render('Subscriber/Products/Index', [
             'products' => $products,
