@@ -22,6 +22,7 @@ class Order extends Model
         'payment_status',
         'payment_method',
         'admin_notes',
+        'payment_reference',
     ];
 
     public function items()

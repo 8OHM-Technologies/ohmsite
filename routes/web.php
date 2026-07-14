@@ -42,8 +42,8 @@ Route::patch('/cart/{id}', [CartController::class, 'update'])->name('cart.update
 Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::delete('/cart-clear', [CartController::class, 'clear'])->name('cart.clear');
 
-Route::get('/checkout', [CheckoutController::class, 'index'])->middleware('throttle:checkout')->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout.store');
+Route::get('/checkout', [CheckoutController::class, 'index'])->middleware(['auth', 'throttle:checkout'])->name('checkout.index');
+Route::post('/checkout', [CheckoutController::class, 'store'])->middleware(['auth', 'throttle:checkout'])->name('checkout.store');
 
 Route::post('/cart/discount', [DiscountController::class, 'apply'])->name('cart.discount.apply');
 Route::delete('/cart/discount', [DiscountController::class, 'remove'])->name('cart.discount.remove');
@@ -82,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
+    Route::get('/payment/checkout/{order}', [\App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');
 });
 
 Route::middleware(['auth', 'verified', 'subscribed'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {

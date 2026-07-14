@@ -31,6 +31,10 @@ class User extends Authenticatable
         'is_vip',
         'is_banned',
         'ban_reason',
+        'paystack_customer_code',
+        'subscription_code',
+        'subscription_status',
+        'subscribed_at',
     ];
 
     public function isAdmin()
@@ -63,6 +67,7 @@ class User extends Authenticatable
             'total_orders' => 'integer',
             'is_vip' => 'boolean',
             'is_banned' => 'boolean',
+            'subscribed_at' => 'datetime',
         ];
     }
 

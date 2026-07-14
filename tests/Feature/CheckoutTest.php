@@ -24,6 +24,9 @@ class CheckoutTest extends TestCase
 
     public function test_checkout_screen_redirects_if_cart_is_empty()
     {
+        $user = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($user);
+
         $response = $this->get(route('checkout.index'));
 
         $response->assertRedirect(route('cart.index'));
@@ -32,8 +35,11 @@ class CheckoutTest extends TestCase
 
     public function test_checkout_screen_renders_if_cart_has_items()
     {
+        $user = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($user);
+
         $product = Product::factory()->create(['price' => 100]);
-        $cart = Cart::create();
+        $cart = Cart::create(['user_id' => $user->id]);
         $cartItem = $cart->items()->create([
             'product_id' => $product->id,
             'quantity' => 1,
@@ -45,6 +51,7 @@ class CheckoutTest extends TestCase
         $mockCartService->shouldReceive('getSummary')->andReturn([
             'subtotal' => 100.00,
             'discount' => 0.00,
+            'total' => 100.00,
         ]);
 
         $response = $this->get(route('checkout.index'));
@@ -74,8 +81,9 @@ class CheckoutTest extends TestCase
             'phone' => '0211234567',
         ]);
 
-        // Redirects to orders index for authenticated user
-        $response->assertRedirect(route('orders.index'));
+        // Redirects to payment checkout
+        $order = \App\Models\Order::latest()->first();
+        $response->assertRedirect(route('payment.checkout', $order));
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
@@ -90,31 +98,8 @@ class CheckoutTest extends TestCase
         $this->assertTrue($this->cartService->getCart()->items->isEmpty());
     }
 
-    public function test_can_process_checkout_for_guest_user()
+    public function test_guest_checkout_redirects_to_login()
     {
-        Notification::fake();
-
-        $product = Product::factory()->create([
-            'price' => 150,
-            'stock' => 5,
-        ]);
-
-        $cart = Cart::create();
-        $cartItem = $cart->items()->create([
-            'product_id' => $product->id,
-            'quantity' => 1,
-            'unit_price' => 150,
-        ]);
-
-        $mockCartService = $this->mock(CartService::class);
-        $mockCartService->shouldReceive('getCart')->andReturn($cart);
-        $mockCartService->shouldReceive('getSummary')->andReturn([
-            'subtotal' => 150.00,
-            'discount' => 0.00,
-            'total' => 150.00,
-        ]);
-        $mockCartService->shouldReceive('clearCart')->once();
-
         $response = $this->post(route('checkout.store'), [
             'email' => 'guest@example.com',
             'first_name' => 'Jane',
@@ -123,15 +108,6 @@ class CheckoutTest extends TestCase
             'phone' => '0119876543',
         ]);
 
-        // Redirects to home for guest user
-        $response->assertRedirect(route('home'));
-
-        $this->assertDatabaseHas('orders', [
-            'user_id' => null,
-            'email' => 'guest@example.com',
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
-            'total_amount' => 150.00,
-        ]);
+        $response->assertRedirect(route('login'));
     }
 }
