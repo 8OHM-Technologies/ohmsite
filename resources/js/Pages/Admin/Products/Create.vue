@@ -44,6 +44,28 @@ const removeFeature = (index) => {
     form.features.splice(index, 1);
 };
 
+const draggedIndex = ref(null);
+
+const onDragStart = (index, event) => {
+    draggedIndex.value = index;
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+    }
+};
+
+const onDragEnter = (index) => {
+    if (draggedIndex.value !== null && draggedIndex.value !== index) {
+        const item = form.features[draggedIndex.value];
+        form.features.splice(draggedIndex.value, 1);
+        form.features.splice(index, 0, item);
+        draggedIndex.value = index;
+    }
+};
+
+const onDragEnd = () => {
+    draggedIndex.value = null;
+};
+
 const submit = () => {
     form.post(route('admin.products.store'), {
         onSuccess: () => form.reset(),
@@ -150,16 +172,26 @@ const handleGalleryImages = (e) => {
                             <button type="button" @click="addFeature"
                                 class="bg-white text-black px-8 rounded-xl font-black uppercase text-[10px] tracking-widest">Add</button>
                         </div>
-                        <div class="flex flex-col gap-3 mt-6">
-                            <div v-for="(feature, index) in form.features" :key="index"
-                                class="group flex items-center justify-between bg-zinc-800 border border-white/10 px-6 py-4 rounded-xl text-xs font-bold text-white transition-all">
-                                <span>{{ feature }}</span>
+                        <TransitionGroup name="list" tag="div" class="flex flex-col gap-3 mt-6">
+                            <div v-for="(feature, index) in form.features"
+                                :key="feature"
+                                draggable="true"
+                                @dragstart="onDragStart(index, $event)"
+                                @dragover.prevent
+                                @dragenter="onDragEnter(index)"
+                                @dragend="onDragEnd"
+                                class="group flex items-center justify-between bg-zinc-800 border border-white/10 px-6 py-4 rounded-xl text-xs font-bold text-white cursor-grab active:cursor-grabbing transition-all hover:bg-zinc-800/80 hover:border-admin-modern/30"
+                                :class="{ 'opacity-40 border-dashed border-admin-modern': draggedIndex === index }">
+                                <div class="flex items-center gap-2 select-none">
+                                    <i class="ph-light ph-dots-six-vertical text-zinc-500 text-sm"></i>
+                                    <span>{{ feature }}</span>
+                                </div>
                                 <button type="button" @click="removeFeature(index)"
                                     class="text-zinc-500 hover:text-rose-500 transition-colors">
                                     <X class="w-4 h-4" />
                                 </button>
                             </div>
-                        </div>
+                        </TransitionGroup>
                     </div>
                 </div>
 
@@ -233,6 +265,10 @@ const handleGalleryImages = (e) => {
 </template>
 
 <style scoped>
+.list-move {
+    transition: transform 0.25s ease;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
     width: 3px;
 }

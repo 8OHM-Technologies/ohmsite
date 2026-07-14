@@ -35,6 +35,28 @@ const removeFeature = (index) => {
     form.features.splice(index, 1);
 };
 
+const draggedIndex = ref(null);
+
+const onDragStart = (index, event) => {
+    draggedIndex.value = index;
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+    }
+};
+
+const onDragEnter = (index) => {
+    if (draggedIndex.value !== null && draggedIndex.value !== index) {
+        const item = form.features[draggedIndex.value];
+        form.features.splice(draggedIndex.value, 1);
+        form.features.splice(index, 0, item);
+        draggedIndex.value = index;
+    }
+};
+
+const onDragEnd = () => {
+    draggedIndex.value = null;
+};
+
 const submit = () => {
     // We use POST with _method: 'PUT' to handle file uploads in Laravel
     form.post(route('admin.products.update', props.product.id), {
@@ -139,14 +161,24 @@ const handleGalleryImages = (e) => {
                                     <button type="button" @click="addFeature"
                                         class="btn-primary text-black px-6 rounded-2xl font-black uppercase text-[10px] hover:bg-admin-modern/90 transition-all">Add</button>
                                 </div>
-                                <div class="flex flex-col gap-2 mt-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                    <div v-for="(feature, index) in form.features" :key="index"
-                                        class="flex items-center justify-between bg-zinc-800 border border-white/10 px-4 py-3 rounded-xl text-xs font-bold text-white">
-                                        <span>{{ feature }}</span>
+                                <TransitionGroup name="list" tag="div" class="flex flex-col gap-2 mt-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                    <div v-for="(feature, index) in form.features"
+                                        :key="feature"
+                                        draggable="true"
+                                        @dragstart="onDragStart(index, $event)"
+                                        @dragover.prevent
+                                        @dragenter="onDragEnter(index)"
+                                        @dragend="onDragEnd"
+                                        class="flex items-center justify-between bg-zinc-800 border border-white/10 px-4 py-3 rounded-xl text-xs font-bold text-white cursor-grab active:cursor-grabbing transition-all hover:bg-zinc-800/80 hover:border-admin-modern/30"
+                                        :class="{ 'opacity-40 border-dashed border-admin-modern': draggedIndex === index }">
+                                        <div class="flex items-center gap-2 select-none">
+                                            <i class="ph-light ph-dots-six-vertical text-zinc-500 text-sm"></i>
+                                            <span>{{ feature }}</span>
+                                        </div>
                                         <button type="button" @click="removeFeature(index)"
-                                            class="text-zinc-500 hover:text-red-500 transition-colors">&times;</button>
+                                            class="text-zinc-500 hover:text-red-500 transition-colors text-base font-normal px-1">&times;</button>
                                     </div>
-                                </div>
+                                </TransitionGroup>
                             </div>
                         </div>
                     </div>
@@ -219,3 +251,22 @@ const handleGalleryImages = (e) => {
         </div>
     </AdminLayout>
 </template>
+
+<style scoped>
+.list-move {
+    transition: transform 0.25s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+</style>
