@@ -572,7 +572,7 @@ const employerSignatureSeries = computed(() => {
 
 <template>
 
-    <Head title="8OHM | End-to-end Data Solutions">
+    <Head title="8OHM. | End-to-end Data Solutions">
         <link rel="canonical" href="https://8ohm.co.za/demo" />
     </Head>
 

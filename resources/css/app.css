@@ -15,148 +15,148 @@
 
 /* ── 8OHM.co.za Global Styles ── */
 :root {
-    --color-brand: #ff8800;
+  --color-brand: #ff8800;
 
-    /* Typography — Using Satoshi for slick headings, Argentum for the body */
-    --font-display: 'Argentum Sans', 'Argentum Sans', 'Montserrat', sans-serif;
-    --font-body: 'Argentum Sans', 'Montserrat', sans-serif;
+  /* Typography — Using Satoshi for slick headings, Argentum for the body */
+  --font-display: 'Argentum Sans', 'Argentum Sans', 'Montserrat', sans-serif;
+  --font-body: 'Argentum Sans', 'Montserrat', sans-serif;
 
-    /* Core palette — dark theme */
-    --color-bg: #0a0a0f;
-    --color-text-primary: #f0f0f5;
-    --color-text-secondary: #a0a0b0;
-    --color-text-muted: #606070;
+  /* Core palette — dark theme */
+  --color-bg: #0a0a0f;
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #606070;
 
-    --color-primary: #ff8800;
-    --color-primary-50: #fff5e6;
-    --color-primary-100: #ffe8cc;
-    --color-primary-200: #ffd9b3;
-    --color-primary-300: #ffca99;
-    --color-primary-400: #ffbb80;
-    --color-primary-500: #ff8800;
-    --color-primary-600: #e67800;
-    --color-primary-700: #cc6900;
-    --color-primary-800: #b35a00;
-    --color-primary-900: #994b00;
+  --color-primary: #ff8800;
+  --color-primary-50: #fff5e6;
+  --color-primary-100: #ffe8cc;
+  --color-primary-200: #ffd9b3;
+  --color-primary-300: #ffca99;
+  --color-primary-400: #ffbb80;
+  --color-primary-500: #ff8800;
+  --color-primary-600: #e67800;
+  --color-primary-700: #cc6900;
+  --color-primary-800: #b35a00;
+  --color-primary-900: #994b00;
 
-    /* Accents */
-    --color-accent-primary: #ff8800;
-    --color-accent-secondary: #8dd7da;
+  /* Accents */
+  --color-accent-primary: #ff8800;
+  --color-accent-secondary: #8dd7da;
 
-    /* Surfaces (glass cards) */
-    --color-surface-outer: rgba(255, 255, 255, 0.04);
-    --color-surface-inner: rgba(255, 255, 255, 0.06);
+  /* Surfaces (glass cards) */
+  --color-surface-outer: rgba(255, 255, 255, 0.04);
+  --color-surface-inner: rgba(255, 255, 255, 0.06);
 
-    /* Borders (glass cards) */
-    --color-border-outer: rgba(255, 255, 255, 0.08);
-    --color-border-inner: rgba(255, 255, 255, 0.10);
+  /* Borders (glass cards) */
+  --color-border-outer: rgba(255, 255, 255, 0.08);
+  --color-border-inner: rgba(255, 255, 255, 0.10);
 
-    /* Motion */
-    --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Motion */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 
-    --color-admin-sidebar: #0F0F10;
-    --color-admin-main: #09090B;
-    --color-admin-accent: #ff8800;
-    --color-admin-modern: #ff8800;
+  --color-admin-sidebar: #0F0F10;
+  --color-admin-main: #09090B;
+  --color-admin-accent: #ff8800;
+  --color-admin-modern: #ff8800;
 }
 
 @theme {
-    --breakpoint-nav: 1236px;
+  --breakpoint-nav: 1236px;
 }
 
 @plugin "flyonui/theme" {
-    name: "8OHM Dashboard Dark";
-    default: false;
-    prefersdark: false;
-    color-scheme: "dark";
-    --color-base-100: oklch(25.33% 0.016 252.42);
-    --color-base-200: oklch(23.26% 0.014 253.1);
-    --color-base-300: oklch(21.15% 0.012 254.09);
-    --color-base-content: oklch(97.807% 0.029 256.847);
-    --color-primary: #ff8800;
-    --color-primary-content: oklch(14% 0.004 49.25);
-    --color-secondary: #8dd7da;
-    --color-secondary-content: oklch(94% 0.028 342.258);
-    --color-accent: #ff8800;
-    --color-accent-content: oklch(14% 0.004 49.25);
-    --color-neutral: oklch(14% 0.005 285.823);
-    --color-neutral-content: oklch(92% 0.004 286.32);
-    --color-info: oklch(74% 0.16 232.661);
-    --color-info-content: oklch(14% 0.004 49.25);
-    --color-success: oklch(59% 0.145 163.225);
-    --color-success-content: oklch(14% 0.004 49.25);
-    --color-warning: oklch(82% 0.189 84.429);
-    --color-warning-content: oklch(14% 0.004 49.25);
-    --color-error: oklch(57% 0.245 27.325);
-    --color-error-content: oklch(14% 0.004 49.25);
-    --radius-selector: 0.5rem;
-    --radius-field: 0.25rem;
-    --radius-box: 0.5rem;
-    --size-selector: 0.25rem;
-    --size-field: 0.25rem;
-    --border: 1px;
-    --depth: 1;
-    --noise: 0;
+  name: "8OHM Dashboard Dark";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(25.33% 0.016 252.42);
+  --color-base-200: oklch(23.26% 0.014 253.1);
+  --color-base-300: oklch(21.15% 0.012 254.09);
+  --color-base-content: oklch(97.807% 0.029 256.847);
+  --color-primary: #ff8800;
+  --color-primary-content: oklch(14% 0.004 49.25);
+  --color-secondary: #8dd7da;
+  --color-secondary-content: oklch(94% 0.028 342.258);
+  --color-accent: #ff8800;
+  --color-accent-content: oklch(14% 0.004 49.25);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(14% 0.004 49.25);
+  --color-success: oklch(59% 0.145 163.225);
+  --color-success-content: oklch(14% 0.004 49.25);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(14% 0.004 49.25);
+  --color-error: oklch(57% 0.245 27.325);
+  --color-error-content: oklch(14% 0.004 49.25);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 /* ── Font Face Declarations ── */
 @font-face {
-    font-family: 'Argentum Sans';
-    src: url('../../public/assets/fonts/argentum-sans.regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Argentum Sans';
+  src: url('../../public/assets/fonts/argentum-sans.regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Argentum Sans';
-    src: url('../../public/assets/fonts/argentum-sans.semicondensed-medium.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Argentum Sans';
+  src: url('../../public/assets/fonts/argentum-sans.semicondensed-medium.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 ::selection {
-    background-color: var(--color-accent-secondary);
-    color: var(--color-accent-primary);
+  background-color: var(--color-accent-secondary);
+  color: var(--color-accent-primary);
 }
 
 .btn {
-    border: 1px solid transparent;
-    transition: all 0.3s var(--ease-premium);
+  border: 1px solid transparent;
+  transition: all 0.3s var(--ease-premium);
 }
 
 .btn-primary {
-    background: var(--color-accent-primary);
-    color: #050505;
-    box-shadow: 0 10px 30px rgba(255, 136, 0, 0.2);
+  background: var(--color-accent-primary);
+  color: #050505;
+  box-shadow: 0 10px 30px rgba(255, 136, 0, 0.2);
 }
 
 .btn-primary:hover {
-    background: rgba(255, 136, 0, 0.15);
-    color: var(--color-accent-primary);
-    border-color: var(--color-accent-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(255, 136, 0, 0.35);
+  background: rgba(255, 136, 0, 0.15);
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(255, 136, 0, 0.35);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--color-text-primary);
-    border: 1px solid var(--color-border-outer);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-outer);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--color-accent-primary);
-    border-color: var(--color-accent-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(255, 136, 0, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(255, 136, 0, 0.15);
 }
 
 /* --- Background Visuals --- */

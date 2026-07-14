@@ -21,7 +21,7 @@ const props = defineProps({
 
 <template>
 
-    <Head title="8OHM | End-to-end Data Solutions">
+    <Head title="8OHM. | End-to-end Data Solutions">
         <meta name="robots" content="noindex, nofollow" />
     </Head>
 

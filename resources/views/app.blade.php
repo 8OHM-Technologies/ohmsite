@@ -23,7 +23,7 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="8OHM | End-to-end Data Solutions">
+    <meta property="og:title" content="8OHM. | End-to-end Data Solutions">
     <meta property="og:description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">
     <meta property="og:image" content="{{ asset('assets/images/8OHM_Logo_border.webp') }}">
@@ -31,7 +31,7 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url()->current() }}">
-    <meta name="twitter:title" content="8OHM | End-to-end Data Solutions">
+    <meta name="twitter:title" content="8OHM. | End-to-end Data Solutions">
     <meta name="twitter:description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">
     <meta name="twitter:image" content="{{ asset('assets/images/8OHM_Logo_border.webp') }}">

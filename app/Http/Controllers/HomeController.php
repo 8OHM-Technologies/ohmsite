@@ -73,6 +73,9 @@ class HomeController extends Controller
 
             $aboutUs = HomeSetting::where('key', 'about_us')->first();
 
+            $roadmap = HomeSetting::where('key', 'roadmap')->first();
+            $sectionHeaders = HomeSetting::where('key', 'section_headers')->first();
+
             $products = Product::whereIn('slug', [
                 'once-off-dataset',
                 'developer-api',
@@ -86,6 +89,8 @@ class HomeController extends Controller
                 'popularProducts' => $popularProducts,
                 'newArrivals' => $newArrivals,
                 'aboutUs' => $aboutUs ? $aboutUs->value : null,
+                'roadmapItems' => $roadmap ? $roadmap->value : null,
+                'sectionHeaders' => $sectionHeaders ? $sectionHeaders->value : null,
                 'products' => $products,
             ]);
         } catch (\Throwable $e) {
@@ -95,6 +100,8 @@ class HomeController extends Controller
                 'popularProducts' => [],
                 'newArrivals' => [],
                 'aboutUs' => null,
+                'roadmapItems' => null,
+                'sectionHeaders' => null,
                 'products' => [],
             ]);
         }

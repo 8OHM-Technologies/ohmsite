@@ -6,6 +6,8 @@ import Navbar from '@/Components/Navbar.vue'
 const props = defineProps({
   auth: Object,
   products: Array,
+  roadmapItems: Array,
+  sectionHeaders: Object,
 });
 
 const frequencies = [
@@ -13,56 +15,92 @@ const frequencies = [
   { value: 'annually', label: 'Annually (Save 17%)' },
 ]
 
-const roadmap = [
-  {
-    status: 'Live',
-    date: 'Current',
-    title: 'CCMA Arbitration Awards',
-    description: 'Comprehensive CCMA Awards & Judgment records.',
-    icon: 'ph-check-circle',
-    iconClass: 'text-green-500'
-  },
-  {
-    status: 'Upcoming',
-    date: 'Q3 2026',
-    title: 'SA Labour Court Case Law',
-    description: 'Comprehensive case law from the Labour and Labour Appeal Courts.',
-    icon: 'ph-spinner',
-    iconClass: 'text-blue-500'
-  },
-  {
-    status: 'Upcoming',
-    date: 'Q4 2026',
-    title: 'SA High Court Case Law',
-    description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
-    icon: 'ph-calendar-blank',
-    iconClass: 'text-orange-500'
-  },
-  {
-    status: 'Planned',
-    date: 'Q1 2027',
-    title: 'Tribunals and Other Courts Case Law',
-    description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
-    icon: 'ph-rocket-launch',
-    iconClass: 'text-yellow-500'
-  },
-  {
-    status: 'Planned',
-    date: '2027',
-    title: 'Legislative Expansion',
-    description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.',
-    icon: 'ph-rocket-launch',
-    iconClass: 'text-yellow-500'
-  },
-  {
-    status: 'Ultimate Goal',
-    date: '2027',
-    title: 'LaybaLaw AI',
-    description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
-    icon: 'ph-robot',
-    iconClass: 'text-red-500'
-  },
-];
+const roadmap = computed(() => {
+  if (props.roadmapItems && props.roadmapItems.length > 0) {
+    return props.roadmapItems;
+  }
+  return [
+    {
+      status: 'Live',
+      date: 'Current',
+      title: 'CCMA Arbitration Awards',
+      description: 'Comprehensive CCMA Awards & Judgment records.',
+      icon: 'ph-check-circle',
+      iconClass: 'text-green-500'
+    },
+    {
+      status: 'Upcoming',
+      date: 'Q3 2026',
+      title: 'SA Labour Court Case Law',
+      description: 'Comprehensive case law from the Labour and Labour Appeal Courts.',
+      icon: 'ph-spinner',
+      iconClass: 'text-blue-500'
+    },
+    {
+      status: 'Upcoming',
+      date: 'Q4 2026',
+      title: 'SA High Court Case Law',
+      description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
+      icon: 'ph-calendar-blank',
+      iconClass: 'text-orange-500'
+    },
+    {
+      status: 'Planned',
+      date: 'Q1 2027',
+      title: 'Tribunals and Other Courts Case Law',
+      description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
+      icon: 'ph-rocket-launch',
+      iconClass: 'text-yellow-500'
+    },
+    {
+      status: 'Planned',
+      date: '2027',
+      title: 'Legislative Expansion',
+      description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.',
+      icon: 'ph-rocket-launch',
+      iconClass: 'text-yellow-500'
+    },
+    {
+      status: 'Ultimate Goal',
+      date: '2027',
+      title: 'LaybaLaw AI',
+      description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
+      icon: 'ph-robot',
+      iconClass: 'text-red-500'
+    },
+  ];
+});
+
+const sectionHeader = (key, field) => {
+  const defaults = {
+    services: {
+      eyebrow: 'Data Solutions and IT Consulting',
+      title: 'SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals',
+      subtitle: 'Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon) via download and API, or explore trends visually using our analytics dashboard.',
+    },
+    philosophy: {
+      eyebrow: 'Why Infinity Ohm?',
+      title: 'Our Philosophy',
+      subtitle: 'Strategic engineering, absolute data ownership, and open standards.',
+    },
+    ohmbase: {
+      eyebrow: 'DIY Smart Home Blueprints',
+      title: 'OhmBase',
+      subtitle: 'The business data architectures we build are born from our philosophy of absolute digital sovereignty. Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build their own self-hosted, cloud-free smart home ecosystems.',
+    },
+    faq: {
+      eyebrow: 'FAQs',
+      title: 'Frequently Asked Questions',
+      subtitle: '',
+    },
+    contact: {
+      eyebrow: 'Contact',
+      title: 'Enquire Now',
+      subtitle: 'Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware waitlists? Reach out below.',
+    },
+  };
+  return props.sectionHeaders?.[key]?.[field] || defaults[key]?.[field] || '';
+};
 
 const frequency = ref(frequencies[0])
 
@@ -323,7 +361,7 @@ onUnmounted(() => {
 
 <template>
 
-  <Head title="8OHM | End-to-end Data Solutions">
+  <Head title="8OHM. | End-to-end Data Solutions">
     <link rel="canonical" href="https://8ohm.co.za" />
   </Head>
 
@@ -428,14 +466,13 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge secondary">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Data Solutions and IT Consulting</span>
+            <span class="eyebrow-text">{{ sectionHeader('services', 'eyebrow') }}</span>
           </div>
           <h2 class="section-title">
-            SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals
+            {{ sectionHeader('services', 'title') }}
           </h2>
           <p class="section-subtitle">
-            Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon)
-            via download and API, or explore trends visually using our analytics dashboard.
+            {{ sectionHeader('services', 'subtitle') }}
           </p>
         </div>
         <div class="bento-grid">
@@ -704,11 +741,11 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Why Infinity Ohm?</span>
+            <span class="eyebrow-text">{{ sectionHeader('philosophy', 'eyebrow') }}</span>
           </div>
-          <h2 class="section-title">Our Philosophy</h2>
+          <h2 class="section-title">{{ sectionHeader('philosophy', 'title') }}</h2>
           <p class="section-subtitle">
-            Strategic engineering, absolute data ownership, and open standards.
+            {{ sectionHeader('philosophy', 'subtitle') }}
           </p>
         </div>
         <div class="bento-grid">
@@ -783,14 +820,11 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">DIY Smart Home Blueprints</span>
+            <span class="eyebrow-text">{{ sectionHeader('ohmbase', 'eyebrow') }}</span>
           </div>
-          <h2 class="section-title">OhmBase</h2>
+          <h2 class="section-title">{{ sectionHeader('ohmbase', 'title') }}</h2>
           <p class="section-subtitle">
-            The business data architectures we build are born from our philosophy of absolute digital sovereignty.
-            Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build
-            their own
-            self-hosted, cloud-free smart home ecosystems.
+            {{ sectionHeader('ohmbase', 'subtitle') }}
           </p>
         </div>
         <div class="bento-grid">
@@ -871,10 +905,10 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">FAQs</span>
+            <span class="eyebrow-text">{{ sectionHeader('faq', 'eyebrow') }}</span>
           </div>
           <h2 class="section-title section-title-large">
-            Frequently Asked Questions
+            {{ sectionHeader('faq', 'title') }}
           </h2>
         </div>
 
@@ -969,14 +1003,13 @@ onUnmounted(() => {
         <div class="section-header">
           <div class="eyebrow-badge">
             <span class="eyebrow-dot"></span>
-            <span class="eyebrow-text">Contact</span>
+            <span class="eyebrow-text">{{ sectionHeader('contact', 'eyebrow') }}</span>
           </div>
           <h2 class="section-title section-title-large">
-            Enquire Now
+            {{ sectionHeader('contact', 'title') }}
           </h2>
           <p class="section-subtitle">
-            Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware
-            waitlists? Reach out below.
+            {{ sectionHeader('contact', 'subtitle') }}
           </p>
         </div>
 

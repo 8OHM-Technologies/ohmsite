@@ -15,6 +15,8 @@ class AdminHomeController extends Controller
         return Inertia::render('Admin/Home/Edit', [
             'heroSlider' => HomeSetting::where('key', 'hero_slider')->first(),
             'aboutUs' => HomeSetting::where('key', 'about_us')->first(),
+            'roadmap' => HomeSetting::where('key', 'roadmap')->first(),
+            'sectionHeaders' => HomeSetting::where('key', 'section_headers')->first(),
             'products' => Product::all(),
         ]);
     }
@@ -26,6 +28,8 @@ class AdminHomeController extends Controller
             'hero_images.*' => 'nullable|image|max:2048',
             'about_us' => 'nullable|array',
             'about_us_image' => 'nullable|image|max:2048',
+            'roadmap' => 'nullable|array',
+            'section_headers' => 'nullable|array',
         ]);
 
         if ($request->has('hero_slider')) {
@@ -65,6 +69,20 @@ class AdminHomeController extends Controller
             HomeSetting::updateOrCreate(
                 ['key' => 'about_us'],
                 ['value' => $aboutUsData]
+            );
+        }
+
+        if ($request->has('roadmap')) {
+            HomeSetting::updateOrCreate(
+                ['key' => 'roadmap'],
+                ['value' => $request->roadmap]
+            );
+        }
+
+        if ($request->has('section_headers')) {
+            HomeSetting::updateOrCreate(
+                ['key' => 'section_headers'],
+                ['value' => $request->section_headers]
             );
         }
 

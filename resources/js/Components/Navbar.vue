@@ -119,7 +119,7 @@ const getHref = (link) => {
             <div class="absolute left-1/2 -translate-x-1/2 nav:static nav:translate-x-0 nav:justify-self-start transition-all duration-500 flex items-center"
                 :class="[isScrolled ? 'nav:w-40' : 'nav:w-auto']">
                 <Link :href="route('home')" class="block">
-                    <img src="/assets/images/8OHM_Logo.webp" alt="8OHM | End-to-end Data Solutions | Logo"
+                    <img src="/assets/images/8OHM_Logo.webp" alt="8OHM. | End-to-end Data Solutions | Logo"
                         class="transition-all duration-500" :style="{
                             height: isScrolled ? '24px' : '48px',
                             maxHeight: '128px'
