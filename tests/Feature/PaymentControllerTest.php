@@ -125,4 +125,3 @@ class PaymentControllerTest extends TestCase
         Notification::assertNotSentTo($user, PaymentCompleted::class);
     }
 }
-

@@ -63,7 +63,7 @@ class OrderController extends Controller
                         $user->update([
                             'subscription_status' => 'active',
                             'subscribed_at' => now(),
-                            'subscription_code' => $user->subscription_code ?? 'sub_manual_' . time(),
+                            'subscription_code' => $user->subscription_code ?? 'sub_manual_'.time(),
                         ]);
                     }
                 }

@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\ApiKey;
 use App\Models\Analytics;
+use App\Models\ApiKey;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +25,12 @@ class DeveloperApiTest extends TestCase
             default => str($productName)->slug()->toString(),
         };
 
-        $product = \App\Models\Product::factory()->create([
+        $product = Product::factory()->create([
             'name' => $productName,
             'slug' => $slug,
         ]);
 
-        $order = \App\Models\Order::create([
+        $order = Order::create([
             'user_id' => $user->id,
             'email' => $user->email,
             'first_name' => 'John',
@@ -86,7 +88,7 @@ class DeveloperApiTest extends TestCase
             'key' => 'ohm_live_123456',
         ]);
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(403);
         $response->assertJson(['error' => 'Active Developer API or Pro Analytics subscription is required.']);
     }
@@ -104,7 +106,7 @@ class DeveloperApiTest extends TestCase
             'court' => 'CCMA',
         ]);
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
         $this->assertDatabaseCount('api_calls', 1);
@@ -134,7 +136,7 @@ class DeveloperApiTest extends TestCase
 
         Analytics::factory()->create();
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(429);
         $response->assertJson(['error' => 'API rate limit exceeded for this month.']);
     }
@@ -163,11 +165,11 @@ class DeveloperApiTest extends TestCase
 
         Analytics::factory()->create();
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(200);
 
         // One more call hits limit
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(429);
     }
 
@@ -194,7 +196,7 @@ class DeveloperApiTest extends TestCase
         }
         DB::table('api_calls')->insert($calls);
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(429);
     }
 
@@ -209,7 +211,7 @@ class DeveloperApiTest extends TestCase
             'key' => 'ohm_live_123456',
         ]);
 
-        $response = $this->withHeaders(['Authorization' => 'Bearer ' . $key->key])->getJson('/api/v1/cases');
+        $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(403);
         $response->assertJson(['error' => 'Your account has been banned: Spamming']);
     }

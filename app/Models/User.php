@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -172,7 +173,7 @@ class User extends Authenticatable
     /**
      * Get the API keys associated with the user.
      */
-    public function apiKeys(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function apiKeys(): HasMany
     {
         return $this->hasMany(ApiKey::class);
     }
@@ -180,7 +181,7 @@ class User extends Authenticatable
     /**
      * Get the API calls made by the user.
      */
-    public function apiCalls(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function apiCalls(): HasMany
     {
         return $this->hasMany(ApiCall::class);
     }

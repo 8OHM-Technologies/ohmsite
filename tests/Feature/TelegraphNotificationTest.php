@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Order;
-use App\Models\User;
 use App\Models\Product;
+use App\Models\User;
 use App\Notifications\OrderPlaced;
 use App\Notifications\PaymentCompleted;
 use App\Notifications\PaymentFailedOrError;
@@ -30,8 +30,8 @@ class TelegraphNotificationTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         $customer = User::factory()->create(['role' => 'customer']);
 
-        $this->assertSame('123456789', $admin->routeNotificationForTelegraph(new OrderPlaced(new Order())));
-        $this->assertNull($customer->routeNotificationForTelegraph(new OrderPlaced(new Order())));
+        $this->assertSame('123456789', $admin->routeNotificationForTelegraph(new OrderPlaced(new Order)));
+        $this->assertNull($customer->routeNotificationForTelegraph(new OrderPlaced(new Order)));
     }
 
     public function test_notifications_via_channel_selection()

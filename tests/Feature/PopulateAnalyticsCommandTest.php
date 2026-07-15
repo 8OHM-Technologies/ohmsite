@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Analytics;
-use App\Models\ExtractedData;
+use App\Models\BackupAnalytics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
 class PopulateAnalyticsCommandTest extends TestCase
 {
@@ -38,14 +38,14 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         DB::connection('pgsql_coeus')->table('entities')->insert([
             'id' => $entityId,
-            'name' => 'Test Entity ' . $entityId,
+            'name' => 'Test Entity '.$entityId,
             'created_at' => now(),
         ]);
 
         DB::connection('pgsql_coeus')->table('targets')->insert([
             'id' => $targetId,
             'entity_id' => $entityId,
-            'target_name' => 'Test Target ' . $targetId,
+            'target_name' => 'Test Target '.$targetId,
             'location' => 'https://example.com',
             'created_at' => now(),
         ]);
@@ -83,7 +83,7 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         $this->artisan('analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
-            ->expectsOutput('Successfully processed 1 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
         // Verify analytics table has the mapped record
@@ -148,7 +148,7 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         $this->artisan('analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
-            ->expectsOutput('Successfully processed 1 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
         // Verify analytics table has the mapped record
@@ -200,7 +200,7 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         $this->artisan('analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
-            ->expectsOutput('Successfully processed 0 records.')
+            ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
         // Verify analytics table remains empty
@@ -231,10 +231,116 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         $this->artisan('analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
-            ->expectsOutput('Successfully processed 0 records.')
+            ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
         // Verify analytics table remains empty
         $this->assertEquals(0, Analytics::count());
+    }
+
+    public function test_deletes_local_records_not_in_extracted_records(): void
+    {
+        $targetId = $this->createTarget();
+        $id = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2000-07-01',
+            'record_type' => 'sabinet_ccma',
+            'data' => json_encode([
+                'court' => 'CCMA',
+                'title' => 'Gumede v Mastercraft, KN39790',
+                'award_date' => '2000-07-01',
+                'award_number' => 'KN39790',
+            ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => now(),
+        ]);
+
+        // First run: inserts the record locally
+        $this->artisan('analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        $this->assertEquals(1, Analytics::count());
+
+        // Delete from coeus DB
+        DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->delete();
+
+        // Second run: should detect deletion in coeus and delete it locally
+        $this->artisan('analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 0 records. Deleted 1 obsolete records.')
+            ->assertExitCode(0);
+
+        $this->assertEquals(0, Analytics::count());
+    }
+
+    public function test_creates_backup_before_changes(): void
+    {
+        $targetId = $this->createTarget();
+        $id1 = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id1,
+            'target_id' => $targetId,
+            'document_date' => '2000-07-01',
+            'record_type' => 'sabinet_ccma',
+            'data' => json_encode([
+                'court' => 'CCMA',
+                'title' => 'Gumede v Mastercraft, KN39790',
+                'award_date' => '2000-07-01',
+                'award_number' => 'KN39790',
+            ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => now(),
+        ]);
+
+        // First run: inserts the first record
+        $this->artisan('analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        $this->assertEquals(1, Analytics::count());
+        // Since changes were made, backup should contain the snapshot *before* the first changes (which was empty)
+        $this->assertEquals(0, BackupAnalytics::count());
+
+        // Insert second record
+        $id2 = Str::uuid()->toString();
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id2,
+            'target_id' => $targetId,
+            'document_date' => '2000-07-02',
+            'record_type' => 'sabinet_ccma',
+            'data' => json_encode([
+                'court' => 'CCMA',
+                'title' => 'Naidoo v Mastercraft, KN39791',
+                'award_date' => '2000-07-02',
+                'award_number' => 'KN39791',
+            ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => now(),
+        ]);
+
+        // Second run: inserts the second record
+        $this->artisan('analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        // Current analytics has 2 records
+        $this->assertEquals(2, Analytics::count());
+        // Backup should contain the snapshot *before* this run (which was the 1 record from the first run)
+        $this->assertEquals(1, BackupAnalytics::count());
+        $this->assertEquals('Gumede v Mastercraft, KN39790', BackupAnalytics::first()->title);
     }
 }

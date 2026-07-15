@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\PaymentCompleted;
+use App\Notifications\PaymentFailedOrError;
 use Binkode\Paystack\Support\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
 
 class PaymentController extends Controller
@@ -47,10 +51,10 @@ class PaymentController extends Controller
         try {
             $response = Transaction::initialize($params);
         } catch (\Throwable $e) {
-            $admins = \App\Models\User::where('role', 'admin')->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Initialization Failure', $e->getMessage()));
+            $admins = User::where('role', 'admin')->get();
+            Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Initialization Failure', $e->getMessage()));
 
-            return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack: ' . $e->getMessage());
+            return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack: '.$e->getMessage());
         }
 
         if (isset($response['status']) && $response['status'] === true) {
@@ -64,8 +68,8 @@ class PaymentController extends Controller
             return Inertia::location($response['data']['authorization_url']);
         }
 
-        $admins = \App\Models\User::where('role', 'admin')->get();
-        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Initialization Failure', 'Paystack API returned false status.'));
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Initialization Failure', 'Paystack API returned false status.'));
 
         return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack.');
     }
@@ -85,10 +89,10 @@ class PaymentController extends Controller
             $response = Transaction::verify($reference);
         } catch (\Throwable $e) {
             $order = Order::where('payment_reference', $reference)->first();
-            $admins = \App\Models\User::where('role', 'admin')->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Verification Failure', $e->getMessage()));
+            $admins = User::where('role', 'admin')->get();
+            Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Verification Failure', $e->getMessage()));
 
-            return redirect()->route('orders.index')->with('error', 'Payment verification failed: ' . $e->getMessage());
+            return redirect()->route('orders.index')->with('error', 'Payment verification failed: '.$e->getMessage());
         }
 
         if (isset($response['data']['status']) && $response['data']['status'] === 'success') {
@@ -118,17 +122,17 @@ class PaymentController extends Controller
                 }
 
                 // Notify Admins
-                $admins = \App\Models\User::where('role', 'admin')->get();
-                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentCompleted($order));
+                $admins = User::where('role', 'admin')->get();
+                Notification::send($admins, new PaymentCompleted($order));
             }
 
             return redirect()->route('orders.index')->with('success', 'Payment successful!');
         }
 
         $order = Order::where('payment_reference', $reference)->first();
-        $admins = \App\Models\User::where('role', 'admin')->get();
+        $admins = User::where('role', 'admin')->get();
         $msg = $response['message'] ?? ($response['data']['gateway_response'] ?? 'Payment verification failed.');
-        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Verification Failure', $msg));
+        Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Verification Failure', $msg));
 
         return redirect()->route('orders.index')->with('error', 'Payment verification failed.');
     }

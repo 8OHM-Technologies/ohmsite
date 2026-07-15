@@ -3,8 +3,12 @@
 namespace App\Listeners;
 
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\PaymentCompleted;
+use App\Notifications\PaymentFailedOrError;
 use Binkode\Paystack\Events\Hook;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PaystackWebhookListener
 {
@@ -53,8 +57,8 @@ class PaystackWebhookListener
                     }
 
                     // Notify Admins
-                    $admins = \App\Models\User::where('role', 'admin')->get();
-                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentCompleted($order));
+                    $admins = User::where('role', 'admin')->get();
+                    Notification::send($admins, new PaymentCompleted($order));
 
                     Log::info("Order #{$order->id} marked as completed via webhook.");
                 }
@@ -64,9 +68,9 @@ class PaystackWebhookListener
         if ($eventType === 'charge.failed') {
             $reference = $data['reference'] ?? null;
             $order = $reference ? Order::where('payment_reference', $reference)->first() : null;
-            $admins = \App\Models\User::where('role', 'admin')->get();
+            $admins = User::where('role', 'admin')->get();
             $msg = $data['gateway_response'] ?? 'Charge failed';
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Charge Failed Webhook', $msg));
+            Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Charge Failed Webhook', $msg));
         }
     }
 }

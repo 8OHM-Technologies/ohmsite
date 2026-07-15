@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use DefStudio\Telegraph\Notifications\TelegraphMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -10,7 +11,9 @@ class PaymentFailedOrError extends Notification
     use Queueable;
 
     protected $order;
+
     protected $errorType;
+
     protected $errorMessage;
 
     public function __construct($order, string $errorType, string $errorMessage)
@@ -31,18 +34,18 @@ class PaymentFailedOrError extends Notification
         return $channels;
     }
 
-    public function toTelegraph($notifiable): \DefStudio\Telegraph\Notifications\TelegraphMessage
+    public function toTelegraph($notifiable): TelegraphMessage
     {
         $orderId = $this->order ? $this->order->id : 'N/A';
-        $amount = $this->order ? 'R' . number_format($this->order->total_amount, 2) : 'N/A';
+        $amount = $this->order ? 'R'.number_format($this->order->total_amount, 2) : 'N/A';
 
-        $html = "⚠️ <b>Payment Failed or Error!</b>\n\n" .
-            "<b>Error Type:</b> {$this->errorType}\n" .
-            "<b>Order ID:</b> #{$orderId}\n" .
-            "<b>Amount:</b> {$amount}\n" .
-            "<b>Message:</b> <code>" . e($this->errorMessage) . "</code>";
+        $html = "⚠️ <b>Payment Failed or Error!</b>\n\n".
+            "<b>Error Type:</b> {$this->errorType}\n".
+            "<b>Order ID:</b> #{$orderId}\n".
+            "<b>Amount:</b> {$amount}\n".
+            '<b>Message:</b> <code>'.e($this->errorMessage).'</code>';
 
-        return \DefStudio\Telegraph\Notifications\TelegraphMessage::make($html)->html();
+        return TelegraphMessage::make($html)->html();
     }
 
     public function toArray($notifiable): array
@@ -50,7 +53,7 @@ class PaymentFailedOrError extends Notification
         $orderId = $this->order ? $this->order->id : null;
         $amount = $this->order ? $this->order->total_amount : null;
 
-        $msg = '[' . $this->errorType . '] ' . ($orderId ? 'Order #' . $orderId . ': ' : '') . $this->errorMessage;
+        $msg = '['.$this->errorType.'] '.($orderId ? 'Order #'.$orderId.': ' : '').$this->errorMessage;
 
         return [
             'order_id' => $orderId,

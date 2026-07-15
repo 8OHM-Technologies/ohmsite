@@ -6,6 +6,7 @@ use App\Models\Analytics;
 use App\Models\ExtractedData;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PopulateAnalytics extends Command
 {
@@ -29,101 +30,148 @@ class PopulateAnalytics extends Command
     public function handle(): int
     {
         $limit = (int) $this->option('limit');
-        $processedCount = 0;
-        $batchSize = 100;
 
         $this->info("Starting population of analytics database. Max limit: {$limit} records.");
 
-        while ($processedCount < $limit) {
-            $chunkSize = min($batchSize, $limit - $processedCount);
+        // 1. Retrieve all local extracted_record_id values from analytics
+        $localIds = Analytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
+        $localIdsMap = array_flip($localIds);
 
-            // Fetch a chunk of unprocessed records
-            $records = ExtractedData::whereNull('processed_at')
-                ->whereNotNull('cleaned_at')
-                ->limit($chunkSize)
-                ->get();
+        // 2. Retrieve all valid IDs from extracted_records (cleaned_at IS NOT NULL)
+        $coeusIds = ExtractedData::whereNotNull('cleaned_at')->pluck('id')->toArray();
+        $coeusIdsMap = array_flip($coeusIds);
 
-            if ($records->isEmpty()) {
-                break;
-            }
-
-            foreach ($records as $record) {
-                $data = $record->data;
-
-                if (empty($data)) {
-                    $this->warn("Skipping record ID {$record->id} due to empty data payload.");
-                    try {
-                        $record->update([
-                            'processed_at' => now(),
-                        ]);
-                    } catch (\Exception $e) {
-                        $this->error("Failed to mark empty record ID {$record->id} as processed: {$e->getMessage()}");
-                    }
-                    continue;
-                }
-
-                try {
-                    $title = $data['title'] ?? 'Unknown';
-                    $awardNumber = $data['award_number'] ?? null;
-
-                    // Handle Detailed vs Indexed state
-                    $employee = $data['employee'] ?? null;
-                    $employer = $data['employer'] ?? null;
-
-                    if ($employee === null || $employer === null) {
-                        $parsedTitle = $this->parseTitle($title, $awardNumber);
-                        $employee = $employee ?? $parsedTitle['employee'];
-                        $employer = $employer ?? $parsedTitle['employer'];
-                    }
-
-                    $courtLocation = $data['court_location'] ?? $this->parseCourtLocation($awardNumber);
-                    $reason = $data['reason_for_dismissal'] ?? $this->parseReasonForDismissal($title);
-                    $forum = $data['forum'] ?? $data['court'] ?? 'CCMA';
-                    $detailTitle = $data['detail_title'] ?? $title;
-                    $previewImageUrl = $data['preview_image_url'] ?? null;
-                    $detailsScrapedAt = $data['details_scraped_at'] ?? $data['index_scraped_at'] ?? null;
-
-                    // Create the analytics entry in pgsql database
-                    Analytics::create([
-                        'title' => $title,
-                        'document_type' => $data['document_type'] ?? 'CCMA Bargaining Council Awards',
-                        'award_date' => $data['award_date'] ?? ($record->document_date ? $record->document_date->toDateString() : now()->toDateString()),
-                        'court' => $data['court'] ?? 'CCMA',
-                        'award_number' => $awardNumber ?? 'Unknown',
-                        'hearing_start' => $data['hearing_start'] ?? null,
-                        'hearing_end' => $data['hearing_end'] ?? null,
-                        'date_modified' => $data['date_modified'] ?? null,
-                        'detail_url' => $data['detail_url'] ?? null,
-                        'detail_title' => $detailTitle,
-                        'employee' => $employee,
-                        'employer' => $employer,
-                        'forum' => $forum,
-                        'court_location' => $courtLocation,
-                        'reason_for_dismissal' => $reason,
-                        'preview_image_url' => $previewImageUrl,
-                        'details_scraped_at' => $detailsScrapedAt ? Carbon::parse($detailsScrapedAt) : null,
-                    ]);
-
-                    // Update the coeus record
-                    $record->update([
-                        'processed_at' => now(),
-                    ]);
-
-                    $processedCount++;
-                } catch (\Exception $e) {
-                    $this->error("Failed to process record ID {$record->id}: {$e->getMessage()}");
-                    try {
-                        $record->update([
-                            'processed_at' => now(),
-                        ]);
-                    } catch (\Exception $updateEx) {
-                        $this->error("Could not mark record {$record->id} as processed: {$updateEx->getMessage()}");
-                    }
-                }
+        // 3. Determine deleted records (present locally, but no longer in coeus)
+        $deletedIds = [];
+        foreach ($localIds as $id) {
+            if (! isset($coeusIdsMap[$id])) {
+                $deletedIds[] = $id;
             }
         }
 
-        $this->info("Successfully processed {$processedCount} records.");
+        // 4. Determine new incoming records
+        $newIds = [];
+        foreach ($coeusIds as $id) {
+            if (! isset($localIdsMap[$id])) {
+                $newIds[] = $id;
+            }
+        }
+
+        // Apply limit to new records
+        $newIdsToProcess = array_slice($newIds, 0, $limit);
+
+        // If no new records to process and no records to delete, we are done!
+        if (empty($newIdsToProcess) && empty($deletedIds)) {
+            $this->info('Successfully processed 0 records. Deleted 0 obsolete records.');
+
+            return self::SUCCESS;
+        }
+
+        // 5. Fetch and parse new records
+        $preparedRecords = [];
+        $newRecords = ExtractedData::whereIn('id', $newIdsToProcess)->get();
+
+        foreach ($newRecords as $record) {
+            $data = $record->data;
+
+            if (empty($data)) {
+                $this->warn("Skipping record ID {$record->id} due to empty data payload.");
+
+                continue;
+            }
+
+            try {
+                $title = $data['title'] ?? 'Unknown';
+                $awardNumber = $data['award_number'] ?? null;
+
+                // Handle Detailed vs Indexed state
+                $employee = $data['employee'] ?? null;
+                $employer = $data['employer'] ?? null;
+
+                if ($employee === null || $employer === null) {
+                    $parsedTitle = $this->parseTitle($title, $awardNumber);
+                    $employee = $employee ?? $parsedTitle['employee'];
+                    $employer = $employer ?? $parsedTitle['employer'];
+                }
+
+                $courtLocation = $data['court_location'] ?? $this->parseCourtLocation($awardNumber);
+                $reason = $data['reason_for_dismissal'] ?? $this->parseReasonForDismissal($title);
+                $forum = $data['forum'] ?? $data['court'] ?? 'CCMA';
+                $detailTitle = $data['detail_title'] ?? $title;
+                $previewImageUrl = $data['preview_image_url'] ?? null;
+                $detailsScrapedAt = $data['details_scraped_at'] ?? $data['index_scraped_at'] ?? null;
+
+                $preparedRecords[] = [
+                    'extracted_record_id' => $record->id,
+                    'title' => $title,
+                    'document_type' => $data['document_type'] ?? 'CCMA Bargaining Council Awards',
+                    'award_date' => $data['award_date'] ?? ($record->document_date ? $record->document_date->toDateString() : now()->toDateString()),
+                    'court' => $data['court'] ?? 'CCMA',
+                    'award_number' => $awardNumber ?? 'Unknown',
+                    'hearing_start' => $data['hearing_start'] ?? null,
+                    'hearing_end' => $data['hearing_end'] ?? null,
+                    'date_modified' => $data['date_modified'] ?? null,
+                    'detail_url' => $data['detail_url'] ?? null,
+                    'detail_title' => $detailTitle,
+                    'employee' => $employee,
+                    'employer' => $employer,
+                    'forum' => $forum,
+                    'court_location' => $courtLocation,
+                    'reason_for_dismissal' => $reason,
+                    'preview_image_url' => $previewImageUrl,
+                    'details_scraped_at' => $detailsScrapedAt ? Carbon::parse($detailsScrapedAt) : null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            } catch (\Exception $e) {
+                $this->error("Failed to parse record ID {$record->id}: {$e->getMessage()}");
+            }
+        }
+
+        // 6. Perform the sync inside database transaction with table lock
+        if (! empty($preparedRecords) || ! empty($deletedIds)) {
+            DB::transaction(function () use ($preparedRecords, $deletedIds) {
+                $connection = DB::connection();
+                if ($connection->getDriverName() === 'pgsql') {
+                    $connection->statement('LOCK TABLE analytics, backup_analytics IN ACCESS EXCLUSIVE MODE');
+                }
+
+                // Create backup before any changes are made to the current model
+                DB::table('backup_analytics')->truncate();
+                $columns = [
+                    'id', 'extracted_record_id', 'title', 'document_type', 'award_date', 'court',
+                    'award_number', 'hearing_start', 'hearing_end', 'date_modified',
+                    'detail_url', 'detail_title', 'employee', 'employer', 'forum',
+                    'court_location', 'reason_for_dismissal', 'preview_image_url',
+                    'details_scraped_at', 'created_at', 'updated_at',
+                ];
+                $columnsStr = implode(', ', $columns);
+                DB::statement("INSERT INTO backup_analytics ($columnsStr) SELECT $columnsStr FROM analytics");
+
+                // Delete local records not present in extracted_records
+                if (! empty($deletedIds)) {
+                    Analytics::whereIn('extracted_record_id', $deletedIds)->delete();
+                }
+
+                // Insert new records
+                if (! empty($preparedRecords)) {
+                    foreach (array_chunk($preparedRecords, 100) as $chunk) {
+                        Analytics::insert($chunk);
+                    }
+                }
+            });
+        }
+
+        // 7. Update processed_at timestamps in coeus DB for all processed records (including skipped/failed)
+        if (! empty($newIdsToProcess)) {
+            ExtractedData::whereIn('id', $newIdsToProcess)->update([
+                'processed_at' => now(),
+            ]);
+        }
+
+        $processedCount = count($preparedRecords);
+        $deletedCount = count($deletedIds);
+        $this->info("Successfully processed {$processedCount} records. Deleted {$deletedCount} obsolete records.");
 
         return self::SUCCESS;
     }
@@ -133,8 +181,6 @@ class PopulateAnalytics extends Command
      *
      * Format: "Employee v Employer, AwardNumber" or "Employee v Employer"
      *
-     * @param string $title
-     * @param string|null $awardNumber
      * @return array{employee: string, employer: string}
      */
     private function parseTitle(string $title, ?string $awardNumber): array
@@ -148,7 +194,7 @@ class PopulateAnalytics extends Command
 
             // If we have an award number, remove it from the end of the employer name
             if (! empty($awardNumber)) {
-                $pattern = '/' . preg_quote($awardNumber, '/') . '$/i';
+                $pattern = '/'.preg_quote($awardNumber, '/').'$/i';
                 $employer = preg_replace($pattern, '', $employerWithAward);
                 $employer = rtrim(trim($employer), ',');
             } else {
@@ -169,9 +215,6 @@ class PopulateAnalytics extends Command
 
     /**
      * Deduce court location based on the award number prefix.
-     *
-     * @param string|null $awardNumber
-     * @return string
      */
     private function parseCourtLocation(?string $awardNumber): string
     {
@@ -196,9 +239,6 @@ class PopulateAnalytics extends Command
 
     /**
      * Deduce reason for dismissal based on keywords in title.
-     *
-     * @param string $title
-     * @return string
      */
     private function parseReasonForDismissal(string $title): string
     {

@@ -13,7 +13,9 @@ class CustomerManagementTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $customer;
+
     protected Product $product;
 
     protected function setUp(): void

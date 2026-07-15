@@ -35,7 +35,7 @@ class InitialSeeder extends Seeder
         ]);
 
         // 2.1 Subscribed User
-        User::firstOrCreate(['email'=> 'subscriber@8ohm.co.za'], [
+        User::firstOrCreate(['email' => 'subscriber@8ohm.co.za'], [
             'first_name' => 'Test',
             'last_name' => 'Subscriber',
             'password' => Hash::make('password'),
@@ -43,7 +43,7 @@ class InitialSeeder extends Seeder
         ]);
 
         // 2.2 Managed Pipeline User
-        User::firstOrCreate(['email'=> 'pipeline@8ohm.co.za'], [
+        User::firstOrCreate(['email' => 'pipeline@8ohm.co.za'], [
             'first_name' => 'Test',
             'last_name' => 'Pipeline',
             'password' => Hash::make('password'),

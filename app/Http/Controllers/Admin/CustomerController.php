@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
@@ -30,7 +32,7 @@ class CustomerController extends Controller
     {
         return Inertia::render('Admin/Customers/Show', [
             'customer' => $customer->load(['orders.items.product', 'favorites']),
-            'products' => \App\Models\Product::select('id', 'name', 'price', 'slug')->get(),
+            'products' => Product::select('id', 'name', 'price', 'slug')->get(),
         ]);
     }
 
@@ -39,7 +41,7 @@ class CustomerController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $customer->id,
+            'email' => 'required|email|unique:users,email,'.$customer->id,
             'phone' => 'nullable|string|max:20',
             'company_name' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
@@ -76,9 +78,9 @@ class CustomerController extends Controller
             'frequency' => 'nullable|string|in:monthly,yearly',
         ]);
 
-        $product = \App\Models\Product::findOrFail($request->product_id);
+        $product = Product::findOrFail($request->product_id);
 
-        $order = \App\Models\Order::create([
+        $order = Order::create([
             'user_id' => $customer->id,
             'email' => $customer->email,
             'first_name' => $customer->first_name ?? 'Manual',
@@ -104,7 +106,7 @@ class CustomerController extends Controller
                 $customer->update([
                     'subscription_status' => 'active',
                     'subscribed_at' => now(),
-                    'subscription_code' => $customer->subscription_code ?? 'sub_manual_' . time(),
+                    'subscription_code' => $customer->subscription_code ?? 'sub_manual_'.time(),
                 ]);
             }
         }

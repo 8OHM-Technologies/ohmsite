@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\ApiKey;
 use App\Models\ApiCall;
+use App\Models\ApiKey;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,8 +13,7 @@ class VerifyDeveloperApiKey
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -38,7 +37,7 @@ class VerifyDeveloperApiKey
 
         if ($user->is_banned) {
             return response()->json([
-                'error' => 'Your account has been banned: ' . ($user->ban_reason ?? 'No reason provided')
+                'error' => 'Your account has been banned: '.($user->ban_reason ?? 'No reason provided'),
             ], 403);
         }
 

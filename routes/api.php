@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\CaseController;
+use App\Http\Middleware\VerifyDeveloperApiKey;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +25,7 @@ Route::get('/health', function () {
     }
 });
 
-Route::middleware(\App\Http\Middleware\VerifyDeveloperApiKey::class)->prefix('v1')->group(function () {
-    Route::get('/cases', [\App\Http\Controllers\Api\CaseController::class, 'index']);
-    Route::get('/cases/{id}', [\App\Http\Controllers\Api\CaseController::class, 'show']);
+Route::middleware(VerifyDeveloperApiKey::class)->prefix('v1')->group(function () {
+    Route::get('/cases', [CaseController::class, 'index']);
+    Route::get('/cases/{id}', [CaseController::class, 'show']);
 });

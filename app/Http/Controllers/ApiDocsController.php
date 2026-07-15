@@ -34,7 +34,7 @@ class ApiDocsController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $token = 'ohm_live_' . bin2hex(random_bytes(24));
+        $token = 'ohm_live_'.bin2hex(random_bytes(24));
 
         auth()->user()->apiKeys()->create([
             'key' => $token,
