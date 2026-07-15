@@ -5,6 +5,7 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import LoadingScreen from '@/Components/LoadingScreen.vue';
 import Toast from '@/Components/Toast.vue';
+import demoData from '@/Pages/Demo/Analytics/demo_data.json';
 import {
     Package,
     BarChart3,
@@ -14,7 +15,10 @@ import {
     Bell,
     LogOut,
     UserCircle,
-    ShoppingCart
+    ShoppingCart,
+    Database,
+    Briefcase,
+    Calendar
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -108,6 +112,57 @@ onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('mousemove', handleMouseMove);
 });
+
+// Calculate dataset breakdown from cases prop or fallback to demoData
+const datasetStats = computed(() => {
+    const rawCases = page.props.cases && page.props.cases.length > 0
+        ? page.props.cases
+        : demoData;
+
+    if (!rawCases || rawCases.length === 0) {
+        return {
+            total: 0,
+            employers: 0,
+            dateRange: 'N/A'
+        };
+    }
+
+    const total = rawCases.length;
+
+    // Unique employers count
+    const employersSet = new Set();
+    rawCases.forEach(c => {
+        if (c.employer) {
+            employersSet.add(c.employer.trim().toLowerCase());
+        }
+    });
+    const employers = employersSet.size;
+
+    // Get min & max years from award_date or hearing dates
+    let minYear = null;
+    let maxYear = null;
+    rawCases.forEach(c => {
+        const dateStr = c.award_date || c.hearing_start;
+        if (dateStr) {
+            const year = new Date(dateStr.split('T')[0]).getFullYear();
+            if (!isNaN(year)) {
+                if (minYear === null || year < minYear) minYear = year;
+                if (maxYear === null || year > maxYear) maxYear = year;
+            }
+        }
+    });
+
+    let dateRange = 'Unknown';
+    if (minYear !== null && maxYear !== null) {
+        dateRange = minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
+    }
+
+    return {
+        total,
+        employers,
+        dateRange
+    };
+});
 </script>
 
 <template>
@@ -172,7 +227,8 @@ onUnmounted(() => {
                             {{ user.first_name ? user.first_name.charAt(0) : '' }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-black uppercase tracking-widest text-white truncate">{{ user.first_name }} {{ user.last_name }}
+                            <p class="text-xs font-black uppercase tracking-widest text-white truncate">{{
+                                user.first_name }} {{ user.last_name }}
                             </p>
                             <p class="text-[10px] font-bold text-zinc-500 truncate uppercase">Pro Subscriber</p>
                         </div>
@@ -200,9 +256,62 @@ onUnmounted(() => {
                             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-admin-modern transition-colors">
                             <Search class="h-4 w-4" />
                         </div>
-                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
-                            placeholder="Type 'Analytics' or 'Products'..."
+                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text" placeholder="Search..."
                             class="block w-full pl-11 pr-4 py-2.5 bg-zinc-900/50 border border-white/5 text-sm text-white placeholder:text-zinc-600 rounded-xl focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50 transition-all outline-none" />
+                    </div>
+                </div>
+
+                <!-- Dataset Breakdown -->
+                <div
+                    class="hidden xl:flex items-center gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] shrink-0">
+                    <!-- Total Records -->
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Database class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total
+                                Records</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.total.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Unique Employers -->
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Briefcase class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.employers.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Date Range -->
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Calendar class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date
+                                Range</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.dateRange }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -291,7 +400,8 @@ onUnmounted(() => {
                             <button class="flex items-center group">
                                 <div
                                     class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden group-hover:border-admin-modern transition-all duration-300">
-                                    <img v-if="user.profile_photo_url" :src="user.profile_photo_url" :alt="user.first_name + ' ' + user.last_name"
+                                    <img v-if="user.profile_photo_url" :src="user.profile_photo_url"
+                                        :alt="user.first_name + ' ' + user.last_name"
                                         class="w-full h-full object-cover" />
                                     <div v-else
                                         class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-400">
@@ -347,5 +457,13 @@ onUnmounted(() => {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.text-admin-modern {
+    color: #ff8800;
+}
+
+.bg-admin-modern\/10 {
+    background-color: rgba(255, 136, 0, 0.1);
 }
 </style>
