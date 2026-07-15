@@ -63,14 +63,14 @@ class InitialSeeder extends Seeder
             ]
         );
 
-        Dataset::updateOrCreate(
-            ['slug' => 'labour-court'],
-            [
-                'name' => 'Labour Court Judgments',
-                'description' => 'Sanitized, structured Labour Court judgments with regular updates.',
-                'is_active' => true,
-            ]
-        );
+        // Dataset::updateOrCreate(
+        //     ['slug' => 'labour-court'],
+        //     [
+        //         'name' => 'Labour Court Judgments',
+        //         'description' => 'Sanitized, structured Labour Court judgments with regular updates.',
+        //         'is_active' => true,
+        //     ]
+        // );
 
         // 3.2 Digital Products (Persistent)
         Product::updateOrCreate(
