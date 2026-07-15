@@ -215,9 +215,11 @@ onMounted(() => {
                       style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
                       Dataset:</label>
                     <select id="dataset-tier-dataset" v-model="onceOffDataset"
-                      style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
-                      <option v-for="ds in datasets" :key="ds.value" :value="ds.value">{{ ds.label }}</option>
-                      <option value="all">All Datasets</option>
+                      style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--color-text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
+                      <option v-for="ds in datasets" :key="ds.value" :value="ds.value"
+                        style="background-color: #0a0a0f; color: var(--color-text-primary);">{{ ds.label }}</option>
+                      <option value="all" style="background-color: #0a0a0f; color: var(--color-text-primary);">All
+                        Datasets</option>
                     </select>
                   </div>
 
@@ -270,9 +272,11 @@ onMounted(() => {
                       style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
                       Dataset:</label>
                     <select id="dataset-tier-developer" v-model="developerDataset"
-                      style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
-                      <option v-for="ds in datasets" :key="ds.value" :value="ds.value">{{ ds.label }}</option>
-                      <option value="all">All Datasets</option>
+                      style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--color-text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
+                      <option v-for="ds in datasets" :key="ds.value" :value="ds.value"
+                        style="background-color: #0a0a0f; color: var(--color-text-primary);">{{ ds.label }}</option>
+                      <option value="all" style="background-color: #0a0a0f; color: var(--color-text-primary);">All
+                        Datasets</option>
                     </select>
                   </div>
 
@@ -428,8 +432,10 @@ onMounted(() => {
                 <div>
                   <strong>Managed Data Acquisition & Pipelines:</strong>
                   Build custom, automated extraction workflows tailored to your specific industry needs. Whether
-                  aggregating public web data, monitoring competitor pricing, or integrating fragmented internal databases, we
-                  handle the extraction, transformation, and secure routing of structured data directly into your private
+                  aggregating public web data, monitoring competitor pricing, or integrating fragmented internal
+                  databases, we
+                  handle the extraction, transformation, and secure routing of structured data directly into your
+                  private
                   ecosystem.
                 </div>
               </li>
