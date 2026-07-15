@@ -4,7 +4,7 @@ import { Link } from '@inertiajs/vue3'
 
 <template>
   <footer class="pt-20 pb-10 border-t border-white/5 text-center relative z-10">
-    <img src="/assets/images/8OHM_Logo.webp" class="h-8 mx-auto opacity-20 mb-8" />
+    <img src="/assets/images/8OHM_Logo.webp" alt="8OHM Logo" class="h-8 mx-auto opacity-20 mb-8" />
     <div class="text-zinc-700 text-[10px] font-black uppercase tracking-[0.5em]">
       © 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights reserved.
     </div>

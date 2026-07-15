@@ -8,6 +8,8 @@ import Toast from '@/Components/Toast.vue';
 defineProps({
     auth: Object,
     title: String,
+    description: String,
+    canonical: String,
 });
 
 const orb1 = ref(null);
@@ -41,7 +43,10 @@ onUnmounted(() => {
     <div
         class="min-h-screen bg-black text-white font-sans overflow-x-hidden scroll-smooth selection:bg-white selection:text-black relative">
 
-        <Head :title="title" />
+        <Head :title="title">
+            <meta head-key="description" name="description" :content="description || 'Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence'" />
+            <link v-if="canonical" head-key="canonical" rel="canonical" :href="canonical" />
+        </Head>
 
         <LoadingScreen />
         <Toast />

@@ -64,7 +64,7 @@ watch(isFilterDrawerOpen, (val) => {
 </script>
 
 <template>
-    <MainLayout :auth="auth" title="Services">
+    <MainLayout :auth="auth" title="Services" description="Explore 8OHM Technologies' data services, including CCMA and Labour Court datasets, Developer APIs, and Pro Analytics dashboards." canonical="https://8ohm.co.za/services">
 
 
         <div class="relative z-10">
@@ -233,7 +233,7 @@ watch(isFilterDrawerOpen, (val) => {
                                     <div
                                         class="absolute inset-0 bg-gradient-to-br from-zinc-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                                     </div>
-                                    <img :src="product.image"
+                                    <img :src="product.image" :alt="product.name + ' - South African Public Data Service logo'"
                                         class="w-full h-full object-contain relative z-10 transition-all duration-700 group-hover:scale-110 group-hover:-rotate-6 drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]" />
 
                                     <!-- Sale Badge -->

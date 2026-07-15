@@ -1,0 +1,31 @@
+# 8OHM Technologies
+
+8OHM Technologies is a South African public and legal data intelligence provider. We automate the extraction, cleansing, sanitization, and structuring of complex, unstable public data feeds—starting with CCMA arbitration awards and Labour Court judgments—to deliver clean, POPIA-compliant analytics and databases.
+
+## Core Offerings
+
+* **Once-off Datasets**: Curated bulk downloads of public legal data (CCMA, Labour Courts) in structured CSV format.
+* **Developer API**: REST API endpoints offering programmatic access to real-time CCMA and judicial case data.
+* **Pro Analytics**: A rich, visual, no-code dashboard allowing HR, legal, and operational professionals to track judicial decisions, arbitrator trends, and case outcomes.
+* **Managed Data Pipelines**: Bespoke ETL, scraping, and data pipeline integrations for proprietary enterprise systems.
+* **OhmBase (Open Source)**: Open-source initiative empowering individuals to self-host secure smart home architectures (reflecting our core value of digital sovereignty).
+
+## Key Public Routes & Sitemap
+
+* **Home (`/`)**: Main landing page presenting our core philosophy, product tiers, pricing, and FAQ.
+* **Services (`/services`)**: Paginated listing of public data products and subscriptions.
+* **Service Details (`/services/{id}`)**: Dedicated page for each specific offering (datasets, API plans, analytics, managed pipelines).
+* **Demo (`/demo`)**: Visual sandbox demonstrating the capabilities of the Pro Analytics dashboard.
+* **Privacy Policy (`/privacy-policy`)**: Detailed document explaining our strict data minimization and compliance under the Protection of Personal Information Act (POPIA).
+* **Terms & Conditions (`/terms`)**: Standard operational terms of service.
+* **Fair Usage (`/fair-usage`)**: Platform rate limiting and usage policy.
+* **Refund & Cancellation (`/refund-cancellation`)**: Guidelines for subscription and once-off data download transactions.
+
+## Technical Specifications
+
+* **Backend**: Laravel 12 (PHP 8.3)
+* **Frontend**: Inertia.js (v2), Vue 3, Pinia State Management
+* **Styling**: Tailwind CSS v4 & FlyonUI
+* **Database**: PostgreSQL (pgsql)
+* **Compliance**: Strictly compliant with the Protection of Personal Information Act (POPIA) of South Africa. Local data hosting within South Africa.
+* **Information Officer**: Mr. Tiaan Fourie

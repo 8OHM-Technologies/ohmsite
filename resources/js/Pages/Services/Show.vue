@@ -44,11 +44,33 @@ const addToCart = () => {
     cartStore.addItem(props.product.id, 1, {});
 };
 
+const metaDescription = computed(() => props.product.description || `Purchase ${props.product.name} from 8OHM Technologies. CCMA & Labour Court data solutions.`);
+const canonicalUrl = computed(() => `https://8ohm.co.za/services/${props.product.id}`);
 
+const schemaMarkup = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    'name': props.product.name,
+    'image': props.product.image ? (props.product.image.startsWith('http') ? props.product.image : `https://8ohm.co.za${props.product.image}`) : '',
+    'description': props.product.description || `Purchase ${props.product.name} from 8OHM Technologies.`,
+    'category': props.product.category?.name || 'Data Service',
+    'offers': {
+        '@type': 'Offer',
+        'price': Math.round(props.product.sale_price || props.product.price),
+        'priceCurrency': 'ZAR',
+        'availability': 'https://schema.org/InStock',
+        'url': `https://8ohm.co.za/services/${props.product.id}`
+    }
+}));
 </script>
 
 <template>
-    <MainLayout :auth="auth" :title="product.name">
+    <MainLayout :auth="auth" :title="product.name" :description="metaDescription" :canonical="canonicalUrl">
+        <Head>
+            <script type="application/ld+json">
+                {{ JSON.stringify(schemaMarkup) }}
+            </script>
+        </Head>
 
 
         <div class="relative z-10">
@@ -70,16 +92,16 @@ const addToCart = () => {
                         <button v-for="(img, idx) in allImages" :key="idx" @click="activeImage = img"
                             :class="activeImage === img ? 'border-white' : 'border-white/5 hover:border-white/20'"
                             class="w-full aspect-square bg-zinc-900 rounded-2xl border p-2 transition-all flex items-center justify-center overflow-hidden">
-                            <img :src="img" class="max-h-full object-contain" />
+                            <img :src="img" :alt="product.name + ' thumbnail ' + idx" class="max-h-full object-contain" />
                         </button>
                     </div>
 
                     <!-- Large Image -->
                     <div
                         class="flex-1 bg-zinc-900 rounded-[3rem] border border-white/5 flex items-center justify-center relative overflow-hidden group shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
-                        <img src="/assets/images/popular-bg.png"
+                        <img src="/assets/images/popular-bg.png" alt="" role="presentation"
                             class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-30 transition-all duration-1000 scale-150 group-hover:rotate-6" />
-                        <img :src="activeImage"
+                        <img :src="activeImage" :alt="product.name + ' service display image'"
                             class="max-h-[500px] object-contain relative z-10 drop-shadow-[0_30px_30px_rgba(0,0,0,0.7)] transform -rotate-[5deg] group-hover:rotate-0 transition-all duration-1000" />
                     </div>
                 </div>
@@ -164,9 +186,9 @@ const addToCart = () => {
                         <Link :href="route('services.show', related.id)" class="block">
                             <div
                                 class="aspect-square bg-zinc-900 rounded-[2.5rem] p-10 flex items-center justify-center relative overflow-hidden border border-white/5 group-hover:border-white/20 transition-all duration-700 shadow-2xl">
-                                <img src="/assets/images/popular-bg.png"
+                                <img src="/assets/images/popular-bg.png" alt="" role="presentation"
                                     class="absolute inset-0 w-full h-full object-cover opacity-5 group-hover:opacity-20 transition-all duration-700 scale-150 group-hover:rotate-12" />
-                                <img :src="related.image"
+                                <img :src="related.image" :alt="related.name + ' service display image'"
                                     class="h-32 object-contain relative z-10 transition-all duration-1000 group-hover:scale-110 group-hover:-rotate-12 drop-shadow-[0_20px_20px_rgba(0,0,0,0.5)]" />
                             </div>
                             <div class="px-2 mt-6 space-y-1 text-center">
