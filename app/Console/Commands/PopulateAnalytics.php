@@ -7,6 +7,7 @@ use App\Models\ExtractedData;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PopulateAnalytics extends Command
 {
@@ -173,7 +174,71 @@ class PopulateAnalytics extends Command
         $deletedCount = count($deletedIds);
         $this->info("Successfully processed {$processedCount} records. Deleted {$deletedCount} obsolete records.");
 
+        // Generate the CSV and JSON dataset files
+        $this->generateDatasetFiles();
+
         return self::SUCCESS;
+    }
+
+    /**
+     * Generate CSV and JSON dataset files from the current local Analytics model entries.
+     */
+    private function generateDatasetFiles(): void
+    {
+        $this->info('Generating CSV and JSON dataset files...');
+
+        $csvHeader = ['ID', 'Case Reference', 'Title', 'Employer', 'Employee', 'Court Location', 'Dismissal Reason', 'Outcome', 'Date Decision', 'Detail URL', 'Details Scraped At'];
+        $csvData = [];
+        $csvData[] = "\xEF\xBB\xBF".implode(',', array_map(fn ($h) => '"'.str_replace('"', '""', $h).'"', $csvHeader));
+
+        $jsonData = [];
+
+        $analytics = Analytics::all();
+        foreach ($analytics as $item) {
+            $row = [
+                $item->id,
+                $item->award_number,
+                $item->title,
+                $item->employer,
+                $item->employee,
+                $item->court_location,
+                $item->reason_for_dismissal,
+                $item->court,
+                $item->award_date ? $item->award_date->toDateString() : null,
+                $item->detail_url,
+                $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+            ];
+            $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
+
+            $jsonData[] = [
+                'id' => $item->id,
+                'case_reference' => $item->award_number,
+                'title' => $item->title,
+                'employer' => $item->employer,
+                'employee' => $item->employee,
+                'court_location' => $item->court_location,
+                'dismissal_reason' => $item->reason_for_dismissal,
+                'outcome' => $item->court,
+                'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
+                'detail_url' => $item->detail_url,
+                'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+            ];
+        }
+
+        $csvContent = implode("\n", $csvData);
+        $jsonContent = json_encode($jsonData, JSON_PRETTY_PRINT);
+
+        // Ensure datasets directory exists in local storage
+        if (! Storage::disk('local')->exists('datasets')) {
+            Storage::disk('local')->makeDirectory('datasets');
+        }
+
+        foreach (['ccma', 'all'] as $dataset) {
+            Storage::disk('local')->put("datasets/8ohm_{$dataset}_dataset.csv", $csvContent);
+            Storage::disk('local')->put("datasets/8ohm_{$dataset}_dataset.json", $jsonContent);
+        }
+
+        $this->info('Dataset files generated successfully.');
     }
 
     /**

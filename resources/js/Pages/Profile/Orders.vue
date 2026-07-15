@@ -155,15 +155,24 @@ const getFrequencyLabel = (value) => {
                                 <!-- Product Specific Action Links -->
                                 <template v-if="order.payment_status === 'paid'">
                                     <div v-if="item.product.name.toLowerCase().includes('once-off dataset')"
-                                        class="mt-3">
-                                        <a :href="route('downloads.dataset', { dataset: item.options?.dataset || 'all' })"
+                                        class="mt-3 flex gap-2 flex-wrap">
+                                        <a :href="route('downloads.dataset', { dataset: item.options?.dataset || 'all', format: 'csv' })"
                                             class="inline-flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-500 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
-                                            Download Dataset
+                                            Download CSV
+                                        </a>
+                                        <a :href="route('downloads.dataset', { dataset: item.options?.dataset || 'all', format: 'json' })"
+                                            class="inline-flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500 hover:text-black text-sky-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            Download JSON
                                         </a>
                                     </div>
                                     <div v-else-if="item.product.name.toLowerCase().includes('developer api')"

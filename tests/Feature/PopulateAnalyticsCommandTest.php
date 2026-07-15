@@ -4,8 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Analytics;
 use App\Models\BackupAnalytics;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -55,6 +59,7 @@ class PopulateAnalyticsCommandTest extends TestCase
 
     public function test_populates_indexed_data_correctly(): void
     {
+        Storage::fake('local');
         $targetId = $this->createTarget();
         $id = Str::uuid()->toString();
 
@@ -108,6 +113,12 @@ class PopulateAnalyticsCommandTest extends TestCase
         // Verify coeus record has processed_at set
         $record = DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->first();
         $this->assertNotNull($record->processed_at);
+
+        // Verify dataset files were generated
+        Storage::disk('local')->assertExists('datasets/8ohm_ccma_dataset.csv');
+        Storage::disk('local')->assertExists('datasets/8ohm_ccma_dataset.json');
+        Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.csv');
+        Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.json');
     }
 
     public function test_populates_detailed_data_correctly(): void
@@ -342,5 +353,53 @@ class PopulateAnalyticsCommandTest extends TestCase
         // Backup should contain the snapshot *before* this run (which was the 1 record from the first run)
         $this->assertEquals(1, BackupAnalytics::count());
         $this->assertEquals('Gumede v Mastercraft, KN39790', BackupAnalytics::first()->title);
+    }
+
+    public function test_user_can_download_dataset_in_both_formats(): void
+    {
+        Storage::fake('local');
+
+        // Create the dataset files in local storage
+        Storage::disk('local')->put('datasets/8ohm_ccma_dataset.csv', 'dummy csv');
+        Storage::disk('local')->put('datasets/8ohm_ccma_dataset.json', 'dummy json');
+
+        $user = User::factory()->create();
+
+        // Create product once-off-dataset and associate order/item to authorize access
+        $product = Product::factory()->create([
+            'slug' => 'once-off-dataset',
+            'name' => 'Once-off Dataset',
+            'price' => 5000,
+        ]);
+        $order = Order::create([
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'address' => '123 Street',
+            'city' => 'Johannesburg',
+            'country' => 'South Africa',
+            'phone' => '123456789',
+            'total_amount' => 5000,
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+        ]);
+        $order->items()->create([
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'unit_price' => 5000,
+        ]);
+
+        // Request CSV format
+        $responseCsv = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'ccma', 'format' => 'csv']));
+        $responseCsv->assertStatus(200);
+        $responseCsv->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $this->assertEquals('dummy csv', $responseCsv->streamedContent());
+
+        // Request JSON format
+        $responseJson = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'ccma', 'format' => 'json']));
+        $responseJson->assertStatus(200);
+        $responseJson->assertHeader('Content-Type', 'application/json');
+        $this->assertEquals('dummy json', $responseJson->streamedContent());
     }
 }
