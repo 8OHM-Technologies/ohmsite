@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import MainLayout from '@/Layouts/MainLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { 
     Key, 
     Copy, 
@@ -12,35 +12,54 @@ import {
     Layers, 
     ShieldCheck,
     ArrowRight,
-    RefreshCw
+    RefreshCw,
+    Trash2
 } from 'lucide-vue-next';
 
 defineProps({
-    auth: Object
+    auth: Object,
+    apiKeys: Array
 });
 
-const apiKey = ref('');
-const showKey = ref(false);
 const isGenerating = ref(false);
-const copied = ref(false);
 const activeTab = ref('curl');
+const copiedKey = ref('');
 
 const generateKey = () => {
     isGenerating.value = true;
-    setTimeout(() => {
-        const randomBytes = Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-        apiKey.value = `ohm_live_${randomBytes}`;
-        showKey.value = true;
-        isGenerating.value = false;
-    }, 800);
+    router.post(route('developer.api-keys.store'), {}, {
+        preserveScroll: true,
+        onFinish: () => {
+            isGenerating.value = false;
+        }
+    });
 };
 
-const copyToClipboard = () => {
-    navigator.clipboard.writeText(apiKey.value);
-    copied.value = true;
+const deleteKey = (id) => {
+    if (confirm('Are you sure you want to delete this API key? Requests using this key will immediately fail.')) {
+        router.delete(route('developer.api-keys.destroy', id), {
+            preserveScroll: true
+        });
+    }
+};
+
+const copyKey = (keyText) => {
+    navigator.clipboard.writeText(keyText);
+    copiedKey.value = keyText;
     setTimeout(() => {
-        copied.value = false;
+        if (copiedKey.value === keyText) {
+            copiedKey.value = '';
+        }
     }, 2000);
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 };
 
 const codeSnippets = {
@@ -118,25 +137,34 @@ print(response.json())`
                                     Authenticate your requests using Bearer tokens. Keep your keys secret and never share them or expose them in client-side code.
                                 </p>
 
-                                <div v-if="apiKey" class="bg-black/40 border border-white/5 rounded-2xl p-6 mb-6">
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Your API Key</p>
-                                    <div class="flex items-center justify-between gap-4 bg-zinc-900 border border-white/5 rounded-xl px-4 py-3.5 font-mono text-sm text-sky-400 overflow-x-auto whitespace-nowrap">
-                                        <span>{{ apiKey }}</span>
-                                        <button @click="copyToClipboard" class="p-1.5 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0">
-                                            <Check v-if="copied" class="w-4 h-4 text-emerald-400" />
-                                            <Copy v-else class="w-4 h-4 text-zinc-400 hover:text-white" />
-                                        </button>
-                                    </div>
-                                </div>
-
                                 <button 
                                     @click="generateKey" 
                                     :disabled="isGenerating"
-                                    class="inline-flex items-center gap-2 bg-white text-black hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-600 px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs transition-all active:scale-95"
+                                    class="inline-flex items-center gap-2 bg-white text-black hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-600 px-8 py-4 rounded-full font-black uppercase tracking-widest text-xs transition-all active:scale-95 mb-8"
                                 >
                                     <RefreshCw v-if="isGenerating" class="w-4 h-4 animate-spin" />
-                                    <span>{{ apiKey ? 'Regenerate API Key' : 'Generate API Key' }}</span>
+                                    <span>Generate API Key</span>
                                 </button>
+
+                                <!-- API Keys List -->
+                                <div v-if="apiKeys && apiKeys.length > 0" class="space-y-4 pt-6 border-t border-white/5">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Active API Keys</p>
+                                    <div v-for="keyObj in apiKeys" :key="keyObj.id" class="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between gap-4 bg-zinc-900 border border-white/5 rounded-xl px-4 py-3 font-mono text-xs text-sky-400 overflow-x-auto whitespace-nowrap">
+                                                <span>{{ keyObj.key }}</span>
+                                                <button @click="copyKey(keyObj.key)" class="p-1 hover:bg-white/5 rounded transition-colors flex-shrink-0 ml-auto">
+                                                    <Check v-if="copiedKey === keyObj.key" class="w-3.5 h-3.5 text-emerald-400" />
+                                                    <Copy v-else class="w-3.5 h-3.5 text-zinc-400 hover:text-white" />
+                                                </button>
+                                            </div>
+                                            <p class="text-[9px] text-zinc-500 mt-1.5 ml-1">Created {{ formatDate(keyObj.created_at) }}</p>
+                                        </div>
+                                        <button @click="deleteKey(keyObj.id)" class="p-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all border border-red-500/10 self-start sm:self-center flex-shrink-0">
+                                            <Trash2 class="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

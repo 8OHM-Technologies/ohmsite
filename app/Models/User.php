@@ -39,6 +39,7 @@ class User extends Authenticatable
         'company_name',
         'phone',
         'country',
+        'api_limit_override',
     ];
 
     public function isAdmin()
@@ -72,6 +73,7 @@ class User extends Authenticatable
             'is_vip' => 'boolean',
             'is_banned' => 'boolean',
             'subscribed_at' => 'datetime',
+            'api_limit_override' => 'integer',
         ];
     }
 
@@ -165,5 +167,59 @@ class User extends Authenticatable
         }
 
         return null;
+    }
+
+    /**
+     * Get the API keys associated with the user.
+     */
+    public function apiKeys(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApiKey::class);
+    }
+
+    /**
+     * Get the API calls made by the user.
+     */
+    public function apiCalls(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ApiCall::class);
+    }
+
+    /**
+     * Check if the user has access to the Developer API.
+     */
+    public function hasApiAccess(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        if ($this->api_limit_override !== null) {
+            return $this->api_limit_override > 0;
+        }
+
+        return $this->hasApiSubscriptionAccess() || $this->isSubscribed();
+    }
+
+    /**
+     * Get the user's monthly API call limit.
+     */
+    public function getApiCallLimit(): int
+    {
+        if ($this->api_limit_override !== null) {
+            return $this->api_limit_override;
+        }
+
+        $limit = 0;
+
+        if ($this->isSubscribed()) {
+            $limit += 3000;
+        }
+
+        if ($this->hasApiSubscriptionAccess()) {
+            $limit += 1000;
+        }
+
+        return $limit;
     }
 }

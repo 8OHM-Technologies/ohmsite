@@ -100,6 +100,8 @@ Route::middleware(['auth', 'verified', 'has.dataset.access'])->group(function ()
 
 Route::middleware(['auth', 'verified', 'has.api.access'])->group(function () {
     Route::get('/developer/docs', [ApiDocsController::class, 'index'])->name('developer.docs');
+    Route::post('/developer/api-keys', [ApiDocsController::class, 'store'])->name('developer.api-keys.store');
+    Route::delete('/developer/api-keys/{apiKey}', [ApiDocsController::class, 'destroy'])->name('developer.api-keys.destroy');
 });
 
 require __DIR__.'/auth.php';

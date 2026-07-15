@@ -29,7 +29,8 @@ const editForm = useForm({
     phone: props.customer.phone || '',
     company_name: props.customer.company_name || '',
     country: props.customer.country || '',
-    role: props.customer.role || 'customer'
+    role: props.customer.role || 'customer',
+    api_limit_override: props.customer.api_limit_override !== null && props.customer.api_limit_override !== undefined ? props.customer.api_limit_override : ''
 });
 
 const openEditModal = () => {
@@ -155,10 +156,9 @@ const updateOrderStatus = (orderId, status, paymentStatus) => {
                 </div>
             </div>
 
-            <!-- Extended Metadata Info Card -->
             <div class="bg-zinc-900/40 border border-white/5 rounded-[2.5rem] p-8 space-y-6">
                 <h3 class="text-lg font-black uppercase text-zinc-400 tracking-wider">Extended Profile Info</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 text-sm">
                     <div>
                         <span class="text-xs text-zinc-500 block">Phone</span>
                         <span class="font-bold text-white">{{ customer.phone || 'Not provided' }}</span>
@@ -177,6 +177,10 @@ const updateOrderStatus = (orderId, status, paymentStatus) => {
                             :class="customer.subscription_status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-zinc-500/10 text-zinc-400'">
                             {{ customer.subscription_status || 'Inactive' }}
                         </span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-zinc-500 block">API Limit Override</span>
+                        <span class="font-bold text-white">{{ customer.api_limit_override !== null ? customer.api_limit_override : 'None' }}</span>
                     </div>
                 </div>
             </div>
@@ -323,6 +327,12 @@ const updateOrderStatus = (orderId, status, paymentStatus) => {
                                 <option value="admin" class="bg-zinc-950">Admin</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">API Call Limit Override</label>
+                        <input v-model="editForm.api_limit_override" type="number" placeholder="e.g. 5000 (leave empty for default)"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:ring-1 focus:ring-admin-modern focus:border-admin-modern transition-all" />
                     </div>
 
                     <div class="flex gap-3 pt-4">

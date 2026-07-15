@@ -16,7 +16,7 @@ class ApiAccessMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->hasApiSubscriptionAccess()) {
+        if (auth()->check() && auth()->user()->hasApiAccess()) {
             return $next($request);
         }
 

@@ -22,3 +22,8 @@ Route::get('/health', function () {
         ], 500);
     }
 });
+
+Route::middleware(\App\Http\Middleware\VerifyDeveloperApiKey::class)->prefix('v1')->group(function () {
+    Route::get('/cases', [\App\Http\Controllers\Api\CaseController::class, 'index']);
+    Route::get('/cases/{id}', [\App\Http\Controllers\Api\CaseController::class, 'show']);
+});

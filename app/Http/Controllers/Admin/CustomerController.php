@@ -44,9 +44,10 @@ class CustomerController extends Controller
             'company_name' => 'nullable|string|max:255',
             'country' => 'nullable|string|max:255',
             'role' => 'required|string|in:customer,admin',
+            'api_limit_override' => 'nullable|integer|min:0',
         ]);
 
-        $customer->update($request->only([
+        $data = $request->only([
             'first_name',
             'last_name',
             'email',
@@ -54,7 +55,13 @@ class CustomerController extends Controller
             'company_name',
             'country',
             'role',
-        ]));
+        ]);
+
+        $data['api_limit_override'] = $request->input('api_limit_override') !== '' && $request->input('api_limit_override') !== null
+            ? (int) $request->input('api_limit_override')
+            : null;
+
+        $customer->update($data);
 
         return back()->with('success', 'Customer details updated successfully.');
     }
