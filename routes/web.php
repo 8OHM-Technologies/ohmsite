@@ -70,6 +70,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::patch('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::post('/customers/{customer}/orders', [CustomerController::class, 'createOrder'])->name('customers.create-order');
     Route::post('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
     Route::post('/customers/{customer}/toggle-vip', [CustomerController::class, 'toggleVip'])->name('customers.toggle-vip');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');

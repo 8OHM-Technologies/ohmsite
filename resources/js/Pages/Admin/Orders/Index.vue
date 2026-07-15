@@ -68,12 +68,34 @@ const getStatusColor = (status) => {
     }
 };
 
+const getPaymentStatusColor = (status) => {
+    if (!status) return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
+    switch (status.toLowerCase()) {
+        case 'paid': return 'bg-green-400/10 text-green-400 border-green-400/20';
+        case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
+        case 'failed': return 'bg-red-400/10 text-red-400 border-red-400/20';
+        default: return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
+    }
+};
+
 const updateOrderStatus = (newStatus) => {
     router.patch(route('admin.orders.update-status', selectedOrder.value.id), {
-        status: newStatus
+        status: newStatus,
+        payment_status: selectedOrder.value.payment_status || 'pending'
     }, {
         onSuccess: () => {
             selectedOrder.value.status = newStatus;
+        }
+    });
+};
+
+const updateOrderPaymentStatus = (newPaymentStatus) => {
+    router.patch(route('admin.orders.update-status', selectedOrder.value.id), {
+        status: selectedOrder.value.status,
+        payment_status: newPaymentStatus
+    }, {
+        onSuccess: () => {
+            selectedOrder.value.payment_status = newPaymentStatus;
         }
     });
 };
@@ -237,7 +259,7 @@ const updateOrderStatus = (newStatus) => {
 
                     <div class="space-y-10">
                         <!-- Quick Stats -->
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <div class="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5">
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total
                                     Amount</p>
@@ -250,6 +272,14 @@ const updateOrderStatus = (newStatus) => {
                                 <div :class="getStatusColor(selectedOrder.status)"
                                     class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border mt-1">
                                     {{ selectedOrder.status }}
+                                </div>
+                            </div>
+                            <div class="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5">
+                                <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Payment
+                                    Status</p>
+                                <div :class="getPaymentStatusColor(selectedOrder.payment_status)"
+                                    class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border mt-1">
+                                    {{ selectedOrder.payment_status || 'pending' }}
                                 </div>
                             </div>
                         </div>
@@ -300,12 +330,23 @@ const updateOrderStatus = (newStatus) => {
                             <div class="grid grid-cols-3 gap-2">
                                 <button v-for="s in ['Active', 'Completed', 'Expired']" :key="s"
                                     @click="updateOrderStatus(s.toLowerCase())"
-                                    class="py-3 px-4 bg-white/5 hover:bg-admin-modern hover:text-black rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all border border-white/5">
+                                    :class="selectedOrder.status === s.toLowerCase() ? 'bg-admin-modern text-black font-black' : 'bg-white/5 text-white hover:bg-white/10'"
+                                    class="py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5">
                                     {{ s }}
                                 </button>
                             </div>
 
-                            <div class="flex gap-4">
+                            <h4 class="text-xs font-black text-white uppercase tracking-widest pt-2">Update Payment Status</h4>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button v-for="p in ['Paid', 'Pending', 'Failed']" :key="p"
+                                    @click="updateOrderPaymentStatus(p.toLowerCase())"
+                                    :class="selectedOrder.payment_status === p.toLowerCase() ? 'bg-admin-modern text-black font-black' : 'bg-white/5 text-white hover:bg-white/10'"
+                                    class="py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/5">
+                                    {{ p }}
+                                </button>
+                            </div>
+
+                            <div class="flex gap-4 pt-4">
                                 <button
                                     class="flex-1 py-4 px-6 bg-white text-black rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-200 transition-all">
                                     Print Invoice

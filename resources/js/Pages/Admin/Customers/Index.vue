@@ -92,6 +92,7 @@ const getStatusLabel = (customer) => {
                             <th class="p-6">Email</th>
                             <th class="p-6 text-center">Orders</th>
                             <th class="p-6 text-center">Spent</th>
+                            <th class="p-6 text-center">Subscription</th>
                             <th class="p-6 text-center">Status</th>
                             <th class="p-6 text-right">Actions</th>
                         </tr>
@@ -111,6 +112,16 @@ const getStatusLabel = (customer) => {
                             <td class="p-6 text-zinc-400 text-sm">{{ customer.email }}</td>
                             <td class="p-6 text-center text-zinc-400 font-medium">{{ customer.orders_count || 0 }}</td>
                             <td class="p-6 text-center text-white font-black">{{ formatPrice(customer.total_spent) }}
+                            </td>
+                            <td class="p-6 text-center">
+                                <span v-if="customer.subscription_status === 'active'"
+                                    class="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                    Active
+                                </span>
+                                <span v-else
+                                    class="px-3 py-1 bg-zinc-500/10 text-zinc-500 border border-zinc-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                    None
+                                </span>
                             </td>
                             <td class="p-6 text-center">
                                 <span :class="getStatusClass(customer)"
