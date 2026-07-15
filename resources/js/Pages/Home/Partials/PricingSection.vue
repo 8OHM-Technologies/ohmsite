@@ -57,7 +57,7 @@ const developerProduct = computed(() => {
 });
 
 const analyticsProduct = computed(() => {
-  return props.products?.find(p => p.slug === 'analytics-dashboard') || {};
+  return props.products?.find(p => p.slug === 'pro-analytics') || {};
 });
 
 const pipelineProduct = computed(() => {
@@ -139,7 +139,7 @@ const handleSubscribeDeveloper = () => {
 };
 
 const handleSubscribeAnalytics = () => {
-  const id = getProductId('analytics-dashboard');
+  const id = getProductId('pro-analytics');
   if (!id) return;
   addToCart(id, {
     frequency: frequency.value.value

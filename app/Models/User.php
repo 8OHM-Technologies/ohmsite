@@ -100,7 +100,7 @@ class User extends Authenticatable
         return $this->orders()
             ->where('payment_status', 'paid')
             ->whereHas('items.product', function ($query) {
-                $query->where('slug', 'analytics-dashboard');
+                $query->where('slug', 'pro-analytics');
             })
             ->exists();
     }

@@ -79,7 +79,7 @@ class HomeController extends Controller
             $products = Product::whereIn('slug', [
                 'once-off-dataset',
                 'developer-api',
-                'analytics-dashboard',
+                'pro-analytics',
                 'managed-data-pipeline',
             ])->get();
 

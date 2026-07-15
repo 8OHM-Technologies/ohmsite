@@ -14,18 +14,18 @@ return [
 
     'plans' => [
         'developer-api' => [
-            'monthly' => env('PAYSTACK_PLAN_DEV_API_MONTHLY', 'PLN_6boiths7ayehqxk'),
-            'annually' => env('PAYSTACK_PLAN_DEV_API_ANNUALLY', 'PLN_skqc1pit99d1qrw'),
+            'monthly' => env('PAYSTACK_PLAN_DEV_API_MONTHLY'),
+            'annually' => env('PAYSTACK_PLAN_DEV_API_ANNUALLY'),
         ],
-        'analytics-dashboard' => [
-            'monthly' => env('PAYSTACK_PLAN_ANALYTICS_MONTHLY', 'PLN_q8f4zhybxlk9efv'),
-            'annually' => env('PAYSTACK_PLAN_ANALYTICS_ANNUALLY', 'PLN_4f8wx4z1zz68ck2'),
+        'pro-analytics' => [
+            'monthly' => env('PAYSTACK_PLAN_ANALYTICS_MONTHLY'),
+            'annually' => env('PAYSTACK_PLAN_ANALYTICS_ANNUALLY'),
         ],
         'managed-data-pipeline' => [
-            'quarterly' => env('PAYSTACK_PLAN_PIPELINE_QUARTERLY', 'PLN_nhjogt30eluzplc'),
-            'biannually' => env('PAYSTACK_PLAN_PIPELINE_BIANNUALLY', 'PLN_rxqrqcutqngi07y'),
-            'annually' => env('PAYSTACK_PLAN_PIPELINE_ANNUALLY', 'PLN_gcwm81fcaj87woy'),
-            'monthly' => env('PAYSTACK_PLAN_PIPELINE_MONTHLY', 'PLN_gcwm81fcaj87woy'),
+            'quarterly' => env('PAYSTACK_PLAN_PIPELINE_QUARTERLY'),
+            'biannually' => env('PAYSTACK_PLAN_PIPELINE_BIANNUALLY'),
+            'annually' => env('PAYSTACK_PLAN_PIPELINE_ANNUALLY'),
+            'monthly' => env('PAYSTACK_PLAN_PIPELINE_MONTHLY'),
         ],
     ],
 ];

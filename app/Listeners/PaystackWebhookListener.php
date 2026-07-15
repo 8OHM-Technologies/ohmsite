@@ -42,7 +42,7 @@ class PaystackWebhookListener
                         $order->load('items.product');
                         foreach ($order->items as $item) {
                             $product = $item->product;
-                            if (in_array($product->slug, ['developer-api', 'analytics-dashboard', 'managed-data-pipeline'])) {
+                            if (in_array($product->slug, ['developer-api', 'pro-analytics', 'managed-data-pipeline'])) {
                                 $user->update([
                                     'subscription_status' => 'active',
                                     'subscribed_at' => now(),

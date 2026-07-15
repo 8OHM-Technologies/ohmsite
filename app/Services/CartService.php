@@ -194,7 +194,7 @@ class CartService
         }
 
         // Analytics Dashboard
-        if ($product->slug === 'analytics-dashboard') {
+        if ($product->slug === 'pro-analytics') {
             $frequency = $options['frequency'] ?? 'monthly';
             $base = (float) $product->price;
 

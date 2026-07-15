@@ -50,9 +50,9 @@ const getFrequencyLabel = (value) => {
     <MainLayout :auth="auth" title="My Orders">
         <div class="max-w-7xl mx-auto">
             <div class="mb-16">
-                <h1 class="text-7xl font-black uppercase tracking-tighter text-white leading-none">My Orders</h1>
-                <p class="text-zinc-500 font-black uppercase tracking-widest text-xs mt-4">Track and manage your recent
-                    purchases</p>
+                <h1 class="text-7xl font-black uppercase tracking-tighter text-white leading-none">My Services</h1>
+                <p class="text-zinc-500 font-black uppercase tracking-widest text-xs mt-4">Manage your subscriptions or
+                    download once-off dataset purchases.</p>
             </div>
 
             <div v-if="orders.length === 0" class="text-center py-20 bg-zinc-900 rounded-[3rem] border border-white/5">
@@ -111,9 +111,11 @@ const getFrequencyLabel = (value) => {
                                 <h4 class="text-sm font-bold text-white truncate">{{ item.product.name }}</h4>
                                 <p class="text-xs text-zinc-500 mt-1 uppercase tracking-tighter">
                                     Qty: {{ item.quantity }}
+                                    <br>
                                     <template v-if="item.options?.dataset">
                                         • Dataset: {{ getDatasetLabel(item.options.dataset) }}
                                     </template>
+                                    <br>
                                     <template v-if="item.options?.frequency">
                                         • Billing: {{ getFrequencyLabel(item.options.frequency) }}
                                     </template>
@@ -123,26 +125,38 @@ const getFrequencyLabel = (value) => {
 
                                 <!-- Product Specific Action Links -->
                                 <template v-if="order.payment_status === 'paid'">
-                                    <div v-if="item.product.name.toLowerCase().includes('once-off dataset')" class="mt-3">
-                                        <a :href="route('downloads.dataset', { dataset: item.options?.dataset || 'all' })" class="inline-flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-500 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    <div v-if="item.product.name.toLowerCase().includes('once-off dataset')"
+                                        class="mt-3">
+                                        <a :href="route('downloads.dataset', { dataset: item.options?.dataset || 'all' })"
+                                            class="inline-flex items-center gap-1.5 bg-amber-500/10 hover:bg-amber-500 hover:text-black text-amber-500 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
                                             Download Dataset
                                         </a>
                                     </div>
-                                    <div v-else-if="item.product.name.toLowerCase().includes('developer api')" class="mt-3">
-                                        <Link :href="route('developer.docs')" class="inline-flex items-center gap-1.5 bg-sky-400/10 hover:bg-sky-400 hover:text-black text-sky-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    <div v-else-if="item.product.name.toLowerCase().includes('developer api')"
+                                        class="mt-3">
+                                        <Link :href="route('developer.docs')"
+                                            class="inline-flex items-center gap-1.5 bg-sky-400/10 hover:bg-sky-400 hover:text-black text-sky-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                             </svg>
                                             API Documentation
                                         </Link>
                                     </div>
-                                    <div v-else-if="item.product.name.toLowerCase().includes('analytics dashboard') || item.product.name.toLowerCase().includes('pro analytics')" class="mt-3">
-                                        <Link :href="route('pro-dashboard.index')" class="inline-flex items-center gap-1.5 bg-emerald-400/10 hover:bg-emerald-400 hover:text-black text-emerald-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                                    <div v-else-if="item.product.name.toLowerCase().includes('analytics dashboard') || item.product.name.toLowerCase().includes('pro analytics')"
+                                        class="mt-3">
+                                        <Link :href="route('pro-dashboard.index')"
+                                            class="inline-flex items-center gap-1.5 bg-emerald-400/10 hover:bg-emerald-400 hover:text-black text-emerald-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
                                             </svg>
                                             Access Pro Analytics
                                         </Link>

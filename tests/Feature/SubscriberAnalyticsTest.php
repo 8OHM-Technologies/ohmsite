@@ -17,7 +17,7 @@ class SubscriberAnalyticsTest extends TestCase
     {
         $product = Product::factory()->create([
             'name' => 'Analytics Dashboard',
-            'slug' => 'analytics-dashboard',
+            'slug' => 'pro-analytics',
         ]);
         $order = Order::create([
             'user_id' => $user->id,

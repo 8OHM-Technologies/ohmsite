@@ -20,7 +20,7 @@ class PaymentController extends Controller
 
         foreach ($order->items as $item) {
             $product = $item->product;
-            if (in_array($product->slug, ['developer-api', 'analytics-dashboard', 'managed-data-pipeline'])) {
+            if (in_array($product->slug, ['developer-api', 'pro-analytics', 'managed-data-pipeline'])) {
                 $hasSubscription = true;
                 $frequency = $item->options['frequency'] ?? 'monthly';
                 $planCode = config("paystack.plans.{$product->slug}.{$frequency}");
@@ -44,7 +44,11 @@ class PaymentController extends Controller
             $params['plan'] = $planCode;
         }
 
-        $response = Transaction::initialize($params);
+        try {
+            $response = Transaction::initialize($params);
+        } catch (\Throwable $e) {
+            return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack: ' . $e->getMessage());
+        }
 
         if (isset($response['status']) && $response['status'] === true) {
             // Save reference to the order
@@ -71,7 +75,11 @@ class PaymentController extends Controller
             return redirect()->route('orders.index')->with('error', 'No reference returned.');
         }
 
-        $response = Transaction::verify($reference);
+        try {
+            $response = Transaction::verify($reference);
+        } catch (\Throwable $e) {
+            return redirect()->route('orders.index')->with('error', 'Payment verification failed: ' . $e->getMessage());
+        }
 
         if (isset($response['data']['status']) && $response['data']['status'] === 'success') {
             $order = Order::where('payment_reference', $reference)->firstOrFail();
@@ -89,7 +97,7 @@ class PaymentController extends Controller
                     $order->load('items.product');
                     foreach ($order->items as $item) {
                         $product = $item->product;
-                        if (in_array($product->slug, ['developer-api', 'analytics-dashboard', 'managed-data-pipeline'])) {
+                        if (in_array($product->slug, ['developer-api', 'pro-analytics', 'managed-data-pipeline'])) {
                             $user->update([
                                 'subscription_status' => 'active',
                                 'subscribed_at' => now(),

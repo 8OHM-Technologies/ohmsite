@@ -98,7 +98,7 @@ flowchart TD
 | **Middleware** | `has.api.access` → [ApiAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/ApiAccessMiddleware.php) |
 | **Protected resource** | `GET /developer/docs` → [ApiDocsController::index](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/ApiDocsController.php) → [Developer/Docs.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Developer/Docs.vue) |
 
-#### Pro Analytics Subscription (`slug: analytics-dashboard`)
+#### Pro Analytics Subscription (`slug: pro-analytics`)
 
 | Aspect | Detail |
 |--------|--------|

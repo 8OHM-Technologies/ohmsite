@@ -111,7 +111,7 @@ class InitialSeeder extends Seeder
         );
 
         Product::updateOrCreate(
-            ['slug' => 'analytics-dashboard'],
+            ['slug' => 'pro-analytics'],
             [
                 'name' => 'Pro Analytics',
                 'description' => 'No code required. Access to trends and insights through our analytics platform.',

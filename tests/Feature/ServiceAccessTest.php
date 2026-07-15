@@ -17,7 +17,7 @@ class ServiceAccessTest extends TestCase
         $slug = match ($productName) {
             'Once-off Dataset' => 'once-off-dataset',
             'Developer API' => 'developer-api',
-            'Analytics Dashboard' => 'analytics-dashboard',
+            'Analytics Dashboard' => 'pro-analytics',
             'Managed Data Pipeline' => 'managed-data-pipeline',
             default => str($productName)->slug()->toString(),
         };
