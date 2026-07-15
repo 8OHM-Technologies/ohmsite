@@ -13,7 +13,8 @@ const activeTab = ref('profile');
 const user = usePage().props.auth.user;
 
 const profileForm = useForm({
-    name: user.name,
+    first_name: user.first_name,
+    last_name: user.last_name,
     email: user.email,
     language: props.settings.platform?.language || 'English',
 });
@@ -97,7 +98,7 @@ const tabs = [
                                 <div class="relative group">
                                     <div
                                         class="w-24 h-24 rounded-[2rem] bg-zinc-800 flex items-center justify-center font-black text-3xl text-white border border-white/10 overflow-hidden shadow-2xl">
-                                        <span v-if="!user.profile_photo_url">{{ user.name.charAt(0) }}</span>
+                                        <span v-if="!user.profile_photo_url">{{ user.first_name ? user.first_name.charAt(0) : '' }}</span>
                                         <img v-else :src="user.profile_photo_url" class="w-full h-full object-cover" />
                                     </div>
                                     <button
@@ -106,7 +107,7 @@ const tabs = [
                                     </button>
                                 </div>
                                 <div>
-                                    <h3 class="text-2xl font-black text-white uppercase tracking-tight">{{ user.name }}
+                                    <h3 class="text-2xl font-black text-white uppercase tracking-tight">{{ user.first_name }} {{ user.last_name }}
                                     </h3>
                                     <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-1">{{
                                         user.email }}</p>
@@ -120,9 +121,16 @@ const tabs = [
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div class="space-y-3">
                                         <label
-                                            class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] ml-1">Full
-                                            Identity</label>
-                                        <input type="text" v-model="profileForm.name"
+                                            class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] ml-1">First
+                                            Name</label>
+                                        <input type="text" v-model="profileForm.first_name"
+                                            class="w-full bg-black/40 border-white/5 rounded-2xl py-4 px-6 text-white focus:ring-1 focus:ring-admin-modern/40 transition-all font-bold" />
+                                    </div>
+                                    <div class="space-y-3">
+                                        <label
+                                            class="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] ml-1">Last
+                                            Name</label>
+                                        <input type="text" v-model="profileForm.last_name"
                                             class="w-full bg-black/40 border-white/5 rounded-2xl py-4 px-6 text-white focus:ring-1 focus:ring-admin-modern/40 transition-all font-bold" />
                                     </div>
                                     <div class="space-y-3">

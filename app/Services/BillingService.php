@@ -15,14 +15,10 @@ class BillingService
     {
         // 1. Ensure user has a Paystack customer code
         if (! $user->paystack_customer_code) {
-            $nameParts = explode(' ', $user->name, 2);
-            $firstName = $nameParts[0] ?? '';
-            $lastName = $nameParts[1] ?? '';
-
             $customerRes = Customer::create([
                 'email' => $user->email,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
             ]);
 
             if (isset($customerRes['data']['customer_code'])) {

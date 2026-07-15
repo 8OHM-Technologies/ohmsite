@@ -103,9 +103,9 @@ const getStatusLabel = (customer) => {
                                 <div class="flex items-center gap-3">
                                     <div
                                         class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-black text-xs text-white uppercase border border-white/5">
-                                        {{ (customer.name || 'U').charAt(0) }}
+                                        {{ (customer.first_name || 'U').charAt(0) }}
                                     </div>
-                                    <span class="font-bold text-white">{{ customer.name }}</span>
+                                    <span class="font-bold text-white">{{ customer.first_name }} {{ customer.last_name }}</span>
                                 </div>
                             </td>
                             <td class="p-6 text-zinc-400 text-sm">{{ customer.email }}</td>

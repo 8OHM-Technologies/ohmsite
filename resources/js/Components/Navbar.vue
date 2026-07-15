@@ -189,12 +189,11 @@ const getHref = (link) => {
                                         class="w-8 h-8 bg-zinc-800 border border-white/10 rounded-full flex items-center justify-center overflow-hidden">
                                         <img v-if="auth.user.profile_photo_url" :src="auth.user.profile_photo_url"
                                             class="w-full h-full object-cover" />
-                                        <span v-else class="text-[11px] font-black">{{ auth.user.name.charAt(0)
-                                        }}</span>
+                                        <span v-else class="text-[11px] font-black">{{ auth.user.first_name ? auth.user.first_name.charAt(0) : '' }}</span>
                                     </div>
                                     <span
                                         class="hidden sm:inline-block text-[11px] font-black tracking-widest uppercase text-zinc-300">{{
-                                            auth.user.name }}</span>
+                                            auth.user.first_name }} {{ auth.user.last_name }}</span>
                                 </button>
                             </template>
                             <template #content>
@@ -308,11 +307,11 @@ const getHref = (link) => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-black">
-                                {{ auth.user.name.charAt(0) }}
+                                {{ auth.user.first_name ? auth.user.first_name.charAt(0) : '' }}
                             </div>
                             <div>
                                 <p class="text-[11px] font-black uppercase tracking-widest text-white">{{
-                                    auth.user.name }}
+                                    auth.user.first_name }} {{ auth.user.last_name }}
                                 </p>
                                 <p class="text-[11px] font-bold uppercase tracking-widest text-zinc-600 mt-0.5">My
                                     Account

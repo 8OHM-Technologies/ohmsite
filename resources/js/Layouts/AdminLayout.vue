@@ -166,10 +166,10 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                         class="bg-zinc-900/40 rounded-2xl p-3 flex items-center gap-3 border border-white/5 hover:bg-zinc-900/60 transition-colors group cursor-pointer">
                         <div
                             class="w-10 h-10 rounded-xl bg-gradient-to-br from-admin-modern to-emerald-500 flex items-center justify-center font-bold text-black shadow-lg shadow-admin-modern/10">
-                            {{ user.name.charAt(0) }}
+                            {{ user.first_name ? user.first_name.charAt(0) : '' }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-black uppercase tracking-widest text-white truncate">{{ user.name }}
+                            <p class="text-xs font-black uppercase tracking-widest text-white truncate">{{ user.first_name }} {{ user.last_name }}
                             </p>
                             <p class="text-[10px] font-bold text-zinc-500 truncate uppercase">{{ user.role }}</p>
                         </div>
@@ -298,7 +298,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                             <button class="flex items-center group">
                                 <div
                                     class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden group-hover:border-admin-modern transition-all duration-300">
-                                    <img v-if="user.profile_photo_url" :src="user.profile_photo_url" :alt="user.name"
+                                    <img v-if="user.profile_photo_url" :src="user.profile_photo_url" :alt="user.first_name + ' ' + user.last_name"
                                         class="w-full h-full object-cover" />
                                     <div v-else
                                         class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-400">
@@ -310,7 +310,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
                         <template #content>
                             <div class="px-4 py-3 border-b border-white/5 lg:hidden">
-                                <p class="text-xs font-bold text-white">{{ user.name }}</p>
+                                <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}</p>
                                 <p class="text-[10px] text-zinc-500 truncate">{{ user.email }}</p>
                             </div>
                             <DropdownLink :href="route('profile.edit')"> Profile Settings </DropdownLink>

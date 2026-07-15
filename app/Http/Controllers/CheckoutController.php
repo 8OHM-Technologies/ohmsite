@@ -76,7 +76,6 @@ class CheckoutController extends Controller
                     'company_name' => $request->company_name,
                     'phone' => $request->phone,
                     'country' => $request->country,
-                    'name' => $request->first_name.' '.$request->last_name,
                 ]);
             }
 

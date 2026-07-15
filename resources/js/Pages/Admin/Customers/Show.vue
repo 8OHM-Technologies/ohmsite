@@ -18,7 +18,7 @@ const formatDate = (dateString) => {
 
 <template>
 
-    <Head :title="'Customer: ' + customer.name" />
+    <Head :title="'Customer: ' + customer.first_name + ' ' + customer.last_name" />
     <AdminLayout>
         <div class="p-10 space-y-10">
             <!-- Header -->
@@ -32,7 +32,7 @@ const formatDate = (dateString) => {
                         </svg>
                     </Link>
                     <div>
-                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase">{{ customer.name }}</h1>
+                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase">{{ customer.first_name }} {{ customer.last_name }}</h1>
                         <p class="text-zinc-500 font-medium">{{ customer.email }} • Joined {{
                             formatDate(customer.created_at) }}</p>
                     </div>

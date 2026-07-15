@@ -130,7 +130,6 @@ class CheckoutTest extends TestCase
         $user->refresh();
         $this->assertSame('John', $user->first_name);
         $this->assertSame('Doe', $user->last_name);
-        $this->assertSame('John Doe', $user->name);
         $this->assertSame('Acme Inc', $user->company_name);
         $this->assertSame('0211234567', $user->phone);
         $this->assertSame('South Africa', $user->country);

@@ -168,11 +168,11 @@ const updateOrderStatus = (newStatus) => {
                                     <div class="flex items-center gap-3">
                                         <div
                                             class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center font-bold text-xs text-zinc-400">
-                                            {{ order.user?.name.charAt(0) }}
+                                            {{ order.user?.first_name ? order.user.first_name.charAt(0) : '' }}
                                         </div>
                                         <p
                                             class="text-sm font-bold text-white group-hover:text-admin-modern transition-colors">
-                                            {{ order.user?.name }}</p>
+                                            {{ order.user ? order.user.first_name + ' ' + order.user.last_name : 'Guest User' }}</p>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6 text-sm text-zinc-400">
@@ -261,7 +261,7 @@ const updateOrderStatus = (newStatus) => {
                                     class="text-xs font-black text-white uppercase tracking-widest border-b border-white/5 pb-2">
                                     Customer Info</h4>
                                 <div class="space-y-2">
-                                    <p class="text-sm font-bold text-white">{{ selectedOrder.user?.name }}</p>
+                                    <p class="text-sm font-bold text-white">{{ selectedOrder.user ? selectedOrder.user.first_name + ' ' + selectedOrder.user.last_name : (selectedOrder.first_name ? selectedOrder.first_name + ' ' + selectedOrder.last_name : 'Guest User') }}</p>
                                     <p class="text-xs text-zinc-400">{{ selectedOrder.user?.email }}</p>
                                     <p class="text-xs text-zinc-400">{{ selectedOrder.phone || 'No phone provided' }}
                                     </p>

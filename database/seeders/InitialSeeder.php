@@ -20,7 +20,7 @@ class InitialSeeder extends Seeder
             [
                 'first_name' => 'Tiaan',
                 'last_name' => 'Fourie',
-                'password' => Hash::make(env('ADMIN_EMAIL')),
+                'password' => Hash::make(env('ADMIN_PASSWORD')),
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ]
