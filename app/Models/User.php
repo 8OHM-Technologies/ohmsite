@@ -154,4 +154,16 @@ class User extends Authenticatable
 
         return route('profile.edit');
     }
+
+    /**
+     * Route notifications for the Telegram channel.
+     */
+    public function routeNotificationForTelegraph($notification): ?string
+    {
+        if ($this->isAdmin()) {
+            return config('telegraph.chat_id') ?? env('TELEGRAM_CHAT_ID');
+        }
+
+        return null;
+    }
 }

@@ -52,9 +52,21 @@ class PaystackWebhookListener
                         }
                     }
 
+                    // Notify Admins
+                    $admins = \App\Models\User::where('role', 'admin')->get();
+                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentCompleted($order));
+
                     Log::info("Order #{$order->id} marked as completed via webhook.");
                 }
             }
+        }
+
+        if ($eventType === 'charge.failed') {
+            $reference = $data['reference'] ?? null;
+            $order = $reference ? Order::where('payment_reference', $reference)->first() : null;
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            $msg = $data['gateway_response'] ?? 'Charge failed';
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\PaymentFailedOrError($order, 'Paystack Charge Failed Webhook', $msg));
         }
     }
 }
