@@ -1,0 +1,348 @@
+name: 8OHM.CO.ZA - PRODUCTION VPS DEPLOY
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # 1. Detect which Docker images actually need rebuilding
+  detect-changes:
+    runs-on: ubuntu-latest
+    environment: vps-prod
+    outputs:
+      any_image_changed: ${{ steps.filter.outputs.app == 'true' || steps.filter.outputs.web == 'true' }}
+      app_changed: ${{ steps.filter.outputs.app }}
+      web_changed: ${{ steps.filter.outputs.web }}
+      msg_id: ${{ steps.telegram-start.outputs.msg_id }}
+    steps:
+      - name: Notify on Workflow Start
+        id: telegram-start
+        run: |
+          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "parse_mode=HTML" \
+            -d "text=🧨 STARTED ${{github.workflow}} 🧨 %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a>  %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>")
+
+          MSG_ID=$(echo "$RESPONSE" | jq '.result.message_id')
+          echo "msg_id=$MSG_ID" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Check for per-image file changes
+        uses: dorny/paths-filter@f3ceefdc7ef57bc2d8560787d4b6c33e44044cec
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'Dockerfile'
+              - 'app/**'
+              - 'bootstrap/**'
+              - 'config/**'
+              - 'database/**'
+              - 'resources/**'
+              - 'routes/**'
+              - 'composer.*'
+              - 'package*.json'
+              - 'vite.config.js'
+              - 'docker-compose*.yml'
+              - '.github/workflows/deploy.yml'
+            web:
+              - 'Dockerfile.web'
+              - 'docker/nginx/**'
+              - 'resources/**'
+              - 'public/**'
+              - 'package*.json'
+              - 'vite.config.js'
+              - 'docker-compose*.yml'
+              - '.github/workflows/deploy.yml'
+
+  # 2. Run PHP/Laravel and Frontend Tests in Parallel
+  laravel-tests:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    environment: vps-prod
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
+          coverage: xdebug
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Generate key
+        run: php artisan key:generate
+      - name: Directory Permissions
+        run: chmod -R 777 storage bootstrap/cache
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+      - name: Execute tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan test
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ LARAVEL TESTS FAILED ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FAILED ${{github.workflow}} ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+  frontend-tests:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    environment: vps-prod
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install Dependencies
+        run: npm install
+      - name: Build
+        run: |
+          rm -rf public/build
+          npm run build
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FRONTEND TESTS FAILED ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FAILED ${{github.workflow}} ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+  # 3. Build and Push only images with detected changes
+  build-and-push:
+    needs: [detect-changes, laravel-tests, frontend-tests]
+    if: ${{ needs.detect-changes.outputs.any_image_changed == 'true' }}
+    runs-on: ubuntu-latest
+    environment: vps-prod
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Notify on Start
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=🏗️ BUILD STAGE STARTED 🏗️ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Set up PHP for production asset build
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
+
+      - name: Install Composer Dependencies (Production)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+      - name: Set up Node for frontend asset build
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install Node Dependencies and Build Assets
+        run: |
+          rm -rf public/build
+          npm install
+          npm run build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@22b48a429f10e1de233237b5c534c9c3d2e41597
+
+      - name: Log in to GHCR
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push App Image
+        if: ${{ needs.detect-changes.outputs.app_changed == 'true' }}
+        uses: docker/build-push-action@1d0c110a5d679453d30b396aa86f6bb6ae377b76
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ghcr.io/8ohm-technologies/ohmsite-app:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and Push Web (Nginx) Image
+        if: ${{ needs.detect-changes.outputs.web_changed == 'true' }}
+        uses: docker/build-push-action@1d0c110a5d679453d30b396aa86f6bb6ae377b76
+        with:
+          context: .
+          file: Dockerfile.web
+          push: true
+          tags: ghcr.io/8ohm-technologies/ohmsite-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=✅ BUILD STAGE COMPLETED ✅ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ BUILD STAGE FAILED ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+  # 4. Always deploy (Performs a remote Git Pull and updates Docker)
+  deploy:
+    needs: [detect-changes, build-and-push, laravel-tests, frontend-tests]
+    if: always() && (needs.build-and-push.result == 'success' || needs.build-and-push.result == 'skipped') && needs.laravel-tests.result == 'success' && needs.frontend-tests.result == 'success'
+    runs-on: ubuntu-latest
+    environment: vps-prod
+    steps:
+      - name: Notify on Start
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=🚀 DEPLOY STAGE STARTED 🚀 %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Install Cloudflared on Runner
+        run: |
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared-linux-amd64
+          sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+
+      - name: Configure SSH ProxyCommand
+        run: |
+          mkdir -p ~/.ssh
+          echo "Host ${{ secrets.SSH_HOST }}" >> ~/.ssh/config
+          echo "  ProxyCommand cloudflared access ssh --hostname %h" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy via Git Pull on VPS
+        uses: nick-fields/retry@v3
+        env:
+          TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: |
+            ssh -A -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'bash -s' <<'EOF'
+              set -euo pipefail
+
+              TARGET_DIR="/home/deploy-user/ohmsite"
+              REPO_URL="git@github.com:8OHM-Technologies/ohmsite.git"
+
+              if [ ! -d "$TARGET_DIR/.git" ]; then
+                echo "Initializing repository directory structure..."
+                mkdir -p "$TARGET_DIR"
+                cd "$TARGET_DIR"
+                git init
+                git remote add origin "$REPO_URL"
+                git fetch origin
+                git checkout -f main
+              else
+                cd "$TARGET_DIR"
+                git reset --hard HEAD
+                git pull origin main
+              fi
+
+              # Ensure Laravel storage directory permissions & structure
+              mkdir -p storage/framework/{sessions,views,cache} storage/logs
+              chmod -R 775 storage bootstrap/cache
+
+              echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+              docker compose -f docker-compose.prod.yml pull
+
+              # Extract fresh build assets from the new app image using a temporary container
+              rm -rf public/build
+              docker rm -f temp-app || true
+              docker create --name temp-app ghcr.io/8ohm-technologies/ohmsite-app:latest
+              docker cp temp-app:/var/www/public/build ./public/
+              docker rm -f temp-app
+
+              docker compose -f docker-compose.prod.yml up -d
+
+              # Run composer install
+              docker exec ohmsite-app composer install --no-dev --optimize-autoloader --no-interaction
+
+              # Run Laravel database migrations & optimizations
+              docker exec ohmsite-app php artisan migrate --force
+              docker exec ohmsite-app php artisan config:cache
+              docker exec ohmsite-app php artisan route:cache
+              docker exec ohmsite-app php artisan view:cache
+
+              docker image prune -f
+            EOF
+
+      - name: Notify on Success
+        if: success()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=✅ DEPLOY STAGE COMPLETED ✅  %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=🏝️ COMPLETED ${{github.workflow}} 🏝️ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ DEPLOY STAGE FAILED ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d "parse_mode=HTML" \
+          -d "reply_parameters={\"message_id\":${{ needs.detect-changes.outputs.msg_id }}}" \
+          -d "text=❌ FAILED ${{github.workflow}} ❌ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"

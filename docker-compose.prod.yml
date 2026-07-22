@@ -1,0 +1,43 @@
+services:
+  # ---------------------------------------------------------
+  # Laravel PHP Application
+  # ---------------------------------------------------------
+  app:
+    image: ghcr.io/8ohm-technologies/ohmsite-app:latest
+    container_name: ohmsite-app
+    restart: unless-stopped
+    working_dir: /var/www
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www
+      - ./storage:/var/www/storage
+    networks:
+      - 8ohm-network
+
+  # ---------------------------------------------------------
+  # Nginx Web Server
+  # ---------------------------------------------------------
+  web:
+    image: ghcr.io/8ohm-technologies/ohmsite-web:latest
+    container_name: ohmsite-web
+    restart: unless-stopped
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./storage:/var/www/storage
+    networks:
+      - 8ohm-network
+    depends_on:
+      - app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ohmsite.rule=Host(`8ohm.co.za`) || Host(`www.8ohm.co.za`)"
+      - "traefik.http.routers.ohmsite.entrypoints=websecure"
+      - "traefik.http.routers.ohmsite.tls=true"
+      - "traefik.http.services.ohmsite.loadbalancer.server.port=80"
+      - "traefik.docker.network=8ohm-network"
+
+networks:
+  8ohm-network:
+    external: true

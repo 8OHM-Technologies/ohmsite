@@ -1,0 +1,100 @@
+<script setup>
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import { Toaster } from 'vue-sonner';
+import { useCartStore } from '@/Stores/useCartStore';
+import MainLayout from '@/Layouts/MainLayout.vue';
+import CartItem from '@/Components/Cart/CartItem.vue';
+import CartSummary from '@/Components/Cart/CartSummary.vue';
+import EmptyCart from '@/Components/Cart/EmptyCart.vue';
+import SavedItems from '@/Components/Cart/SavedItems.vue';
+import { ChevronLeft, Trash2 } from 'lucide-vue-next';
+
+const props = defineProps({
+    cart: Object,
+    summary: Object,
+    auth: Object,
+});
+
+const cartStore = useCartStore();
+
+// Sync props with Pinia store
+onMounted(() => {
+    cartStore.updateFromProps(props.cart.data, props.summary);
+});
+
+// Watch for prop changes (from Inertia navigations/reloads)
+watch(() => props.cart.data, (newData) => {
+    cartStore.items = newData.items;
+}, { deep: true });
+
+watch(() => props.summary, (newSummary) => {
+    cartStore.summary = newSummary;
+}, { deep: true });
+
+
+</script>
+
+<template>
+    <MainLayout :auth="auth" title="Shopping Cart">
+        <!-- <Toaster position="top-right" richColors /> -->
+
+
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-10 space-y-4 sm:space-y-0">
+                <div>
+                    <Link href="/#services"
+                        class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors mb-2">
+                        <ChevronLeft class="w-4 h-4 mr-1" />
+                        Go back
+                    </Link>
+                    <h1 class="text-4xl font-black uppercase tracking-tighter text-white">
+                        Shopping Cart
+                        <span v-if="cartStore.itemCount > 0" class="text-zinc-500">({{ cartStore.itemCount }})</span>
+                    </h1>
+                </div>
+
+                <button v-if="!cartStore.isEmpty" @click="cartStore.clearCart"
+                    class="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-colors">
+                    <Trash2 class="w-4 h-4 mr-2" />
+                    Clear Cart
+                </button>
+            </div>
+
+            <div v-if="cartStore.isEmpty"
+                class="bg-zinc-900/50 rounded-[3rem] border border-dashed border-white/5 p-12">
+                <EmptyCart />
+            </div>
+
+            <div v-else class="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
+                <!-- Cart Items List -->
+                <div class="lg:col-span-8 space-y-2">
+                    <CartItem v-for="item in cartStore.items" :key="item.id" :item="item"
+                        @update:quantity="(qty) => cartStore.updateQuantity(item.id, qty)"
+                        @remove="cartStore.removeItem(item.id)" @toggle-favorite="() => { }" />
+
+
+                </div>
+
+                <!-- Summary Sidebar -->
+                <div class="mt-16 lg:mt-0 lg:col-span-4">
+                    <CartSummary :summary="cartStore.summary" @apply-discount="cartStore.applyDiscount"
+                        @remove-discount="cartStore.removeDiscount" />
+                </div>
+            </div>
+
+            <!-- Saved Items Section (Optional/Placeholder) -->
+            <SavedItems :items="[]" />
+        </div>
+    </MainLayout>
+</template>
+
+<style scoped>
+.animate-in {
+    animation-fill-mode: forwards;
+}
+
+
+</style>
