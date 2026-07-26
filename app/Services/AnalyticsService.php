@@ -185,6 +185,25 @@ class AnalyticsService
     }
 
     /**
+     * Get scraping pipeline metrics from coeus database.
+     *
+     * @return array
+     */
+    public function getScrapingPipelineMetrics(): array
+    {
+        $this->enforceAdmin();
+
+        return \App\Models\ScrapingPipelineMetrics::all()->map(function ($metric) {
+            return [
+                'id' => $metric->id,
+                'pipeline_name' => $metric->pipeline_name,
+                'metrics' => $metric->metrics,
+                'updated_at' => $metric->updated_at?->toIso8601String(),
+            ];
+        })->toArray();
+    }
+
+    /**
      * Enforce that the user is an authenticated admin.
      */
     private function enforceAdmin(): void

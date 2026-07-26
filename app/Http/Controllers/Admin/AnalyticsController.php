@@ -8,10 +8,15 @@ use App\Models\OrderItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\AnalyticsService;
 use Inertia\Inertia;
 
 class AnalyticsController extends Controller
 {
+    public function __construct(
+        protected AnalyticsService $analytics
+    ) {}
+
     public function index(Request $request)
     {
         $timeframe = $request->get('timeframe', '30 Days');
@@ -147,6 +152,7 @@ class AnalyticsController extends Controller
             'trafficSources' => $trafficSources,
             'chartLabels' => $labels,
             'currentTimeframe' => $timeframe,
+            'scrapingMetrics' => $this->analytics->getScrapingPipelineMetrics(),
         ]);
     }
 

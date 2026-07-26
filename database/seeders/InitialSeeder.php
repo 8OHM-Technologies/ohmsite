@@ -112,7 +112,7 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Developer API',
                 'description' => 'Power your custom applications with direct access to our structured legal dataset API.',
-                'price' => 580.00,
+                'price' => 1580.00,
                 'image' => '/assets/images/products/api.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
@@ -132,7 +132,7 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Pro Analytics',
                 'description' => 'No code required. Access to trends and insights through our analytics platform.',
-                'price' => 3800.00,
+                'price' => 5800.00,
                 'image' => '/assets/images/products/analytics.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
