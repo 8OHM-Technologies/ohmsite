@@ -18,6 +18,21 @@ const props = defineProps({
 const timeframe = ref(props.currentTimeframe || '30 Days');
 const activeTab = ref('sales');
 const selectedPipelineId = ref(props.scrapingMetrics && props.scrapingMetrics.length > 0 ? props.scrapingMetrics[0].id : null);
+const isRefreshing = ref(false);
+
+const refreshScrapingMetrics = async () => {
+    isRefreshing.value = true;
+    try {
+        await fetch('https://control-plane.8ohm.co.za/api/pipelines/analytics/?refresh=true', {
+            method: 'GET',
+        });
+        router.reload({ only: ['scrapingMetrics'] });
+    } catch (error) {
+        console.error('Failed to refresh scraping metrics:', error);
+    } finally {
+        isRefreshing.value = false;
+    }
+};
 
 const selectedPipeline = computed(() => {
     if (!props.scrapingMetrics || props.scrapingMetrics.length === 0) return null;
@@ -25,7 +40,26 @@ const selectedPipeline = computed(() => {
 });
 
 const pipelineMetrics = computed(() => {
-    return selectedPipeline.value?.metrics || {};
+    const rawMetrics = selectedPipeline.value?.metrics || {};
+    if (rawMetrics.workers) {
+        const normalizedWorkers = {};
+        for (const [key, value] of Object.entries(rawMetrics.workers)) {
+            const normalizedKey = key === 'unknown' ? '1' : key;
+            normalizedWorkers[normalizedKey] = value;
+        }
+        return {
+            ...rawMetrics,
+            workers: normalizedWorkers
+        };
+    }
+    return rawMetrics;
+});
+
+const isWorkerOnline = computed(() => {
+    const intervals = pipelineMetrics.value.last_hour_5min_intervals?.intervals || [];
+    if (intervals.length === 0) return false;
+    const lastInterval = intervals[intervals.length - 1];
+    return (lastInterval.count || 0) > 0;
 });
 
 const speedSeries = computed(() => {
@@ -288,12 +322,14 @@ const getStatusIcon = (type) => {
             </div>
 
             <!-- Tabs Navigation -->
-            <div class="flex items-center gap-1 bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-1 rounded-2xl self-start w-fit">
+            <div
+                class="flex items-center gap-1 bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-1 rounded-2xl self-start w-fit">
                 <button @click="activeTab = 'sales'"
                     :class="[activeTab === 'sales' ? 'bg-white text-black font-black' : 'text-zinc-500 hover:text-white hover:bg-white/[0.02]']"
                     class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     Sales Analytics
                 </button>
@@ -301,7 +337,8 @@ const getStatusIcon = (type) => {
                     :class="[activeTab === 'scraping' ? 'bg-white text-black font-black' : 'text-zinc-500 hover:text-white hover:bg-white/[0.02]']"
                     class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     Scraping Analytics
                 </button>
@@ -344,14 +381,16 @@ const getStatusIcon = (type) => {
                         class="lg:col-span-2 bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[3rem] flex flex-col">
                         <div class="flex items-center justify-between mb-8">
                             <div>
-                                <h3 class="text-xl font-black text-white uppercase tracking-tighter">Revenue Trajectory</h3>
+                                <h3 class="text-xl font-black text-white uppercase tracking-tighter">Revenue Trajectory
+                                </h3>
                                 <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">12-Month
                                     Performance Cycle</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-2xl font-black text-admin-modern tracking-tighter">{{
                                     formatCurrency(stats.revenue.total) }}</p>
-                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Active Period</p>
+                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Active Period
+                                </p>
                             </div>
                         </div>
                         <div class="flex-1 min-h-[350px]">
@@ -370,8 +409,9 @@ const getStatusIcon = (type) => {
                                     class="flex items-center gap-3">
                                     <div class="w-2 h-2 rounded-full"
                                         :style="{ backgroundColor: trafficOptions.colors[i] }"></div>
-                                    <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{ label
-                                        }}</span>
+                                    <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{
+                                        label
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -392,16 +432,19 @@ const getStatusIcon = (type) => {
                                         <img :src="product.image" class="w-full h-full object-cover" />
                                     </div>
                                     <div>
-                                        <p class="text-sm font-black text-white uppercase tracking-tight leading-tight">{{
-                                            product.name }}</p>
-                                        <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mt-1">{{
-                                            product.sales }} Silhouettes</p>
+                                        <p class="text-sm font-black text-white uppercase tracking-tight leading-tight">
+                                            {{
+                                                product.name }}</p>
+                                        <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest mt-1">
+                                            {{
+                                                product.sales }} Silhouettes</p>
                                     </div>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm font-black text-white tracking-tighter">{{
                                         formatCurrency(product.revenue) }}</p>
-                                    <p class="text-[9px] font-black uppercase tracking-widest mt-1 text-admin-modern/50">
+                                    <p
+                                        class="text-[9px] font-black uppercase tracking-widest mt-1 text-admin-modern/50">
                                         {{ product.brand }}
                                     </p>
                                 </div>
@@ -441,7 +484,8 @@ const getStatusIcon = (type) => {
                                             activity.time }}</p>
                                     </div>
                                 </div>
-                                <p v-if="activity.amount" class="text-sm font-black text-white tracking-tighter opacity-80">
+                                <p v-if="activity.amount"
+                                    class="text-sm font-black text-white tracking-tighter opacity-80">
                                     {{ activity.amount }}</p>
                             </div>
                         </div>
@@ -449,17 +493,22 @@ const getStatusIcon = (type) => {
                         <!-- Live Stats Widget -->
                         <div class="mt-12 grid grid-cols-3 gap-6 border-t border-white/5 pt-10">
                             <div>
-                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Live Nodes
+                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Live
+                                    Nodes
                                 </p>
-                                <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats.active_visitors }}
+                                <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats.active_visitors
+                                }}
                                 </p>
                             </div>
                             <div>
-                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Txs</p>
-                                <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats.sales_today }}</p>
+                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Txs
+                                </p>
+                                <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats.sales_today }}
+                                </p>
                             </div>
                             <div>
-                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Rev</p>
+                                <p class="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-2">Daily Rev
+                                </p>
                                 <p class="text-2xl font-black text-admin-modern tracking-tighter">{{
                                     formatCurrency(liveStats.revenue_today) }}</p>
                             </div>
@@ -471,38 +520,57 @@ const getStatusIcon = (type) => {
             <!-- Scraping Tab Content -->
             <div v-if="activeTab === 'scraping'" class="space-y-10 animate-in fade-in duration-500">
                 <!-- Pipeline Selector -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-zinc-900/30 backdrop-blur-md border border-white/5 p-6 rounded-[2rem]">
-                    <div class="flex items-center gap-4">
-                        <span class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Active Pipeline:</span>
+                <div
+                    class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-zinc-900/30 backdrop-blur-md border border-white/5 p-6 rounded-[2rem]">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <span class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Active
+                            Pipeline:</span>
                         <div class="relative">
-                            <select v-model="selectedPipelineId" class="bg-zinc-950 text-white border border-white/10 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-admin-modern">
+                            <select v-model="selectedPipelineId"
+                                class="bg-zinc-950 text-white border border-white/10 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-admin-modern">
                                 <option v-for="p in props.scrapingMetrics" :key="p.id" :value="p.id">
                                     {{ p.pipeline_name }}
                                 </option>
                             </select>
                         </div>
+                        <button @click="refreshScrapingMetrics" :disabled="isRefreshing"
+                            class="flex items-center gap-2 bg-white/5 hover:bg-white/10 active:scale-95 disabled:opacity-50 disabled:pointer-events-none text-white border border-white/10 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200">
+                            <svg :class="{ 'animate-spin': isRefreshing }" class="w-3.5 h-3.5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H18" />
+                            </svg>
+                            <span>{{ isRefreshing ? 'Refreshing...' : 'Refresh' }}</span>
+                        </button>
                     </div>
                     <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                        Last Synchronized: <span class="text-white">{{ selectedPipeline ? new Date(selectedPipeline.updated_at).toLocaleString() : 'N/A' }}</span>
+                        Last Synchronized: <span class="text-white">{{ selectedPipeline ? new
+                            Date(selectedPipeline.updated_at).toLocaleString() : 'N/A' }}</span>
                     </div>
                 </div>
 
-                <div v-if="!selectedPipeline" class="text-center py-20 bg-zinc-900/40 border border-white/5 rounded-[3rem]">
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-xs">No Scraping Pipeline Metrics Available</p>
+                <div v-if="!selectedPipeline"
+                    class="text-center py-20 bg-zinc-900/40 border border-white/5 rounded-[3rem]">
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-xs">No Scraping Pipeline Metrics
+                        Available</p>
                 </div>
 
                 <template v-else>
                     <!-- KPI Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <!-- Total Scraped -->
-                        <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
+                        <div
+                            class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
                             <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                     </svg>
                                 </div>
-                                <span class="text-admin-modern bg-admin-modern/10 text-[10px] font-black px-2 py-1 rounded-lg">
+                                <span
+                                    class="text-admin-modern bg-admin-modern/10 text-[10px] font-black px-2 py-1 rounded-lg">
                                     All Time
                                 </span>
                             </div>
@@ -513,11 +581,14 @@ const getStatusIcon = (type) => {
                         </div>
 
                         <!-- Active Scraped -->
-                        <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
+                        <div
+                            class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
                             <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
                                 </div>
                                 <span class="text-blue-400 bg-blue-400/10 text-[10px] font-black px-2 py-1 rounded-lg">
@@ -531,36 +602,45 @@ const getStatusIcon = (type) => {
                         </div>
 
                         <!-- Scrape Rate -->
-                        <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
+                        <div
+                            class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
                             <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                     </svg>
                                 </div>
                                 <span class="text-zinc-400 bg-white/5 text-[10px] font-black px-2 py-1 rounded-lg">
                                     {{ formatRate(pipelineMetrics.overall?.scrape_rate) }}
                                 </span>
                             </div>
-                            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Scrape Rate / Hour</p>
+                            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Scrape Rate / Hour
+                            </p>
                             <p class="text-3xl font-black text-white mt-1 tracking-tighter">
                                 {{ Math.round(pipelineMetrics.overall?.scrape_rate_per_hour || 0).toLocaleString() }}
                             </p>
                         </div>
 
                         <!-- Worker Uptime -->
-                        <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
+                        <div
+                            class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[2.5rem] group hover:bg-zinc-900/60 transition-all duration-500">
                             <div class="flex items-center justify-between mb-6">
-                                <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
+                                <div
+                                    class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-zinc-400 group-hover:text-admin-modern transition-colors">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </div>
-                                <span class="text-green-400 bg-green-400/10 text-[10px] font-black px-2 py-1 rounded-lg">
+                                <span
+                                    class="text-green-400 bg-green-400/10 text-[10px] font-black px-2 py-1 rounded-lg">
                                     Online
                                 </span>
                             </div>
-                            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Uptime Duration</p>
+                            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Uptime Duration
+                            </p>
                             <p class="text-3xl font-black text-white mt-1 tracking-tighter">
                                 {{ formatUptime(pipelineMetrics.overall?.uptime_seconds) }}
                             </p>
@@ -570,27 +650,36 @@ const getStatusIcon = (type) => {
                     <!-- Main Charts -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <!-- Throughput Speed Chart -->
-                        <div class="lg:col-span-2 bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[3rem] flex flex-col">
+                        <div
+                            class="lg:col-span-2 bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[3rem] flex flex-col">
                             <div class="flex items-center justify-between mb-8">
                                 <div>
-                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Throughput Speed</h3>
-                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Detailing & Indexing Rates (5-Min Intervals)</p>
+                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Throughput
+                                        Speed</h3>
+                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
+                                        Detailing & Indexing Rates (5-Min Intervals)</p>
                                 </div>
                             </div>
                             <div class="flex-1 min-h-[350px]">
-                                <VueApexCharts width="100%" height="350" :options="speedChartOptions" :series="speedSeries" />
+                                <VueApexCharts width="100%" height="350" :options="speedChartOptions"
+                                    :series="speedSeries" />
                             </div>
                         </div>
 
                         <!-- Indexing vs Detailing Share -->
-                        <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[3rem] flex flex-col">
-                            <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-8">Operation Split</h3>
+                        <div
+                            class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-8 rounded-[3rem] flex flex-col">
+                            <h3 class="text-xl font-black text-white uppercase tracking-tighter mb-8">Operation Split
+                            </h3>
                             <div class="flex-1 flex flex-col items-center justify-center">
                                 <VueApexCharts width="250" :options="typeChartOptions" :series="typeSeries" />
                                 <div class="grid grid-cols-2 gap-4 w-full mt-10">
-                                    <div v-for="(label, i) in typeChartOptions.labels" :key="label" class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full" :style="{ backgroundColor: typeChartOptions.colors[i] }"></div>
-                                        <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{ label }}</span>
+                                    <div v-for="(label, i) in typeChartOptions.labels" :key="label"
+                                        class="flex items-center gap-3">
+                                        <div class="w-2 h-2 rounded-full"
+                                            :style="{ backgroundColor: typeChartOptions.colors[i] }"></div>
+                                        <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{
+                                            label }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -603,15 +692,18 @@ const getStatusIcon = (type) => {
                         <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-10 rounded-[3rem]">
                             <div class="flex items-center justify-between mb-8">
                                 <div>
-                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Worker Nodes</h3>
-                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Cluster allocation & execution status</p>
+                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Worker Nodes
+                                    </h3>
+                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
+                                        Cluster allocation & execution status</p>
                                 </div>
                             </div>
-                            
+
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
-                                        <tr class="border-b border-white/5 text-[9px] font-black text-zinc-600 uppercase tracking-wider">
+                                        <tr
+                                            class="border-b border-white/5 text-[9px] font-black text-zinc-600 uppercase tracking-wider">
                                             <th class="pb-4">Node</th>
                                             <th class="pb-4">Status</th>
                                             <th class="pb-4">Scraped</th>
@@ -620,14 +712,25 @@ const getStatusIcon = (type) => {
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-white/5">
-                                        <tr v-for="(worker, id) in pipelineMetrics.workers" :key="id" class="text-xs group">
+                                        <tr v-for="(worker, id) in pipelineMetrics.workers" :key="id"
+                                            class="text-xs group">
                                             <td class="py-4 text-white font-black">
                                                 Worker {{ id }}
                                             </td>
                                             <td class="py-4">
                                                 <div class="flex items-center gap-1.5">
-                                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                                                    <span class="text-[9px] font-bold text-green-400 uppercase tracking-wider">Active</span>
+                                                    <template v-if="isWorkerOnline">
+                                                        <span
+                                                            class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                                                        <span
+                                                            class="text-[9px] font-bold text-green-400 uppercase tracking-wider">Online</span>
+                                                    </template>
+                                                    <template v-else>
+                                                        <span
+                                                            class="w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
+                                                        <span
+                                                            class="text-[9px] font-bold text-red-400 uppercase tracking-wider">Offline</span>
+                                                    </template>
                                                 </div>
                                             </td>
                                             <td class="py-4 text-zinc-300 font-medium">
@@ -649,12 +752,16 @@ const getStatusIcon = (type) => {
                         <div class="bg-zinc-900/40 backdrop-blur-md border border-white/5 p-10 rounded-[3rem]">
                             <div class="flex items-center justify-between mb-8">
                                 <div>
-                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Node Load Share</h3>
-                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Total items scraped per node</p>
+                                    <h3 class="text-xl font-black text-white uppercase tracking-tighter">Node Load Share
+                                    </h3>
+                                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Total
+                                        items scraped per node
+                                    </p>
                                 </div>
                             </div>
                             <div class="min-h-[250px]">
-                                <VueApexCharts width="100%" height="250" :options="workerChartOptions" :series="workerSeries" />
+                                <VueApexCharts width="100%" height="250" :options="workerChartOptions"
+                                    :series="workerSeries" />
                             </div>
                         </div>
                     </div>
