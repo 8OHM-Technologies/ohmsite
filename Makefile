@@ -26,7 +26,9 @@ down:
 	docker compose down
 
 prod-up:
-	docker compose -f docker-compose.prod.yml up -d --build
+	docker compose -f docker-compose.prod.yml pull
+	docker compose -f docker-compose.prod.yml up -d --force-recreate
+
 
 # Tear down all containers, networks, and volumes
 prod-down:
