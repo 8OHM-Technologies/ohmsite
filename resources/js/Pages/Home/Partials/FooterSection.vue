@@ -85,7 +85,8 @@ const socialNavigation = [
               src="/assets/images/8OHM_Logo.webp" alt="8OHM Logo" />
           </Link>
           <p class="text-xs/6 text-zinc-400 max-w-xs font-semibold uppercase tracking-wider">
-            Professional-grade public data pipelines, custom web scraping, and secure, open-source smart home solutions.
+            Custom data pipelines, business automation systems, and private AI automation
+            systems.
           </p>
         </div>
 
