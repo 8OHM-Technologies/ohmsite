@@ -35,8 +35,8 @@ Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/fair-usage', [HomeController::class, 'fairUsage'])->name('fair-usage');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/datasets/{slug}/sample', [HomeController::class, 'datasetSample'])->name('datasets.sample');
-//Route::get('/services', [ShopController::class, 'index'])->name('services.index');
-//Route::get('/services/{product}', [ShopController::class, 'show'])->name('services.show');
+Route::get('/services', [ShopController::class, 'index'])->name('services.index');
+Route::get('/services/{product}', [ShopController::class, 'show'])->name('services.show');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
