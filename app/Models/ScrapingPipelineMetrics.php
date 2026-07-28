@@ -42,7 +42,8 @@ class ScrapingPipelineMetrics extends Model
     protected $keyType = 'string';
 
     /**
-     * Indicates if the model should be timestamped.
+     * Disable Eloquent's automatic timestamp management.
+     * The updated_at column is written by Django; we only read it.
      *
      * @var bool
      */
@@ -58,7 +59,7 @@ class ScrapingPipelineMetrics extends Model
         return [
             'pipeline_name' => 'string',
             'metrics' => 'array',
-            'updated_at' => 'datetime'
+            'updated_at' => 'datetime',
         ];
     }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import VueApexCharts from "vue3-apexcharts";
@@ -15,24 +15,69 @@ const props = defineProps({
     scrapingMetrics: Array
 });
 
+const REFRESH_INTERVAL_MS = 60_000;
+
 const timeframe = ref(props.currentTimeframe || '30 Days');
 const activeTab = ref('sales');
-const selectedPipelineId = ref(props.scrapingMetrics && props.scrapingMetrics.length > 0 ? props.scrapingMetrics[0].id : null);
+const selectedPipelineId = ref(props.scrapingMetrics?.length > 0 ? props.scrapingMetrics[0].id : null);
 const isRefreshing = ref(false);
+let refreshIntervalId = null;
 
+/**
+ * Calls the Laravel server-side refresh endpoint (which in turn calls the
+ * control plane API), then re-loads the scrapingMetrics prop via Inertia.
+ * isRefreshing stays true until the Inertia reload completes.
+ */
 const refreshScrapingMetrics = async () => {
+    if (isRefreshing.value) return;
+
     isRefreshing.value = true;
     try {
-        await fetch('https://control-plane.8ohm.co.za/api/pipelines/analytics/?refresh=true', {
-            method: 'GET',
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        await fetch(route('admin.analytics.refresh-scraping'), {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken ?? '',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
         });
-        router.reload({ only: ['scrapingMetrics'] });
     } catch (error) {
-        console.error('Failed to refresh scraping metrics:', error);
-    } finally {
-        isRefreshing.value = false;
+        console.error('Failed to trigger analytics refresh:', error);
     }
+
+    // Always reload Inertia props so the chart hydrates with the latest DB data.
+    router.reload({
+        only: ['scrapingMetrics'],
+        onFinish: () => {
+            isRefreshing.value = false;
+        },
+    });
 };
+
+// Keep selectedPipelineId valid after a reload refreshes the pipeline list.
+watch(
+    () => props.scrapingMetrics,
+    (metrics) => {
+        if (!metrics?.length) return;
+        const stillExists = metrics.some(p => p.id === selectedPipelineId.value);
+        if (!stillExists) {
+            selectedPipelineId.value = metrics[0].id;
+        }
+    }
+);
+
+onMounted(() => {
+    // Trigger an immediate refresh so the chart is populated on first load.
+    refreshScrapingMetrics();
+    // Schedule periodic auto-refresh.
+    refreshIntervalId = setInterval(refreshScrapingMetrics, REFRESH_INTERVAL_MS);
+});
+
+onUnmounted(() => {
+    clearInterval(refreshIntervalId);
+});
 
 const selectedPipeline = computed(() => {
     if (!props.scrapingMetrics || props.scrapingMetrics.length === 0) return null;

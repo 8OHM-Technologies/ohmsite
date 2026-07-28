@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Carbon\Carbon;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use App\Services\AnalyticsService;
 use Inertia\Inertia;
 
@@ -152,6 +154,26 @@ class AnalyticsController extends Controller
             'trafficSources' => $trafficSources,
             'chartLabels' => $labels,
             'currentTimeframe' => $timeframe,
+            'scrapingMetrics' => $this->analytics->getScrapingPipelineMetrics(),
+        ]);
+    }
+
+    /**
+     * Trigger a fresh analytics calculation on the control plane and return
+     * the updated scraping metrics to the Inertia page via a partial reload.
+     */
+    public function refreshScrapingMetrics(): \Illuminate\Http\JsonResponse
+    {
+        try {
+            Http::timeout(60)->get('https://control-plane.8ohm.co.za/api/pipelines/analytics/', [
+                'refresh' => 'true',
+            ]);
+        } catch (ConnectionException $e) {
+            // Non-fatal: the DB may already have recent data.
+            logger()->warning('Control plane analytics refresh failed: '.$e->getMessage());
+        }
+
+        return response()->json([
             'scrapingMetrics' => $this->analytics->getScrapingPipelineMetrics(),
         ]);
     }

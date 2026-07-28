@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
     Route::post('/customers/{customer}/toggle-vip', [CustomerController::class, 'toggleVip'])->name('customers.toggle-vip');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::post('/analytics/refresh-scraping', [AnalyticsController::class, 'refreshScrapingMetrics'])->name('analytics.refresh-scraping');
     Route::get('/licenses', [InventoryController::class, 'index'])->name('licenses.index');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
