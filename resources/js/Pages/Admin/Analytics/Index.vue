@@ -28,28 +28,13 @@ let refreshIntervalId = null;
  * control plane API), then re-loads the scrapingMetrics prop via Inertia.
  * isRefreshing stays true until the Inertia reload completes.
  */
-const refreshScrapingMetrics = async () => {
+const refreshScrapingMetrics = () => {
     if (isRefreshing.value) return;
 
     isRefreshing.value = true;
-    try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-        await fetch(route('admin.analytics.refresh-scraping'), {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken ?? '',
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-        });
-    } catch (error) {
-        console.error('Failed to trigger analytics refresh:', error);
-    }
-
-    // Always reload Inertia props so the chart hydrates with the latest DB data.
-    router.reload({
+    router.post(route('admin.analytics.refresh-scraping'), {}, {
         only: ['scrapingMetrics'],
+        preserveScroll: true,
         onFinish: () => {
             isRefreshing.value = false;
         },

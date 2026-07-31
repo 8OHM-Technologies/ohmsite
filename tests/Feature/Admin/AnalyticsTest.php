@@ -78,4 +78,23 @@ class AnalyticsTest extends TestCase
             ->where('scrapingMetrics.0.pipeline_name', 'Saflii Labour Court - CCT')
         );
     }
+
+    public function test_admin_can_refresh_scraping_metrics()
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'https://control-plane.8ohm.co.za/api/pipelines/analytics/*' => \Illuminate\Support\Facades\Http::response(['status' => 'ok'], 200),
+        ]);
+
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('admin.analytics.refresh-scraping'));
+
+        $response->assertRedirect();
+        \Illuminate\Support\Facades\Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'https://control-plane.8ohm.co.za/api/pipelines/analytics/');
+        });
+    }
 }

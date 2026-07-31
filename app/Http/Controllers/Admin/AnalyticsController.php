@@ -162,20 +162,18 @@ class AnalyticsController extends Controller
      * Trigger a fresh analytics calculation on the control plane and return
      * the updated scraping metrics to the Inertia page via a partial reload.
      */
-    public function refreshScrapingMetrics(): \Illuminate\Http\JsonResponse
+    public function refreshScrapingMetrics(): \Illuminate\Http\RedirectResponse
     {
         try {
             Http::timeout(60)->get('https://control-plane.8ohm.co.za/api/pipelines/analytics/', [
                 'refresh' => 'true',
             ]);
-        } catch (ConnectionException $e) {
+        } catch (\Throwable $e) {
             // Non-fatal: the DB may already have recent data.
             logger()->warning('Control plane analytics refresh failed: '.$e->getMessage());
         }
 
-        return response()->json([
-            'scrapingMetrics' => $this->analytics->getScrapingPipelineMetrics(),
-        ]);
+        return redirect()->back();
     }
 
     private function calculateGrowthPercent($current, $previous): float
