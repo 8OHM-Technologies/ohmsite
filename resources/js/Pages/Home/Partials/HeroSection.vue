@@ -56,7 +56,7 @@ onMounted(() => {
           other courts and tribunals. Access everything for FREE via our website, or subscribe to gain access to our
           analytics API,
           unlock judicial trends and insights with our Pro Dashboard, or let us
-          build custom data pipelines for your proprietary needs.
+          build custom data pipelines for your unique business needs.
         </p>
 
         <div class="cta-group reveal-item">
