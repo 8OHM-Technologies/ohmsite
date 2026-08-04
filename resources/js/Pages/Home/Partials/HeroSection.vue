@@ -51,9 +51,9 @@ onMounted(() => {
         <p class="hero-tagline reveal-item">
           South African public data sources are notoriously unstable and difficult to extract. We handle the
           extraction,
-          cleaning, and structuring of public records—starting with the Labour and High Court Case Law, and expanding
+          cleaning, and structuring of public records—starting with Labour and High Court Case Law, and expanding
           soon to
-          other courts, tribunals. Access everything for FREE via our website, or subscribe to gain access to our
+          other courts and tribunals. Access everything for FREE via our website, or subscribe to gain access to our
           analytics API,
           unlock judicial trends and insights with our Pro Dashboard, or let us
           build custom data pipelines for your proprietary needs.
