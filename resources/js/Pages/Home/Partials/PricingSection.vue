@@ -287,7 +287,7 @@ onMounted(() => {
                           <span>Billed {{ frequency.value }}</span>
                         </div>
                       </div>
-                      <span class="developer-pricing-label">Live API & Updates</span>
+                      <span class="developer-pricing-label">Live API Feed</span>
                     </div>
                   </div>
                 </div>
@@ -296,7 +296,7 @@ onMounted(() => {
                   <!-- Tier Action Button -->
                   <button type="button" @click="handleSubscribeDeveloper" aria-describedby="tier-developer"
                     class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">
-                    <span>Subscribe to Basic API</span>
+                    <span>Subscribe to API</span>
                     <div class="btn-icon">
                       <i class="ph-light ph-credit-card"></i>
                     </div>

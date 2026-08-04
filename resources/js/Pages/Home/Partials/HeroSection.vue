@@ -51,15 +51,17 @@ onMounted(() => {
         <p class="hero-tagline reveal-item">
           South African public data sources are notoriously unstable and difficult to extract. We handle the
           extraction,
-          cleaning, and structuring of public records—starting with the CCMA and Labour Courts, and expanding soon to
-          High Courts and beyond. Get reliable,
-          POPIA-compliant data feeds directly via API, track judicial trends using our analytics platform, or let us
+          cleaning, and structuring of public records—starting with the Labour and High Court Case Law, and expanding
+          soon to
+          other courts, tribunals. Access everything for FREE via our website, or subscribe to gain access to our
+          analytics API,
+          unlock judicial trends and insights with our Pro Dashboard, or let us
           build custom data pipelines for your proprietary needs.
         </p>
 
         <div class="cta-group reveal-item">
           <button type="button" @click="$emit('open-modal')" class="btn btn-primary">
-            <span>Explore Dataset Samples</span>
+            <span>Access Free Datasets</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>

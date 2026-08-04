@@ -16,47 +16,39 @@ const roadmap = computed(() => {
     {
       status: 'Live',
       date: 'Current',
-      title: 'CCMA Arbitration Awards',
-      description: 'Comprehensive CCMA Awards & Judgment records.',
+      title: 'SA Labour & High Courts Case Law',
+      description: 'Comprehensive case law from the Labour and Labour Appeal Courts as well as the High Courts and Supreme Court of Appeal.',
       icon: 'ph-check-circle',
       iconClass: 'text-green-500'
     },
     {
-      status: 'Upcoming',
-      date: 'Q3 2026',
-      title: 'SA Labour Court Case Law',
-      description: 'Comprehensive case law from the Labour and Labour Appeal Courts.',
-      icon: 'ph-spinner',
-      iconClass: 'text-blue-500'
-    },
-    {
-      status: 'Upcoming',
+      status: 'Planned',
       date: 'Q4 2026',
-      title: 'SA High Court Case Law',
-      description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.',
-      icon: 'ph-calendar-blank',
-      iconClass: 'text-orange-500'
+      title: 'Tribunals and Other Courts Case Law',
+      description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts. Published Acts, Bills, Government Gazettes and other legislative documents included.',
+      icon: 'ph-rocket-launch',
+      iconClass: 'text-yellow-500'
     },
     {
       status: 'Planned',
       date: 'Q1 2027',
-      title: 'Tribunals and Other Courts Case Law',
-      description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
+      title: 'Industry Expansion',
+      description: 'Expansion of our datasets covering other industries like mining, logistics, energy and health & safety.',
       icon: 'ph-rocket-launch',
       iconClass: 'text-yellow-500'
     },
     {
-      status: 'Planned',
-      date: '2027',
-      title: 'Legislative Expansion',
-      description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.',
-      icon: 'ph-rocket-launch',
-      iconClass: 'text-yellow-500'
-    },
-    {
-      status: 'Ultimate Goal',
+      status: 'Future',
       date: '2027',
       title: 'LaybaLaw AI',
+      description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
+      icon: 'ph-robot',
+      iconClass: 'text-red-500'
+    },
+    {
+      status: 'Future',
+      date: '2027',
+      title: 'International Mining Landscape Dashboard',
       description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
       icon: 'ph-robot',
       iconClass: 'text-red-500'
@@ -74,8 +66,7 @@ const roadmap = computed(() => {
       <div class="carousel">
         <div
           class="carousel-body h-full carousel-dragging:transition-none carousel-dragging:cursor-grabbing cursor-grab opacity-0">
-          <div v-for="item in roadmap" :key="item.title" class="carousel-slide"
-            style="padding-top: 1px !important">
+          <div v-for="item in roadmap" :key="item.title" class="carousel-slide" style="padding-top: 1px !important">
             <div class="roadmap-card mx-1.5">
 
               <!-- Status Badge -->
