@@ -1,15 +1,28 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
 import axios from 'axios';
+import {
+  Scale,
+  Search,
+  Filter,
+  Eye,
+  RefreshCw,
+  Calendar,
+  FileText,
+  ChevronRight,
+  X,
+  ExternalLink,
+  Database,
+  CheckCircle2,
+  AlertTriangle,
+  FileCheck
+} from 'lucide-vue-next';
 
-// PrimeVue Components
+// PrimeVue Free Components (Open Source MIT)
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
-import Button from 'primevue/button';
-import Tag from 'primevue/tag';
 import Dialog from 'primevue/dialog';
 import Skeleton from 'primevue/skeleton';
 import type { DataTableLazyLoadEvent } from 'primevue/datatable';
@@ -34,19 +47,12 @@ const searchQuery = ref('');
 const selectedRecordType = ref('');
 const selectedCourt = ref('');
 
-// Record detail modal state
+// Document Detail Dialog state
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
 
-// Options for record type filter
-const recordTypeOptions = [
-  { label: 'All Record Types', value: '' },
-  { label: 'CCMA Arbitration Awards (sabinet_ccma)', value: 'sabinet_ccma' },
-  { label: 'SAFLII Court Judgments (saflii_courts)', value: 'saflii_courts' }
-];
-
-// Current lazy load parameters
+// Lazy parameter state
 const lazyParams = ref<DataTableLazyLoadEvent>({
   first: 0,
   rows: 25,
@@ -100,7 +106,8 @@ const onSearchInput = () => {
   }, 350);
 };
 
-const onFilterChange = () => {
+const setRecordType = (type: string) => {
+  selectedRecordType.value = type;
   lazyParams.value.first = 0;
   loadLazyRecords();
 };
@@ -120,16 +127,6 @@ const viewRecordDetail = async (record: RecordSummary) => {
   }
 };
 
-const getCourtSeverity = (court: string) => {
-  if (!court) return 'secondary';
-  const c = court.toUpperCase();
-  if (c.includes('CCMA')) return 'info';
-  if (c.includes('ZACC')) return 'warn';
-  if (c.includes('ZASCA')) return 'success';
-  if (c.includes('LABOUR')) return 'help';
-  return 'contrast';
-};
-
 const formatValue = (val: any) => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'object') return JSON.stringify(val, null, 2);
@@ -142,240 +139,341 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head title="OHMLaw | Legal Search & Intelligence Portal" />
+  <Head title="OHMLaw - Legal Intelligence" />
 
-  <div class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-    <!-- Header Navigation -->
-    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-xl shadow-md">
-            ⚖️
-          </div>
-          <div>
-            <h1 class="text-xl font-bold tracking-tight">OHMLaw Intelligence</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400">South African Legal Records & CCMA Award Search Engine</p>
-          </div>
+  <AdminLayout>
+    <!-- Page Header conforming to ohmsite Admin layout -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-2 h-8 bg-admin-modern rounded-full"></div>
+          <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
+            OHMLaw Intelligence
+          </h1>
+        </div>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+          South African Legal Records & CCMA Dispute Intelligence Engine (630,000+ Indexed Records)
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-admin-modern">
+          <span class="w-2 h-2 rounded-full bg-admin-modern animate-pulse"></span>
+          {{ totalRecords.toLocaleString() }} Active Records
+        </span>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls Container conforming to ohmsite design system -->
+    <div class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8 space-y-6 mb-8">
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+        
+        <!-- Global Search Field -->
+        <div class="relative flex-1 max-w-2xl">
+          <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
+          <input
+            type="text"
+            v-model="searchQuery"
+            @input="onSearchInput"
+            placeholder="Search by Case #, Applicant, Respondent, Court, or Keywords..."
+            class="w-full bg-black/40 border border-white/5 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/30 placeholder:text-zinc-600"
+          />
         </div>
 
-        <div class="flex items-center space-x-4">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            630,000+ Records Indexed
-          </span>
-          <a href="/dashboard" class="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium">
-            Dashboard &rarr;
-          </a>
+        <!-- Filter Pill Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            @click="setRecordType('')"
+            class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
+            :class="selectedRecordType === '' ? 'bg-white text-black border-white shadow-lg' : 'bg-zinc-800/50 text-zinc-400 border-white/5 hover:text-white'"
+          >
+            All Records
+          </button>
+
+          <button
+            @click="setRecordType('sabinet_ccma')"
+            class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
+            :class="selectedRecordType === 'sabinet_ccma' ? 'bg-admin-modern text-black border-admin-modern shadow-lg' : 'bg-zinc-800/50 text-zinc-400 border-white/5 hover:text-white'"
+          >
+            CCMA Awards
+          </button>
+
+          <button
+            @click="setRecordType('saflii_courts')"
+            class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
+            :class="selectedRecordType === 'saflii_courts' ? 'bg-admin-modern text-black border-admin-modern shadow-lg' : 'bg-zinc-800/50 text-zinc-400 border-white/5 hover:text-white'"
+          >
+            SAFLII Courts
+          </button>
+
+          <button
+            @click="loadLazyRecords()"
+            class="p-3 bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white rounded-xl transition-all"
+            title="Refresh Dataset"
+          >
+            <RefreshCw class="w-4 h-4" />
+          </button>
         </div>
       </div>
-    </header>
+    </div>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- PrimeVue Lazy DataTable Container conforming to ohmsite admin card theme -->
+    <div class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
+      <DataTable
+        :value="records"
+        :lazy="true"
+        :totalRecords="totalRecords"
+        :loading="loading"
+        @lazy="onLazy"
+        paginator
+        :rows="25"
+        :rowsPerPageOptions="[10, 25, 50, 100]"
+        dataKey="id"
+        stateStorage="local"
+        stateKey="ohmlaw-admin-table-state"
+        tableStyle="min-width: 60rem"
+        class="p-datatable-dark-custom"
+      >
+        <template #empty>
+          <div class="py-20 text-center flex flex-col items-center">
+            <div class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
+              <Database class="w-8 h-8 text-zinc-600" />
+            </div>
+            <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-500 mb-1">No legal records found</h3>
+            <p class="text-zinc-600 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or filters</p>
+          </div>
+        </template>
 
-      <!-- Filter & Search Controls Bar -->
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          
-          <!-- Global Search Input -->
-          <div class="relative flex-1">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <i class="ph ph-magnifying-glass text-lg"></i>
+        <Column field="case_number" header="Case Reference" sortable style="width: 18%">
+          <template #body="{ data }">
+            <span v-if="data.case_number" class="font-mono text-xs font-bold px-3 py-1.5 bg-black/40 border border-white/10 text-white rounded-lg inline-block">
+              {{ data.case_number }}
             </span>
-            <InputText
-              v-model="searchQuery"
-              @input="onSearchInput"
-              placeholder="Search by Case #, Applicant, Respondent, Court, or Keywords..."
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+            <span v-else class="text-xs text-zinc-600 font-bold uppercase tracking-widest">N/A</span>
+          </template>
+          <template #loading>
+            <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
 
-          <!-- Filters -->
-          <div class="flex flex-wrap items-center gap-3">
-            <Select
-              v-model="selectedRecordType"
-              :options="recordTypeOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Filter Record Type"
-              @change="onFilterChange"
-              class="w-56 text-sm"
-            />
-            <Button
-              icon="pi pi-refresh"
-              severity="secondary"
-              text
-              rounded
-              aria-label="Refresh"
-              @click="loadLazyRecords()"
-              title="Refresh Table"
-            />
-          </div>
-        </div>
-      </div>
+        <Column field="court" header="Court / Forum" sortable style="width: 16%">
+          <template #body="{ data }">
+            <span class="px-3 py-1 bg-admin-modern/10 border border-admin-modern/20 text-admin-modern font-black text-[10px] uppercase tracking-wider rounded-lg inline-block">
+              {{ data.court }}
+            </span>
+          </template>
+          <template #loading>
+            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
 
-      <!-- PrimeVue Lazy DataTable Container -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-2">
-        <DataTable
-          :value="records"
-          :lazy="true"
-          :totalRecords="totalRecords"
-          :loading="loading"
-          @lazy="onLazy"
-          paginator
-          :rows="25"
-          :rowsPerPageOptions="[10, 25, 50, 100]"
-          dataKey="id"
-          stateStorage="local"
-          stateKey="ohmlaw-datatable-state"
-          tableStyle="min-width: 60rem"
-          class="p-datatable-sm"
-        >
-          <template #empty>
-            <div class="text-center py-12 text-slate-500">
-              <i class="ph ph-folder-open text-4xl mb-2"></i>
-              <p class="text-base font-medium">No legal records found matching your filters.</p>
+        <Column field="document_date" header="Date" sortable style="width: 14%">
+          <template #body="{ data }">
+            <span class="text-xs font-bold text-zinc-400 tracking-wider">
+              {{ data.document_date || 'N/A' }}
+            </span>
+          </template>
+          <template #loading>
+            <Skeleton width="70%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="title" header="Title / Matter" style="width: 40%">
+          <template #body="{ data }">
+            <div class="font-black text-sm text-white uppercase tracking-tight hover:text-admin-modern transition cursor-pointer" @click="viewRecordDetail(data)">
+              {{ data.title }}
+            </div>
+            <div v-if="data.summary" class="text-[10px] text-zinc-500 font-medium line-clamp-1 mt-1">
+              {{ data.summary }}
             </div>
           </template>
+          <template #loading>
+            <Skeleton width="90%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
 
-          <Column field="case_number" header="Case Reference" sortable style="width: 18%">
-            <template #body="{ data }">
-              <span v-if="data.case_number" class="font-mono text-xs font-semibold px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200">
-                {{ data.case_number }}
-              </span>
-              <span v-else class="text-xs text-slate-400 italic">N/A</span>
-            </template>
-            <template #loading>
-              <Skeleton width="80%" height="1.5rem" />
-            </template>
-          </Column>
+        <Column header="Actions" style="width: 12%" class="text-right">
+          <template #body="{ data }">
+            <button
+              @click="viewRecordDetail(data)"
+              class="w-full sm:w-auto bg-white text-black px-4 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-admin-modern transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
+            >
+              <Eye class="w-3.5 h-3.5" />
+              View
+            </button>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
-          <Column field="court" header="Court / Forum" sortable style="width: 16%">
-            <template #body="{ data }">
-              <Tag :value="data.court" :severity="getCourtSeverity(data.court)" class="text-xs font-bold uppercase tracking-wider" />
-            </template>
-            <template #loading>
-              <Skeleton width="60%" height="1.5rem" />
-            </template>
-          </Column>
-
-          <Column field="document_date" header="Date" sortable style="width: 14%">
-            <template #body="{ data }">
-              <span class="text-xs font-medium text-slate-600 dark:text-slate-300">
-                {{ data.document_date || 'N/A' }}
-              </span>
-            </template>
-            <template #loading>
-              <Skeleton width="70%" height="1.5rem" />
-            </template>
-          </Column>
-
-          <Column field="title" header="Title / Matter" style="width: 42%">
-            <template #body="{ data }">
-              <div class="font-semibold text-sm text-slate-900 dark:text-slate-100 hover:text-blue-600 transition cursor-pointer" @click="viewRecordDetail(data)">
-                {{ data.title }}
-              </div>
-              <div v-if="data.summary" class="text-xs text-slate-500 line-clamp-1 mt-0.5">
-                {{ data.summary }}
-              </div>
-            </template>
-            <template #loading>
-              <Skeleton width="90%" height="1.5rem" />
-            </template>
-          </Column>
-
-          <Column header="Actions" style="width: 10%" class="text-right">
-            <template #body="{ data }">
-              <Button
-                icon="pi pi-eye"
-                label="View"
-                severity="primary"
-                size="small"
-                outlined
-                @click="viewRecordDetail(data)"
-              />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-
-    </main>
-
-    <!-- Judgment / Document Viewer Modal Dialog -->
+    <!-- Document Detail Dialog conforming to ohmsite design system -->
     <Dialog
       v-model:visible="detailModalVisible"
       modal
       header="Legal Document View"
-      :style="{ width: '80vw', maxWidth: '1000px' }"
+      :style="{ width: '85vw', maxWidth: '1100px' }"
       :breakpoints="{ '960px': '90vw', '640px': '95vw' }"
       dismissableMask
+      class="ohmlaw-custom-dialog"
     >
       <div v-if="detailLoading" class="p-8 space-y-4">
-        <Skeleton width="60%" height="2rem" />
-        <Skeleton width="40%" height="1.2rem" />
-        <Skeleton width="100%" height="12rem" />
+        <Skeleton width="60%" height="2rem" class="bg-zinc-800" />
+        <Skeleton width="40%" height="1.2rem" class="bg-zinc-800" />
+        <Skeleton width="100%" height="16rem" class="bg-zinc-800" />
       </div>
 
-      <div v-else-if="selectedDetail" class="space-y-6 p-2">
+      <div v-else-if="selectedDetail" class="space-y-6 p-2 text-white">
         <!-- Title & Metadata Header -->
-        <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">
-            {{ selectedDetail.data.title || selectedDetail.data.name || 'Legal Record Detail' }}
+        <div class="border-b border-white/10 pb-6">
+          <h2 class="text-2xl font-black uppercase tracking-tight text-white mb-3">
+            {{ selectedDetail.data.title || selectedDetail.data.name || 'Legal Record Details' }}
           </h2>
-          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
-            <span v-if="selectedDetail.data.court"><strong>Forum:</strong> {{ selectedDetail.data.court }}</span>
-            <span v-if="selectedDetail.data.case_number"><strong>Case #:</strong> {{ selectedDetail.data.case_number }}</span>
-            <span v-if="selectedDetail.document_date"><strong>Date:</strong> {{ selectedDetail.document_date }}</span>
-            <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-blue-600 hover:underline flex items-center gap-1">
-              Source <i class="ph ph-arrow-square-out"></i>
+          <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-400">
+            <span v-if="selectedDetail.data.court" class="flex items-center gap-1">
+              <span class="text-zinc-600 uppercase tracking-widest text-[9px]">Forum:</span> {{ selectedDetail.data.court }}
+            </span>
+            <span v-if="selectedDetail.data.case_number" class="flex items-center gap-1">
+              <span class="text-zinc-600 uppercase tracking-widest text-[9px]">Case #:</span> {{ selectedDetail.data.case_number }}
+            </span>
+            <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
+              <span class="text-zinc-600 uppercase tracking-widest text-[9px]">Date:</span> {{ selectedDetail.document_date }}
+            </span>
+            <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1">
+              Original Source <ExternalLink class="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
 
-        <!-- Highlight Callouts -->
-        <div v-if="selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding" class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200 text-sm">
-          <strong class="font-bold block mb-1">Holding & Final Order:</strong>
-          <p>{{ selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding }}</p>
+        <!-- Highlight Callout Boxes -->
+        <div v-if="selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding" class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium space-y-1">
+          <div class="flex items-center gap-2 text-emerald-400 font-black uppercase text-[10px] tracking-widest">
+            <CheckCircle2 class="w-4 h-4" /> Holding & Final Order
+          </div>
+          <p class="leading-relaxed">{{ selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding }}</p>
         </div>
 
-        <div v-if="selectedDetail.data.reason_for_dismissal" class="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-900 dark:text-red-200 text-sm">
-          <strong class="font-bold block mb-1">Reason for Dismissal:</strong>
-          <p>{{ selectedDetail.data.reason_for_dismissal }}</p>
+        <div v-if="selectedDetail.data.reason_for_dismissal" class="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium space-y-1">
+          <div class="flex items-center gap-2 text-rose-400 font-black uppercase text-[10px] tracking-widest">
+            <AlertTriangle class="w-4 h-4" /> Reason for Dismissal
+          </div>
+          <p class="leading-relaxed">{{ selectedDetail.data.reason_for_dismissal }}</p>
         </div>
 
-        <div v-if="selectedDetail.data.ai_summary || selectedDetail.data.summary" class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-sm">
-          <strong class="font-bold block mb-1">📖 Summary & Headnotes:</strong>
-          <p class="whitespace-pre-line">{{ selectedDetail.data.ai_summary || selectedDetail.data.summary }}</p>
+        <div v-if="selectedDetail.data.ai_summary || selectedDetail.data.summary" class="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium space-y-1">
+          <div class="flex items-center gap-2 text-amber-400 font-black uppercase text-[10px] tracking-widest">
+            <FileCheck class="w-4 h-4" /> Summary & Headnotes
+          </div>
+          <p class="whitespace-pre-line leading-relaxed">{{ selectedDetail.data.ai_summary || selectedDetail.data.summary }}</p>
         </div>
 
-        <!-- Full Document Text -->
+        <!-- Full Document Text Viewer -->
         <div v-if="selectedDetail.data.full_text || selectedDetail.data.text || selectedDetail.data.content" class="space-y-2">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">📄 Full Document Text</h3>
-          <div class="p-6 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-serif text-sm leading-relaxed text-slate-800 dark:text-slate-200 whitespace-pre-line max-h-[500px] overflow-y-auto">
+          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Full Judgment Text</h3>
+          <div class="p-6 rounded-2xl bg-black/60 border border-white/5 font-serif text-sm leading-relaxed text-zinc-300 whitespace-pre-line max-h-[500px] overflow-y-auto">
             {{ selectedDetail.data.full_text || selectedDetail.data.text || selectedDetail.data.content }}
           </div>
         </div>
 
-        <!-- Dynamic Payload Data Grid -->
+        <!-- Metadata Attributes Grid -->
         <div class="space-y-2">
-          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">📋 Metadata Attributes</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Document Metadata Attributes</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-black/40 p-5 rounded-2xl border border-white/5">
             <template v-for="(val, key) in selectedDetail.data" :key="key">
-              <div v-if="val && !['full_text', 'text', 'content'].includes(String(key))" class="flex flex-col">
-                <span class="font-semibold text-slate-500 capitalize">{{ String(key).replace(/_/g, ' ') }}:</span>
-                <span class="font-mono text-slate-800 dark:text-slate-200 break-all">{{ formatValue(val) }}</span>
+              <div v-if="val && !['full_text', 'text', 'content'].includes(String(key))" class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ String(key).replace(/_/g, ' ') }}</span>
+                <span class="font-mono text-zinc-300 break-all">{{ formatValue(val) }}</span>
               </div>
             </template>
           </div>
         </div>
       </div>
     </Dialog>
-
-  </div>
+  </AdminLayout>
 </template>
 
-<style scoped>
-:deep(.p-datatable) {
-  font-family: inherit;
+<style>
+/* Custom PrimeVue dark table styling to match ohmsite design system */
+.p-datatable-dark-custom {
+  background: transparent !important;
+}
+
+.p-datatable-dark-custom .p-datatable-header,
+.p-datatable-dark-custom .p-datatable-footer {
+  background: transparent !important;
+  border: none !important;
+}
+
+.p-datatable-dark-custom .p-datatable-thead > tr > th {
+  background: transparent !important;
+  color: #71717a !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  letter-spacing: 0.2em !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody > tr {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody > tr:hover {
+  background: rgba(39, 39, 42, 0.4) !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody > tr > td {
+  padding: 1.25rem 1.5rem !important;
+  border: none !important;
+}
+
+.p-datatable-dark-custom .p-paginator {
+  background: transparent !important;
+  border: none !important;
+  padding-top: 1.5rem !important;
+  color: #a1a1aa !important;
+}
+
+.p-datatable-dark-custom .p-paginator .p-paginator-page,
+.p-datatable-dark-custom .p-paginator .p-paginator-first,
+.p-datatable-dark-custom .p-paginator .p-paginator-prev,
+.p-datatable-dark-custom .p-paginator .p-paginator-next,
+.p-datatable-dark-custom .p-paginator .p-paginator-last {
+  background: rgba(24, 24, 27, 0.5) !important;
+  color: #a1a1aa !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 0.75rem !important;
+  margin: 0 0.125rem !important;
+}
+
+.p-datatable-dark-custom .p-paginator .p-paginator-page.p-highlight {
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+}
+
+/* Custom PrimeVue Dialog Modal Dark Theme */
+.ohmlaw-custom-dialog .p-dialog {
+  background: #09090b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75) !important;
+}
+
+.ohmlaw-custom-dialog .p-dialog-header {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 1.5rem 2rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.025em !important;
+}
+
+.ohmlaw-custom-dialog .p-dialog-content {
+  background: transparent !important;
+  padding: 1.5rem 2rem !important;
 }
 </style>

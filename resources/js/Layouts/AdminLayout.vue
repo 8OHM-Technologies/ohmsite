@@ -21,7 +21,8 @@ import {
     Plus,
     LogOut,
     UserCircle,
-    Database
+    Database,
+    Scale
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -78,6 +79,7 @@ const navigation = [
     { name: 'Home Page', href: route('admin.home.edit'), icon: Home },
     { name: 'Products', href: route('admin.products.index'), icon: Package },
     { name: 'Datasets', href: route('admin.datasets.index'), icon: Database },
+    { name: 'OHMLaw', href: route('ohmlaw.index'), icon: Scale },
     { name: 'Orders', href: route('admin.orders.index'), icon: ShoppingCart },
     { name: 'Customers', href: route('admin.customers.index'), icon: Users },
     { name: 'Analytics', href: route('admin.analytics.index'), icon: BarChart3 },
