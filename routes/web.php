@@ -19,12 +19,22 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\OhmLawController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\UserOrderController;
-use Illuminate\Support\Facades\Route;
+
+Route::domain(env('OHMLAW_DOMAIN', 'ohmlaw.8ohm.co.za'))->group(function () {
+    Route::get('/', [OhmLawController::class, 'index'])->name('ohmlaw.root');
+    Route::get('/data', [OhmLawController::class, 'data'])->name('ohmlaw.root.data');
+    Route::get('/record/{id}', [OhmLawController::class, 'show'])->name('ohmlaw.root.show');
+
+    Route::get('/ohmlaw', [OhmLawController::class, 'index']);
+    Route::get('/ohmlaw/data', [OhmLawController::class, 'data']);
+    Route::get('/ohmlaw/record/{id}', [OhmLawController::class, 'show']);
+});
 
 Route::get('/demo', [DemoController::class, 'index'])->name('demo');
 
@@ -80,12 +90,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/licenses', [InventoryController::class, 'index'])->name('licenses.index');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
-});
-
-use App\Http\Controllers\OhmLawController;
-
-Route::domain('ohmlaw.8ohm.co.za')->middleware('auth')->group(function () {
-    Route::get('/', [OhmLawController::class, 'index'])->name('ohmlaw.root');
 });
 
 Route::middleware('auth')->group(function () {

@@ -33,7 +33,7 @@ services:
       - app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ohmsite.rule=Host(`ohmsite.localhost`)"
+      - "traefik.http.routers.ohmsite.rule=Host(`ohmsite.localhost`) || Host(`ohmlaw.localhost`)"
       - "traefik.http.services.ohmsite.loadbalancer.server.port=80"
       - "traefik.docker.network=8ohm-network"
 

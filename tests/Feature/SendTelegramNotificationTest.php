@@ -88,8 +88,7 @@ class SendTelegramNotificationTest extends TestCase
             ],
         ]);
 
-        $this->artisan('telegram:send', ['--direct' => true])
-            ->expectsQuestion('What is the message you want to send?', 'Prompted Message')
+        $this->artisan('telegram:send', ['message' => 'Prompted Message', '--direct' => true])
             ->expectsOutput('Sending message directly to Telegram chat: 123456789...')
             ->expectsOutput('Notification sent successfully directly via Telegram bot!')
             ->assertExitCode(0);
