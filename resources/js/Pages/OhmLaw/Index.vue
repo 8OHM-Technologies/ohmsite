@@ -24,13 +24,23 @@ import {
 // PrimeVue Free Components (Open Source MIT)
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Dialog from 'primevue/dialog';
+import Modal from '@/Components/Modal.vue';
 import Skeleton from 'primevue/skeleton';
-import type { DataTableLazyLoadEvent } from 'primevue/datatable';
+import type { DataTablePageEvent, DataTableSortEvent, DataTableFilterEvent } from 'primevue/datatable';
+
+type DataTableLazyLoadEvent = DataTablePageEvent | DataTableSortEvent | DataTableFilterEvent;
+
+interface AuthUser {
+  id: number;
+  role: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+}
 
 // Dynamic Layout Selection based on User Role (Admin vs Subscriber)
 const page = usePage();
-const user = computed(() => page.props.auth.user);
+const user = computed(() => (page.props.auth?.user as unknown as AuthUser | null) || null);
 const isAdmin = computed(() => user.value && user.value.role === 'admin');
 const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberLayout);
 
@@ -60,7 +70,7 @@ const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
 
 // Lazy parameter state
-const lazyParams = ref<DataTableLazyLoadEvent>({
+const lazyParams = ref<Partial<DataTableLazyLoadEvent>>({
   first: 0,
   rows: 25,
   sortField: 'created_at',
@@ -143,6 +153,125 @@ const formatValue = (val: any) => {
 onMounted(() => {
   loadLazyRecords();
 });
+
+// Document-specific category helpers and metadata filters
+const EXCLUDED_KEYS = new Set([
+  'detail_url',
+  'detail_title',
+  'index_scraped_at',
+  'preview_image_url',
+  'details_scraped_at',
+  'scraped_at',
+  'source_url',
+  'metadata'
+]);
+
+const SPECIAL_LAYOUT_KEYS = new Set([
+  'result',
+  'order',
+  'holding',
+  'reason_for_dismissal',
+  'dismissal_reason',
+  'reasons_for_dismissal',
+  'summary',
+  'ai_summary',
+  'headnotes',
+  'abstract',
+  'full_text',
+  'text',
+  'content',
+  'raw_text',
+  'judgment_text',
+  'title',
+  'name',
+  'heading'
+]);
+
+const getDocumentType = (record: any): 'case' | 'gazette' | 'journal' | 'court_roll' => {
+  if (!record) return 'case';
+  const url = (record.source_url || '').toLowerCase();
+  const type = (record.record_type || '').toLowerCase();
+
+  if (url.includes('/gaz/') || url.includes('gazette') || type.includes('gazette') || type.includes('gaz')) {
+    return 'gazette';
+  }
+  if (url.includes('/journals/') || url.includes('journal') || type.includes('journal')) {
+    return 'journal';
+  }
+  if (url.includes('/rolls/') || url.includes('/other/') || url.includes('courtroll') || url.includes('roll') || type.includes('roll')) {
+    return 'court_roll';
+  }
+  return 'case';
+};
+
+const getDocumentBodyText = (recordData: any) => {
+  if (!recordData) return '';
+  return recordData.full_text || recordData.text || recordData.content || recordData.raw_text || recordData.judgment_text || '';
+};
+
+const getDocumentSummary = (recordData: any) => {
+  if (!recordData) return '';
+  return recordData.ai_summary || recordData.summary || recordData.headnotes || recordData.abstract || '';
+};
+
+const getDocumentHolding = (recordData: any) => {
+  if (!recordData) return '';
+  return recordData.result || recordData.order || recordData.holding || '';
+};
+
+const getDocumentDismissal = (recordData: any) => {
+  if (!recordData) return '';
+  return recordData.reason_for_dismissal || recordData.dismissal_reason || recordData.reasons_for_dismissal || '';
+};
+
+const getFilteredMetadata = (recordData: any) => {
+  if (!recordData) return [];
+
+  const courtForumValues: string[] = [];
+  const courtForumKeysToExclude = new Set<string>();
+
+  for (const key of Object.keys(recordData)) {
+    const val = recordData[key];
+    if (val === null || val === undefined || val === '') continue;
+    const kNorm = key.toLowerCase().replace(/_/g, ' ').trim();
+    if (
+      kNorm === 'court' ||
+      kNorm === 'forum' ||
+      kNorm === 'court forum' ||
+      kNorm === 'court/forum' ||
+      kNorm === 'forum/court' ||
+      kNorm === 'court / forum'
+    ) {
+      courtForumKeysToExclude.add(key);
+      const valStr = String(val).trim();
+      if (valStr && !courtForumValues.includes(valStr)) {
+        courtForumValues.push(valStr);
+      }
+    }
+  }
+
+  const items: { label: string; value: any }[] = [];
+
+  if (courtForumValues.length > 0) {
+    items.push({
+      label: 'Court/Forum',
+      value: courtForumValues.join(' / '),
+    });
+  }
+
+  for (const key of Object.keys(recordData)) {
+    const val = recordData[key];
+    if (val === null || val === undefined || val === '') continue;
+    if (EXCLUDED_KEYS.has(key) || SPECIAL_LAYOUT_KEYS.has(key) || courtForumKeysToExclude.has(key)) {
+      continue;
+    }
+
+    const label = key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    items.push({ label, value: val });
+  }
+
+  return items.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
+};
 </script>
 
 <template>
@@ -231,7 +360,9 @@ onMounted(() => {
         :lazy="true"
         :totalRecords="totalRecords"
         :loading="loading"
-        @lazy="onLazy"
+        @page="onLazy"
+        @sort="onLazy"
+        @filter="onLazy"
         paginator
         :rows="25"
         :rowsPerPageOptions="[10, 25, 50, 100]"
@@ -313,88 +444,206 @@ onMounted(() => {
       </DataTable>
     </div>
 
-    <!-- Document Detail Dialog -->
-    <Dialog
-      v-model:visible="detailModalVisible"
-      modal
-      header="Legal Document View"
-      :style="{ width: '85vw', maxWidth: '1100px' }"
-      :breakpoints="{ '960px': '90vw', '640px': '95vw' }"
-      dismissableMask
-      class="ohmlaw-custom-dialog"
-    >
-      <div v-if="detailLoading" class="p-8 space-y-4">
-        <Skeleton width="60%" height="2rem" class="bg-zinc-800" />
-        <Skeleton width="40%" height="1.2rem" class="bg-zinc-800" />
-        <Skeleton width="100%" height="16rem" class="bg-zinc-800" />
-      </div>
-
-      <div v-else-if="selectedDetail" class="space-y-6 p-2 text-white">
-        <!-- Title & Metadata Header -->
-        <div class="border-b border-white/10 pb-6">
-          <h2 class="text-2xl font-black uppercase tracking-tight text-white mb-3">
-            {{ selectedDetail.data.title || selectedDetail.data.name || 'Legal Record Details' }}
-          </h2>
-          <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300">
-            <span v-if="selectedDetail.data.court" class="flex items-center gap-1">
-              <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{ selectedDetail.data.court }}
-            </span>
-            <span v-if="selectedDetail.data.case_number" class="flex items-center gap-1">
-              <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Case #:</span> {{ selectedDetail.data.case_number }}
-            </span>
-            <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
-              <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Date:</span> {{ selectedDetail.document_date }}
-            </span>
-            <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1">
-              Original Source <ExternalLink class="w-3.5 h-3.5" />
-            </a>
+    <!-- Document Detail Modal -->
+    <Modal :show="detailModalVisible" @close="detailModalVisible = false" maxWidth="5xl">
+      <div class="relative bg-zinc-950 text-white rounded-2xl border border-white/10 overflow-hidden shadow-2xl max-h-[95vh] flex flex-col">
+        <!-- Top Sticky Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-10">
+          <div class="flex items-center gap-2">
+            <Scale class="w-5 h-5 text-admin-modern" />
+            <span class="text-xs font-black uppercase tracking-widest text-zinc-400">Legal Document Intelligence</span>
           </div>
+          <button 
+            @click="detailModalVisible = false" 
+            class="p-1.5 bg-zinc-800/80 border border-white/10 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-all"
+            title="Close Document"
+          >
+            <X class="w-4 h-4" />
+          </button>
         </div>
 
-        <!-- Highlight Callout Boxes -->
-        <div v-if="selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding" class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium space-y-1">
-          <div class="flex items-center gap-2 text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-            <CheckCircle2 class="w-4 h-4" /> Holding & Final Order
+        <!-- Scrollable content area -->
+        <div class="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
+          <!-- Loading State -->
+          <div v-if="detailLoading" class="space-y-6">
+            <Skeleton width="60%" height="2rem" class="bg-zinc-800/60" />
+            <Skeleton width="40%" height="1.2rem" class="bg-zinc-800/60" />
+            <Skeleton width="100%" height="16rem" class="bg-zinc-800/60 rounded-xl" />
           </div>
-          <p class="leading-relaxed">{{ selectedDetail.data.result || selectedDetail.data.order || selectedDetail.data.holding }}</p>
-        </div>
 
-        <div v-if="selectedDetail.data.reason_for_dismissal" class="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-1">
-          <div class="flex items-center gap-2 text-rose-400 font-black uppercase text-[10px] tracking-widest">
-            <AlertTriangle class="w-4 h-4" /> Reason for Dismissal
-          </div>
-          <p class="leading-relaxed">{{ selectedDetail.data.reason_for_dismissal }}</p>
-        </div>
-
-        <div v-if="selectedDetail.data.ai_summary || selectedDetail.data.summary" class="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium space-y-1">
-          <div class="flex items-center gap-2 text-amber-400 font-black uppercase text-[10px] tracking-widest">
-            <FileCheck class="w-4 h-4" /> Summary & Headnotes
-          </div>
-          <p class="whitespace-pre-line leading-relaxed">{{ selectedDetail.data.ai_summary || selectedDetail.data.summary }}</p>
-        </div>
-
-        <!-- Full Document Text Viewer -->
-        <div v-if="selectedDetail.data.full_text || selectedDetail.data.text || selectedDetail.data.content" class="space-y-2">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Full Judgment Text</h3>
-          <div class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-200 whitespace-pre-line max-h-[500px] overflow-y-auto">
-            {{ selectedDetail.data.full_text || selectedDetail.data.text || selectedDetail.data.content }}
-          </div>
-        </div>
-
-        <!-- Metadata Attributes Grid -->
-        <div class="space-y-2">
-          <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Document Metadata Attributes</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-black/40 p-5 rounded-2xl border border-white/10">
-            <template v-for="(val, key) in selectedDetail.data" :key="key">
-              <div v-if="val && !['full_text', 'text', 'content'].includes(String(key))" class="flex flex-col gap-0.5">
-                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ String(key).replace(/_/g, ' ') }}</span>
-                <span class="font-mono text-zinc-200 break-all">{{ formatValue(val) }}</span>
+          <!-- Document Detail Loaded -->
+          <div v-else-if="selectedDetail" class="space-y-6">
+            
+            <!-- Category-specific layouts -->
+            
+            <!-- 1. COURT ROLLS LAYOUT (Compact, one-liner style) -->
+            <div v-if="getDocumentType(selectedDetail) === 'court_roll'" class="space-y-4">
+              <div class="flex items-start gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-white/5 shadow-inner">
+                <div class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/10 text-admin-modern shrink-0">
+                  <Calendar class="w-5 h-5" />
+                </div>
+                <div class="space-y-2 flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern text-[9px] font-black uppercase tracking-widest rounded">Court Roll</span>
+                    <span v-if="selectedDetail.document_date" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">{{ selectedDetail.document_date }}</span>
+                  </div>
+                  <h2 class="text-lg font-black uppercase tracking-tight text-white leading-snug">
+                    {{ selectedDetail.data.title || selectedDetail.data.name || 'Court Roll Schedule' }}
+                  </h2>
+                  <p class="text-xs font-bold text-zinc-400">
+                    <span class="text-zinc-600 uppercase tracking-widest text-[9px] mr-1">Forum:</span>
+                    {{ selectedDetail.data.court || selectedDetail.record_type }}
+                  </p>
+                </div>
               </div>
-            </template>
+
+              <!-- Compact Text Block -->
+              <div v-if="getDocumentBodyText(selectedDetail.data)" class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-300 whitespace-pre-line max-h-[350px] overflow-y-auto custom-scrollbar">
+                {{ getDocumentBodyText(selectedDetail.data) }}
+              </div>
+              
+              <!-- Clean minimal detail list -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-900/30 p-4 rounded-xl border border-white/5">
+                <div v-for="item in getFilteredMetadata(selectedDetail.data)" :key="item.label" class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
+                  <span class="font-mono text-zinc-300 font-bold truncate max-w-[200px]">{{ formatValue(item.value) }}</span>
+                </div>
+                <div v-if="selectedDetail.source_url" class="flex items-center justify-between py-1 col-span-1 sm:col-span-2 border-t border-white/5 mt-1 pt-2">
+                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Source Link</span>
+                  <a :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1 font-bold">
+                    Go to Original <ExternalLink class="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. GAZETTE & JOURNAL LAYOUT (Formatted, premium printed text document) -->
+            <div v-else-if="['gazette', 'journal'].includes(getDocumentType(selectedDetail))" class="max-w-3xl mx-auto space-y-8 py-2">
+              
+              <!-- Document Header Block -->
+              <div class="border-b-2 border-white/10 pb-6 text-center space-y-4">
+                <div class="flex items-center justify-center gap-2">
+                  <span class="px-3 py-1 bg-white text-black text-[9px] font-black uppercase tracking-[0.2em] rounded-full">
+                    {{ getDocumentType(selectedDetail) === 'gazette' ? 'Official Gazette Notice' : 'Academic Law Journal' }}
+                  </span>
+                </div>
+
+                <h1 class="font-serif text-3xl sm:text-4xl font-black text-white tracking-tight leading-snug max-w-2xl mx-auto">
+                  {{ selectedDetail.data.title || selectedDetail.data.name || 'Publication Document' }}
+                </h1>
+
+                <!-- Formal Sub-Header -->
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  <span v-if="selectedDetail.data.publisher || selectedDetail.data.journal_name" class="flex items-center gap-1">
+                    <span class="text-zinc-600">Publisher:</span> 
+                    {{ selectedDetail.data.publisher || selectedDetail.data.journal_name }}
+                  </span>
+                  <span v-if="selectedDetail.data.gazette_number || selectedDetail.data.volume" class="flex items-center gap-1">
+                    <span class="text-zinc-600">Reference:</span> 
+                    <code>{{ selectedDetail.data.gazette_number || selectedDetail.data.volume }}</code>
+                  </span>
+                  <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
+                    <span class="text-zinc-600">Date:</span> 
+                    {{ selectedDetail.document_date }}
+                  </span>
+                </div>
+
+                <!-- Abstract / Summary Callout in reader layout -->
+                <div v-if="getDocumentSummary(selectedDetail.data)" class="text-left bg-zinc-900/40 border border-white/5 p-5 rounded-2xl max-w-2xl mx-auto">
+                  <p class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2">Abstract / Executive Summary</p>
+                  <p class="text-xs leading-relaxed text-zinc-300 font-medium whitespace-pre-line">{{ getDocumentSummary(selectedDetail.data) }}</p>
+                </div>
+              </div>
+
+              <!-- Main Reading Body (No table, premium formatted document look and feel) -->
+              <div v-if="getDocumentBodyText(selectedDetail.data)" class="prose prose-invert font-serif max-w-none text-zinc-200 leading-relaxed text-base space-y-6 whitespace-pre-line px-2 sm:px-6">
+                {{ getDocumentBodyText(selectedDetail.data) }}
+              </div>
+
+              <!-- End of Document Footer / Details section (subtle, clean) -->
+              <div class="border-t border-white/10 pt-6 mt-10">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="item in getFilteredMetadata(selectedDetail.data)" :key="item.label" class="px-2.5 py-1 bg-zinc-900/60 border border-white/5 rounded-lg text-zinc-400">
+                      <strong>{{ item.label }}:</strong> {{ formatValue(item.value) }}
+                    </span>
+                  </div>
+                  <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1 shrink-0 font-black tracking-widest text-[9px]">
+                    Go to Source <ExternalLink class="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. CASE LAW / COURT JUDGMENTS LAYOUT (Default detailed case view) -->
+            <div v-else class="space-y-6">
+              <!-- Title & Metadata Header -->
+              <div class="border-b border-white/10 pb-6">
+                <h2 class="text-2xl font-black uppercase tracking-tight text-white mb-3">
+                  {{ selectedDetail.data.title || selectedDetail.data.name || 'Legal Record Details' }}
+                </h2>
+                <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300">
+                  <span v-if="selectedDetail.data.court" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{ selectedDetail.data.court }}
+                  </span>
+                  <span v-if="selectedDetail.data.case_number" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Case #:</span> {{ selectedDetail.data.case_number }}
+                  </span>
+                  <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Date:</span> {{ selectedDetail.document_date }}
+                  </span>
+                  <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1">
+                    Original Source <ExternalLink class="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+
+              <!-- Highlight Callout Boxes (Result / Holding / Order) -->
+              <div v-if="getDocumentHolding(selectedDetail.data)" class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium space-y-1">
+                <div class="flex items-center gap-2 text-emerald-400 font-black uppercase text-[10px] tracking-widest">
+                  <CheckCircle2 class="w-4 h-4" /> Holding & Final Order
+                </div>
+                <p class="leading-relaxed">{{ getDocumentHolding(selectedDetail.data) }}</p>
+              </div>
+
+              <div v-if="getDocumentDismissal(selectedDetail.data)" class="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-1">
+                <div class="flex items-center gap-2 text-rose-400 font-black uppercase text-[10px] tracking-widest">
+                  <AlertTriangle class="w-4 h-4" /> Reason for Dismissal
+                </div>
+                <p class="leading-relaxed">{{ getDocumentDismissal(selectedDetail.data) }}</p>
+              </div>
+
+              <div v-if="getDocumentSummary(selectedDetail.data)" class="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium space-y-1">
+                <div class="flex items-center gap-2 text-amber-400 font-black uppercase text-[10px] tracking-widest">
+                  <FileCheck class="w-4 h-4" /> Summary & Headnotes
+                </div>
+                <p class="whitespace-pre-line leading-relaxed">{{ getDocumentSummary(selectedDetail.data) }}</p>
+              </div>
+
+              <!-- Full Judgment Text Viewer -->
+              <div v-if="getDocumentBodyText(selectedDetail.data)" class="space-y-2">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Full Judgment Text</h3>
+                <div class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-200 whitespace-pre-line max-h-[500px] overflow-y-auto custom-scrollbar">
+                  {{ getDocumentBodyText(selectedDetail.data) }}
+                </div>
+              </div>
+
+              <!-- Metadata Attributes Grid (Alphabetically sorted, filtered) -->
+              <div v-if="getFilteredMetadata(selectedDetail.data).length > 0" class="space-y-2">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Document Metadata Attributes</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-black/40 p-5 rounded-2xl border border-white/10">
+                  <div v-for="item in getFilteredMetadata(selectedDetail.data)" :key="item.label" class="flex flex-col gap-0.5">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
+                    <span class="font-mono text-zinc-200 break-all">{{ formatValue(item.value) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
-    </Dialog>
+    </Modal>
   </component>
 </template>
 
@@ -476,50 +725,20 @@ onMounted(() => {
   height: 1rem !important;
 }
 
-/* Custom PrimeVue Dialog Modal Dark Theme & High Contrast Close Button */
-.ohmlaw-custom-dialog .p-dialog {
-  background: #09090b !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: 2rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85) !important;
+/* Custom scrollbar for reader layout scroll containers */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-.ohmlaw-custom-dialog .p-dialog-header {
-  background: transparent !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 1.5rem 2rem !important;
-  font-weight: 900 !important;
-  text-transform: uppercase !important;
-  letter-spacing: -0.025em !important;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 9999px;
 }
-
-.ohmlaw-custom-dialog .p-dialog-content {
-  background: transparent !important;
-  padding: 1.5rem 2rem !important;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
 }
-
-.ohmlaw-custom-dialog .p-dialog-close-button,
-.ohmlaw-custom-dialog .p-dialog-header-icon {
-  color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 0.5rem !important;
-  padding: 0.5rem !important;
-  width: 2rem !important;
-  height: 2rem !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.ohmlaw-custom-dialog .p-dialog-close-button:hover,
-.ohmlaw-custom-dialog .p-dialog-header-icon:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: #ffffff !important;
-}
-
-.ohmlaw-custom-dialog svg {
-  fill: currentColor !important;
-  color: #ffffff !important;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 </style>
