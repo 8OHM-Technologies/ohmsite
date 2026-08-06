@@ -17,7 +17,8 @@ import {
     ShoppingCart,
     Database,
     Briefcase,
-    Calendar
+    Calendar,
+    Scale
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -64,13 +65,24 @@ const handleSearch = () => {
 
 const navigation = [
     { name: 'Analytics', href: route('pro-dashboard.index'), icon: BarChart3 },
+    { name: 'OHMLaw Intelligence', href: route('ohmlaw.index'), icon: Scale },
     { name: 'Products', href: route('pro-dashboard.products.index'), icon: Package },
 ];
 
 const isUrl = (url) => {
-    const currentUrl = page.url.split('?')[0].substr(1);
-    const targetUrl = url.replace(page.props.app_url + '/', '').replace(page.props.app_url, '');
-    return currentUrl === targetUrl || currentUrl.startsWith(targetUrl + '/');
+    if (!url) return false;
+    let path = url.replace(/^(?:\/\/|[^\/]+)*\//, '');
+    if (path.startsWith('/')) path = path.substring(1);
+    path = path.split('?')[0].replace(/\/$/, '');
+
+    let current = page.url.split('?')[0];
+    if (current.startsWith('/')) current = current.substring(1);
+    current = current.replace(/\/$/, '');
+
+    if (!path) {
+        return current === '';
+    }
+    return current === path || current.startsWith(path + '/');
 };
 
 // Close sidebar on route change (mobile)

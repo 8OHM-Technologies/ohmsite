@@ -84,10 +84,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
 use App\Http\Controllers\OhmLawController;
 
-Route::domain('ohmlaw.8ohm.co.za')->middleware('auth')->group(function () {
-    Route::get('/', [OhmLawController::class, 'index'])->name('ohmlaw.root');
-});
-
 Route::middleware('auth')->group(function () {
     Route::get('/ohmlaw', [OhmLawController::class, 'index'])->name('ohmlaw.index');
     Route::get('/ohmlaw/data', [OhmLawController::class, 'data'])->name('ohmlaw.data');

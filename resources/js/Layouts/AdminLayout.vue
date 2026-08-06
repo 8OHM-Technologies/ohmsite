@@ -88,9 +88,19 @@ const navigation = [
 ];
 
 const isUrl = (url) => {
-    const currentUrl = page.url.split('?')[0].substr(1);
-    const targetUrl = url.replace(page.props.app_url + '/', '').replace(page.props.app_url, '');
-    return currentUrl === targetUrl || currentUrl.startsWith(targetUrl + '/');
+    if (!url) return false;
+    let path = url.replace(/^(?:\/\/|[^\/]+)*\//, '');
+    if (path.startsWith('/')) path = path.substring(1);
+    path = path.split('?')[0].replace(/\/$/, '');
+
+    let current = page.url.split('?')[0];
+    if (current.startsWith('/')) current = current.substring(1);
+    current = current.replace(/\/$/, '');
+
+    if (!path) {
+        return current === '';
+    }
+    return current === path || current.startsWith(path + '/');
 };
 
 // Close sidebar on route change (mobile)
