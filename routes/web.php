@@ -84,11 +84,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
 use App\Http\Controllers\OhmLawController;
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ohmlaw', [OhmLawController::class, 'index'])->name('ohmlaw.index');
     Route::get('/ohmlaw/data', [OhmLawController::class, 'data'])->name('ohmlaw.data');
     Route::get('/ohmlaw/record/{id}', [OhmLawController::class, 'show'])->name('ohmlaw.show');
+});
 
+Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -89,6 +89,8 @@ class EnquiryNotificationTest extends TestCase
      */
     public function test_user_registration_sends_notification_to_admins(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
+
         Telegraph::fake([
             TelegraphCore::ENDPOINT_MESSAGE => ['result' => ['message_id' => 999]],
         ]);
@@ -108,7 +110,7 @@ class EnquiryNotificationTest extends TestCase
 
         $response = $this->post('/register', $registrationPayload);
 
-        $this->assertAuthenticated();
+        $this->assertGuest();
 
         // Verify admin got notification in database
         $this->assertEquals(1, $admin->notifications()->count());

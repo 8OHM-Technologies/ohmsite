@@ -60,12 +60,12 @@ onMounted(() => {
         </p>
 
         <div class="cta-group reveal-item">
-          <button type="button" @click="$emit('open-modal')" class="btn btn-primary">
+          <Link :href="route('ohmlaw.index')" class="btn btn-primary">
             <span>Access Free Datasets</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>
-          </button>
+          </Link>
           <Link href="/demo" class="btn btn-secondary">
             <span>View Demo Dashboard</span>
             <div class="btn-icon">

@@ -50,6 +50,18 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+
+        if (! $user->hasVerifiedEmail()) {
+            Auth::logout();
+
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => __('Please check your email and click the confirmation link to verify your account before logging in.'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

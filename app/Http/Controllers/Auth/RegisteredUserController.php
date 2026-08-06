@@ -53,8 +53,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
         // Notify admins
         try {
             $admins = User::where('role', 'admin')->get();
@@ -63,6 +61,6 @@ class RegisteredUserController extends Controller
             \Illuminate\Support\Facades\Log::error('Failed to send Telegram notification for user registration: '.$e->getMessage());
         }
 
-        return redirect($user->getRedirectUrl());
+        return redirect()->route('login')->with('status', __('Registration successful! Please check your email for a confirmation link to verify your account before logging in.'));
     }
 }
