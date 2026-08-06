@@ -150,6 +150,102 @@ const formatValue = (val: any) => {
   return String(val);
 };
 
+const COURT_NAMES_MAP: Record<string, string> = {
+  'ZACC': 'Constitutional Court of South Africa',
+  'ZASCA': 'Supreme Court of Appeal of South Africa',
+  'ZAGPPHC': 'Gauteng High Court, Pretoria',
+  'ZAGPJHC': 'Gauteng High Court, Johannesburg',
+  'ZAWCHC': 'Western Cape High Court, Cape Town',
+  'ZAFSHC': 'Free State High Court, Bloemfontein',
+  'ZAKZNDHC': 'KwaZulu-Natal High Court, Durban',
+  'ZAKZNHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+  'ZAECGHC': 'Eastern Cape High Court, Grahamstown',
+  'ZAECPEHC': 'Eastern Cape High Court, Port Elizabeth',
+  'ZAECELHC': 'Eastern Cape High Court, East London',
+  'ZAECBHC': 'Eastern Cape High Court, Bhisho',
+  'ZALMPPHC': 'Limpopo High Court, Polokwane',
+  'ZANWHC': 'North West High Court, Mahikeng',
+  'ZANCHC': 'Northern Cape High Court, Kimberley',
+  'ZALC': 'Labour Court of South Africa',
+  'ZALAC': 'Labour Appeal Court of South Africa',
+  'ZACAC': 'Competition Appeal Court of South Africa',
+  'ZAEQC': 'Equality Court of South Africa',
+  'ZALCC': 'Land Claims Court of South Africa',
+  'ZATC': 'Tax Court of South Africa',
+  'ZAECC': 'Electoral Court of South Africa',
+  'ZALCJHB': 'Labour Court, Johannesburg',
+  'ZALCPE': 'Labour Court, Port Elizabeth',
+  'ZALCCT': 'Labour Court, Cape Town',
+  'ZALCD': 'Labour Court, Durban',
+  'ZALMPTHC': 'Limpopo High Court, Thohoyandou',
+  'ZAMPMHC': 'Mpumalanga High Court, Middelburg',
+  'ZAMPMBHC': 'Mpumalanga High Court, Mbombela',
+  'ZAKZDHC': 'KwaZulu-Natal High Court, Durban',
+  'ZAKZPHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+  'ZAGPHC': 'Gauteng High Court',
+  'ZAKZHC': 'KwaZulu-Natal High Court',
+  'ZAECHC': 'Eastern Cape High Court'
+};
+
+const formatCourtName = (court: any): string => {
+  if (!court) return '';
+  const cStr = String(court).trim();
+  const cUpper = cStr.toUpperCase();
+  if (COURT_NAMES_MAP[cUpper]) {
+    return COURT_NAMES_MAP[cUpper];
+  }
+  return cStr;
+};
+
+const COURT_LOCATIONS_MAP: Record<string, string> = {
+  'ZACC': 'Johannesburg',
+  'ZASCA': 'Bloemfontein',
+  'ZAGPPHC': 'Pretoria',
+  'ZAGPJHC': 'Johannesburg',
+  'ZAWCHC': 'Cape Town',
+  'ZAFSHC': 'Bloemfontein',
+  'ZAKZNDHC': 'Durban',
+  'ZAKZNHC': 'Pietermaritzburg',
+  'ZAECGHC': 'Grahamstown',
+  'ZAECPEHC': 'Port Elizabeth',
+  'ZAECELHC': 'East London',
+  'ZAECBHC': 'Bhisho',
+  'ZALMPPHC': 'Polokwane',
+  'ZANWHC': 'Mahikeng',
+  'ZANCHC': 'Kimberley',
+  'ZALC': 'Johannesburg',
+  'ZALAC': 'Johannesburg',
+  'ZACAC': 'Johannesburg',
+  'ZAEQC': 'Johannesburg',
+  'ZALCC': 'Johannesburg',
+  'ZATC': 'Johannesburg',
+  'ZAECC': 'Bloemfontein',
+  'ZALCJHB': 'Johannesburg',
+  'ZALCPE': 'Port Elizabeth',
+  'ZALCCT': 'Cape Town',
+  'ZALCD': 'Durban',
+  'ZALMPTHC': 'Thohoyandou',
+  'ZAMPMHC': 'Middelburg',
+  'ZAMPMBHC': 'Mbombela',
+  'ZAKZDHC': 'Durban',
+  'ZAKZPHC': 'Pietermaritzburg',
+  'ZAGPHC': 'Pretoria',
+  'ZAKZHC': 'Pietermaritzburg',
+  'ZAECHC': 'Grahamstown'
+};
+
+const getCourtLocation = (recordData: any): string => {
+  if (!recordData) return '';
+  if (recordData.court_location) return String(recordData.court_location);
+  if (recordData.court) {
+    const courtUpper = String(recordData.court).toUpperCase().trim();
+    if (COURT_LOCATIONS_MAP[courtUpper]) {
+      return COURT_LOCATIONS_MAP[courtUpper];
+    }
+  }
+  return '';
+};
+
 onMounted(() => {
   loadLazyRecords();
 });
@@ -259,7 +355,7 @@ const getFilteredMetadata = (recordData: any) => {
       kNorm === 'court / forum'
     ) {
       courtForumKeysToExclude.add(key);
-      const valStr = String(val).trim();
+      const valStr = formatCourtName(val);
       if (valStr && !courtForumValues.includes(valStr)) {
         courtForumValues.push(valStr);
       }
@@ -413,7 +509,7 @@ const getFilteredMetadata = (recordData: any) => {
         <Column field="court" header="Court / Forum" sortable style="width: 16%">
           <template #body="{ data }">
             <span class="px-3 py-1 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern font-black text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
-              {{ data.court }}
+              {{ formatCourtName(data.court) }}
             </span>
           </template>
           <template #loading>
@@ -501,31 +597,31 @@ const getFilteredMetadata = (recordData: any) => {
                 <div class="space-y-2 flex-1">
                   <div class="flex flex-wrap items-center gap-2">
                     <span class="px-2 py-0.5 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern text-[9px] font-black uppercase tracking-widest rounded">Court Roll</span>
-                    <span v-if="selectedDetail.document_date" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">{{ selectedDetail.document_date }}</span>
-                    <span v-if="selectedDetail.data.court_location" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">&bull; {{ selectedDetail.data.court_location }}</span>
+                    <span v-if="selectedDetail?.document_date" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">{{ selectedDetail.document_date }}</span>
+                    <span v-if="getCourtLocation(selectedDetail?.data)" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">&bull; {{ getCourtLocation(selectedDetail.data) }}</span>
                   </div>
                   <h2 class="text-lg font-black uppercase tracking-tight text-white leading-snug">
-                    {{ selectedDetail.data.title || selectedDetail.data.name || 'Court Roll Schedule' }}
+                    {{ selectedDetail?.data?.title || selectedDetail?.data?.name || 'Court Roll Schedule' }}
                   </h2>
                   <p class="text-xs font-bold text-zinc-400">
                     <span class="text-zinc-600 uppercase tracking-widest text-[9px] mr-1">Forum:</span>
-                    {{ selectedDetail.data.court || selectedDetail.record_type }}
+                    {{ formatCourtName(selectedDetail?.data?.court) || selectedDetail?.record_type }}
                   </p>
                 </div>
               </div>
 
               <!-- Compact Text Block -->
-              <div v-if="getDocumentBodyText(selectedDetail.data)" class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-300 whitespace-pre-line max-h-[350px] overflow-y-auto custom-scrollbar">
+              <div v-if="getDocumentBodyText(selectedDetail?.data)" class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-300 whitespace-pre-line max-h-[350px] overflow-y-auto custom-scrollbar">
                 {{ getDocumentBodyText(selectedDetail.data) }}
               </div>
               
               <!-- Clean minimal detail list -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-900/30 p-4 rounded-xl border border-white/5">
-                <div v-for="item in getFilteredMetadata(selectedDetail.data)" :key="item.label" class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                <div v-for="item in getFilteredMetadata(selectedDetail?.data)" :key="item.label" class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
                   <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
                   <span class="font-mono text-zinc-300 font-bold truncate max-w-[200px]">{{ formatValue(item.value) }}</span>
                 </div>
-                <div v-if="selectedDetail.source_url" class="flex items-center justify-between py-1 col-span-1 sm:col-span-2 border-t border-white/5 mt-1 pt-2">
+                <div v-if="selectedDetail?.source_url" class="flex items-center justify-between py-1 col-span-1 sm:col-span-2 border-t border-white/5 mt-1 pt-2">
                   <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Source Link</span>
                   <a :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1 font-bold">
                     Go to Original <ExternalLink class="w-3 h-3" />
@@ -546,38 +642,38 @@ const getFilteredMetadata = (recordData: any) => {
                 </div>
 
                 <h1 class="font-serif text-3xl sm:text-4xl font-black text-white tracking-tight leading-snug max-w-2xl mx-auto">
-                  {{ selectedDetail.data.title || selectedDetail.data.name || 'Publication Document' }}
+                  {{ selectedDetail?.data?.title || selectedDetail?.data?.name || 'Publication Document' }}
                 </h1>
 
                 <!-- Formal Sub-Header -->
                 <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                  <span v-if="selectedDetail.data.publisher || selectedDetail.data.journal_name" class="flex items-center gap-1">
+                  <span v-if="selectedDetail?.data?.publisher || selectedDetail?.data?.journal_name" class="flex items-center gap-1">
                     <span class="text-zinc-600">Publisher:</span> 
                     {{ selectedDetail.data.publisher || selectedDetail.data.journal_name }}
                   </span>
-                  <span v-if="selectedDetail.data.court_location" class="flex items-center gap-1">
+                  <span v-if="getCourtLocation(selectedDetail?.data)" class="flex items-center gap-1">
                     <span class="text-zinc-600">Location:</span> 
-                    {{ selectedDetail.data.court_location }}
+                    {{ getCourtLocation(selectedDetail.data) }}
                   </span>
-                  <span v-if="selectedDetail.data.gazette_number || selectedDetail.data.volume" class="flex items-center gap-1">
+                  <span v-if="selectedDetail?.data?.gazette_number || selectedDetail?.data?.volume" class="flex items-center gap-1">
                     <span class="text-zinc-600">Reference:</span> 
                     <code>{{ selectedDetail.data.gazette_number || selectedDetail.data.volume }}</code>
                   </span>
-                  <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
+                  <span v-if="selectedDetail?.document_date" class="flex items-center gap-1">
                     <span class="text-zinc-600">Date:</span> 
                     {{ selectedDetail.document_date }}
                   </span>
                 </div>
 
                 <!-- Abstract / Summary Callout in reader layout -->
-                <div v-if="getDocumentSummary(selectedDetail.data)" class="text-left bg-zinc-900/40 border border-white/5 p-5 rounded-2xl max-w-2xl mx-auto">
+                <div v-if="getDocumentSummary(selectedDetail?.data)" class="text-left bg-zinc-900/40 border border-white/5 p-5 rounded-2xl max-w-2xl mx-auto">
                   <p class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2">Abstract / Executive Summary</p>
                   <p class="text-xs leading-relaxed text-zinc-300 font-medium whitespace-pre-line">{{ getDocumentSummary(selectedDetail.data) }}</p>
                 </div>
               </div>
 
               <!-- Main Reading Body (No table, premium formatted document look and feel) -->
-              <div v-if="getDocumentBodyText(selectedDetail.data)" class="prose prose-invert font-serif max-w-none text-zinc-200 leading-relaxed text-base space-y-6 whitespace-pre-line px-2 sm:px-6">
+              <div v-if="getDocumentBodyText(selectedDetail?.data)" class="prose prose-invert font-serif max-w-none text-zinc-200 leading-relaxed text-base space-y-6 whitespace-pre-line px-2 sm:px-6">
                 {{ getDocumentBodyText(selectedDetail.data) }}
               </div>
 
@@ -585,11 +681,11 @@ const getFilteredMetadata = (recordData: any) => {
               <div class="border-t border-white/10 pt-6 mt-10">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                   <div class="flex flex-wrap gap-2">
-                    <span v-for="item in getFilteredMetadata(selectedDetail.data)" :key="item.label" class="px-2.5 py-1 bg-zinc-900/60 border border-white/5 rounded-lg text-zinc-400">
+                    <span v-for="item in getFilteredMetadata(selectedDetail?.data)" :key="item.label" class="px-2.5 py-1 bg-zinc-900/60 border border-white/5 rounded-lg text-zinc-400">
                       <strong>{{ item.label }}:</strong> {{ formatValue(item.value) }}
                     </span>
                   </div>
-                  <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1 shrink-0 font-black tracking-widest text-[9px]">
+                  <a v-if="selectedDetail?.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1 shrink-0 font-black tracking-widest text-[9px]">
                     Go to Source <ExternalLink class="w-3.5 h-3.5" />
                   </a>
                 </div>
@@ -601,22 +697,22 @@ const getFilteredMetadata = (recordData: any) => {
               <!-- Title & Metadata Header -->
               <div class="border-b border-white/10 pb-6">
                 <h2 class="text-2xl font-black uppercase tracking-tight text-white mb-3">
-                  {{ selectedDetail.data.title || selectedDetail.data.name || 'Legal Record Details' }}
+                  {{ selectedDetail?.data?.title || selectedDetail?.data?.name || 'Legal Record Details' }}
                 </h2>
                 <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300">
-                  <span v-if="selectedDetail.data.court" class="flex items-center gap-1">
-                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{ selectedDetail.data.court }}
+                  <span v-if="selectedDetail?.data?.court" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{ formatCourtName(selectedDetail.data.court) }}
                   </span>
-                  <span v-if="selectedDetail.data.court_location" class="flex items-center gap-1">
-                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Location:</span> {{ selectedDetail.data.court_location }}
+                  <span v-if="getCourtLocation(selectedDetail?.data)" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Location:</span> {{ getCourtLocation(selectedDetail.data) }}
                   </span>
-                  <span v-if="selectedDetail.data.case_number" class="flex items-center gap-1">
+                  <span v-if="selectedDetail?.data?.case_number" class="flex items-center gap-1">
                     <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Case #:</span> {{ selectedDetail.data.case_number }}
                   </span>
-                  <span v-if="selectedDetail.document_date" class="flex items-center gap-1">
+                  <span v-if="selectedDetail?.document_date" class="flex items-center gap-1">
                     <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Date:</span> {{ selectedDetail.document_date }}
                   </span>
-                  <a v-if="selectedDetail.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1">
+                  <a v-if="selectedDetail?.source_url" :href="selectedDetail.source_url" target="_blank" class="text-admin-modern hover:underline flex items-center gap-1">
                     Original Source <ExternalLink class="w-3.5 h-3.5" />
                   </a>
                 </div>
