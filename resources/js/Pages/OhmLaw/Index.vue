@@ -156,6 +156,8 @@ onMounted(() => {
 
 // Document-specific category helpers and metadata filters
 const EXCLUDED_KEYS = new Set([
+  'auth_ok',
+  'content_loaded',
   'detail_url',
   'detail_title',
   'index_scraped_at',
@@ -163,6 +165,9 @@ const EXCLUDED_KEYS = new Set([
   'details_scraped_at',
   'scraped_at',
   'source_url',
+  'url',
+  'worker_id',
+  'case_id',
   'metadata'
 ]);
 
@@ -178,10 +183,12 @@ const SPECIAL_LAYOUT_KEYS = new Set([
   'headnotes',
   'abstract',
   'full_text',
+  'center_content',
   'text',
   'content',
   'raw_text',
   'judgment_text',
+  'judgment',
   'title',
   'name',
   'heading'
@@ -206,7 +213,16 @@ const getDocumentType = (record: any): 'case' | 'gazette' | 'journal' | 'court_r
 
 const getDocumentBodyText = (recordData: any) => {
   if (!recordData) return '';
-  return recordData.full_text || recordData.text || recordData.content || recordData.raw_text || recordData.judgment_text || '';
+  return (
+    recordData.full_text ||
+    recordData.center_content ||
+    recordData.text ||
+    recordData.content ||
+    recordData.raw_text ||
+    recordData.judgment_text ||
+    recordData.judgment ||
+    ''
+  );
 };
 
 const getDocumentSummary = (recordData: any) => {
@@ -483,9 +499,10 @@ const getFilteredMetadata = (recordData: any) => {
                   <Calendar class="w-5 h-5" />
                 </div>
                 <div class="space-y-2 flex-1">
-                  <div class="flex items-center gap-2">
+                  <div class="flex flex-wrap items-center gap-2">
                     <span class="px-2 py-0.5 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern text-[9px] font-black uppercase tracking-widest rounded">Court Roll</span>
                     <span v-if="selectedDetail.document_date" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">{{ selectedDetail.document_date }}</span>
+                    <span v-if="selectedDetail.data.court_location" class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">&bull; {{ selectedDetail.data.court_location }}</span>
                   </div>
                   <h2 class="text-lg font-black uppercase tracking-tight text-white leading-snug">
                     {{ selectedDetail.data.title || selectedDetail.data.name || 'Court Roll Schedule' }}
@@ -538,6 +555,10 @@ const getFilteredMetadata = (recordData: any) => {
                     <span class="text-zinc-600">Publisher:</span> 
                     {{ selectedDetail.data.publisher || selectedDetail.data.journal_name }}
                   </span>
+                  <span v-if="selectedDetail.data.court_location" class="flex items-center gap-1">
+                    <span class="text-zinc-600">Location:</span> 
+                    {{ selectedDetail.data.court_location }}
+                  </span>
                   <span v-if="selectedDetail.data.gazette_number || selectedDetail.data.volume" class="flex items-center gap-1">
                     <span class="text-zinc-600">Reference:</span> 
                     <code>{{ selectedDetail.data.gazette_number || selectedDetail.data.volume }}</code>
@@ -585,6 +606,9 @@ const getFilteredMetadata = (recordData: any) => {
                 <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300">
                   <span v-if="selectedDetail.data.court" class="flex items-center gap-1">
                     <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{ selectedDetail.data.court }}
+                  </span>
+                  <span v-if="selectedDetail.data.court_location" class="flex items-center gap-1">
+                    <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Location:</span> {{ selectedDetail.data.court_location }}
                   </span>
                   <span v-if="selectedDetail.data.case_number" class="flex items-center gap-1">
                     <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Case #:</span> {{ selectedDetail.data.case_number }}
