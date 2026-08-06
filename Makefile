@@ -19,7 +19,6 @@ pull:
 # Spin up all containers in the background
 up:
 	docker compose up -d --build
-	docker compose build ohmsite-app ohmsite-web
 
 # Tear down all containers, networks, and volumes
 down:

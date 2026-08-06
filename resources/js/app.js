@@ -11,7 +11,7 @@ import PhosphorIcons from "@phosphor-icons/vue"
 import "flyonui/flyonui"
 
 import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
+import Aura from '@primevue/themes/aura';
 
 const appName = import.meta.env.VITE_APP_NAME || '8OHM';
 const pinia = createPinia();
