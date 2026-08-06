@@ -10,6 +10,9 @@ import { createPinia } from 'pinia';
 import PhosphorIcons from "@phosphor-icons/vue"
 import "flyonui/flyonui"
 
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
+
 const appName = import.meta.env.VITE_APP_NAME || '8OHM';
 const pinia = createPinia();
 
@@ -26,6 +29,14 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(pinia)
             .use(PhosphorIcons)
+            .use(PrimeVue, {
+                theme: {
+                    preset: Aura,
+                    options: {
+                        darkModeSelector: '.dark',
+                    }
+                }
+            })
             .use(createGtm({
                 id: 'GTM-M7VMQ8GR',
                 defer: false,

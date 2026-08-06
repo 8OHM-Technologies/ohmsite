@@ -48,12 +48,12 @@ return [
 
         'pgsql_coeus' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_COEUS_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''),
+            'url' => env('DB_COEUS_URL', env('DB_URL')),
+            'host' => env('DB_COEUS_HOST', env('DB_HOST', 'postgres')),
+            'port' => env('DB_COEUS_PORT', env('DB_PORT', '5432')),
+            'database' => env('DB_COEUS_DATABASE', 'coeus'),
+            'username' => env('DB_COEUS_USERNAME', env('DB_USERNAME', 'postgres')),
+            'password' => env('DB_COEUS_PASSWORD', env('DB_PASSWORD', '')),
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,

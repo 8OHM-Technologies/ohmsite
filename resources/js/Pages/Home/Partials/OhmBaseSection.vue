@@ -14,7 +14,7 @@ const root = ref(null)
 const sectionHeader = (field) => {
   const defaults = {
     eyebrow: 'DIY Smart Home Blueprints',
-    title: 'OhmBase',
+    title: 'OHMBase',
     subtitle: 'The business data architectures we build are born from our philosophy of absolute digital sovereignty. Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build their own self-hosted, cloud-free smart home ecosystems.',
   };
   return props.sectionHeaders?.ohmbase?.[field] || defaults[field] || '';
@@ -59,7 +59,7 @@ onMounted(() => {
               <i class="ph-light ph-book-open"></i>
             </div>
             <h3 class="card-title">
-              OhmBase: DIY Smart Home Blueprints
+              DIY Smart Home Blueprints
             </h3>
             <p class="card-desc">
               We provide the knowledge and tools for you to

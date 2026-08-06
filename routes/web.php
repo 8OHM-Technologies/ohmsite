@@ -82,7 +82,17 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
+use App\Http\Controllers\OhmLawController;
+
+Route::domain('ohmlaw.8ohm.co.za')->middleware('auth')->group(function () {
+    Route::get('/', [OhmLawController::class, 'index'])->name('ohmlaw.root');
+});
+
 Route::middleware('auth')->group(function () {
+    Route::get('/ohmlaw', [OhmLawController::class, 'index'])->name('ohmlaw.index');
+    Route::get('/ohmlaw/data', [OhmLawController::class, 'data'])->name('ohmlaw.data');
+    Route::get('/ohmlaw/record/{id}', [OhmLawController::class, 'show'])->name('ohmlaw.show');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

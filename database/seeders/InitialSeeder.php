@@ -60,25 +60,44 @@ class InitialSeeder extends Seeder
             $demoData = json_decode(file_get_contents($demoDataPath), true);
         }
 
-        Dataset::updateOrCreate(
-            ['slug' => 'ccma'],
-            [
-                'name' => 'CCMA Arbitration Awards',
-                'description' => 'Over 20 years of sanitized, structured CCMA arbitration awards.',
-                'is_active' => true,
-                'demo_data' => $demoData,
-            ]
-        );
+        // Dataset::updateOrCreate(
+        //     ['slug' => 'ccma'],
+        //     [
+        //         'name' => 'CCMA Arbitration Awards',
+        //         'description' => 'Over 20 years of sanitized, structured CCMA arbitration awards.',
+        //         'is_active' => true,
+        //         'demo_data' => $demoData,
+        //     ]
+        // );
 
         Dataset::updateOrCreate(
             ['slug' => 'labour-court'],
             [
                 'name' => 'Labour Court Judgments',
-                'description' => 'Sanitized, structured Labour Court judgments with regular updates.',
-                'is_active' => false,
+                'description' => 'Sanitized, structured Labour Court judgments.',
+                'is_active' => true,
                 'demo_data' => [
                     [
                         'title' => 'Labour Court Sample Case 1',
+                        'document_type' => 'Labour Court Judgments',
+                        'award_date' => '2026-02-15',
+                        'court' => 'Labour Court',
+                        'court_location' => 'Johannesburg',
+                        'details_scraped_at' => '2026-07-12T21:51:07.123456'
+                    ]
+                ],
+            ]
+        );
+
+         Dataset::updateOrCreate(
+            ['slug' => 'high-court'],
+            [
+                'name' => 'High Court Judgments',
+                'description' => 'Sanitized, structured High Court judgments.',
+                'is_active' => true,
+                'demo_data' => [
+                    [
+                        'title' => 'High Court Sample Case 1',
                         'document_type' => 'Labour Court Judgments',
                         'award_date' => '2026-02-15',
                         'court' => 'Labour Court',
@@ -95,12 +114,12 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Once-off Dataset',
                 'description' => 'Get the raw data without analytics or insights and use it for your own purposes. Ideal for AI training or researchers who just want the data.',
-                'price' => 5000.00,
+                'price' => 50000.00,
                 'image' => '/assets/images/products/dataset.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
-                    '20+ Years of Sanitized, structured CCMA award data',
+                    '20+ Years of Sanitized, structured case law data',
                     'Available in JSON or CSV formats',
                     'POPIA Compliant Data Entries',
                 ],
