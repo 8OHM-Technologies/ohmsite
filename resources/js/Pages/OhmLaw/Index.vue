@@ -395,14 +395,15 @@ const getFilteredMetadata = (recordData: any) => {
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-2 h-8 bg-admin-modern rounded-full"></div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
             OHMLaw Intelligence
           </h1>
         </div>
-        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-          South African Legal Records & CCMA Dispute Intelligence Engine (630,000+ Indexed Records)
-        </p>
+        <div>
+          <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+            South African Legal Records & CCMA Dispute Intelligence Engine (630,000+ Indexed Records)
+          </p>
+        </div>
       </div>
 
       <div class="flex items-center gap-3">
@@ -540,8 +541,7 @@ const getFilteredMetadata = (recordData: any) => {
 
     <!-- Document Detail Modal -->
     <Modal :show="detailModalVisible" @close="detailModalVisible = false" maxWidth="5xl">
-      <div
-        class="relative bg-zinc-950 text-white overflow-hidden max-h-[95vh] flex flex-col">
+      <div class="relative bg-zinc-950 text-white overflow-hidden max-h-[95vh] flex flex-col">
         <!-- Top Sticky Header -->
         <div
           class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-10">
@@ -613,7 +613,7 @@ const getFilteredMetadata = (recordData: any) => {
                   class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
                   <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
                   <span class="font-mono text-zinc-300 font-bold truncate max-w-[200px]">{{ formatValue(item.value)
-                  }}</span>
+                    }}</span>
                 </div>
                 <div v-if="selectedDetail?.source_url"
                   class="flex items-center justify-between py-1 col-span-1 sm:col-span-2 border-t border-white/5 mt-1 pt-2">

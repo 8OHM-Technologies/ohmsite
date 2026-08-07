@@ -334,10 +334,15 @@ const getStatusIcon = (type) => {
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Intelligence <span
-                            class="text-admin-modern">Center</span></h1>
-                    <p class="text-zinc-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Real-time performance
-                        metrics and market analysis</p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Intelligence <span
+                                class="text-admin-modern">Center</span></h1>
+                    </div>
+                    <div>
+                        <p class="text-zinc-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Real-time
+                            performance
+                            metrics and market analysis</p>
+                    </div>
                 </div>
 
                 <div v-if="activeTab === 'sales'"
@@ -441,7 +446,7 @@ const getStatusIcon = (type) => {
                                         :style="{ backgroundColor: trafficOptions.colors[i] }"></div>
                                     <span class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{{
                                         label
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
@@ -527,7 +532,7 @@ const getStatusIcon = (type) => {
                                     Nodes
                                 </p>
                                 <p class="text-2xl font-black text-white tracking-tighter">{{ liveStats.active_visitors
-                                }}
+                                    }}
                                 </p>
                             </div>
                             <div>

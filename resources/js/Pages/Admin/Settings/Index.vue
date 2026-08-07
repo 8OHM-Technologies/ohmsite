@@ -65,11 +65,15 @@ const tabs = [
         <div class="space-y-10">
             <!-- Header -->
             <div class="flex items-center gap-4">
-                <div class="w-2 h-10 bg-admin-modern rounded-full shadow-[0_0_20px_rgba(159,232,112,0.3)]"></div>
                 <div>
-                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Control Center</h1>
-                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-1">Manage your identity
-                        and platform configurations</p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Control Center</h1>
+                    </div>
+                    <div>
+                        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-1">Manage your
+                            identity
+                            and platform configurations</p>
+                    </div>
                 </div>
             </div>
 
@@ -98,7 +102,8 @@ const tabs = [
                                 <div class="relative group">
                                     <div
                                         class="w-24 h-24 rounded-[2rem] bg-zinc-800 flex items-center justify-center font-black text-3xl text-white border border-white/10 overflow-hidden shadow-2xl">
-                                        <span v-if="!user.profile_photo_url">{{ user.first_name ? user.first_name.charAt(0) : '' }}</span>
+                                        <span v-if="!user.profile_photo_url">{{ user.first_name ?
+                                            user.first_name.charAt(0) : '' }}</span>
                                         <img v-else :src="user.profile_photo_url" class="w-full h-full object-cover" />
                                     </div>
                                     <button
@@ -107,7 +112,8 @@ const tabs = [
                                     </button>
                                 </div>
                                 <div>
-                                    <h3 class="text-2xl font-black text-white uppercase tracking-tight">{{ user.first_name }} {{ user.last_name }}
+                                    <h3 class="text-2xl font-black text-white uppercase tracking-tight">{{
+                                        user.first_name }} {{ user.last_name }}
                                     </h3>
                                     <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mt-1">{{
                                         user.email }}</p>

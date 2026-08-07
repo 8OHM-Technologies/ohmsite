@@ -22,12 +22,14 @@ const props = defineProps({
         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
             <div>
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="w-2 h-8 bg-admin-modern rounded-full"></div>
+
                     <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">My Collection
                     </h1>
                 </div>
-                <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Access and manage your premium
+                <div>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Access and manage your premium
                     acquisitions</p>
+                </div>
             </div>
         </div>
 
@@ -160,8 +162,10 @@ const props = defineProps({
                                 </div>
                             </div>
                             <div class="flex flex-col gap-1">
-                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Pricing Model</span>
-                                <span class="text-[10px] font-black text-white uppercase tracking-widest truncate">SaaS</span>
+                                <span class="text-[8px] font-black text-zinc-500 uppercase tracking-widest">Pricing
+                                    Model</span>
+                                <span
+                                    class="text-[10px] font-black text-white uppercase tracking-widest truncate">SaaS</span>
                             </div>
                         </div>
 

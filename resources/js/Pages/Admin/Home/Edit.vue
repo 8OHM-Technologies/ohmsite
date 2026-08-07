@@ -213,9 +213,14 @@ const submit = () => {
     <AdminLayout>
         <div class="flex justify-between items-end mb-10">
             <div>
-                <h1 class="text-4xl font-black uppercase tracking-tighter mb-2 text-white">Home Page Editor</h1>
-                <p class="text-zinc-500 font-bold uppercase tracking-widest text-xs">Customize the storefront appearance
-                    and featured collections</p>
+                <div>
+                    <h1 class="text-4xl font-black uppercase tracking-tighter mb-2 text-white">Home Page Editor</h1>
+                </div>
+                <div>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-xs">Customize the storefront
+                        appearance
+                        and featured collections</p>
+                </div>
             </div>
             <button @click="submit"
                 class="btn-primary text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-admin-modern/90 transition-all shadow-xl shadow-admin-modern/10"
@@ -224,7 +229,7 @@ const submit = () => {
             </button>
         </div>
 
-        <div class="space-y-12 pb-20">  
+        <div class="space-y-12 pb-20">
             <!-- Roadmap Carousel Settings -->
             <div class="bg-zinc-900/50 overflow-hidden shadow-sm sm:rounded-[2.5rem] p-10 border border-white/5">
                 <div class="flex justify-between items-center mb-10">
@@ -244,12 +249,15 @@ const submit = () => {
                             class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-8 cursor-pointer select-none">
                             <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap min-w-0">
                                 <!-- Item number badge -->
-                                <span class="bg-zinc-800 text-zinc-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shrink-0">
+                                <span
+                                    class="bg-zinc-800 text-zinc-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shrink-0">
                                     Item {{ index + 1 }}
                                 </span>
                                 <!-- Icon preview -->
-                                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-black/40 border border-white/5 shrink-0">
-                                    <i class="ph-fill text-lg" :class="[item.icon || 'ph-rocket-launch', item.iconClass || 'text-yellow-500']"></i>
+                                <div
+                                    class="flex items-center justify-center w-10 h-10 rounded-xl bg-black/40 border border-white/5 shrink-0">
+                                    <i class="ph-fill text-lg"
+                                        :class="[item.icon || 'ph-rocket-launch', item.iconClass || 'text-yellow-500']"></i>
                                 </div>
                                 <!-- Title and Subtitle -->
                                 <div class="flex flex-col min-w-0">
@@ -266,41 +274,48 @@ const submit = () => {
                             <div class="flex items-center gap-3 shrink-0 self-end sm:self-auto">
                                 <!-- Controls -->
                                 <div class="flex items-center gap-1.5 bg-black/20 p-1 rounded-xl border border-white/5">
-                                    <button @click.stop="moveRoadmapItem(index, -1)" :disabled="index === 0" type="button"
+                                    <button @click.stop="moveRoadmapItem(index, -1)" :disabled="index === 0"
+                                        type="button"
                                         class="text-zinc-500 hover:text-white transition-all bg-zinc-900 hover:bg-zinc-800 rounded-lg p-2 disabled:opacity-30 disabled:cursor-not-allowed border border-white/5"
                                         title="Move Up">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M5 15l7-7 7 7" />
                                         </svg>
                                     </button>
-                                    <button @click.stop="moveRoadmapItem(index, 1)" :disabled="index === form.roadmap.length - 1" type="button"
+                                    <button @click.stop="moveRoadmapItem(index, 1)"
+                                        :disabled="index === form.roadmap.length - 1" type="button"
                                         class="text-zinc-500 hover:text-white transition-all bg-zinc-900 hover:bg-zinc-800 rounded-lg p-2 disabled:opacity-30 disabled:cursor-not-allowed border border-white/5"
                                         title="Move Down">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
                                     <button @click.stop="removeRoadmapItem(index)" type="button"
                                         class="text-zinc-500 hover:text-red-500 transition-all bg-zinc-900 hover:bg-zinc-800 rounded-lg p-2 border border-white/5"
                                         title="Remove">
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                     </button>
                                 </div>
                                 <!-- Chevron -->
-                                <div class="w-8 h-8 rounded-lg bg-black/20 border border-white/5 flex items-center justify-center">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-black/20 border border-white/5 flex items-center justify-center">
                                     <svg class="w-4 h-4 text-zinc-400 transform transition-transform duration-300"
-                                        :class="{ 'rotate-180': activeRoadmapIndex === index }"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                        :class="{ 'rotate-180': activeRoadmapIndex === index }" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Accordion Content -->
-                        <div v-show="activeRoadmapIndex === index" 
+                        <div v-show="activeRoadmapIndex === index"
                             class="px-8 pb-8 border-t border-white/5 pt-8 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 <div>
@@ -384,33 +399,39 @@ const submit = () => {
                             class="flex items-center justify-between p-8 cursor-pointer select-none">
                             <div class="flex items-center gap-4 min-w-0">
                                 <!-- Glowing status dot -->
-                                <div class="w-2.5 h-2.5 bg-admin-modern rounded-full shrink-0 shadow-[0_0_8px_rgba(159,232,112,0.5)]"></div>
+                                <div
+                                    class="w-2.5 h-2.5 bg-admin-modern rounded-full shrink-0 shadow-[0_0_8px_rgba(159,232,112,0.5)]">
+                                </div>
                                 <!-- Section Label/Name -->
                                 <div class="flex flex-col min-w-0">
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Section Header Config</span>
-                                    <span class="text-white font-black uppercase tracking-tight text-sm mt-0.5 capitalize">
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Section
+                                        Header Config</span>
+                                    <span
+                                        class="text-white font-black uppercase tracking-tight text-sm mt-0.5 capitalize">
                                         {{ key }} Section
                                     </span>
                                 </div>
                                 <!-- Quick title preview -->
-                                <span class="hidden md:inline-block text-zinc-500 text-xs font-semibold max-w-md truncate ml-4 border-l border-white/10 pl-4">
+                                <span
+                                    class="hidden md:inline-block text-zinc-500 text-xs font-semibold max-w-md truncate ml-4 border-l border-white/10 pl-4">
                                     {{ section.title || '(No Title)' }}
                                 </span>
                             </div>
 
                             <!-- Chevron -->
-                            <div class="w-8 h-8 rounded-lg bg-black/20 border border-white/5 flex items-center justify-center shrink-0">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-black/20 border border-white/5 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4 text-zinc-400 transform transition-transform duration-300"
-                                    :class="{ 'rotate-180': activeSectionKey === key }"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                    :class="{ 'rotate-180': activeSectionKey === key }" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
                         </div>
 
                         <!-- Accordion Content -->
-                        <div v-show="activeSectionKey === key"
-                            class="px-8 pb-8 border-t border-white/5 pt-8 space-y-6">
+                        <div v-show="activeSectionKey === key" class="px-8 pb-8 border-t border-white/5 pt-8 space-y-6">
                             <div>
                                 <label
                                     class="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Eyebrow

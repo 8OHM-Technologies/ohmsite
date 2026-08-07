@@ -110,8 +110,12 @@ const updateOrderPaymentStatus = (newPaymentStatus) => {
             <!-- Header section -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-black text-white tracking-tight">Orders</h1>
-                    <p class="text-zinc-500 mt-1">Track and manage every purchase from your customers.</p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-3xl font-black text-white tracking-tight">Orders</h1>
+                    </div>
+                    <div>
+                        <p class="text-zinc-500 mt-1">Track and manage every purchase from your customers.</p>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -264,7 +268,7 @@ const updateOrderPaymentStatus = (newPaymentStatus) => {
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total
                                     Amount</p>
                                 <p class="text-2xl font-black text-white">{{ formatCurrency(selectedOrder.total_amount)
-                                    }}</p>
+                                }}</p>
                             </div>
                             <div class="bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5">
                                 <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Order
@@ -291,7 +295,10 @@ const updateOrderPaymentStatus = (newPaymentStatus) => {
                                     class="text-xs font-black text-white uppercase tracking-widest border-b border-white/5 pb-2">
                                     Customer Info</h4>
                                 <div class="space-y-2">
-                                    <p class="text-sm font-bold text-white">{{ selectedOrder.user ? selectedOrder.user.first_name + ' ' + selectedOrder.user.last_name : (selectedOrder.first_name ? selectedOrder.first_name + ' ' + selectedOrder.last_name : 'Guest User') }}</p>
+                                    <p class="text-sm font-bold text-white">{{ selectedOrder.user ?
+                                        selectedOrder.user.first_name + ' ' + selectedOrder.user.last_name :
+                                        (selectedOrder.first_name ? selectedOrder.first_name + ' ' +
+                                        selectedOrder.last_name : 'Guest User') }}</p>
                                     <p class="text-xs text-zinc-400">{{ selectedOrder.user?.email }}</p>
                                     <p class="text-xs text-zinc-400">{{ selectedOrder.phone || 'No phone provided' }}
                                     </p>
@@ -336,7 +343,8 @@ const updateOrderPaymentStatus = (newPaymentStatus) => {
                                 </button>
                             </div>
 
-                            <h4 class="text-xs font-black text-white uppercase tracking-widest pt-2">Update Payment Status</h4>
+                            <h4 class="text-xs font-black text-white uppercase tracking-widest pt-2">Update Payment
+                                Status</h4>
                             <div class="grid grid-cols-3 gap-2">
                                 <button v-for="p in ['Paid', 'Pending', 'Failed']" :key="p"
                                     @click="updateOrderPaymentStatus(p.toLowerCase())"

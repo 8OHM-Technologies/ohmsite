@@ -54,9 +54,13 @@ const getStatusLabel = (customer) => {
         <div class="p-10 space-y-10">
             <!-- Header -->
             <div>
-                <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Customer <span
-                        class="text-admin-modern">Management</span></h1>
-                <p class="text-zinc-500 mt-2 font-medium">Manage your store's customer base and analytics.</p>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Customer <span
+                            class="text-admin-modern">Management</span></h1>
+                </div>
+                <div>
+                    <p class="text-zinc-500 mt-2 font-medium">Manage your store's customer base and analytics.</p>
+                </div>
             </div>
 
             <!-- Stats -->
@@ -64,7 +68,7 @@ const getStatusLabel = (customer) => {
                 <div v-for="(val, key) in stats" :key="key"
                     class="bg-zinc-900/40 border border-white/5 p-8 rounded-[2.5rem]">
                     <p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{{ key.replace('_', ' ')
-                        }}</p>
+                    }}</p>
                     <p class="text-3xl font-black text-white mt-2">{{ val || 0 }}</p>
                 </div>
             </div>
@@ -106,7 +110,8 @@ const getStatusLabel = (customer) => {
                                         class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center font-black text-xs text-white uppercase border border-white/5">
                                         {{ (customer.first_name || 'U').charAt(0) }}
                                     </div>
-                                    <span class="font-bold text-white">{{ customer.first_name }} {{ customer.last_name }}</span>
+                                    <span class="font-bold text-white">{{ customer.first_name }} {{ customer.last_name
+                                        }}</span>
                                 </div>
                             </td>
                             <td class="p-6 text-zinc-400 text-sm">{{ customer.email }}</td>

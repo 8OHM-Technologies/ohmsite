@@ -32,10 +32,14 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-ZA', { style: 'currenc
             <!-- Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 class="text-3xl font-black text-white tracking-tight uppercase">Licenses <span
-                            class="text-admin-modern">Manager</span></h1>
-                    <p class="text-zinc-500 mt-1 font-medium">Monitor active subscriptions, dataset accesses, and
-                        platforms licenses.</p>
+                    <div class="flex items-center gap-3 mb-2">
+                        <h1 class="text-3xl font-black text-white tracking-tight uppercase">Licenses <span
+                                class="text-admin-modern">Manager</span></h1>
+                    </div>
+                    <div>
+                        <p class="text-zinc-500 mt-1 font-medium">Monitor active subscriptions, dataset accesses, and
+                            platforms licenses.</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
                     <Link :href="route('admin.products.create')"

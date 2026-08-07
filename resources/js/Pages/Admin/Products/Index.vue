@@ -34,13 +34,15 @@ const deleteProduct = (id) => {
         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
             <div>
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="w-2 h-8 bg-admin-modern rounded-full"></div>
+
                     <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">Product
                         Inventory
                     </h1>
                 </div>
-                <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Track inventory levels,
+                <div>
+                    <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Track inventory levels,
                     pricing, and catalog details</p>
+                </div>
             </div>
             <Link :href="route('admin.products.create')"
                 class="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-admin-modern transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2">
