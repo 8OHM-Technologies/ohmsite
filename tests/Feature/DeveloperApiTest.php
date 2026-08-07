@@ -221,7 +221,7 @@ class DeveloperApiTest extends TestCase
         $user = User::factory()->create();
         $this->purchaseProduct($user, 'Developer API');
 
-        $response = $this->actingAs($user)->get(route('orders.index'));
+        $response = $this->actingAs($user)->get(route('subscriptions.index'));
         $response->assertStatus(200);
         $response->assertInertia(function ($page) {
             $page->has('apiStats', function ($stats) {

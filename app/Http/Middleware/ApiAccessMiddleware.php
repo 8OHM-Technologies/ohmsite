@@ -22,6 +22,6 @@ class ApiAccessMiddleware
 
         $productName = Product::where('slug', 'developer-api')->value('name') ?? 'Developer API';
 
-        return redirect()->route('orders.index')->with('error', "You must have an active {$productName} subscription to access the API documentation.");
+        return redirect()->route('subscriptions.index')->with('error', "You must have an active {$productName} subscription to access the API documentation.");
     }
 }

@@ -64,7 +64,7 @@ class ServiceAccessTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'ccma']));
 
-        $response->assertRedirect(route('orders.index'));
+        $response->assertRedirect(route('subscriptions.index'));
         $response->assertSessionHas('error', 'You must purchase the Once-off Dataset to access this download.');
     }
 
@@ -74,7 +74,7 @@ class ServiceAccessTest extends TestCase
 
         $response = $this->actingAs($user)->get(route('developer.docs'));
 
-        $response->assertRedirect(route('orders.index'));
+        $response->assertRedirect(route('subscriptions.index'));
         $response->assertSessionHas('error', 'You must have an active Developer API subscription to access the API documentation.');
     }
 

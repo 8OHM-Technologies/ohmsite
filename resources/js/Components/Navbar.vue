@@ -200,8 +200,8 @@ const getHref = (link) => {
                             <template #content>
                                 <DropdownLink v-if="auth.user.role === 'admin'" :href="route('dashboard')"> Admin
                                     Dashboard </DropdownLink>
-                                <DropdownLink :href="route('profile.edit')"> My Profile </DropdownLink>
-                                <DropdownLink :href="route('orders.index')"> Order History </DropdownLink>
+                                <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                <DropdownLink :href="route('subscriptions.index')"> Manage Subscriptions </DropdownLink>
                                 <div class="border-t border-white/5 my-1"></div>
                                 <DropdownLink :href="route('logout')" method="post" as="button" class="text-rose-500">
                                     Log Out </DropdownLink>

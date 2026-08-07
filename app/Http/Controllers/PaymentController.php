@@ -54,7 +54,7 @@ class PaymentController extends Controller
             $admins = User::where('role', 'admin')->get();
             Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Initialization Failure', $e->getMessage()));
 
-            return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack: '.$e->getMessage());
+            return redirect()->route('subscriptions.index')->with('error', 'Unable to initialize transaction with Paystack: '.$e->getMessage());
         }
 
         if (isset($response['status']) && $response['status'] === true) {
@@ -71,7 +71,7 @@ class PaymentController extends Controller
         $admins = User::where('role', 'admin')->get();
         Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Initialization Failure', 'Paystack API returned false status.'));
 
-        return redirect()->route('orders.index')->with('error', 'Unable to initialize transaction with Paystack.');
+        return redirect()->route('subscriptions.index')->with('error', 'Unable to initialize transaction with Paystack.');
     }
 
     /**
@@ -82,7 +82,7 @@ class PaymentController extends Controller
         $reference = $request->query('reference');
 
         if (! $reference) {
-            return redirect()->route('orders.index')->with('error', 'No reference returned.');
+            return redirect()->route('subscriptions.index')->with('error', 'No reference returned.');
         }
 
         try {
@@ -92,7 +92,7 @@ class PaymentController extends Controller
             $admins = User::where('role', 'admin')->get();
             Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Verification Failure', $e->getMessage()));
 
-            return redirect()->route('orders.index')->with('error', 'Payment verification failed: '.$e->getMessage());
+            return redirect()->route('subscriptions.index')->with('error', 'Payment verification failed: '.$e->getMessage());
         }
 
         if (isset($response['data']['status']) && $response['data']['status'] === 'success') {
@@ -126,7 +126,7 @@ class PaymentController extends Controller
                 Notification::send($admins, new PaymentCompleted($order));
             }
 
-            return redirect()->route('orders.index')->with('success', 'Payment successful!');
+            return redirect()->route('subscriptions.index')->with('success', 'Payment successful!');
         }
 
         $order = Order::where('payment_reference', $reference)->first();
@@ -134,6 +134,6 @@ class PaymentController extends Controller
         $msg = $response['message'] ?? ($response['data']['gateway_response'] ?? 'Payment verification failed.');
         Notification::send($admins, new PaymentFailedOrError($order, 'Paystack Verification Failure', $msg));
 
-        return redirect()->route('orders.index')->with('error', 'Payment verification failed.');
+        return redirect()->route('subscriptions.index')->with('error', 'Payment verification failed.');
     }
 }

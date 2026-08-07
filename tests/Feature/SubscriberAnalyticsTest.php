@@ -41,7 +41,7 @@ class SubscriberAnalyticsTest extends TestCase
 
     public function test_subscriber_analytics_requires_authentication(): void
     {
-        $response = $this->get('/pro-dashboard');
+        $response = $this->get('/subscriber');
 
         $response->assertRedirect(route('login'));
     }
@@ -50,10 +50,10 @@ class SubscriberAnalyticsTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('/pro-dashboard');
+        $response = $this->actingAs($user)->get('/subscriber');
 
-        $response->assertRedirect(route('profile.edit'));
-        $response->assertSessionHas('error', 'Please subscribe to the Pro Analytics package to access this section.');
+        $response->assertRedirect(route('subscriptions.index'));
+        $response->assertSessionHas('error', 'An active subscription is required to access this section.');
     }
 
     public function test_subscribed_user_can_access_subscriber_analytics(): void
@@ -61,7 +61,7 @@ class SubscriberAnalyticsTest extends TestCase
         $user = User::factory()->create();
         $this->subscribeUser($user);
 
-        $response = $this->actingAs($user)->get('/pro-dashboard');
+        $response = $this->actingAs($user)->get('/subscriber');
 
         $response->assertStatus(200);
     }
@@ -70,7 +70,7 @@ class SubscriberAnalyticsTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($admin)->get('/pro-dashboard');
+        $response = $this->actingAs($admin)->get('/subscriber');
 
         $response->assertStatus(200);
     }
@@ -81,7 +81,7 @@ class SubscriberAnalyticsTest extends TestCase
         $this->subscribeUser($user);
         Analytics::factory()->count(5)->create();
 
-        $response = $this->actingAs($user)->get('/pro-dashboard');
+        $response = $this->actingAs($user)->get('/subscriber');
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -102,7 +102,7 @@ class SubscriberAnalyticsTest extends TestCase
             'reason_for_dismissal' => 'MISCONDUCT',
         ]);
 
-        $response = $this->actingAs($user)->get('/pro-dashboard');
+        $response = $this->actingAs($user)->get('/subscriber');
 
         $response->assertStatus(200);
 
@@ -118,7 +118,7 @@ class SubscriberAnalyticsTest extends TestCase
         $user = User::factory()->create();
         $this->subscribeUser($user);
 
-        $response = $this->actingAs($user)->get('/pro-dashboard');
+        $response = $this->actingAs($user)->get('/subscriber');
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
@@ -132,7 +132,7 @@ class SubscriberAnalyticsTest extends TestCase
         $user = User::factory()->create();
         $this->subscribeUser($user);
 
-        $response = $this->actingAs($user)->get('/pro-dashboard/analytics');
+        $response = $this->actingAs($user)->get('/subscriber/analytics');
 
         $response->assertNotFound();
     }

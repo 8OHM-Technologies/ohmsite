@@ -19,6 +19,6 @@ class SubscribedMiddleware
             return $next($request);
         }
 
-        return redirect()->route('profile.edit')->with('error', 'Please subscribe to the Pro Analytics package to access this section.');
+        return redirect()->route('subscriptions.index')->with('error', 'An active subscription is required to access this section.');
     }
 }

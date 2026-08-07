@@ -7,15 +7,15 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class UserOrderController extends Controller
+class UserSubscriptionController extends Controller
 {
     /**
-     * Display a listing of the user's orders and subscription stats.
+     * Display a listing of the user's subscription stats.
      */
     public function index()
     {
         $user = Auth::user();
-        $orders = Order::where('user_id', $user->id)
+        $subscriptions = Order::where('user_id', $user->id)
             ->with(['items.product'])
             ->latest()
             ->get();
@@ -37,8 +37,8 @@ class UserOrderController extends Controller
             ];
         }
 
-        return Inertia::render('Profile/Orders', [
-            'orders' => $orders,
+        return Inertia::render('Profile/Subscriptions', [
+            'subscriptions' => $subscriptions,
             'apiStats' => $apiStats,
         ]);
     }

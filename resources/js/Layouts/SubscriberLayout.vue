@@ -44,8 +44,8 @@ const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
 const searchItems = [
-    { name: 'Analytics', href: route('pro-dashboard.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
-    { name: 'Products', href: route('pro-dashboard.products.index'), keywords: ['catalog', 'services', 'plans', 'datasets'] },
+    { name: 'Analytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
+    { name: 'Products', href: route('services.index'), keywords: ['catalog', 'services', 'plans', 'datasets'] },
 ];
 
 const handleSearch = () => {
@@ -64,9 +64,9 @@ const handleSearch = () => {
 };
 
 const navigation = [
-    { name: 'Analytics', href: route('pro-dashboard.index'), icon: BarChart3 },
+    { name: 'Analytics', href: route('subscriber.index'), icon: BarChart3 },
     { name: 'OHMLaw Intelligence', href: route('ohmlaw.index'), icon: Scale },
-    { name: 'Products', href: route('pro-dashboard.products.index'), icon: Package },
+    { name: 'Products', href: route('services.index'), icon: Package },
 ];
 
 const isUrl = (url) => {
@@ -339,8 +339,7 @@ const datasetStats = computed(() => {
                                 </button>
                             </template>
                             <template #content>
-                                <div
-                                    class="bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)]">
+                                <div class="overflow-hidden">
                                     <div
                                         class="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                         <div>
@@ -427,9 +426,9 @@ const datasetStats = computed(() => {
                                 <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}</p>
                                 <p class="text-[10px] text-zinc-500 truncate">{{ user.email }}</p>
                             </div>
-                            <DropdownLink :href="route('profile.edit')"> Profile Settings </DropdownLink>
+                            <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
                             <DropdownLink :href="route('logout')" method="post" as="button" class="text-rose-500">
-                                Sign Out
+                                Log Out
                             </DropdownLink>
                         </template>
                     </Dropdown>

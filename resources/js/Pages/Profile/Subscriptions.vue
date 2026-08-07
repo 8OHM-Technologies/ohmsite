@@ -3,7 +3,7 @@ import MainLayout from '@/Layouts/MainLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 
 defineProps({
-    orders: Array,
+    subscriptions: Array,
     auth: Object,
     apiStats: Object
 });
@@ -48,43 +48,51 @@ const getFrequencyLabel = (value) => {
 </script>
 
 <template>
-    <MainLayout :auth="auth" title="My Orders">
+    <MainLayout :auth="auth" title="Manage Subscriptions">
         <div class="max-w-7xl mx-auto">
             <div class="mb-16">
-                <h1 class="text-7xl font-black uppercase tracking-tighter text-white leading-none">My Services</h1>
+                <h1 class="text-7xl font-black uppercase tracking-tighter text-white leading-none">Manage Subscriptions
+                </h1>
                 <p class="text-zinc-500 font-black uppercase tracking-widest text-xs mt-4">Manage your subscriptions or
                     download once-off dataset purchases.</p>
             </div>
 
             <!-- API Usage Card -->
-            <div v-if="apiStats" class="bg-zinc-900 rounded-[3rem] p-8 border border-sky-500/20 mb-8 overflow-hidden relative">
+            <div v-if="apiStats"
+                class="bg-zinc-900 rounded-[3rem] p-8 border border-sky-500/20 mb-8 overflow-hidden relative">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl -z-10"></div>
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center border border-sky-500/20 text-sky-400">
+                        <div
+                            class="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center border border-sky-500/20 text-sky-400">
                             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                             </svg>
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-white mb-1">Developer API Call Limit</h3>
-                            <p class="text-zinc-500 text-xs font-medium">Your API usage counter resets on the 1st of every month.</p>
+                            <p class="text-zinc-500 text-xs font-medium">Your API usage counter resets on the 1st of
+                                every month.</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-6">
                         <div class="text-right">
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-1">Monthly Used</p>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-1">Monthly Used
+                            </p>
                             <p class="text-lg font-bold text-white">{{ apiStats.used }} / {{ apiStats.limit }}</p>
                         </div>
                         <div class="text-right bg-sky-500/10 px-6 py-3 rounded-2xl border border-sky-500/20">
-                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-sky-400 mb-1">Remaining Calls</p>
+                            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-sky-400 mb-1">Remaining
+                                Calls</p>
                             <p class="text-2xl font-black text-sky-400">{{ apiStats.remaining }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div v-if="orders.length === 0" class="text-center py-20 bg-zinc-900 rounded-[3rem] border border-white/5">
+            <div v-if="subscriptions.length === 0"
+                class="text-center py-20 bg-zinc-900 rounded-[3rem] border border-white/5">
                 <div class="mb-6 flex justify-center">
                     <div class="w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center">
                         <svg class="w-10 h-10 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -93,8 +101,8 @@ const getFrequencyLabel = (value) => {
                         </svg>
                     </div>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">No orders found</h3>
-                <p class="text-zinc-500 mb-8">You haven't placed any orders yet.</p>
+                <h3 class="text-xl font-bold text-white mb-2">No subscriptions found</h3>
+                <p class="text-zinc-500 mb-8">You haven't placed any subscriptions yet.</p>
                 <Link :href="route('home')"
                     class="inline-block bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all">
                     Browse Data Solutions
@@ -102,7 +110,7 @@ const getFrequencyLabel = (value) => {
             </div>
 
             <div v-else class="space-y-6">
-                <div v-for="order in orders" :key="order.id"
+                <div v-for="order in subscriptions" :key="order.id"
                     class="bg-zinc-900 rounded-[3rem] p-8 border border-white/5 overflow-hidden">
                     <div class="flex flex-wrap items-center justify-between gap-6 mb-8 pb-8 border-b border-white/5">
                         <div class="flex items-center gap-6">
@@ -189,7 +197,7 @@ const getFrequencyLabel = (value) => {
                                     </div>
                                     <div v-else-if="item.product.name.toLowerCase().includes('analytics dashboard') || item.product.name.toLowerCase().includes('pro analytics')"
                                         class="mt-3">
-                                        <Link :href="route('pro-dashboard.index')"
+                                        <Link :href="route('subscriber.index')"
                                             class="inline-flex items-center gap-1.5 bg-emerald-400/10 hover:bg-emerald-400 hover:text-black text-emerald-400 text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full transition-all">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">

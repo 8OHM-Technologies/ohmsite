@@ -23,7 +23,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubscriberController;
-use App\Http\Controllers\UserOrderController;
+use App\Http\Controllers\UserSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/demo', [DemoController::class, 'index'])->name('demo');
@@ -94,14 +94,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
+    Route::get('/profile/subscriptions', [UserSubscriptionController::class, 'index'])->name('subscriptions.index');
     Route::get('/payment/checkout/{order}', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 });
 
-Route::middleware(['auth', 'verified', 'subscribed'])->prefix('pro-dashboard')->name('pro-dashboard.')->group(function () {
+Route::middleware(['auth', 'verified', 'subscribed'])->prefix('subscriber')->name('subscriber.')->group(function () {
     Route::get('/', [SubscriberController::class, 'index'])->name('index');
-    Route::get('/products', [SubscriberController::class, 'products'])->name('products.index');
 });
 
 Route::middleware(['auth', 'verified', 'has.dataset.access'])->group(function () {

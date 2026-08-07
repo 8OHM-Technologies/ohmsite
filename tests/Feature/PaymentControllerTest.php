@@ -45,7 +45,7 @@ class PaymentControllerTest extends TestCase
         $response = $this->get(route('payment.checkout', $order));
 
         // Assert redirect to orders index with error message
-        $response->assertRedirect(route('orders.index'));
+        $response->assertRedirect(route('subscriptions.index'));
         $response->assertSessionHas('error', 'Unable to initialize transaction with Paystack: Plan not found');
 
         // Assert admin was notified of the failure, but not the customer
@@ -72,7 +72,7 @@ class PaymentControllerTest extends TestCase
         $response = $this->get(route('payment.callback', ['reference' => 'invalid-reference']));
 
         // Assert redirect to orders index with error message
-        $response->assertRedirect(route('orders.index'));
+        $response->assertRedirect(route('subscriptions.index'));
         $response->assertSessionHas('error', 'Payment verification failed: Transaction not found');
 
         // Assert admin was notified of the verification failure, but not the customer
@@ -113,7 +113,7 @@ class PaymentControllerTest extends TestCase
 
         $response = $this->get(route('payment.callback', ['reference' => 'valid-ref']));
 
-        $response->assertRedirect(route('orders.index'));
+        $response->assertRedirect(route('subscriptions.index'));
         $response->assertSessionHas('success', 'Payment successful!');
 
         $order->refresh();
