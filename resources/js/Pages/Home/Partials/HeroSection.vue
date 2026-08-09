@@ -51,18 +51,18 @@ onMounted(() => {
         <p class="hero-tagline reveal-item">
           South African public data sources are notoriously unstable and difficult to extract. We handle the
           extraction,
-          cleaning, and structuring of public records—starting with legal data. <br> Access case law, government
+          cleaning, and structuring of public records. <br> Access case law, government
           gazettes
           and
-          legal journals for FREE via our website! <br> Or subscribe to our
-          Analytics API for live data feeds,
+          legal journals for FREE! <br><br> Or subscribe to our
+          API for live data feeds,
           unlock judicial trends and insights with our Analytics Dashboard, or let us
-          build custom data pipelines for your unique business needs.
+          build custom data pipelines and automations for your unique business needs.
         </p>
 
         <div class="cta-group reveal-item">
           <Link :href="route('legal-records.index')" class="btn btn-primary">
-            <span>Access FREE RSA Case Law</span>
+            <span>Access FREE SA Case Law</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>

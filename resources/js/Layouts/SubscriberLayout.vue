@@ -45,7 +45,7 @@ const searchQuery = ref('');
 
 const searchItems = [
     { name: 'Analytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
-    { name: 'Free Legal Records', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
+    { name: 'Case Law', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
 ];
 
 const handleSearch = () => {
@@ -64,7 +64,7 @@ const handleSearch = () => {
 };
 
 const navigation = [
-    { name: 'Free Legal Records', href: route('legal-records.index'), icon: Scale },
+    { name: 'Case Law', href: route('legal-records.index'), icon: Scale },
     { name: 'Analytics', href: route('subscriber.index'), icon: BarChart3 },
 ];
 
