@@ -3,27 +3,28 @@
 namespace App\Console\Commands;
 
 use App\Models\Analytics;
-use App\Models\ExtractedData;
+use App\Models\ExtractedRecord;
+use App\Models\ScrubbedRecord;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class PopulateAnalytics extends Command
+class PopulateLegalAnalytics extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'analytics:populate {--limit=1000 : The maximum number of records to process}';
+    protected $signature = 'legal-analytics:populate {--limit=1000 : The maximum number of records to process}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Populate the analytics database from extracted records in batches';
+    protected $description = 'Populate the analytics database from scrubbed records in batches';
 
     /**
      * Execute the console command.
@@ -38,8 +39,11 @@ class PopulateAnalytics extends Command
         $localIds = Analytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
         $localIdsMap = array_flip($localIds);
 
-        // 2. Retrieve all valid IDs from extracted_records (cleaned_at IS NOT NULL)
-        $coeusIds = ExtractedData::whereNotNull('cleaned_at')->pluck('id')->toArray();
+        // 2. Retrieve all valid IDs from scrubbed_records (where extracted_records.record_type != 'sabinet_ccma')
+        $coeusIds = ScrubbedRecord::join('extracted_records', 'scrubbed_records.extracted_record_id', '=', 'extracted_records.id')
+            ->where('extracted_records.record_type', '!=', 'sabinet_ccma')
+            ->pluck('scrubbed_records.extracted_record_id')
+            ->toArray();
         $coeusIdsMap = array_flip($coeusIds);
 
         // 3. Determine deleted records (present locally, but no longer in coeus)
@@ -68,9 +72,11 @@ class PopulateAnalytics extends Command
             return self::SUCCESS;
         }
 
-        // 5. Fetch and parse new records
+        // 5. Fetch and parse new records from scrubbed_records
         $preparedRecords = [];
-        $newRecords = ExtractedData::whereIn('id', $newIdsToProcess)->get();
+        $newRecords = ScrubbedRecord::with('extractedRecord')
+            ->whereIn('extracted_record_id', $newIdsToProcess)
+            ->get();
 
         foreach ($newRecords as $record) {
             $data = $record->data;
@@ -82,37 +88,83 @@ class PopulateAnalytics extends Command
             }
 
             try {
-                $title = $data['title'] ?? 'Unknown';
-                $awardNumber = $data['award_number'] ?? null;
+                $payload = $data;
+                $metadata = $payload['metadata'] ?? null;
 
-                // Handle Detailed vs Indexed state
-                $employee = $data['employee'] ?? null;
-                $employer = $data['employer'] ?? null;
+                if ($metadata) {
+                    // LLM extracted format
+                    $applicant = $payload['applicant_plaintiff'] ?? null;
+                    if (is_array($applicant)) {
+                        $applicant = implode(', ', $applicant);
+                    }
+                    $respondent = $payload['respondent_defendant'] ?? null;
+                    if (is_array($respondent)) {
+                        $respondent = implode(', ', $respondent);
+                    }
 
-                if ($employee === null || $employer === null) {
-                    $parsedTitle = $this->parseTitle($title, $awardNumber);
-                    $employee = $employee ?? $parsedTitle['employee'];
-                    $employer = $employer ?? $parsedTitle['employer'];
+                    $title = $payload['title'] ?? null;
+                    if (!$title && $applicant) {
+                        $title = $applicant . ($respondent ? ' v ' . $respondent : '');
+                    }
+                    if (!$title) {
+                        $title = 'Unknown';
+                    }
+
+                    $employee = $applicant ?: 'Unknown';
+                    $employer = $respondent ?: 'Unknown';
+
+                    $awardNumber = $payload['dataset_number'] ?? $payload['case_number'] ?? $payload['citation'] ?? 'Unknown';
+                    $courtLocation = $payload['court_location'] ?? 'Unknown';
+                    
+                    // reason_for_dismissal represents subjects for Saflii
+                    $reason = 'Unknown';
+                    if (isset($payload['subjects'])) {
+                        $reason = is_array($payload['subjects']) ? implode(', ', $payload['subjects']) : $payload['subjects'];
+                    } elseif (isset($payload['keywords'])) {
+                        $reason = is_array($payload['keywords']) ? implode(', ', $payload['keywords']) : $payload['keywords'];
+                    }
+
+                    $forum = $payload['court'] ?? $metadata['entity_name'] ?? 'Unknown';
+                    $court = $payload['court'] ?? $metadata['entity_name'] ?? 'Unknown';
+                    $detailTitle = $title;
+                    $previewImageUrl = $payload['preview_image_url'] ?? null;
+                    $detailsScrapedAt = $payload['scraped_at'] ?? $payload['details_scraped_at'] ?? null;
+                    $awardDate = $metadata['document_date'] ?? $payload['hearing_date'] ?? null;
+                } else {
+                    // Legacy / Raw Detailed / Indexed format
+                    $title = $payload['title'] ?? 'Unknown';
+                    $awardNumber = $payload['case_number'] ?? $payload['citation'] ?? $payload['dataset_number'] ?? null;
+
+                    $employee = $payload['employee'] ?? null;
+                    $employer = $payload['employer'] ?? null;
+
+                    if ($employee === null || $employer === null) {
+                        $parsedTitle = $this->parseTitle($title, $awardNumber);
+                        $employee = $employee ?? $parsedTitle['employee'];
+                        $employer = $employer ?? $parsedTitle['employer'];
+                    }
+
+                    $courtLocation = $payload['court_location'] ?? $this->parseCourtLocation($awardNumber);
+                    $reason = $payload['reason_for_dismissal'] ?? $this->parseReasonForDismissal($title);
+                    $forum = $payload['forum'] ?? $payload['court'] ?? 'Unknown';
+                    $court = $payload['court'] ?? 'Unknown';
+                    $detailTitle = $payload['detail_title'] ?? $title;
+                    $previewImageUrl = $payload['preview_image_url'] ?? null;
+                    $detailsScrapedAt = $payload['scraped_at'] ?? $payload['details_scraped_at'] ?? null;
+                    $awardDate = $payload['award_date'] ?? null;
                 }
 
-                $courtLocation = $data['court_location'] ?? $this->parseCourtLocation($awardNumber);
-                $reason = $data['reason_for_dismissal'] ?? $this->parseReasonForDismissal($title);
-                $forum = $data['forum'] ?? $data['court'] ?? 'CCMA';
-                $detailTitle = $data['detail_title'] ?? $title;
-                $previewImageUrl = $data['preview_image_url'] ?? null;
-                $detailsScrapedAt = $data['details_scraped_at'] ?? $data['index_scraped_at'] ?? null;
-
                 $preparedRecords[] = [
-                    'extracted_record_id' => $record->id,
+                    'extracted_record_id' => $record->extracted_record_id,
                     'title' => $title,
-                    'document_type' => $data['document_type'] ?? 'CCMA Bargaining Council Awards',
-                    'award_date' => $data['award_date'] ?? ($record->document_date ? $record->document_date->toDateString() : now()->toDateString()),
-                    'court' => $data['court'] ?? 'CCMA',
+                    'document_type' => $metadata['record_type'] ?? $payload['document_type'] ?? 'Judgment',
+                    'award_date' => $awardDate ?? ($record->extractedRecord?->document_date ? $record->extractedRecord->document_date->toDateString() : now()->toDateString()),
+                    'court' => $court ?? 'Unknown',
                     'award_number' => $awardNumber ?? 'Unknown',
-                    'hearing_start' => $data['hearing_start'] ?? null,
-                    'hearing_end' => $data['hearing_end'] ?? null,
-                    'date_modified' => $data['date_modified'] ?? null,
-                    'detail_url' => $data['detail_url'] ?? null,
+                    'hearing_start' => $payload['hearing_start'] ?? ($metadata ? ($payload['hearing_date'] ?? null) : null),
+                    'hearing_end' => $payload['hearing_end'] ?? ($metadata ? ($payload['hearing_date'] ?? null) : null),
+                    'date_modified' => $payload['date_modified'] ?? null,
+                    'detail_url' => $payload['url'] ?? $payload['detail_url'] ?? $record->extractedRecord?->source_url ?? null,
                     'detail_title' => $detailTitle,
                     'employee' => $employee,
                     'employer' => $employer,
@@ -165,7 +217,7 @@ class PopulateAnalytics extends Command
 
         // 7. Update processed_at timestamps in coeus DB for all processed records (including skipped/failed)
         if (! empty($newIdsToProcess)) {
-            ExtractedData::whereIn('id', $newIdsToProcess)->update([
+            ExtractedRecord::whereIn('id', $newIdsToProcess)->update([
                 'processed_at' => now(),
             ]);
         }
@@ -187,53 +239,58 @@ class PopulateAnalytics extends Command
     {
         $this->info('Generating CSV and JSON dataset files...');
 
-        $csvHeader = ['ID', 'Case Reference', 'Title', 'Employer', 'Employee', 'Court Location', 'Dismissal Reason', 'Outcome', 'Date Decision', 'Detail URL', 'Details Scraped At'];
-        $csvData = [];
-        $csvData[] = "\xEF\xBB\xBF".implode(',', array_map(fn ($h) => '"'.str_replace('"', '""', $h).'"', $csvHeader));
+        foreach (['saflii', 'all'] as $dataset) {
+            $csvHeader = ['ID', 'Case Reference', 'Title', 'Employer', 'Employee', 'Court Location', 'Dismissal Reason', 'Outcome', 'Date Decision', 'Detail URL', 'Details Scraped At'];
+            $csvData = [];
+            $csvData[] = "\xEF\xBB\xBF".implode(',', array_map(fn ($h) => '"'.str_replace('"', '""', $h).'"', $csvHeader));
 
-        $jsonData = [];
+            $jsonData = [];
 
-        $analytics = Analytics::all();
-        foreach ($analytics as $item) {
-            $row = [
-                $item->id,
-                $item->award_number,
-                $item->title,
-                $item->employer,
-                $item->employee,
-                $item->court_location,
-                $item->reason_for_dismissal,
-                $item->court,
-                $item->award_date ? $item->award_date->toDateString() : null,
-                $item->detail_url,
-                $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
-            ];
-            $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
+            $query = Analytics::query();
+            if ($dataset === 'saflii') {
+                $query->where('court', '!=', 'CCMA');
+            }
+            $analytics = $query->get();
 
-            $jsonData[] = [
-                'id' => $item->id,
-                'case_reference' => $item->award_number,
-                'title' => $item->title,
-                'employer' => $item->employer,
-                'employee' => $item->employee,
-                'court_location' => $item->court_location,
-                'dismissal_reason' => $item->reason_for_dismissal,
-                'outcome' => $item->court,
-                'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
-                'detail_url' => $item->detail_url,
-                'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
-            ];
-        }
+            foreach ($analytics as $item) {
+                $row = [
+                    $item->id,
+                    $item->award_number,
+                    $item->title,
+                    $item->employer,
+                    $item->employee,
+                    $item->court_location,
+                    $item->reason_for_dismissal,
+                    $item->court,
+                    $item->award_date ? $item->award_date->toDateString() : null,
+                    $item->detail_url,
+                    $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                ];
+                $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
 
-        $csvContent = implode("\n", $csvData);
-        $jsonContent = json_encode($jsonData, JSON_PRETTY_PRINT);
+                $jsonData[] = [
+                    'id' => $item->id,
+                    'case_reference' => $item->award_number,
+                    'title' => $item->title,
+                    'employer' => $item->employer,
+                    'employee' => $item->employee,
+                    'court_location' => $item->court_location,
+                    'dismissal_reason' => $item->reason_for_dismissal,
+                    'outcome' => $item->court,
+                    'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
+                    'detail_url' => $item->detail_url,
+                    'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                ];
+            }
 
-        // Ensure datasets directory exists in local storage
-        if (! Storage::disk('local')->exists('datasets')) {
-            Storage::disk('local')->makeDirectory('datasets');
-        }
+            $csvContent = implode("\n", $csvData);
+            $jsonContent = json_encode($jsonData, JSON_PRETTY_PRINT);
 
-        foreach (['ccma', 'all'] as $dataset) {
+            // Ensure datasets directory exists in local storage
+            if (! Storage::disk('local')->exists('datasets')) {
+                Storage::disk('local')->makeDirectory('datasets');
+            }
+
             Storage::disk('local')->put("datasets/8ohm_{$dataset}_dataset.csv", $csvContent);
             Storage::disk('local')->put("datasets/8ohm_{$dataset}_dataset.json", $jsonContent);
         }

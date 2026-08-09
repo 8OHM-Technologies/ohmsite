@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ExtractedData extends Model
+class ExtractedRecord extends Model
 {
     /**
      * The database connection that should be used by the model.
@@ -56,12 +56,16 @@ class ExtractedData extends Model
     protected function casts(): array
     {
         return [
-            'data' => 'array',
-            'processed_at' => 'datetime',
-            'extracted_at' => 'datetime',
-            'cleaned_at' => 'datetime',
+            'source_url' => 'string',
             'document_date' => 'date',
+            'record_type' => 'string',
+            'data' => 'array',
             'requires_human_review' => 'boolean',
+            'review_reason' => 'string',
+            'scraped_at' => 'datetime',
+            'cleaned_at' => 'datetime',
+            'detailed_at' => 'datetime',
+            'status' => 'string',
         ];
     }
 }

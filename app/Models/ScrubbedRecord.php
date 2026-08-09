@@ -67,6 +67,6 @@ class ScrubbedRecord extends Model
      */
     public function extractedRecord(): BelongsTo
     {
-        return $this->belongsTo(ExtractedData::class, 'extracted_record_id', 'id');
+        return $this->belongsTo(ExtractedRecord::class, 'extracted_record_id', 'id');
     }
 }

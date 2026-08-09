@@ -28,11 +28,12 @@ class PopulateAnalyticsCommandTest extends TestCase
             'prefix' => '',
         ]]);
 
-        // Create the entities, targets, and extracted_records tables in the test pgsql_coeus connection
+        // Create the entities, targets, extracted_records, and scrubbed_records tables in the test pgsql_coeus connection
         $db = DB::connection('pgsql_coeus');
         $db->statement('CREATE TABLE entities (id VARCHAR(36) PRIMARY KEY, name VARCHAR(255) UNIQUE, identifier VARCHAR(50), created_at TIMESTAMP)');
         $db->statement('CREATE TABLE targets (id VARCHAR(36) PRIMARY KEY, entity_id VARCHAR(36), target_name VARCHAR(255), location VARCHAR(255), created_at TIMESTAMP)');
         $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, extracted_at TIMESTAMP, processed_at TIMESTAMP, cleaned_at TIMESTAMP)');
+        $db->statement('CREATE TABLE scrubbed_records (id VARCHAR(36) PRIMARY KEY, extracted_record_id VARCHAR(36), data TEXT, created_at TIMESTAMP)');
     }
 
     private function createTarget(): string
@@ -63,30 +64,39 @@ class PopulateAnalyticsCommandTest extends TestCase
         $targetId = $this->createTarget();
         $id = Str::uuid()->toString();
 
+        $dataPayload = [
+            'court' => 'CCMA',
+            'title' => 'Gumede v Mastercraft, KN39790',
+            'award_date' => '2000-07-01',
+            'detail_url' => 'https://discover.sabinet.co.za/document/1628547',
+            'hearing_end' => '2000-05-30',
+            'award_number' => 'KN39790',
+            'date_modified' => '2019-10-29',
+            'document_type' => 'CCMA Bargaining Council Awards',
+            'hearing_start' => '2000-03-22',
+            'index_scraped_at' => '2026-07-10T16:11:35.943615',
+        ];
+
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id,
             'target_id' => $targetId,
             'document_date' => '2000-07-01',
             'record_type' => 'sabinet_ccma',
-            'data' => json_encode([
-                'court' => 'CCMA',
-                'title' => 'Gumede v Mastercraft, KN39790',
-                'award_date' => '2000-07-01',
-                'detail_url' => 'https://discover.sabinet.co.za/document/1628547',
-                'hearing_end' => '2000-05-30',
-                'award_number' => 'KN39790',
-                'date_modified' => '2019-10-29',
-                'document_type' => 'CCMA Bargaining Council Awards',
-                'hearing_start' => '2000-03-22',
-                'index_scraped_at' => '2026-07-10T16:11:35.943615',
-            ]),
+            'data' => json_encode($dataPayload),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
         ]);
 
-        $this->artisan('analytics:populate')
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode($dataPayload),
+            'created_at' => now(),
+        ]);
+
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
@@ -126,38 +136,47 @@ class PopulateAnalyticsCommandTest extends TestCase
         $targetId = $this->createTarget();
         $id = Str::uuid()->toString();
 
+        $dataPayload = [
+            'court' => 'CCMA',
+            'forum' => 'CCMA Forum',
+            'title' => 'Melikhaya Richard Jikane v Quattro Protection Services (Pty) Ltd, WE54',
+            'employee' => 'Melikhaya Richard Jikane',
+            'employer' => 'Quattro Protection Services (Pty) Ltd',
+            'award_date' => '1996-11-01',
+            'detail_url' => 'https://discover.sabinet.co.za/document/1608136',
+            'hearing_end' => '1996-11-27',
+            'award_number' => 'WE54',
+            'detail_title' => 'Detailed Title Test',
+            'date_modified' => '2019-10-28',
+            'document_type' => 'CCMA Bargaining Council Awards',
+            'hearing_start' => '1996-11-27',
+            'court_location' => 'Western Cape [Cape Town]',
+            'index_scraped_at' => '2026-07-10T13:34:12.453216',
+            'preview_image_url' => 'https://discover.sabinet.co.za/preview.jpg',
+            'details_scraped_at' => '2026-07-12T21:14:46.678241',
+            'reason_for_dismissal' => 'Unfair Dismissal Disputes',
+        ];
+
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id,
             'target_id' => $targetId,
             'document_date' => '1996-11-01',
             'record_type' => 'sabinet_ccma',
-            'data' => json_encode([
-                'court' => 'CCMA',
-                'forum' => 'CCMA Forum',
-                'title' => 'Melikhaya Richard Jikane v Quattro Protection Services (Pty) Ltd, WE54',
-                'employee' => 'Melikhaya Richard Jikane',
-                'employer' => 'Quattro Protection Services (Pty) Ltd',
-                'award_date' => '1996-11-01',
-                'detail_url' => 'https://discover.sabinet.co.za/document/1608136',
-                'hearing_end' => '1996-11-27',
-                'award_number' => 'WE54',
-                'detail_title' => 'Detailed Title Test',
-                'date_modified' => '2019-10-28',
-                'document_type' => 'CCMA Bargaining Council Awards',
-                'hearing_start' => '1996-11-27',
-                'court_location' => 'Western Cape [Cape Town]',
-                'index_scraped_at' => '2026-07-10T13:34:12.453216',
-                'preview_image_url' => 'https://discover.sabinet.co.za/preview.jpg',
-                'details_scraped_at' => '2026-07-12T21:14:46.678241',
-                'reason_for_dismissal' => 'Unfair Dismissal Disputes',
-            ]),
+            'data' => json_encode($dataPayload),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
         ]);
 
-        $this->artisan('analytics:populate')
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode($dataPayload),
+            'created_at' => now(),
+        ]);
+
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
@@ -188,34 +207,196 @@ class PopulateAnalyticsCommandTest extends TestCase
         $this->assertNotNull($record->processed_at);
     }
 
-    public function test_skips_already_processed_records(): void
+    public function test_populates_sabinet_llm_data_correctly(): void
     {
+        Storage::fake('local');
         $targetId = $this->createTarget();
         $id = Str::uuid()->toString();
 
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id,
             'target_id' => $targetId,
-            'document_date' => '2000-07-01',
+            'document_date' => '2026-06-18',
             'record_type' => 'sabinet_ccma',
             'data' => json_encode([
-                'court' => 'CCMA',
-                'title' => 'Gumede v Mastercraft, KN39790',
-                'award_date' => '2000-07-01',
-                'award_number' => 'KN39790',
+                'title' => 'Gumede v Mastercraft',
             ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => now(),
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode([
+                'metadata' => [
+                    'entity_name' => 'CCMA',
+                    'target_name' => 'Durban Regional Office',
+                    'document_date' => '2026-06-18',
+                    'record_type' => 'Arbitration Award',
+                ],
+                'extracted_data' => [
+                    'employer' => 'Mastercraft Retail',
+                    'employee' => 'Gumede',
+                    'arbitrator' => 'Mnguni [AJ]',
+                    'award_number' => 'KN39790',
+                    'court_location' => 'KwaZulu-Natal [Durban]',
+                    'reason_for_dismissal' => 'Misconduct: Employee accused of unauthorized absence',
+                    'outcome' => 'Dismissed',
+                    'costs_order' => 'No order as to costs',
+                ],
+            ]),
+            'created_at' => now(),
+        ]);
+
+        $this->artisan('ccma-analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        $analytic = Analytics::first();
+        $this->assertNotNull($analytic);
+        $this->assertEquals('Gumede v Mastercraft Retail', $analytic->title);
+        $this->assertEquals('Arbitration Award', $analytic->document_type);
+        $this->assertEquals('2026-06-18', $analytic->award_date->toDateString());
+        $this->assertEquals('CCMA', $analytic->court);
+        $this->assertEquals('KN39790', $analytic->award_number);
+        $this->assertEquals('Gumede', $analytic->employee);
+        $this->assertEquals('Mastercraft Retail', $analytic->employer);
+        $this->assertEquals('CCMA', $analytic->forum);
+        $this->assertEquals('KwaZulu-Natal [Durban]', $analytic->court_location);
+        $this->assertEquals('Misconduct: Employee accused of unauthorized absence', $analytic->reason_for_dismissal);
+    }
+
+    public function test_populates_legal_saflii_data_correctly(): void
+    {
+        Storage::fake('local');
+        $targetId = $this->createTarget();
+        $id = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2026-06-18',
+            'record_type' => 'saflii_courts',
+            'data' => json_encode([
+                'url' => 'https://www.saflii.org/za/cases/ZACC/2026/1.html',
+                'title' => 'State v Zuma and Others',
+            ]),
+            'requires_human_review' => false,
+            'extracted_at' => now(),
+            'processed_at' => null,
+            'cleaned_at' => now(),
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode([
+                'metadata' => [
+                    'entity_name' => 'Saflii',
+                    'target_name' => 'ZACC',
+                    'document_date' => '2026-06-18',
+                    'record_type' => 'Judgment',
+                ],
+                'applicant_plaintiff' => 'State',
+                'respondent_defendant' => ['Zuma', 'Ministers of Justice'],
+                'hearing_date' => '2026-06-12',
+                'dataset_number' => 'CCT 12/25',
+                'reportable' => false,
+                'subjects' => ['Criminal Law', 'Constitutional Law'],
+                'court' => 'Constitutional Court',
+                'judges' => ['Zondo CJ', 'Goliath AJ'],
+                'court_location' => 'Johannesburg',
+                'result' => 'Application for leave to appeal dismissed.',
+                'summary' => 'The applicant, ID number [RSA ID], sought urgent relief regarding...',
+                'keywords' => ['leave to appeal', 'constitutional challenge'],
+                'formatted_text' => 'Constitutional Court of South Africa...\nCase no: CCT 12/25...',
+            ]),
+            'created_at' => now(),
+        ]);
+
+        $this->artisan('legal-analytics:populate')
+            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        // Verify analytics table has the mapped record
+        $analytic = Analytics::first();
+        $this->assertNotNull($analytic);
+        $this->assertEquals('State v Zuma, Ministers of Justice', $analytic->title);
+        $this->assertEquals('Judgment', $analytic->document_type);
+        $this->assertEquals('2026-06-18', $analytic->award_date->toDateString());
+        $this->assertEquals('Constitutional Court', $analytic->court);
+        $this->assertEquals('CCT 12/25', $analytic->award_number);
+        $this->assertEquals('2026-06-12', $analytic->hearing_start->toDateString());
+        $this->assertEquals('2026-06-12', $analytic->hearing_end->toDateString());
+        $this->assertEquals('State', $analytic->employee);
+        $this->assertEquals('Zuma, Ministers of Justice', $analytic->employer);
+        $this->assertEquals('Constitutional Court', $analytic->forum);
+        $this->assertEquals('Johannesburg', $analytic->court_location);
+        $this->assertEquals('Criminal Law, Constitutional Law', $analytic->reason_for_dismissal);
+
+        // Verify dataset files were generated
+        Storage::disk('local')->assertExists('datasets/8ohm_saflii_dataset.csv');
+        Storage::disk('local')->assertExists('datasets/8ohm_saflii_dataset.json');
+        Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.csv');
+        Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.json');
+    }
+
+    public function test_skips_already_processed_records(): void
+    {
+        $targetId = $this->createTarget();
+        $id = Str::uuid()->toString();
+
+        $dataPayload = [
+            'court' => 'CCMA',
+            'title' => 'Gumede v Mastercraft, KN39790',
+            'award_date' => '2000-07-01',
+            'award_number' => 'KN39790',
+        ];
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2000-07-01',
+            'record_type' => 'sabinet_ccma',
+            'data' => json_encode($dataPayload),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => now(), // Already processed
         ]);
 
-        $this->artisan('analytics:populate')
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode($dataPayload),
+            'created_at' => now(),
+        ]);
+
+        // Put in Analytics manually so it's considered already locally processed
+        Analytics::create([
+            'extracted_record_id' => $id,
+            'title' => 'Gumede v Mastercraft, KN39790',
+            'document_type' => 'CCMA Bargaining Council Awards',
+            'award_date' => '2000-07-01',
+            'court' => 'CCMA',
+            'award_number' => 'KN39790',
+            'employee' => 'Gumede',
+            'employer' => 'Mastercraft',
+            'court_location' => 'KwaZulu-Natal [Durban]',
+            'reason_for_dismissal' => 'UNFAIR DISMISSAL',
+        ]);
+
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table remains empty
-        $this->assertEquals(0, Analytics::count());
+        // Verify analytics table has 1 record
+        $this->assertEquals(1, Analytics::count());
     }
 
     public function test_skips_records_without_cleaned_at(): void
@@ -240,7 +421,9 @@ class PopulateAnalyticsCommandTest extends TestCase
             'cleaned_at' => null,
         ]);
 
-        $this->artisan('analytics:populate')
+        // Since it's not cleaned, it is not in scrubbed_records table.
+
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
@@ -254,25 +437,34 @@ class PopulateAnalyticsCommandTest extends TestCase
         $targetId = $this->createTarget();
         $id = Str::uuid()->toString();
 
+        $dataPayload = [
+            'court' => 'CCMA',
+            'title' => 'Gumede v Mastercraft, KN39790',
+            'award_date' => '2000-07-01',
+            'award_number' => 'KN39790',
+        ];
+
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id,
             'target_id' => $targetId,
             'document_date' => '2000-07-01',
             'record_type' => 'sabinet_ccma',
-            'data' => json_encode([
-                'court' => 'CCMA',
-                'title' => 'Gumede v Mastercraft, KN39790',
-                'award_date' => '2000-07-01',
-                'award_number' => 'KN39790',
-            ]),
+            'data' => json_encode($dataPayload),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
         ]);
 
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode($dataPayload),
+            'created_at' => now(),
+        ]);
+
         // First run: inserts the record locally
-        $this->artisan('analytics:populate')
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
@@ -281,9 +473,10 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         // Delete from coeus DB
         DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->delete();
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->where('extracted_record_id', $id)->delete();
 
         // Second run: should detect deletion in coeus and delete it locally
-        $this->artisan('analytics:populate')
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 0 records. Deleted 1 obsolete records.')
             ->assertExitCode(0);
@@ -296,25 +489,34 @@ class PopulateAnalyticsCommandTest extends TestCase
         $targetId = $this->createTarget();
         $id1 = Str::uuid()->toString();
 
+        $dataPayload1 = [
+            'court' => 'CCMA',
+            'title' => 'Gumede v Mastercraft, KN39790',
+            'award_date' => '2000-07-01',
+            'award_number' => 'KN39790',
+        ];
+
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id1,
             'target_id' => $targetId,
             'document_date' => '2000-07-01',
             'record_type' => 'sabinet_ccma',
-            'data' => json_encode([
-                'court' => 'CCMA',
-                'title' => 'Gumede v Mastercraft, KN39790',
-                'award_date' => '2000-07-01',
-                'award_number' => 'KN39790',
-            ]),
+            'data' => json_encode($dataPayload1),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
         ]);
 
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id1,
+            'data' => json_encode($dataPayload1),
+            'created_at' => now(),
+        ]);
+
         // First run: inserts the first record
-        $this->artisan('analytics:populate')
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
@@ -325,25 +527,34 @@ class PopulateAnalyticsCommandTest extends TestCase
 
         // Insert second record
         $id2 = Str::uuid()->toString();
+        $dataPayload2 = [
+            'court' => 'CCMA',
+            'title' => 'Naidoo v Mastercraft, KN39791',
+            'award_date' => '2000-07-02',
+            'award_number' => 'KN39791',
+        ];
+
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
             'id' => $id2,
             'target_id' => $targetId,
             'document_date' => '2000-07-02',
             'record_type' => 'sabinet_ccma',
-            'data' => json_encode([
-                'court' => 'CCMA',
-                'title' => 'Naidoo v Mastercraft, KN39791',
-                'award_date' => '2000-07-02',
-                'award_number' => 'KN39791',
-            ]),
+            'data' => json_encode($dataPayload2),
             'requires_human_review' => false,
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
         ]);
 
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id2,
+            'data' => json_encode($dataPayload2),
+            'created_at' => now(),
+        ]);
+
         // Second run: inserts the second record
-        $this->artisan('analytics:populate')
+        $this->artisan('ccma-analytics:populate')
             ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
