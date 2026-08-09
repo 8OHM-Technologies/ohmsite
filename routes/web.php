@@ -82,12 +82,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
-use App\Http\Controllers\OhmLawController;
+use App\Http\Controllers\LegalRecordController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/ohmlaw', [OhmLawController::class, 'index'])->name('ohmlaw.index');
-    Route::get('/ohmlaw/data', [OhmLawController::class, 'data'])->name('ohmlaw.data');
-    Route::get('/ohmlaw/record/{id}', [OhmLawController::class, 'show'])->name('ohmlaw.show');
+    Route::get('/legal-records', [LegalRecordController::class, 'index'])->name('legal-records.index');
+    Route::get('/legal-records/data', [LegalRecordController::class, 'data'])->name('legal-records.data');
+    Route::get('/legal-records/record/{id}', [LegalRecordController::class, 'show'])->name('legal-records.show');
 });
 
 Route::middleware('auth')->group(function () {

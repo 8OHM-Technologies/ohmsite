@@ -89,7 +89,7 @@ const loadLazyRecords = async (event?: DataTableLazyLoadEvent) => {
   const sortOrder = currentParams.sortOrder || -1;
 
   try {
-    const response = await axios.get('/ohmlaw/data', {
+    const response = await axios.get('/legal-records/data', {
       params: {
         offset: first,
         limit: rows,
@@ -135,7 +135,7 @@ const viewRecordDetail = async (record: RecordSummary) => {
   selectedDetail.value = null;
 
   try {
-    const response = await axios.get(`/ohmlaw/record/${record.id}`);
+    const response = await axios.get(`/legal-records/record/${record.id}`);
     selectedDetail.value = response.data;
   } catch (error) {
     console.error('Failed to load record details:', error);
@@ -388,7 +388,7 @@ const getFilteredMetadata = (recordData: any) => {
 
 <template>
 
-  <Head title="OHMLaw - Legal Intelligence" />
+  <Head title="8OHM | Case Law & Legal Records" />
 
   <component :is="LayoutComponent">
     <!-- Page Header conforming to ohmsite design system -->
@@ -396,12 +396,12 @@ const getFilteredMetadata = (recordData: any) => {
       <div>
         <div class="flex items-center gap-3 mb-2">
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
-            OHMLaw Intelligence
+            Case Law & Legal Records
           </h1>
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            South African Legal Records & CCMA Dispute Intelligence Engine (630,000+ Indexed Records)
+            Open Access South African Case Law and Legal Records
           </p>
         </div>
       </div>
@@ -461,7 +461,7 @@ const getFilteredMetadata = (recordData: any) => {
     <div class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
       <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" @page="onLazy"
         @sort="onLazy" @filter="onLazy" paginator :rows="25" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
-        stateStorage="local" stateKey="ohmlaw-datatable-state" tableStyle="min-width: 60rem"
+        stateStorage="local" stateKey="legal-records-datatable-state" tableStyle="min-width: 60rem"
         class="p-datatable-dark-custom">
         <template #empty>
           <div class="py-20 text-center flex flex-col items-center">

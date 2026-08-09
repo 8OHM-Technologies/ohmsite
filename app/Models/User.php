@@ -152,7 +152,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return route('dashboard');
         }
 
-        return route('ohmlaw.index');
+        return route('legal-records.index');
     }
 
     /**

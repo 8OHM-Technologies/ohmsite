@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
-class OhmLawController extends Controller
+class LegalRecordController extends Controller
 {
     /**
-     * Display the OhmLaw Legal Search & Document Portal view.
+     * Display the legal record index view.
      */
     public function index(Request $request): InertiaResponse
     {
-        return Inertia::render('OhmLaw/Index');
+        return Inertia::render('LegalRecords/Index');
     }
 
     /**

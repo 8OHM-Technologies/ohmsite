@@ -61,7 +61,7 @@ onMounted(() => {
         </p>
 
         <div class="cta-group reveal-item">
-          <Link :href="route('ohmlaw.index')" class="btn btn-primary">
+          <Link :href="route('legal-records.index')" class="btn btn-primary">
             <span>Access FREE RSA Case Law</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>

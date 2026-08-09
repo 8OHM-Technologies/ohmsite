@@ -30,7 +30,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('ohmlaw.index'));
+        $response->assertRedirect(route('legal-records.index'));
     }
 
     public function test_unverified_users_cannot_authenticate(): void
