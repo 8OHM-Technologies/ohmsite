@@ -54,7 +54,7 @@ onMounted(() => {
           cleaning, and structuring of public records. <br> Access case law, government
           gazettes
           and
-          legal journals for FREE! <br><br> Or subscribe to our
+          legal journals for FREE! <br> Subscribe to our
           API for live data feeds,
           unlock judicial trends and insights with our Analytics Dashboard, or let us
           build custom data pipelines and automations for your unique business needs.
