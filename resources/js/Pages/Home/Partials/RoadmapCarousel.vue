@@ -26,7 +26,7 @@ const roadmap = computed(() => {
       status: 'Planned',
       date: 'Q4 2026',
       title: 'Tribunals and Other Courts Case Law',
-      description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts. Published Acts, Bills, Government Gazettes and other legislative documents included.',
+      description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.',
       icon: 'ph-rocket-launch',
       iconClass: 'text-yellow-500'
     },
@@ -50,7 +50,7 @@ const roadmap = computed(() => {
       status: 'Future',
       date: '2027',
       title: 'International Mining Landscape Dashboard',
-      description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.',
+      description: 'Analytics dashboard providing insights into the global mining industry, including mineral ',
       icon: 'ph-robot',
       iconClass: 'text-red-500'
     },
@@ -79,14 +79,8 @@ const responsiveOptions = ref([
 <template>
   <!-- Roadmap Carousel Wrapper -->
   <div class="w-full max-w-5xl mx-auto mt-14 sm:mt-auto pb-1 relative z-25">
-    <Carousel
-      :value="roadmap"
-      :numVisible="3"
-      :numScroll="1"
-      :responsiveOptions="responsiveOptions"
-      :showIndicators="false"
-      class="roadmap-carousel"
-    >
+    <Carousel :value="roadmap" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions"
+      :showIndicators="false" class="roadmap-carousel">
       <template #item="slotProps">
         <div class="roadmap-card mx-1.5 h-full">
           <!-- Status Badge -->
