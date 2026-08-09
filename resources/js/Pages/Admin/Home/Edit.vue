@@ -195,10 +195,9 @@ const moveRoadmapItem = (index, direction) => {
 const submit = () => {
     form.post(route('admin.home.update'), {
         preserveScroll: true,
-        onSuccess: () => toast.success('Saved successfully!'),
         onError: (err) => {
             console.error(err);
-            toast.error('Failed to save. Check console.');
+            alert('Failed to save. Check console.');
         }
     });
 };

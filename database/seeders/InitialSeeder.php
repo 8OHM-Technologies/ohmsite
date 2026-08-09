@@ -73,7 +73,7 @@ class InitialSeeder extends Seeder
         Dataset::updateOrCreate(
             ['slug' => 'labour-court'],
             [
-                'name' => 'Labour Court Judgments',
+                'name' => 'Labour Court Case Law',
                 'description' => 'Sanitized, structured Labour Court judgments.',
                 'is_active' => true,
                 'demo_data' => [
@@ -92,7 +92,7 @@ class InitialSeeder extends Seeder
          Dataset::updateOrCreate(
             ['slug' => 'high-court'],
             [
-                'name' => 'High Court Judgments',
+                'name' => 'High Court Case Law',
                 'description' => 'Sanitized, structured High Court judgments.',
                 'is_active' => true,
                 'demo_data' => [
