@@ -437,7 +437,8 @@ onMounted(() => {
                 </div>
               </li>
             </ul>
-            <Link href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom">
+            <Link href="#contact" class="btn btn-primary contact-trigger-btn btn-align-bottom"
+              style="padding: 10px 10px 10px 18px !important">
               <span>Enquire Now</span>
               <div class="btn-icon">
                 <i class="ph-light ph-arrow-right"></i>
@@ -655,7 +656,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 25px 20px 25px 28px !important;
+  padding: 5px 5px 5px 8px !important;
   border-radius: 100px;
   font-family: var(--font-body);
   font-size: 0.95rem;

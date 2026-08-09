@@ -280,7 +280,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 25px 20px 25px 28px !important;
+  padding: 5px 5px 5px 8px !important;
   border-radius: 100px;
   font-family: var(--font-body);
   font-size: 0.95rem;
@@ -495,6 +495,7 @@ onMounted(() => {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);

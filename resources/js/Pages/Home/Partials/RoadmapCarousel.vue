@@ -1,5 +1,6 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import Carousel from 'primevue/carousel'
 
 const props = defineProps({
   roadmapItems: {
@@ -55,52 +56,55 @@ const roadmap = computed(() => {
     },
   ];
 });
+
+const responsiveOptions = ref([
+  {
+    breakpoint: '1024px',
+    numVisible: 3,
+    numScroll: 1
+  },
+  {
+    breakpoint: '768px',
+    numVisible: 2,
+    numScroll: 1
+  },
+  {
+    breakpoint: '560px',
+    numVisible: 1,
+    numScroll: 1
+  }
+]);
 </script>
 
 <template>
   <!-- Roadmap Carousel Wrapper -->
   <div class="w-full max-w-5xl mx-auto mt-14 sm:mt-auto pb-1 relative z-25">
-    <!-- Roadmap Carousel -->
-    <div id="multi-slide" class="relative px-8 sm:px-10"
-      data-carousel='{ "loadingClasses": "opacity-0", "slidesQty": { "xs": 1, "lg": 3 }, "isDraggable": true }'>
-      <div class="carousel">
-        <div
-          class="carousel-body h-full carousel-dragging:transition-none carousel-dragging:cursor-grabbing cursor-grab opacity-0">
-          <div v-for="item in roadmap" :key="item.title" class="carousel-slide" style="padding-top: 1px !important">
-            <div class="roadmap-card mx-1.5">
-
-              <!-- Status Badge -->
-              <div class="status-badge">
-                <i class="ph-fill" :class="[item.icon, item.iconClass]"></i>
-                <span>{{ item.status }} &bull; {{ item.date }}</span>
-              </div>
-
-              <h4 class="card-title-small">
-                {{ item.title }}
-              </h4>
-
-              <p class="card-desc-small">
-                {{ item.description }}
-              </p>
-            </div>
+    <Carousel
+      :value="roadmap"
+      :numVisible="3"
+      :numScroll="1"
+      :responsiveOptions="responsiveOptions"
+      :showIndicators="false"
+      class="roadmap-carousel"
+    >
+      <template #item="slotProps">
+        <div class="roadmap-card mx-1.5 h-full">
+          <!-- Status Badge -->
+          <div class="status-badge">
+            <i class="ph-fill" :class="[slotProps.data.icon, slotProps.data.iconClass]"></i>
+            <span>{{ slotProps.data.status }} &bull; {{ slotProps.data.date }}</span>
           </div>
+
+          <h4 class="card-title-small">
+            {{ slotProps.data.title }}
+          </h4>
+
+          <p class="card-desc-small">
+            {{ slotProps.data.description }}
+          </p>
         </div>
-      </div>
-      <!-- Previous Slide -->
-      <button type="button"
-        class="carousel-prev inset-s-3 max-sm:inset-s-3 carousel-disabled:opacity-50 size-9.5 bg-base-100 flex items-center justify-center rounded-full shadow-base-300/20 shadow-sm"
-        style="background:var(--bg-tertiary);border:1px solid var(--border-color);">
-        <i class="carousel-arrow ph-caret-left"></i>
-        <span class="sr-only">Previous</span>
-      </button>
-      <!-- Next Slide -->
-      <button type="button"
-        class="carousel-next inset-e-5 max-sm:inset-e-3 carousel-disabled:opacity-50 size-9.5 bg-base-100 flex items-center justify-center rounded-full shadow-base-300/20 shadow-sm"
-        style="background:var(--bg-tertiary);border:1px solid var(--border-color);">
-        <i class="carousel-arrow ph-caret-right"></i>
-        <span class="sr-only">Next</span>
-      </button>
-    </div>
+      </template>
+    </Carousel>
   </div>
 </template>
 
@@ -179,5 +183,56 @@ const roadmap = computed(() => {
 .roadmap-card .card-desc-small {
   font-size: 0.8rem;
   line-height: 1.4;
+}
+
+/* Scoped styles to style PrimeVue Carousel custom elements */
+:deep(.p-carousel-content) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+:deep(.p-carousel-container) {
+  width: 100%;
+}
+
+:deep(.p-carousel-prev),
+:deep(.p-carousel-next) {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  transition: all 0.3s var(--ease-premium, cubic-bezier(0.16, 1, 0.3, 1));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  cursor: pointer;
+  z-index: 10;
+}
+
+:deep(.p-carousel-prev:hover),
+:deep(.p-carousel-next:hover) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+:deep(.p-carousel-prev:disabled),
+:deep(.p-carousel-next:disabled) {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+:deep(.p-carousel-items-container) {
+  gap: 0;
+}
+
+:deep(.p-carousel-item) {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
 }
 </style>

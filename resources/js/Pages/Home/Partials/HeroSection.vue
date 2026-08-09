@@ -182,7 +182,7 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 25px 20px 25px 28px !important;
+  padding: 10px 10px 10px 18px !important;
   border-radius: 100px;
   font-family: var(--font-body);
   font-size: 0.95rem;

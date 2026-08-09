@@ -25,7 +25,7 @@
 
 * **Backend**: Laravel 12 (PHP 8.3)
 * **Frontend**: Inertia.js (v2), Vue 3, Pinia State Management
-* **Styling**: Tailwind CSS v4 & FlyonUI
+* **Styling**: Tailwind CSS v4 & PrimeVue
 * **Database**: PostgreSQL (pgsql)
 * **Compliance**: Strictly compliant with the Protection of Personal Information Act (POPIA) of South Africa. Local data hosting within South Africa.
 * **Information Officer**: Mr. Tiaan Fourie

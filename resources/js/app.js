@@ -8,7 +8,6 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { createPinia } from 'pinia';
 import PhosphorIcons from "@phosphor-icons/vue"
-import "flyonui/flyonui"
 
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
@@ -53,13 +52,3 @@ createInertiaApp({
     },
 });
 
-router.on('navigate', () => {
-    setTimeout(() => {
-        if (window.HSStaticMethods && typeof window.HSStaticMethods.autoInit === 'function') {
-            window.HSStaticMethods.autoInit();
-        }
-        if (window.IStaticMethods && typeof window.IStaticMethods.autoInit === 'function') {
-            window.IStaticMethods.autoInit();
-        }
-    }, 100);
-});
