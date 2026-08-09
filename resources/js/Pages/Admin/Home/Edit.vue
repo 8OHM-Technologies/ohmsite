@@ -192,15 +192,13 @@ const moveRoadmapItem = (index, direction) => {
     }
 };
 
-// toggleBrand removed
-
 const submit = () => {
     form.post(route('admin.home.update'), {
         preserveScroll: true,
-        onSuccess: () => alert('Saved successfully!'),
+        onSuccess: () => toast.success('Saved successfully!'),
         onError: (err) => {
             console.error(err);
-            alert('Failed to save. Check console.');
+            toast.error('Failed to save. Check console.');
         }
     });
 };

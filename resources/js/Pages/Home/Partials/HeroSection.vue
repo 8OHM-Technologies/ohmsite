@@ -51,23 +51,24 @@ onMounted(() => {
         <p class="hero-tagline reveal-item">
           South African public data sources are notoriously unstable and difficult to extract. We handle the
           extraction,
-          cleaning, and structuring of public records—starting with Labour and High Court Case Law, and expanding
-          soon to
-          other courts and tribunals. Access everything for FREE via our website, or subscribe to gain access to our
-          analytics API,
-          unlock judicial trends and insights with our Pro Dashboard, or let us
+          cleaning, and structuring of public records—starting with legal data. <br> Access case law, government
+          gazettes
+          and
+          legal journals for FREE via our website! <br> Or subscribe to our
+          Analytics API for live data feeds,
+          unlock judicial trends and insights with our Analytics Dashboard, or let us
           build custom data pipelines for your unique business needs.
         </p>
 
         <div class="cta-group reveal-item">
           <Link :href="route('ohmlaw.index')" class="btn btn-primary">
-            <span>Access Free Datasets</span>
+            <span>Access FREE RSA Case Law</span>
             <div class="btn-icon">
               <i class="ph-light ph-database"></i>
             </div>
           </Link>
           <Link href="/demo" class="btn btn-secondary">
-            <span>View Demo Dashboard</span>
+            <span>View Demo Analytics Dashboard</span>
             <div class="btn-icon">
               <i class="ph-light ph-presentation"></i>
             </div>

@@ -44,7 +44,7 @@ const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
 const searchItems = [
-    { name: 'Analytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
+    { name: 'OHMalytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
     { name: 'Products', href: route('services.index'), keywords: ['catalog', 'services', 'plans', 'datasets'] },
 ];
 
@@ -65,8 +65,7 @@ const handleSearch = () => {
 
 const navigation = [
     { name: 'Analytics', href: route('subscriber.index'), icon: BarChart3 },
-    { name: 'OHMLaw Intelligence', href: route('ohmlaw.index'), icon: Scale },
-    { name: 'Products', href: route('services.index'), icon: Package },
+    { name: 'Legal Records', href: route('ohmlaw.index'), icon: Scale },
 ];
 
 const isUrl = (url) => {
