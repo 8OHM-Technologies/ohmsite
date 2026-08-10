@@ -2,14 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Analytics>
+ * @extends Factory<CcmaAnalytics>
  */
-class AnalyticsFactory extends Factory
+class CcmaAnalyticsFactory extends Factory
 {
+    protected $model = CcmaAnalytics::class;
+
     /**
      * Define the model's default state.
      *

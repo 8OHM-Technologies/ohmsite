@@ -68,4 +68,20 @@ class ExtractedRecord extends Model
             'status' => 'string',
         ];
     }
+
+    /**
+     * Relation to Target.
+     */
+    public function target(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Target::class, 'target_id', 'id');
+    }
+
+    /**
+     * Relation to ScrubbedRecord.
+     */
+    public function scrubbedRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ScrubbedRecord::class, 'extracted_record_id', 'id');
+    }
 }

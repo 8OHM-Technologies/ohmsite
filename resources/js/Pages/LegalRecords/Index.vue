@@ -38,6 +38,16 @@ interface AuthUser {
   email?: string;
 }
 
+interface FilterItem {
+  target_name: string;
+  vanity_name: string;
+  target_type: string;
+}
+
+const props = defineProps<{
+  filters: FilterItem[];
+}>();
+
 // Dynamic Layout Selection based on User Role (Admin vs Subscriber)
 const page = usePage();
 const user = computed(() => (page.props.auth?.user as unknown as AuthUser | null) || null);
@@ -46,6 +56,7 @@ const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberL
 
 interface RecordSummary {
   id: string;
+  source_table: string;
   record_type: string;
   document_date: string | null;
   court: string;
@@ -63,6 +74,9 @@ const loading = ref(false);
 const searchQuery = ref('');
 const selectedRecordType = ref('');
 const selectedCourt = ref('');
+
+// Tab group selection
+const activeGroup = ref<'all' | 'ccma' | 'courts' | 'gazettes_journals' | 'other'>('all');
 
 // Document Detail Dialog state
 const detailModalVisible = ref(false);
@@ -129,13 +143,46 @@ const setRecordType = (type: string) => {
   loadLazyRecords();
 };
 
+const getFiltersForGroup = (group: string): FilterItem[] => {
+  if (group === 'courts') {
+    return props.filters.filter(f => f.target_type === 'cases' && f.target_name !== 'sabinet_ccma');
+  }
+  if (group === 'gazettes_journals') {
+    return props.filters.filter(f => f.target_type === 'gaz' || f.target_type === 'journals');
+  }
+  if (group === 'other') {
+    return props.filters.filter(f => f.target_type === 'other');
+  }
+  return [];
+};
+
+const setActiveGroup = (group: 'all' | 'ccma' | 'courts' | 'gazettes_journals' | 'other') => {
+  activeGroup.value = group;
+  if (group === 'all') {
+    setRecordType('');
+  } else if (group === 'ccma') {
+    setRecordType('sabinet_ccma');
+  } else {
+    const groupFilters = getFiltersForGroup(group);
+    if (groupFilters.length > 0) {
+      setRecordType(groupFilters[0].target_name);
+    } else {
+      setRecordType('');
+    }
+  }
+};
+
 const viewRecordDetail = async (record: RecordSummary) => {
   detailModalVisible.value = true;
   detailLoading.value = true;
   selectedDetail.value = null;
 
   try {
-    const response = await axios.get(`/legal-records/record/${record.id}`);
+    const response = await axios.get(`/legal-records/record/${record.id}`, {
+      params: {
+        source_table: record.source_table
+      }
+    });
     selectedDetail.value = response.data;
   } catch (error) {
     console.error('Failed to load record details:', error);
@@ -430,22 +477,34 @@ const getFilteredMetadata = (recordData: any) => {
 
         <!-- Filter Buttons with High Contrast -->
         <div class="flex flex-wrap items-center gap-2">
-          <button @click="setRecordType('')"
+          <button @click="setActiveGroup('all')"
             class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
-            :class="selectedRecordType === '' ? 'btn-admin-modern' : 'btn-secondary'">
-            All Records
+            :class="activeGroup === 'all' ? 'btn-admin-modern' : 'btn-secondary'">
+            All Sources
           </button>
 
-          <button @click="setRecordType('sabinet_ccma')"
+          <button @click="setActiveGroup('ccma')"
             class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
-            :class="selectedRecordType === 'sabinet_ccma' ? 'btn-admin-modern' : 'btn-secondary'">
+            :class="activeGroup === 'ccma' ? 'btn-admin-modern' : 'btn-secondary'">
             CCMA Awards
           </button>
 
-          <button @click="setRecordType('saflii_courts')"
+          <button @click="setActiveGroup('courts')"
             class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
-            :class="selectedRecordType === 'saflii_courts' ? 'btn-admin-modern' : 'btn-secondary'">
+            :class="activeGroup === 'courts' ? 'btn-admin-modern' : 'btn-secondary'">
             SAFLII Courts
+          </button>
+
+          <button @click="setActiveGroup('gazettes_journals')"
+            class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
+            :class="activeGroup === 'gazettes_journals' ? 'btn-admin-modern' : 'btn-secondary'">
+            Gazettes & Journals
+          </button>
+
+          <button @click="setActiveGroup('other')"
+            class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
+            :class="activeGroup === 'other' ? 'btn-admin-modern' : 'btn-secondary'">
+            Court Rolls & Other
           </button>
 
           <button @click="loadLazyRecords()"
@@ -453,6 +512,20 @@ const getFilteredMetadata = (recordData: any) => {
             title="Refresh Dataset">
             <RefreshCw class="w-4 h-4" />
           </button>
+        </div>
+      </div>
+
+      <!-- Specific Court / Source Dropdown Selection when a group is active -->
+      <div v-if="['courts', 'gazettes_journals', 'other'].includes(activeGroup)"
+           class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-3">
+        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Select Specific Source:</span>
+        <div class="relative min-w-[240px]">
+          <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
+                  class="w-full bg-black/60 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50">
+            <option v-for="filter in getFiltersForGroup(activeGroup)" :key="filter.target_name" :value="filter.target_name">
+              {{ filter.vanity_name }}
+            </option>
+          </select>
         </div>
       </div>
     </div>

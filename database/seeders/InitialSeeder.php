@@ -209,5 +209,9 @@ class InitialSeeder extends Seeder
             //     ['label' => 'Pleasing Costumers', 'value' => '*00*'],
             // ],
         ]]);
+
+        $this->call([
+            TargetVanitySeeder::class,
+        ]);
     }
 }

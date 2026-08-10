@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -23,7 +23,7 @@ class CaseController extends Controller
         $dataset = $request->query('dataset');
         $limit = (int) $request->query('limit', 100);
 
-        $query = Analytics::query();
+        $query = CcmaAnalytics::query();
 
         if ($dataset === 'ccma') {
             $query->whereIn('court', ['CCMA', 'Bargaining Council']);
@@ -49,7 +49,7 @@ class CaseController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $case = Analytics::findOrFail($id);
+        $case = CcmaAnalytics::findOrFail($id);
 
         return response()->json([
             'data' => $case,

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
 use App\Models\ApiKey;
 use App\Models\Order;
 use App\Models\Product;
@@ -102,7 +102,7 @@ class DeveloperApiTest extends TestCase
             'key' => 'ohm_live_123456',
         ]);
 
-        Analytics::factory()->create([
+        CcmaAnalytics::factory()->create([
             'court' => 'CCMA',
         ]);
 
@@ -134,7 +134,7 @@ class DeveloperApiTest extends TestCase
         }
         DB::table('api_calls')->insert($calls);
 
-        Analytics::factory()->create();
+        CcmaAnalytics::factory()->create();
 
         $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(429);
@@ -163,7 +163,7 @@ class DeveloperApiTest extends TestCase
         }
         DB::table('api_calls')->insert($calls);
 
-        Analytics::factory()->create();
+        CcmaAnalytics::factory()->create();
 
         $response = $this->withHeaders(['Authorization' => 'Bearer '.$key->key])->getJson('/api/v1/cases');
         $response->assertStatus(200);

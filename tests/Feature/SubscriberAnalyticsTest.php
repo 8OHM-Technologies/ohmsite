@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -79,7 +79,7 @@ class SubscriberAnalyticsTest extends TestCase
     {
         $user = User::factory()->create();
         $this->subscribeUser($user);
-        Analytics::factory()->count(5)->create();
+        CcmaAnalytics::factory()->count(5)->create();
 
         $response = $this->actingAs($user)->get('/subscriber');
 
@@ -94,7 +94,7 @@ class SubscriberAnalyticsTest extends TestCase
     {
         $user = User::factory()->create();
         $this->subscribeUser($user);
-        Analytics::factory()->create([
+        CcmaAnalytics::factory()->create([
             'title' => 'Test v TestCorp, TC1',
             'employer' => 'TestCorp Ltd',
             'employee' => '[REDACTED]',

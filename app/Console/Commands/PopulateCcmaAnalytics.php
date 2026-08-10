@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
+use App\Models\LegalAnalytics;
 use App\Models\ExtractedRecord;
 use App\Models\ScrubbedRecord;
 use Illuminate\Console\Command;
@@ -36,7 +37,7 @@ class PopulateCcmaAnalytics extends Command
         $this->info("Starting population of analytics database. Max limit: {$limit} records.");
 
         // 1. Retrieve all local extracted_record_id values from analytics
-        $localIds = Analytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
+        $localIds = CcmaAnalytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
         $localIdsMap = array_flip($localIds);
 
         // 2. Retrieve all valid IDs from scrubbed_records (where extracted_records.record_type = 'sabinet_ccma')
@@ -169,11 +170,11 @@ class PopulateCcmaAnalytics extends Command
             DB::transaction(function () use ($preparedRecords, $deletedIds) {
                 $connection = DB::connection();
                 if ($connection->getDriverName() === 'pgsql') {
-                    $connection->statement('LOCK TABLE analytics, backup_analytics IN ACCESS EXCLUSIVE MODE');
+                    $connection->statement('LOCK TABLE ccma_analytics, backup_ccma_analytics IN ACCESS EXCLUSIVE MODE');
                 }
 
                 // Create backup before any changes are made to the current model
-                DB::table('backup_analytics')->truncate();
+                DB::table('backup_ccma_analytics')->truncate();
                 $columns = [
                     'id', 'extracted_record_id', 'title', 'document_type', 'award_date', 'court',
                     'award_number', 'hearing_start', 'hearing_end', 'date_modified',
@@ -182,28 +183,23 @@ class PopulateCcmaAnalytics extends Command
                     'details_scraped_at', 'created_at', 'updated_at',
                 ];
                 $columnsStr = implode(', ', $columns);
-                DB::statement("INSERT INTO backup_analytics ($columnsStr) SELECT $columnsStr FROM analytics");
+                DB::statement("INSERT INTO backup_ccma_analytics ($columnsStr) SELECT $columnsStr FROM ccma_analytics");
 
                 // Delete local records not present in extracted_records
                 if (! empty($deletedIds)) {
-                    Analytics::whereIn('extracted_record_id', $deletedIds)->delete();
+                    CcmaAnalytics::whereIn('extracted_record_id', $deletedIds)->delete();
                 }
 
                 // Insert new records
                 if (! empty($preparedRecords)) {
                     foreach (array_chunk($preparedRecords, 100) as $chunk) {
-                        Analytics::insert($chunk);
+                        CcmaAnalytics::insert($chunk);
                     }
                 }
             });
         }
 
-        // 7. Update processed_at timestamps in coeus DB for all processed records (including skipped/failed)
-        if (! empty($newIdsToProcess)) {
-            ExtractedRecord::whereIn('id', $newIdsToProcess)->update([
-                'processed_at' => now(),
-            ]);
-        }
+
 
         $processedCount = count($preparedRecords);
         $deletedCount = count($deletedIds);
@@ -229,41 +225,104 @@ class PopulateCcmaAnalytics extends Command
 
             $jsonData = [];
 
-            $query = Analytics::query();
             if ($dataset === 'ccma') {
-                $query->where('court', 'CCMA');
-            }
-            $analytics = $query->get();
+                $analytics = CcmaAnalytics::all();
+                foreach ($analytics as $item) {
+                    $row = [
+                        $item->id,
+                        $item->award_number,
+                        $item->title,
+                        $item->employer,
+                        $item->employee,
+                        $item->court_location,
+                        $item->reason_for_dismissal,
+                        $item->court,
+                        $item->award_date ? $item->award_date->toDateString() : null,
+                        $item->detail_url,
+                        $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                    ];
+                    $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
 
-            foreach ($analytics as $item) {
-                $row = [
-                    $item->id,
-                    $item->award_number,
-                    $item->title,
-                    $item->employer,
-                    $item->employee,
-                    $item->court_location,
-                    $item->reason_for_dismissal,
-                    $item->court,
-                    $item->award_date ? $item->award_date->toDateString() : null,
-                    $item->detail_url,
-                    $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
-                ];
-                $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
+                    $jsonData[] = [
+                        'id' => $item->id,
+                        'case_reference' => $item->award_number,
+                        'title' => $item->title,
+                        'employer' => $item->employer,
+                        'employee' => $item->employee,
+                        'court_location' => $item->court_location,
+                        'dismissal_reason' => $item->reason_for_dismissal,
+                        'outcome' => $item->court,
+                        'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
+                        'detail_url' => $item->detail_url,
+                        'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                    ];
+                }
+            } else {
+                // Combined
+                $ccmaItems = CcmaAnalytics::all();
+                $legalItems = LegalAnalytics::all();
 
-                $jsonData[] = [
-                    'id' => $item->id,
-                    'case_reference' => $item->award_number,
-                    'title' => $item->title,
-                    'employer' => $item->employer,
-                    'employee' => $item->employee,
-                    'court_location' => $item->court_location,
-                    'dismissal_reason' => $item->reason_for_dismissal,
-                    'outcome' => $item->court,
-                    'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
-                    'detail_url' => $item->detail_url,
-                    'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
-                ];
+                foreach ($ccmaItems as $item) {
+                    $row = [
+                        'CCMA_' . $item->id,
+                        $item->award_number,
+                        $item->title,
+                        $item->employer,
+                        $item->employee,
+                        $item->court_location,
+                        $item->reason_for_dismissal,
+                        $item->court,
+                        $item->award_date ? $item->award_date->toDateString() : null,
+                        $item->detail_url,
+                        $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                    ];
+                    $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
+
+                    $jsonData[] = [
+                        'id' => 'CCMA_' . $item->id,
+                        'case_reference' => $item->award_number,
+                        'title' => $item->title,
+                        'employer' => $item->employer,
+                        'employee' => $item->employee,
+                        'court_location' => $item->court_location,
+                        'dismissal_reason' => $item->reason_for_dismissal,
+                        'outcome' => $item->court,
+                        'date_decision' => $item->award_date ? $item->award_date->toDateString() : null,
+                        'detail_url' => $item->detail_url,
+                        'details_scraped_at' => $item->details_scraped_at ? $item->details_scraped_at->toDateTimeString() : null,
+                    ];
+                }
+
+                foreach ($legalItems as $item) {
+                    $row = [
+                        'LEGAL_' . $item->id,
+                        $item->case_number,
+                        $item->title,
+                        $item->respondent,
+                        $item->applicant,
+                        $item->court_location,
+                        $item->subjects,
+                        $item->court,
+                        $item->document_date ? $item->document_date->toDateString() : null,
+                        $item->source_url,
+                        $item->created_at ? $item->created_at->toDateTimeString() : null,
+                    ];
+                    $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
+
+                    $jsonData[] = [
+                        'id' => 'LEGAL_' . $item->id,
+                        'case_reference' => $item->case_number,
+                        'title' => $item->title,
+                        'employer' => $item->respondent,
+                        'employee' => $item->applicant,
+                        'court_location' => $item->court_location,
+                        'dismissal_reason' => $item->subjects,
+                        'outcome' => $item->court,
+                        'date_decision' => $item->document_date ? $item->document_date->toDateString() : null,
+                        'detail_url' => $item->source_url,
+                        'details_scraped_at' => $item->created_at ? $item->created_at->toDateTimeString() : null,
+                    ];
+                }
             }
 
             $csvContent = implode("\n", $csvData);

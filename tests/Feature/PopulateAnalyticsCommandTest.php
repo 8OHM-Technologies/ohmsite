@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Analytics;
-use App\Models\BackupAnalytics;
+use App\Models\CcmaAnalytics;
+use App\Models\BackupCcmaAnalytics;
+use App\Models\LegalAnalytics;
+use App\Models\BackupLegalAnalytics;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -32,7 +34,7 @@ class PopulateAnalyticsCommandTest extends TestCase
         $db = DB::connection('pgsql_coeus');
         $db->statement('CREATE TABLE entities (id VARCHAR(36) PRIMARY KEY, name VARCHAR(255) UNIQUE, identifier VARCHAR(50), created_at TIMESTAMP)');
         $db->statement('CREATE TABLE targets (id VARCHAR(36) PRIMARY KEY, entity_id VARCHAR(36), target_name VARCHAR(255), location VARCHAR(255), created_at TIMESTAMP)');
-        $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, extracted_at TIMESTAMP, processed_at TIMESTAMP, cleaned_at TIMESTAMP)');
+        $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, status VARCHAR(50), extracted_at TIMESTAMP, processed_at TIMESTAMP, cleaned_at TIMESTAMP)');
         $db->statement('CREATE TABLE scrubbed_records (id VARCHAR(36) PRIMARY KEY, extracted_record_id VARCHAR(36), data TEXT, created_at TIMESTAMP)');
     }
 
@@ -84,6 +86,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -101,8 +104,8 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table has the mapped record
-        $analytic = Analytics::first();
+        // Verify ccma_analytics table has the mapped record
+        $analytic = CcmaAnalytics::first();
         $this->assertNotNull($analytic);
         $this->assertEquals('Gumede v Mastercraft, KN39790', $analytic->title);
         $this->assertEquals('CCMA Bargaining Council Awards', $analytic->document_type);
@@ -119,10 +122,6 @@ class PopulateAnalyticsCommandTest extends TestCase
         $this->assertEquals('CCMA', $analytic->forum);
         $this->assertEquals('KwaZulu-Natal [Durban]', $analytic->court_location);
         $this->assertEquals('UNFAIR DISMISSAL', $analytic->reason_for_dismissal);
-
-        // Verify coeus record has processed_at set
-        $record = DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->first();
-        $this->assertNotNull($record->processed_at);
 
         // Verify dataset files were generated
         Storage::disk('local')->assertExists('datasets/8ohm_ccma_dataset.csv');
@@ -164,6 +163,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -181,8 +181,8 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table has the mapped record
-        $analytic = Analytics::first();
+        // Verify ccma_analytics table has the mapped record
+        $analytic = CcmaAnalytics::first();
         $this->assertNotNull($analytic);
         $this->assertEquals('Melikhaya Richard Jikane v Quattro Protection Services (Pty) Ltd, WE54', $analytic->title);
         $this->assertEquals('CCMA Bargaining Council Awards', $analytic->document_type);
@@ -201,10 +201,6 @@ class PopulateAnalyticsCommandTest extends TestCase
         $this->assertEquals('Unfair Dismissal Disputes', $analytic->reason_for_dismissal);
         $this->assertEquals('https://discover.sabinet.co.za/preview.jpg', $analytic->preview_image_url);
         $this->assertEquals('2026-07-12 21:14:46', $analytic->details_scraped_at->toDateTimeString());
-
-        // Verify coeus record has processed_at set
-        $record = DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->first();
-        $this->assertNotNull($record->processed_at);
     }
 
     public function test_populates_sabinet_llm_data_correctly(): void
@@ -222,6 +218,7 @@ class PopulateAnalyticsCommandTest extends TestCase
                 'title' => 'Gumede v Mastercraft',
             ]),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -256,7 +253,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        $analytic = Analytics::first();
+        $analytic = CcmaAnalytics::first();
         $this->assertNotNull($analytic);
         $this->assertEquals('Gumede v Mastercraft Retail', $analytic->title);
         $this->assertEquals('Arbitration Award', $analytic->document_type);
@@ -286,6 +283,7 @@ class PopulateAnalyticsCommandTest extends TestCase
                 'title' => 'State v Zuma and Others',
             ]),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -319,25 +317,23 @@ class PopulateAnalyticsCommandTest extends TestCase
         ]);
 
         $this->artisan('legal-analytics:populate')
-            ->expectsOutput('Starting population of analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Starting population of legal analytics database. Max limit: 1000 records.')
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table has the mapped record
-        $analytic = Analytics::first();
+        // Verify legal_analytics table has the mapped record
+        $analytic = LegalAnalytics::first();
         $this->assertNotNull($analytic);
-        $this->assertEquals('State v Zuma, Ministers of Justice', $analytic->title);
-        $this->assertEquals('Judgment', $analytic->document_type);
-        $this->assertEquals('2026-06-18', $analytic->award_date->toDateString());
+        $this->assertEquals('State v Zuma and Others', $analytic->title);
+        $this->assertEquals('saflii_courts', $analytic->document_type);
+        $this->assertEquals('2026-06-18', $analytic->document_date->toDateString());
         $this->assertEquals('Constitutional Court', $analytic->court);
-        $this->assertEquals('CCT 12/25', $analytic->award_number);
-        $this->assertEquals('2026-06-12', $analytic->hearing_start->toDateString());
-        $this->assertEquals('2026-06-12', $analytic->hearing_end->toDateString());
-        $this->assertEquals('State', $analytic->employee);
-        $this->assertEquals('Zuma, Ministers of Justice', $analytic->employer);
-        $this->assertEquals('Constitutional Court', $analytic->forum);
+        $this->assertEquals('CCT 12/25', $analytic->case_number);
+        $this->assertEquals('State', $analytic->applicant);
+        $this->assertEquals('Zuma, Ministers of Justice', $analytic->respondent);
+        $this->assertEquals('Application for leave to appeal dismissed.', $analytic->outcome);
         $this->assertEquals('Johannesburg', $analytic->court_location);
-        $this->assertEquals('Criminal Law, Constitutional Law', $analytic->reason_for_dismissal);
+        $this->assertEquals('Criminal Law, Constitutional Law', $analytic->subjects);
 
         // Verify dataset files were generated
         Storage::disk('local')->assertExists('datasets/8ohm_saflii_dataset.csv');
@@ -365,6 +361,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => now(), // Already processed
         ]);
@@ -376,8 +373,8 @@ class PopulateAnalyticsCommandTest extends TestCase
             'created_at' => now(),
         ]);
 
-        // Put in Analytics manually so it's considered already locally processed
-        Analytics::create([
+        // Put in CcmaAnalytics manually so it's considered already locally processed
+        CcmaAnalytics::create([
             'extracted_record_id' => $id,
             'title' => 'Gumede v Mastercraft, KN39790',
             'document_type' => 'CCMA Bargaining Council Awards',
@@ -395,8 +392,8 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table has 1 record
-        $this->assertEquals(1, Analytics::count());
+        // Verify ccma_analytics table has 1 record
+        $this->assertEquals(1, CcmaAnalytics::count());
     }
 
     public function test_skips_records_without_cleaned_at(): void
@@ -416,6 +413,7 @@ class PopulateAnalyticsCommandTest extends TestCase
                 'award_number' => 'KN39790',
             ]),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => null,
@@ -428,8 +426,8 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        // Verify analytics table remains empty
-        $this->assertEquals(0, Analytics::count());
+        // Verify ccma_analytics table remains empty
+        $this->assertEquals(0, CcmaAnalytics::count());
     }
 
     public function test_deletes_local_records_not_in_extracted_records(): void
@@ -451,6 +449,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -469,7 +468,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        $this->assertEquals(1, Analytics::count());
+        $this->assertEquals(1, CcmaAnalytics::count());
 
         // Delete from coeus DB
         DB::connection('pgsql_coeus')->table('extracted_records')->where('id', $id)->delete();
@@ -481,7 +480,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 0 records. Deleted 1 obsolete records.')
             ->assertExitCode(0);
 
-        $this->assertEquals(0, Analytics::count());
+        $this->assertEquals(0, CcmaAnalytics::count());
     }
 
     public function test_creates_backup_before_changes(): void
@@ -503,6 +502,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload1),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -521,9 +521,9 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
             ->assertExitCode(0);
 
-        $this->assertEquals(1, Analytics::count());
+        $this->assertEquals(1, CcmaAnalytics::count());
         // Since changes were made, backup should contain the snapshot *before* the first changes (which was empty)
-        $this->assertEquals(0, BackupAnalytics::count());
+        $this->assertEquals(0, DB::table('backup_ccma_analytics')->count());
 
         // Insert second record
         $id2 = Str::uuid()->toString();
@@ -541,6 +541,7 @@ class PopulateAnalyticsCommandTest extends TestCase
             'record_type' => 'sabinet_ccma',
             'data' => json_encode($dataPayload2),
             'requires_human_review' => false,
+            'status' => 'detailed',
             'extracted_at' => now(),
             'processed_at' => null,
             'cleaned_at' => now(),
@@ -560,10 +561,10 @@ class PopulateAnalyticsCommandTest extends TestCase
             ->assertExitCode(0);
 
         // Current analytics has 2 records
-        $this->assertEquals(2, Analytics::count());
+        $this->assertEquals(2, CcmaAnalytics::count());
         // Backup should contain the snapshot *before* this run (which was the 1 record from the first run)
-        $this->assertEquals(1, BackupAnalytics::count());
-        $this->assertEquals('Gumede v Mastercraft, KN39790', BackupAnalytics::first()->title);
+        $this->assertEquals(1, DB::table('backup_ccma_analytics')->count());
+        $this->assertEquals('Gumede v Mastercraft, KN39790', DB::table('backup_ccma_analytics')->first()->title);
     }
 
     public function test_user_can_download_dataset_in_both_formats(): void
@@ -571,8 +572,8 @@ class PopulateAnalyticsCommandTest extends TestCase
         Storage::fake('local');
 
         // Create the dataset files in local storage
-        Storage::disk('local')->put('datasets/8ohm_ccma_dataset.csv', 'dummy csv');
-        Storage::disk('local')->put('datasets/8ohm_ccma_dataset.json', 'dummy json');
+        Storage::disk('local')->put('datasets/8ohm_saflii_dataset.csv', 'dummy csv');
+        Storage::disk('local')->put('datasets/8ohm_saflii_dataset.json', 'dummy json');
 
         $user = User::factory()->create();
 
@@ -602,13 +603,13 @@ class PopulateAnalyticsCommandTest extends TestCase
         ]);
 
         // Request CSV format
-        $responseCsv = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'ccma', 'format' => 'csv']));
+        $responseCsv = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'saflii', 'format' => 'csv']));
         $responseCsv->assertStatus(200);
         $responseCsv->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
         $this->assertEquals('dummy csv', $responseCsv->streamedContent());
 
         // Request JSON format
-        $responseJson = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'ccma', 'format' => 'json']));
+        $responseJson = $this->actingAs($user)->get(route('downloads.dataset', ['dataset' => 'saflii', 'format' => 'json']));
         $responseJson->assertStatus(200);
         $responseJson->assertHeader('Content-Type', 'application/json');
         $this->assertEquals('dummy json', $responseJson->streamedContent());

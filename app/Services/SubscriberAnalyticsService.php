@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Analytics;
+use App\Models\CcmaAnalytics;
 
 class SubscriberAnalyticsService
 {
@@ -13,7 +13,7 @@ class SubscriberAnalyticsService
      */
     public function getDashboardPayload(): array
     {
-        $cases = Analytics::all()->toArray();
+        $cases = CcmaAnalytics::all()->toArray();
 
         return [
             'cases' => $cases,
