@@ -226,16 +226,218 @@ const datasetStats = computed(() => {
         <div class="lg:ml-72 flex flex-col min-h-screen">
             <!-- Topbar -->
             <header
-                class="h-20 lg:h-24 flex items-center justify-between px-4 sm:px-8 lg:px-10 sticky top-0 bg-admin-main/80 backdrop-blur-xl z-30 border-b border-white/5">
-                <div class="flex items-center gap-4 lg:hidden">
-                    <button @click="isSidebarOpen = true" class="p-2 text-zinc-400 hover:text-white transition-colors">
-                        <Menu class="w-6 h-6" />
-                    </button>
-                    <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
+                class="flex flex-col gap-4 px-4 sm:px-8 lg:px-10 py-4 sticky top-0 bg-admin-main/80 backdrop-blur-xl z-30 border-b border-white/5">
+                <!-- Top Row: Stats (or Mobile Logo) on Left, Profile/Notifications on Right -->
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center gap-4 lg:hidden">
+                        <button @click="isSidebarOpen = true" class="p-2 text-zinc-400 hover:text-white transition-colors">
+                            <Menu class="w-6 h-6" />
+                        </button>
+                        <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
+                    </div>
+
+                    <!-- Dataset Breakdown -->
+                    <div
+                        class="hidden lg:flex items-center gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] shrink-0">
+                        <!-- Total Records -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <Database class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total
+                                    Records</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.total.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                        <!-- Total Cases -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <FileText class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Cases</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.cases.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                        <!-- Journals / Gazettes -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <BookOpen class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Journals
+                                    &amp; Gaz.</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.gazettes.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                        <!-- Court Rolls -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <Scroll class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Court
+                                    Rolls</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.courtRolls.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                        <!-- Date Range -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <Calendar class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date
+                                    Range</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.dateRange }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-5">
+                        <!-- Action Buttons - Hidden on mobile, icons only on tablet -->
+                        <div class="hidden sm:flex items-center gap-2">
+                            <Dropdown align="right" width="96">
+                                <template #trigger>
+                                    <button
+                                        class="p-2.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all relative group border border-white/5">
+                                        <Bell class="h-4.5 w-4.5 group-hover:rotate-12 transition-transform" />
+                                        <span v-if="unreadCount > 0"
+                                            class="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-admin-modern rounded-full ring-2 ring-admin-main shadow-[0_0_10px_rgba(229,255,69,0.5)]"></span>
+                                    </button>
+                                </template>
+                                <template #content>
+                                    <div class="overflow-hidden">
+                                        <div
+                                            class="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                                            <div>
+                                                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white">Alert
+                                                    Center</h4>
+                                                <p
+                                                    class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">
+                                                    {{ unreadCount }} Unread Messages</p>
+                                            </div>
+                                            <button v-if="unreadCount > 0" @click="markAllAsRead"
+                                                class="text-[9px] font-black text-admin-modern uppercase tracking-widest hover:text-white transition-colors">Mark
+                                                Read</button>
+                                        </div>
+
+                                        <div class="max-h-[450px] overflow-y-auto custom-scrollbar">
+                                            <div v-if="notifications.length === 0" class="py-20 text-center">
+                                                <div
+                                                    class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                                                    <Bell class="w-5 h-5 text-zinc-700" />
+                                                </div>
+                                                <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                                                    System Clear</p>
+                                            </div>
+
+                                            <div v-for="notification in notifications" :key="notification.id"
+                                                @click="markAsRead(notification.id)"
+                                                class="p-5 border-b border-white/5 hover:bg-white/[0.03] transition-all cursor-pointer group relative"
+                                                :class="{ 'bg-white/[0.01]': !notification.read_at }">
+                                                <div v-if="!notification.read_at"
+                                                    class="absolute left-0 top-0 bottom-0 w-0.5 bg-admin-modern shadow-[0_0_10px_rgba(229,255,69,0.5)]">
+                                                </div>
+
+                                                <div class="flex gap-4">
+                                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
+                                                        :class="notification.data.type === 'order' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-admin-modern/10 border border-admin-modern/20'">
+                                                        <ShoppingCart v-if="notification.data.type === 'order'"
+                                                            class="w-4.5 h-4.5 text-emerald-400" />
+                                                        <Bell v-else class="w-4.5 h-4.5 text-admin-modern" />
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p
+                                                            class="text-[11px] font-black text-zinc-300 group-hover:text-white transition-colors leading-relaxed">
+                                                            {{ notification.data.message }}
+                                                        </p>
+                                                        <div class="flex items-center gap-2 mt-1.5">
+                                                            <span
+                                                                class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{
+                                                                    notification.created_at_human || 'Just now' }}</span>
+                                                            <template v-if="notification.data.amount">
+                                                                <span class="text-[8px] text-zinc-800">•</span>
+                                                                <span class="text-[9px] font-black text-emerald-400">R{{
+                                                                    notification.data.amount }}</span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                        </div>
+
+                        <div class="h-8 w-px bg-white/10 mx-1"></div>
+
+                        <Dropdown align="right" width="48">
+                            <template #trigger>
+                                <button class="flex items-center group">
+                                    <div
+                                        class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden group-hover:border-admin-modern transition-all duration-300">
+                                        <img v-if="user.profile_photo_url" :src="user.profile_photo_url"
+                                            :alt="user.first_name + ' ' + user.last_name"
+                                            class="w-full h-full object-cover" />
+                                        <div v-else
+                                            class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-400">
+                                            <UserCircle class="w-6 h-6" />
+                                        </div>
+                                    </div>
+                                </button>
+                            </template>
+
+                            <template #content>
+                                <div class="px-4 py-3 border-b border-white/5 lg:hidden">
+                                    <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}</p>
+                                    <p class="text-[10px] text-zinc-500 truncate">{{ user.email }}</p>
+                                </div>
+                                <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                <DropdownLink :href="route('logout')" method="post" as="button" class="text-rose-500">
+                                    Log Out
+                                </DropdownLink>
+                            </template>
+                        </Dropdown>
+                    </div>
                 </div>
 
-                <div class="hidden md:flex flex-1 max-w-xl mx-4 lg:mx-0">
-                    <div class="relative w-full group">
+                <!-- Bottom Row: Search Bar -->
+                <div class="hidden md:flex w-full">
+                    <div class="relative w-full max-w-xl group">
                         <div
                             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-500 group-focus-within:text-admin-modern transition-colors">
                             <Search class="h-4 w-4" />
@@ -243,204 +445,6 @@ const datasetStats = computed(() => {
                         <input v-model="searchQuery" @keyup.enter="handleSearch" type="text" placeholder="Search..."
                             class="block w-full pl-11 pr-4 py-2.5 bg-zinc-900/50 border border-white/5 text-sm text-white placeholder:text-zinc-600 rounded-xl focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50 transition-all outline-none" />
                     </div>
-                </div>
-
-                <!-- Dataset Breakdown -->
-                <div
-                    class="hidden xl:flex items-center gap-4 sm:gap-6 bg-white/[0.02] border border-white/5 rounded-2xl p-3 sm:px-5 sm:py-2.5 backdrop-blur-md shadow-inner shadow-white/[0.01] shrink-0">
-                    <!-- Total Records -->
-                    <div class="flex items-center gap-2.5">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <Database class="w-4 h-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total
-                                Records</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.total.toLocaleString() }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
-
-                    <!-- Total Cases -->
-                    <div class="flex items-center gap-2.5">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <FileText class="w-4 h-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Cases</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.cases.toLocaleString() }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
-
-                    <!-- Journals / Gazettes -->
-                    <div class="flex items-center gap-2.5">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <BookOpen class="w-4 h-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Journals
-                                &amp; Gaz.</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.gazettes.toLocaleString() }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
-
-                    <!-- Court Rolls -->
-                    <div class="flex items-center gap-2.5">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <Scroll class="w-4 h-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Court
-                                Rolls</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.courtRolls.toLocaleString() }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
-
-                    <!-- Date Range -->
-                    <div class="flex items-center gap-2.5">
-                        <div
-                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <Calendar class="w-4 h-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date
-                                Range</span>
-                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.dateRange }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3 sm:gap-5">
-                    <!-- Action Buttons - Hidden on mobile, icons only on tablet -->
-                    <div class="hidden sm:flex items-center gap-2">
-                        <Dropdown align="right" width="96">
-                            <template #trigger>
-                                <button
-                                    class="p-2.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl transition-all relative group border border-white/5">
-                                    <Bell class="h-4.5 w-4.5 group-hover:rotate-12 transition-transform" />
-                                    <span v-if="unreadCount > 0"
-                                        class="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-admin-modern rounded-full ring-2 ring-admin-main shadow-[0_0_10px_rgba(229,255,69,0.5)]"></span>
-                                </button>
-                            </template>
-                            <template #content>
-                                <div class="overflow-hidden">
-                                    <div
-                                        class="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                                        <div>
-                                            <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white">Alert
-                                                Center</h4>
-                                            <p
-                                                class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">
-                                                {{ unreadCount }} Unread Messages</p>
-                                        </div>
-                                        <button v-if="unreadCount > 0" @click="markAllAsRead"
-                                            class="text-[9px] font-black text-admin-modern uppercase tracking-widest hover:text-white transition-colors">Mark
-                                            Read</button>
-                                    </div>
-
-                                    <div class="max-h-[450px] overflow-y-auto custom-scrollbar">
-                                        <div v-if="notifications.length === 0" class="py-20 text-center">
-                                            <div
-                                                class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
-                                                <Bell class="w-5 h-5 text-zinc-700" />
-                                            </div>
-                                            <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-                                                System Clear</p>
-                                        </div>
-
-                                        <div v-for="notification in notifications" :key="notification.id"
-                                            @click="markAsRead(notification.id)"
-                                            class="p-5 border-b border-white/5 hover:bg-white/[0.03] transition-all cursor-pointer group relative"
-                                            :class="{ 'bg-white/[0.01]': !notification.read_at }">
-                                            <div v-if="!notification.read_at"
-                                                class="absolute left-0 top-0 bottom-0 w-0.5 bg-admin-modern shadow-[0_0_10px_rgba(229,255,69,0.5)]">
-                                            </div>
-
-                                            <div class="flex gap-4">
-                                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
-                                                    :class="notification.data.type === 'order' ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-admin-modern/10 border border-admin-modern/20'">
-                                                    <ShoppingCart v-if="notification.data.type === 'order'"
-                                                        class="w-4.5 h-4.5 text-emerald-400" />
-                                                    <Bell v-else class="w-4.5 h-4.5 text-admin-modern" />
-                                                </div>
-                                                <div class="flex-1 min-w-0">
-                                                    <p
-                                                        class="text-[11px] font-black text-zinc-300 group-hover:text-white transition-colors leading-relaxed">
-                                                        {{ notification.data.message }}
-                                                    </p>
-                                                    <div class="flex items-center gap-2 mt-1.5">
-                                                        <span
-                                                            class="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">{{
-                                                                notification.created_at_human || 'Just now' }}</span>
-                                                        <template v-if="notification.data.amount">
-                                                            <span class="text-[8px] text-zinc-800">•</span>
-                                                            <span class="text-[9px] font-black text-emerald-400">R{{
-                                                                notification.data.amount }}</span>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </Dropdown>
-                    </div>
-
-                    <div class="h-8 w-px bg-white/10 mx-1"></div>
-
-                    <Dropdown align="right" width="48">
-                        <template #trigger>
-                            <button class="flex items-center group">
-                                <div
-                                    class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-zinc-800 border border-white/10 overflow-hidden group-hover:border-admin-modern transition-all duration-300">
-                                    <img v-if="user.profile_photo_url" :src="user.profile_photo_url"
-                                        :alt="user.first_name + ' ' + user.last_name"
-                                        class="w-full h-full object-cover" />
-                                    <div v-else
-                                        class="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-400">
-                                        <UserCircle class="w-6 h-6" />
-                                    </div>
-                                </div>
-                            </button>
-                        </template>
-
-                        <template #content>
-                            <div class="px-4 py-3 border-b border-white/5 lg:hidden">
-                                <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}</p>
-                                <p class="text-[10px] text-zinc-500 truncate">{{ user.email }}</p>
-                            </div>
-                            <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
-                            <DropdownLink :href="route('logout')" method="post" as="button" class="text-rose-500">
-                                Log Out
-                            </DropdownLink>
-                        </template>
-                    </Dropdown>
                 </div>
             </header>
 
