@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'verified', 'subscribed'])->prefix('subscriber')->name('subscriber.')->group(function () {
     Route::get('/', [SubscriberController::class, 'index'])->name('index');
+    Route::get('/analytics/data', [SubscriberController::class, 'data'])->name('analytics.data');
 });
 
 Route::middleware(['auth', 'verified', 'has.dataset.access'])->group(function () {
