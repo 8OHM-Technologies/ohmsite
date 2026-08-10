@@ -476,9 +476,9 @@ const legalCourtsSeries = computed(() => [{ name: 'Records', data: legalTopCourt
                 </div>
 
                 <!-- Active dataset label -->
-                <div class="flex items-center gap-2 pt-2">
+                <div class="flex items-center justify-center gap-2 pt-2 w-full">
                     <span class="w-2 h-2 rounded-full bg-admin-modern animate-pulse"></span>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                    <span class="text-sm font-black uppercase tracking-widest text-zinc-300">
                         {{ selectedVanityName }}
                     </span>
                 </div>
