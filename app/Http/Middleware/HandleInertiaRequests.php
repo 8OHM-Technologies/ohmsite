@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\CcmaAnalytics;
 use App\Models\Dataset;
+use App\Models\LegalAnalytics;
+use App\Models\ScrubbedRecord;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -66,6 +69,56 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'dataset_summary' => function () {
+                try {
+                    $totalRecords = ScrubbedRecord::count();
+
+                    $totalCases = LegalAnalytics::where('target_type', 'cases')->count()
+                        + CcmaAnalytics::count();
+
+                    $totalGazettes = LegalAnalytics::whereIn('target_type', ['gaz', 'journals'])->count();
+
+                    $totalCourtRolls = CcmaAnalytics::count();
+
+                    // Date range from legal_analytics document_date
+                    $minYear = LegalAnalytics::whereNotNull('document_date')
+                        ->selectRaw('MIN(EXTRACT(YEAR FROM document_date)::int) as yr')
+                        ->value('yr');
+                    $maxYear = LegalAnalytics::whereNotNull('document_date')
+                        ->selectRaw('MAX(EXTRACT(YEAR FROM document_date)::int) as yr')
+                        ->value('yr');
+
+                    $ccmaMin = CcmaAnalytics::whereNotNull('award_date')
+                        ->selectRaw('MIN(EXTRACT(YEAR FROM award_date)::int) as yr')
+                        ->value('yr');
+                    $ccmaMax = CcmaAnalytics::whereNotNull('award_date')
+                        ->selectRaw('MAX(EXTRACT(YEAR FROM award_date)::int) as yr')
+                        ->value('yr');
+
+                    $globalMin = collect(array_filter([$minYear, $ccmaMin]))->min();
+                    $globalMax = collect(array_filter([$maxYear, $ccmaMax]))->max();
+
+                    $dateRange = $globalMin && $globalMax
+                        ? ($globalMin === $globalMax ? (string) $globalMin : "{$globalMin} – {$globalMax}")
+                        : 'N/A';
+
+                    return [
+                        'total_records' => $totalRecords,
+                        'total_cases'   => $totalCases,
+                        'total_gazettes' => $totalGazettes,
+                        'total_court_rolls' => $totalCourtRolls,
+                        'date_range'    => $dateRange,
+                    ];
+                } catch (\Throwable $e) {
+                    return [
+                        'total_records'     => 0,
+                        'total_cases'       => 0,
+                        'total_gazettes'    => 0,
+                        'total_court_rolls' => 0,
+                        'date_range'        => 'N/A',
+                    ];
+                }
+            },
         ];
     }
 }

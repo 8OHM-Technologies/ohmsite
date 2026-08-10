@@ -16,7 +16,9 @@ import {
     UserCircle,
     ShoppingCart,
     Database,
-    Briefcase,
+    FileText,
+    BookOpen,
+    Scroll,
     Calendar,
     Scale
 } from 'lucide-vue-next';
@@ -45,7 +47,7 @@ const searchQuery = ref('');
 
 const searchItems = [
     { name: 'Analytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
-    { name: 'Case Law', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
+    { name: 'Legal Records', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
 ];
 
 const handleSearch = () => {
@@ -64,7 +66,7 @@ const handleSearch = () => {
 };
 
 const navigation = [
-    { name: 'Case Law', href: route('legal-records.index'), icon: Scale },
+    { name: 'Legal Records', href: route('legal-records.index'), icon: Scale },
     { name: 'Analytics', href: route('subscriber.index'), icon: BarChart3 },
 ];
 
@@ -123,54 +125,26 @@ onUnmounted(() => {
     window.removeEventListener('mousemove', handleMouseMove);
 });
 
-// Calculate dataset breakdown from cases prop or fallback to demoData
+// Dataset breakdown from server-side shared prop
 const datasetStats = computed(() => {
-    const rawCases = page.props.cases && page.props.cases.length > 0
-        ? page.props.cases
-        : [];
+    const summary = page.props.dataset_summary;
 
-    if (!rawCases || rawCases.length === 0) {
+    if (!summary) {
         return {
             total: 0,
-            employers: 0,
-            dateRange: 'N/A'
+            cases: 0,
+            gazettes: 0,
+            courtRolls: 0,
+            dateRange: 'N/A',
         };
     }
 
-    const total = rawCases.length;
-
-    // Unique employers count
-    const employersSet = new Set();
-    rawCases.forEach(c => {
-        if (c.employer) {
-            employersSet.add(c.employer.trim().toLowerCase());
-        }
-    });
-    const employers = employersSet.size;
-
-    // Get min & max years from award_date or hearing dates
-    let minYear = null;
-    let maxYear = null;
-    rawCases.forEach(c => {
-        const dateStr = c.award_date || c.hearing_start;
-        if (dateStr) {
-            const year = new Date(dateStr.split('T')[0]).getFullYear();
-            if (!isNaN(year)) {
-                if (minYear === null || year < minYear) minYear = year;
-                if (maxYear === null || year > maxYear) maxYear = year;
-            }
-        }
-    });
-
-    let dateRange = 'Unknown';
-    if (minYear !== null && maxYear !== null) {
-        dateRange = minYear === maxYear ? `${minYear}` : `${minYear} - ${maxYear}`;
-    }
-
     return {
-        total,
-        employers,
-        dateRange
+        total: summary.total_records ?? 0,
+        cases: summary.total_cases ?? 0,
+        gazettes: summary.total_gazettes ?? 0,
+        courtRolls: summary.total_court_rolls ?? 0,
+        dateRange: summary.date_range ?? 'N/A',
     };
 });
 </script>
@@ -292,17 +266,53 @@ const datasetStats = computed(() => {
                     <!-- Divider -->
                     <div class="h-8 w-px bg-white/10 shrink-0"></div>
 
-                    <!-- Unique Employers -->
+                    <!-- Total Cases -->
                     <div class="flex items-center gap-2.5">
                         <div
                             class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <Briefcase class="w-4 h-4" />
+                            <FileText class="w-4 h-4" />
                         </div>
                         <div class="flex flex-col">
                             <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Cases</span>
                             <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.employers.toLocaleString() }}</span>
+                                datasetStats.cases.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Journals / Gazettes -->
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <BookOpen class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Journals
+                                &amp; Gaz.</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.gazettes.toLocaleString() }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                    <!-- Court Rolls -->
+                    <div class="flex items-center gap-2.5">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                            <Scroll class="w-4 h-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Court
+                                Rolls</span>
+                            <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                datasetStats.courtRolls.toLocaleString() }}</span>
                         </div>
                     </div>
 
