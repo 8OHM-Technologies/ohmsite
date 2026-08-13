@@ -443,12 +443,12 @@ const getFilteredMetadata = (recordData: any) => {
       <div>
         <div class="flex items-center gap-3 mb-2">
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
-            Case Law & Legal Records
+            Legal Records
           </h1>
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            Open Access South African Case Law and Legal Records
+            Open Access South African Legal Records including Case Law, Journals and Court Rolls
           </p>
         </div>
       </div>
@@ -492,7 +492,7 @@ const getFilteredMetadata = (recordData: any) => {
           <button @click="setActiveGroup('courts')"
             class="px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all"
             :class="activeGroup === 'courts' ? 'btn-admin-modern' : 'btn-secondary'">
-            SAFLII Courts
+            Court Judgments
           </button>
 
           <button @click="setActiveGroup('gazettes_journals')"
@@ -517,12 +517,13 @@ const getFilteredMetadata = (recordData: any) => {
 
       <!-- Specific Court / Source Dropdown Selection when a group is active -->
       <div v-if="['courts', 'gazettes_journals', 'other'].includes(activeGroup)"
-           class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-3">
+        class="pt-4 border-t border-white/5 flex flex-wrap items-center gap-3">
         <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Select Specific Source:</span>
         <div class="relative min-w-[240px]">
           <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
-                  class="w-full bg-black/60 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50">
-            <option v-for="filter in getFiltersForGroup(activeGroup)" :key="filter.target_name" :value="filter.target_name">
+            class="w-full bg-black/60 border border-white/10 rounded-xl py-2 px-3 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50">
+            <option v-for="filter in getFiltersForGroup(activeGroup)" :key="filter.target_name"
+              :value="filter.target_name">
               {{ filter.vanity_name }}
             </option>
           </select>
