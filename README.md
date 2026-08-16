@@ -83,6 +83,19 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 
 ---
 
+## 📡 Monitoring & Telegram Notifications
+
+The application integrates with Telegram via `defstudio/telegraph` to alert admins about critical platform events and system anomalies:
+
+- **🚨 Backend Exceptions & Server Errors**: Automatically captures unhandled exceptions with HTTP/CLI context, user ID, IP, and location. Throttled at **1 alert per 15 minutes per unique exception** to prevent channel flood.
+- **⏱️ Scheduled Task Tracking**: Instant notifications when scheduled tasks fail (`ScheduledTaskFailed`), with optional completion summaries (`ScheduledTaskFinished`).
+- **💥 Queue Job Failures**: Real-time alerts when background queue jobs fail (`JobFailed`) with connection, queue, and error details.
+- **🛡️ Security & Auth Lockouts**: Alerts triggered on brute-force authentication lockouts (`Lockout`) with IP and target account details.
+- **💼 Business Events**: Instant alerts for `OrderPlaced`, `PaymentCompleted`, `PaymentFailedOrError`, `NewUserRegistered`, and `WebsiteEnquiryReceived`.
+- **🛠️ Manual Dispatch & CLI**: Send manual or broadcast messages via `vendor/bin/sail artisan telegram:send "Your message"`.
+
+---
+
 ## Authentication & Middleware
 
 Access levels are enforced via specialized middlewares:

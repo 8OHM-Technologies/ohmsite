@@ -138,3 +138,27 @@ flowchart TD
 | `subscribed` | [SubscribedMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/SubscribedMiddleware.php) | Pro Analytics dashboard |
 | `has.dataset.access` | [DatasetAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/DatasetAccessMiddleware.php) | Dataset downloads |
 | `has.api.access` | [ApiAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/ApiAccessMiddleware.php) | Developer API docs |
+
+---
+
+## 4. System Monitoring & Telegram Notifications
+
+All system anomalies and key events are dispatched to admin Telegram chats via [TelegramAlertService](file:///home/tiaanf/Dev/ohmsite/app/Services/TelegramAlertService.php) and [TelegramSystemEventsSubscriber](file:///home/tiaanf/Dev/ohmsite/app/Listeners/TelegramSystemEventsSubscriber.php):
+
+```mermaid
+flowchart TD
+    A["System Event / Exception"] --> B{"Event Type"}
+    B -->|Unhandled 500 Error| C["TelegramAlertService::reportException"]
+    B -->|ScheduledTaskFailed / Finished| D["TelegramSystemEventsSubscriber"]
+    B -->|JobFailed| D
+    B -->|Lockout| D
+    C --> E{"Check Throttle Cache (15m window)"}
+    E -->|Already sent| F["Increment count & suppress"]
+    E -->|First occurrence| G["Build SystemErrorNotification"]
+    D --> H["Build Event Notification"]
+    G --> I{"Admin User in DB?"}
+    H --> I
+    I -->|Yes| J["Notification::send(admins, ...)"]
+    I -->|No / DB Down| K["Direct Dispatch: Telegraph::chat(chatId)"]
+```
+
