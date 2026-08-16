@@ -38,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
             PaystackWebhookListener::class
         );
 
+        Event::subscribe(\App\Listeners\TelegramSystemEventsSubscriber::class);
+
+
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });

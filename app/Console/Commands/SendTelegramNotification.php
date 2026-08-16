@@ -49,13 +49,20 @@ class SendTelegramNotification extends Command
         $chatId = $this->option('chat') ?: config('telegraph.chat_id');
         $direct = $this->option('direct') || !empty($this->option('chat'));
 
-        $admin = User::where('role', 'admin')->first();
+        if (!$direct) {
+            try {
+                $admin = User::where('role', 'admin')->first();
 
-        if (!$direct && $admin !== null) {
-            $this->info("Sending notification to admin '{$admin->email}' (chat: {$chatId})...");
-            Notification::send($admin, new ManualNotification($message, $format));
-            $this->info('Notification sent successfully to admin and logged to the database!');
-            return self::SUCCESS;
+                if ($admin !== null) {
+                    $this->info("Sending notification to admin '{$admin->email}' (chat: {$chatId})...");
+                    Notification::send($admin, new ManualNotification($message, $format));
+                    $this->info('Notification sent successfully to admin and logged to the database!');
+
+                    return self::SUCCESS;
+                }
+            } catch (\Throwable $e) {
+                $this->warn('Database unavailable ('.$e->getMessage().'). Falling back to direct Telegram dispatch.');
+            }
         }
 
         if (empty($chatId)) {

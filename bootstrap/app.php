@@ -38,5 +38,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi(); // For Sanctum
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->reportable(function (\Throwable $e): void {
+            \App\Services\TelegramAlertService::reportException($e);
+        });
     })->create();
+

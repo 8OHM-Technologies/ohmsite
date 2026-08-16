@@ -238,4 +238,25 @@ return [
     'payments' => [
         'provider_token' => env('TELEGRAPH_PAYMENT_PROVIDER_TOKEN', ''),
     ],
+
+    /*
+     * System Monitoring & Notification settings
+     */
+    'notifications' => [
+        'errors' => [
+            'enabled' => env('TELEGRAM_NOTIFY_ERRORS', true),
+            'throttle_minutes' => (int) env('TELEGRAM_ERROR_THROTTLE_MINS', 15),
+        ],
+        'scheduled_tasks' => [
+            'notify_on_failure' => env('TELEGRAM_NOTIFY_SCHEDULE_FAILURE', true),
+            'notify_on_success' => env('TELEGRAM_NOTIFY_SCHEDULE_SUCCESS', false),
+        ],
+        'queue' => [
+            'notify_on_failure' => env('TELEGRAM_NOTIFY_QUEUE_FAILURE', true),
+        ],
+        'auth' => [
+            'notify_on_lockout' => env('TELEGRAM_NOTIFY_AUTH_LOCKOUT', true),
+        ],
+    ],
 ];
+
