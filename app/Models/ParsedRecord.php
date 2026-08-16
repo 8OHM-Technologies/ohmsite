@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ScrubbedRecord extends Model
+class ParsedRecord extends Model
 {
     /**
      * The database connection that should be used by the model.
@@ -19,7 +19,7 @@ class ScrubbedRecord extends Model
      *
      * @var string
      */
-    protected $table = 'scrubbed_records';
+    protected $table = 'parsed_records';
 
     /**
      * The attributes that aren't mass assignable.

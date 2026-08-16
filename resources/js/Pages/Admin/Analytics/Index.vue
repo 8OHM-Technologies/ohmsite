@@ -86,6 +86,9 @@ const pipelineMetrics = computed(() => {
 });
 
 const isWorkerOnline = computed(() => {
+    if (pipelineMetrics.value?.is_online !== undefined) {
+        return Boolean(pipelineMetrics.value.is_online);
+    }
     const intervals = pipelineMetrics.value.last_hour_5min_intervals?.intervals || [];
     if (intervals.length === 0) return false;
     const lastInterval = intervals[intervals.length - 1];
@@ -564,7 +567,7 @@ const getStatusIcon = (type) => {
                             <select v-model="selectedPipelineId"
                                 class="bg-zinc-950 text-white border border-white/10 rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider focus:outline-none focus:border-admin-modern">
                                 <option v-for="p in props.scrapingMetrics" :key="p.id" :value="p.id">
-                                    {{ p.pipeline_name }}
+                                    {{ p.metrics?.label || p.pipeline_name }}
                                 </option>
                             </select>
                         </div>
@@ -670,8 +673,9 @@ const getStatusIcon = (type) => {
                                     </svg>
                                 </div>
                                 <span
-                                    class="text-green-400 bg-green-400/10 text-[10px] font-black px-2 py-1 rounded-lg">
-                                    Online
+                                    :class="isWorkerOnline ? 'text-green-400 bg-green-400/10' : 'text-zinc-500 bg-zinc-800/50'"
+                                    class="text-[10px] font-black px-2 py-1 rounded-lg">
+                                    {{ isWorkerOnline ? 'Online' : 'Idle' }}
                                 </span>
                             </div>
                             <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Uptime Duration

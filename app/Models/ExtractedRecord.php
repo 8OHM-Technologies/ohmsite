@@ -63,8 +63,10 @@ class ExtractedRecord extends Model
             'requires_human_review' => 'boolean',
             'review_reason' => 'string',
             'scraped_at' => 'datetime',
-            'cleaned_at' => 'datetime',
             'detailed_at' => 'datetime',
+            'parsed_at' => 'datetime',
+            'scrubbed_at' => 'datetime',
+            'updated_at' => 'datetime',
             'status' => 'string',
         ];
     }
@@ -83,5 +85,13 @@ class ExtractedRecord extends Model
     public function scrubbedRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ScrubbedRecord::class, 'extracted_record_id', 'id');
+    }
+
+    /**
+     * Relation to ParsedRecord.
+     */
+    public function parsedRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ParsedRecord::class, 'extracted_record_id', 'id');
     }
 }

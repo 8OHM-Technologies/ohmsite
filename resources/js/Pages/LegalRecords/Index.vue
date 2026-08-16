@@ -21,7 +21,6 @@ import {
   FileCheck
 } from 'lucide-vue-next';
 
-// PrimeVue Free Components (Open Source MIT)
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Modal from '@/Components/Modal.vue';
@@ -75,15 +74,12 @@ const searchQuery = ref('');
 const selectedRecordType = ref('');
 const selectedCourt = ref('');
 
-// Tab group selection
 const activeGroup = ref<'all' | 'ccma' | 'courts' | 'gazettes_journals' | 'other'>('all');
 
-// Document Detail Dialog state
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
 
-// Lazy parameter state
 const lazyParams = ref<Partial<DataTableLazyLoadEvent>>({
   first: 0,
   rows: 25,
