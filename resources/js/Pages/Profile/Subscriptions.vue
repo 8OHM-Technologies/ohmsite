@@ -102,7 +102,7 @@ const getFrequencyLabel = (value) => {
                     </div>
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2">No subscriptions found</h3>
-                <p class="text-zinc-500 mb-8">You haven't placed any subscriptions yet.</p>
+                <p class="text-zinc-500 mb-8">You haven't placed any orders or subscribed to any packages yet.</p>
                 <Link :href="route('home')"
                     class="inline-block bg-white text-black px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-zinc-200 transition-all">
                     Browse Data Solutions
