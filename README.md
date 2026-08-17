@@ -78,7 +78,8 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 - **Rate Limiting**: Limits enforced dynamically based on active tier (1000/mo for API, 3000/mo for Pro).
 
 ### 2. Pro Analytics Dashboard (`subscribed`)
-- Custom data visualizations and trends analysis.
+- **CCMA Awards Analytics**: Labor arbitration trends, procedural velocity (hearing duration, award delay, ingestion latency), regional exposure, and employer risk profiling.
+- **SAFLII Courts Jurisprudence Intelligence**: Superior court analytics (Constitutional Court & Competition Appeal Court), precedent citation networks, citation treatment breakdown (Applied, Referred, Distinguished), judicial bench analysis, and comprehensive case dossier viewer with *Ratio Decidendi* and *Obiter Dicta* extraction.
 - Instant exports of sanitized datasets.
 
 ---

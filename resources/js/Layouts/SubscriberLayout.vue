@@ -20,7 +20,10 @@ import {
     BookOpen,
     Scroll,
     Calendar,
-    Scale
+    Scale,
+    ChevronDown,
+    Briefcase,
+    Gavel
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -45,8 +48,16 @@ const markAllAsRead = () => {
 const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
+const isAnalyticsUrl = computed(() => {
+    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
+    return current === 'subscriber' || current.startsWith('subscriber/analytics');
+});
+
+const isAnalyticsExpanded = ref(true);
+
 const searchItems = [
-    { name: 'Analytics', href: route('subscriber.index'), keywords: ['home', 'overview', 'main', 'stats', 'charts', 'performance', 'reports', 'trend'] },
+    { name: 'CCMA Awards Analytics', href: route('subscriber.analytics.ccma'), keywords: ['ccma', 'awards', 'labour', 'labor', 'dismissal', 'arbitration', 'analytics', 'stats', 'trends'] },
+    { name: 'SAFLII Courts Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
     { name: 'Legal Records', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
 ];
 
@@ -64,11 +75,6 @@ const handleSearch = () => {
         searchQuery.value = '';
     }
 };
-
-const navigation = [
-    { name: 'Legal Records', href: route('legal-records.index'), icon: Scale },
-    { name: 'Analytics', href: route('subscriber.index'), icon: BarChart3 },
-];
 
 const isUrl = (url) => {
     if (!url) return false;
@@ -186,19 +192,68 @@ const datasetStats = computed(() => {
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
-                    <div v-for="item in navigation" :key="item.name">
-                        <Link :href="item.href"
+                <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 custom-scrollbar">
+                    <!-- Legal Records Direct Link -->
+                    <div>
+                        <Link :href="route('legal-records.index')"
                             class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
                             :class="[
-                                isUrl(item.href)
+                                isUrl(route('legal-records.index'))
                                     ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
                                     : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
                             ]">
-                            <component :is="item.icon" class="mr-3.5 h-5 w-5 transition-colors duration-200"
-                                :class="[isUrl(item.href) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                            {{ item.name }}
+                            <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                :class="[isUrl(route('legal-records.index')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                            Legal Records
                         </Link>
+                    </div>
+
+                    <!-- Expandable Analytics Menu -->
+                    <div class="space-y-1">
+                        <button type="button" @click="isAnalyticsExpanded = !isAnalyticsExpanded"
+                            class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
+                            :class="[
+                                isAnalyticsUrl
+                                    ? 'text-white bg-white/[0.04]'
+                                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                            ]">
+                            <div class="flex items-center">
+                                <BarChart3 class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                    :class="[isAnalyticsUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Analytics</span>
+                            </div>
+                            <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
+                                :class="{ 'transform rotate-180 text-admin-modern': isAnalyticsExpanded }" />
+                        </button>
+
+                        <!-- Sub-menu Items -->
+                        <div v-show="isAnalyticsExpanded" class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <!-- CCMA Awards -->
+                            <Link :href="route('subscriber.analytics.ccma')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('subscriber.analytics.ccma'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Briefcase class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('subscriber.analytics.ccma')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                CCMA Awards
+                            </Link>
+
+                            <!-- SAFLII Courts -->
+                            <Link :href="route('subscriber.analytics.saflii')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Gavel class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                SAFLII Courts
+                            </Link>
+                        </div>
                     </div>
                 </nav>
 

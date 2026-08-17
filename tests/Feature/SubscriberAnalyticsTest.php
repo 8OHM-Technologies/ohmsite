@@ -92,9 +92,37 @@ class SubscriberAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('Subscriber/Analytics/Index')
+            ->component('Subscriber/Analytics/SafliiCourts')
             ->has('filters')
             ->where('filters.0.target_name', 'sabinet_ccma')
+        );
+    }
+
+    public function test_subscriber_ccma_route_renders_ccma_component(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        $response = $this->actingAs($user)->get('/subscriber/analytics/ccma');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Subscriber/Analytics/CcmaAwards')
+            ->has('filters')
+        );
+    }
+
+    public function test_subscriber_saflii_route_renders_saflii_component(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        $response = $this->actingAs($user)->get('/subscriber/analytics/saflii');
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('Subscriber/Analytics/SafliiCourts')
+            ->has('filters')
         );
     }
 
@@ -108,7 +136,7 @@ class SubscriberAnalyticsTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('Subscriber/Analytics/Index')
+            ->component('Subscriber/Analytics/SafliiCourts')
             ->missing('cases')
         );
     }
@@ -157,6 +185,49 @@ class SubscriberAnalyticsTest extends TestCase
         $response->assertJsonPath('type', 'ccma');
         $this->assertCount(1, $response->json('cases'));
         $this->assertStringContainsString('Gauteng', $response->json('cases.0.court_location'));
+    }
+
+    public function test_analytics_data_endpoint_returns_saflii_courts_payload(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        LegalAnalytics::factory()->create([
+            'target_name'   => 'ZACC',
+            'target_type'   => 'cases',
+            'court'         => 'Constitutional Court of South Africa',
+            'case_number'   => 'CCT 01/20',
+            'document_date' => '2020-05-15',
+            'data'          => [
+                'extracted_data' => [
+                    'court' => 'Constitutional Court of South Africa',
+                    'reportable' => true,
+                    'summary' => 'Landmark constitutional rights case.',
+                    'ratio_decidendi' => 'Section 27 enforces right to access.',
+                    'judges' => ['Cameron J', 'Froneman J'],
+                    'precedents_cited' => [
+                        ['case_name_citation' => '[1999] ZACC 17', 'treatment' => 'Applied/Followed']
+                    ],
+                ]
+            ]
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'type',
+            'totals' => ['total_cases', 'reportable_count', 'reportable_percentage', 'total_precedents', 'avg_precedents_per_case', 'total_judges', 'avg_hearing_to_judgment_days'],
+            'courts_breakdown',
+            'timeline_trend' => ['years', 'counts', 'avg_duration_days'],
+            'precedents_intelligence' => ['top_cited', 'treatment_distribution', 'density_distribution'],
+            'bench_intelligence' => ['top_judges', 'panel_sizes'],
+            'cases',
+            'filter_options' => ['courts', 'judges', 'years'],
+        ]);
+        $response->assertJsonPath('type', 'saflii_courts');
+        $response->assertJsonPath('totals.total_cases', 1);
+        $this->assertCount(1, $response->json('cases'));
     }
 
     public function test_analytics_data_endpoint_returns_legal_payload(): void

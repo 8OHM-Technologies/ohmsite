@@ -16,16 +16,43 @@ class SubscriberController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render('Subscriber/Analytics/Index', [
+        return Inertia::render('Subscriber/Analytics/SafliiCourts', [
+            'filters' => $this->analytics->getFilters(),
+        ]);
+    }
+
+    public function ccma(): Response
+    {
+        return Inertia::render('Subscriber/Analytics/CcmaAwards', [
+            'filters' => $this->analytics->getFilters(),
+        ]);
+    }
+
+    public function saflii(): Response
+    {
+        return Inertia::render('Subscriber/Analytics/SafliiCourts', [
             'filters' => $this->analytics->getFilters(),
         ]);
     }
 
     public function data(Request $request): JsonResponse
     {
-        $targetName = trim((string) $request->input('target_name', 'sabinet_ccma'));
+        $type = (string) $request->input('type', '');
+        $targetName = trim((string) $request->input('target_name', ''));
 
-        if ($targetName === 'sabinet_ccma') {
+        if ($type === 'saflii_courts' || $targetName === 'saflii_courts' || $targetName === 'courts') {
+            $filters = [
+                'court'      => (string) $request->input('court', 'All'),
+                'judge'      => (string) $request->input('judge', 'All'),
+                'year'       => (string) $request->input('year', 'All'),
+                'reportable' => (string) $request->input('reportable', 'All'),
+                'search'     => (string) $request->input('search', ''),
+            ];
+
+            return response()->json($this->analytics->getSafliiCourtsPayload($filters));
+        }
+
+        if ($targetName === 'sabinet_ccma' || $type === 'ccma' || (!$targetName && !$type)) {
             $filters = [
                 'province' => (string) $request->input('province', 'All'),
                 'category' => (string) $request->input('category', 'All'),

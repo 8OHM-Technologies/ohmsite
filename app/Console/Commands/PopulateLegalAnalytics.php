@@ -135,14 +135,17 @@ class PopulateLegalAnalytics extends Command
                         $targetType = empty($targetType) ? 'cases' : $targetType;
                         $targetName = empty($targetName) ? 'Unknown' : $targetName;
 
+                        $extData = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
+                        $metaData = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
+
                         $title = $payload['title'] ?? $payload['name'] ?? null;
                         if (empty($title) && ! empty($record->data)) {
                             $rawPayload = is_string($record->data) ? json_decode($record->data, true) : (array)$record->data;
                             $title = $rawPayload['title'] ?? $rawPayload['name'] ?? null;
                         }
                         if (empty($title)) {
-                            $applicant = $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
-                            $respondent = $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
+                            $applicant = $extData['applicant_plaintiff'] ?? $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
+                            $respondent = $extData['respondent_defendant'] ?? $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
                             if (is_array($applicant)) {
                                 $applicant = implode(', ', $applicant);
                             }
@@ -155,9 +158,9 @@ class PopulateLegalAnalytics extends Command
                         }
                         $title = $title ?: ('Record #' . substr($record->id, 0, 8));
 
-                        $documentDate = $record->document_date ? $record->document_date->toDateString() : ($payload['judgment_date'] ?? $payload['date'] ?? null);
-                        $court = $payload['court'] ?? $targetName;
-                        $caseNumber = $payload['case_number'] ?? $payload['dataset_number'] ?? $payload['gazette_number'] ?? $payload['volume'] ?? null;
+                        $documentDate = $record->document_date ? $record->document_date->toDateString() : ($extData['judgment_date'] ?? $metaData['document_date'] ?? $payload['judgment_date'] ?? $payload['date'] ?? null);
+                        $court = $extData['court'] ?? $payload['court'] ?? $targetName;
+                        $caseNumber = $metaData['case_number'] ?? $payload['case_number'] ?? $payload['dataset_number'] ?? $payload['gazette_number'] ?? $payload['volume'] ?? null;
 
                         $chunkPrepared[] = [
                             'extracted_record_id' => $record->id,
