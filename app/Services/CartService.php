@@ -174,23 +174,12 @@ class CartService
             return $base;
         }
 
-        // Developer API
+        // Developer API (8OHM Case Law)
         if ($product->slug === 'developer-api') {
             $frequency = $options['frequency'] ?? 'monthly';
-            $dataset = $options['dataset'] ?? 'ccma';
             $base = (float) $product->price;
-            $isMonthly = $frequency === 'monthly';
-            $basePrice = $isMonthly ? $base : $base * 10;
 
-            if ($dataset === 'all') {
-                $n = Dataset::where('is_active', true)->count();
-                $extraDatasets = max(0, $n - 1);
-                $addOnRate = $isMonthly ? 100.00 : 1000.00;
-
-                return $basePrice + $extraDatasets * $addOnRate;
-            }
-
-            return $basePrice;
+            return $frequency === 'monthly' ? $base : $base * 10;
         }
 
         // Analytics Dashboard

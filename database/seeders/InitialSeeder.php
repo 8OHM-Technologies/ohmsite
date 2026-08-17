@@ -110,37 +110,20 @@ class InitialSeeder extends Seeder
 
         // 3.2 Digital Products (Persistent)
         Product::updateOrCreate(
-            ['slug' => 'once-off-dataset'],
-            [
-                'name' => 'Once-off Dataset',
-                'description' => 'Get the raw data without analytics or insights and use it for your own purposes. Ideal for AI training or researchers who just want the data.',
-                'price' => 50000.00,
-                'image' => '/assets/images/products/dataset.png',
-                'stock' => 9999,
-                'category_id' => $dataSolutions->id,
-                'features' => [
-                    '20+ Years of Sanitized, structured case law data',
-                    'Available in JSON or CSV formats',
-                    'POPIA Compliant Data Entries',
-                ],
-            ]
-        );
-
-        Product::updateOrCreate(
             ['slug' => 'developer-api'],
             [
-                'name' => 'Developer API',
-                'description' => 'Power your custom applications with direct access to our structured legal dataset API.',
+                'name' => '8OHM Case Law',
+                'description' => 'API access to all case law records and advanced extracted dataset attributes for your applications.',
                 'price' => 1580.00,
                 'image' => '/assets/images/products/api.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
+                    'API access to all case law records (High Courts & Labour Courts)',
+                    'Access to advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
                     'Structured OpenAPI-standard REST endpoints',
                     'Standard API rate limits (1000 req/month)',
                     'Add-ons available to increase rate limits',
-                    'Add-on Datasets at Reduced Prices',
-                    'Standard Helpdesk Ticket Support',
                     'POPIA Compliant Data Entries',
                 ],
             ]
@@ -149,19 +132,39 @@ class InitialSeeder extends Seeder
         Product::updateOrCreate(
             ['slug' => 'pro-analytics'],
             [
-                'name' => 'Pro Analytics',
-                'description' => 'No code required. Access to trends and insights through our analytics platform.',
+                'name' => '8OHM Legal Analytics',
+                'description' => 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.',
                 'price' => 5800.00,
                 'image' => '/assets/images/products/analytics.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
-                    'Includes all Developer API features',
-                    'No-code Interactive Analytics Dashboard',
+                    'Higher API Limits (3000 req/month) & Analytics Endpoints',
+                    'Interactive Analytics Dashboard with advanced metrics and trends',
+                    'Jurisprudence overview & judgment volume trend analysis',
+                    'Precedents & citation network intelligence',
+                    'Judicial bench & panel analytics',
+                    'Case intelligence & automated Ratio Decidendi extraction',
                     'Automated Reports & CSV/JSON exports',
-                    'Expanded API Endpoint Catalogue',
-                    'Increased API rate limits (3000 req/month)',
                     'Priority Helpdesk Ticket Support',
+                    'POPIA Compliant Data Entries',
+                ],
+            ]
+        );
+
+        Product::updateOrCreate(
+            ['slug' => 'once-off-dataset'],
+            [
+                'name' => 'Once-off Datasets',
+                'description' => 'Raw sanitized case law datasets in bulk for AI training, local LLM fine-tuning, or offline research.',
+                'price' => 50000.00,
+                'image' => '/assets/images/products/dataset.png',
+                'stock' => 9999,
+                'category_id' => $dataSolutions->id,
+                'features' => [
+                    '20+ Years of sanitized, structured case law data',
+                    'Available in JSON or CSV formats',
+                    'Ideal for AI training & research pipelines',
                     'POPIA Compliant Data Entries',
                 ],
             ]

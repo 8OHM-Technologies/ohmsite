@@ -22,10 +22,11 @@ Built with **Laravel 12** and **Inertia.js (Vue3)**, features a custom admin das
 This platform is a data-centric SaaS and digital licensing platform tailored for legal and analytical datasets. Decoupled from hardcoded business logic, the entire product ecosystem, subscription tiers, API access rights, and telemetry are managed dynamically.
 
 ### Core Offerings
-- **Once-off Datasets**: POPIA-compliant legal datasets (e.g. CCMA arbitration awards) available for download in CSV/JSON formats.
-- **Developer API**: Subscription-based developer portal offering REST API access with managed rate limits.
-- **Pro Analytics**: No-code interactive analytics dashboard showing trends and insights.
-- **Managed Data Pipelines**: Custom web scraping, ETL, and private LLM deployments.
+- **Tier 1: FREE Case Law**: Free access to basic South African case law records with standard public metadata for High Courts and Labour Courts.
+- **Tier 2: 8OHM Case Law**: API access to all case law records, advanced dataset features (ratio decidendi, scrubbed records, acts cited), and live continuous data feed.
+- **Tier 3: 8OHM Legal Analytics**: Complete no-code analytics platform, higher API limits (3,000 req/mo), interactive jurisprudence and citation network dashboards, and automated exports.
+- **Tier 4: Once-off Datasets**: POPIA-compliant raw case law datasets available for bulk download in CSV/JSON formats for AI training and offline research.
+- **Managed Data Infrastructure**: Custom web scraping, ETL data engineering, and private LLM deployments.
 
 ---
 

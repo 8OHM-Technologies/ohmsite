@@ -42,8 +42,7 @@ const datasets = computed(() => {
   return [];
 });
 
-const onceOffDataset = ref('ccma')
-const developerDataset = ref('ccma')
+const onceOffDataset = ref('high-court')
 
 const onceOffProduct = computed(() => {
   return props.products?.find(p => p.slug === 'once-off-dataset') || {};
@@ -61,31 +60,64 @@ const pipelineProduct = computed(() => {
   return props.products?.find(p => p.slug === 'managed-data-pipeline') || {};
 });
 
+const developerFeatures = computed(() => {
+  return developerProduct.value.features?.length
+    ? developerProduct.value.features
+    : [
+      'API access to all case law records (High Courts & Labour Courts)',
+      'Access to advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
+      'Structured OpenAPI-standard REST endpoints',
+      'Standard API rate limits (1000 req/month)',
+      'Add-ons available to increase rate limits',
+      'POPIA Compliant Data Entries',
+    ];
+});
+
+const analyticsFeatures = computed(() => {
+  return analyticsProduct.value.features?.length
+    ? analyticsProduct.value.features
+    : [
+      'Higher API Limits (3000 req/month) & Analytics Endpoints',
+      'Interactive Analytics Dashboard with advanced metrics and trends',
+      'Jurisprudence overview & judgment volume trend analysis',
+      'Precedents & citation network intelligence',
+      'Judicial bench & panel analytics',
+      'Case intelligence & automated Ratio Decidendi extraction',
+      'Automated Reports & CSV/JSON exports',
+      'Priority Helpdesk Ticket Support',
+      'POPIA Compliant Data Entries',
+    ];
+});
+
+const onceOffFeatures = computed(() => {
+  return onceOffProduct.value.features?.length
+    ? onceOffProduct.value.features
+    : [
+      '20+ Years of sanitized, structured case law data',
+      'Available in JSON or CSV formats',
+      'Ideal for AI training & research pipelines',
+      'POPIA Compliant Data Entries',
+    ];
+});
+
 const onceOffPrice = computed(() => {
-  const base = onceOffProduct.value.price || 5000;
+  const base = onceOffProduct.value.price || 50000;
   if (onceOffDataset.value === 'all') {
-    const n = datasets.value.length;
-    return n * base - (n - 1) * 500;
+    const n = Math.max(1, datasets.value.length);
+    return n * base - (n - 1) * 5000;
   }
   return base;
 });
 
 const developerPrice = computed(() => {
   const isMonthly = frequency.value.value === 'monthly';
-  const base = developerProduct.value.price || 380;
-  const basePrice = isMonthly ? base : base * 10;
-
-  if (developerDataset.value === 'all') {
-    const extraDatasets = datasets.value.length - 1;
-    const addOnRate = isMonthly ? 100 : 1000;
-    return basePrice + extraDatasets * addOnRate;
-  }
-  return basePrice;
+  const base = developerProduct.value.price || 1580;
+  return isMonthly ? base : base * 10;
 });
 
 const analyticsPrice = computed(() => {
   const isMonthly = frequency.value.value === 'monthly';
-  const base = analyticsProduct.value.price || 3800;
+  const base = analyticsProduct.value.price || 5800;
   return isMonthly ? base : base * 10;
 });
 
@@ -130,7 +162,6 @@ const handleSubscribeDeveloper = () => {
   const id = getProductId('developer-api');
   if (!id) return;
   addToCart(id, {
-    dataset: developerDataset.value,
     frequency: frequency.value.value
   });
 };
@@ -145,10 +176,11 @@ const handleSubscribeAnalytics = () => {
 
 onMounted(() => {
   if (datasets.value.length > 0) {
-    const hasCcma = datasets.value.some(d => d.value === 'ccma');
-    if (!hasCcma) {
+    const hasDefault = datasets.value.some(d => d.value === 'high-court');
+    if (hasDefault) {
+      onceOffDataset.value = 'high-court';
+    } else {
       onceOffDataset.value = datasets.value[0].value;
-      developerDataset.value = datasets.value[0].value;
     }
   }
 
@@ -201,11 +233,170 @@ onMounted(() => {
 
             <!-- Pricing Tiers Grid -->
             <div class="pricing-grid">
-              <!-- Card 1: Once-off Dataset -->
+              <!-- Tier 1: FREE Case Law -->
+              <div class="pricing-card" id="card-free">
+                <div class="pricing-card-header">
+                  <div class="pricing-tier-badge">Free Access</div>
+                  <h3 id="tier-free" class="pricing-tier-name">FREE Case Law</h3>
+                  <p class="card-desc-small" style="margin-bottom: 20px;">
+                    Essential public case law records with basic lookup capabilities and standard metadata.
+                  </p>
+
+                  <!-- Included Coverage Box -->
+                  <div class="included-coverage-box" style="margin-bottom: 20px;">
+                    <span class="coverage-box-title">Includes basic information for:</span>
+                    <div class="coverage-badges">
+                      <span class="coverage-badge"><i class="ph-light ph-scales"></i> High Courts</span>
+                      <span class="coverage-badge"><i class="ph-light ph-gavel"></i> Labour Courts</span>
+                    </div>
+                  </div>
+
+                  <!-- Pricing Value & Period -->
+                  <div class="developer-pricing-options">
+                    <div class="developer-pricing-option active" style="cursor: default;">
+                      <div class="pricing-price-container">
+                        <span class="pricing-price-value">R0</span>
+                        <div class="pricing-price-period">
+                          <span class="pricing-price-currency">ZAR</span>
+                          <span>Free Forever</span>
+                        </div>
+                      </div>
+                      <span class="developer-pricing-label">Standard Public Access</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: auto;">
+                  <!-- Tier Action Button -->
+                  <Link :href="route('register')" aria-describedby="tier-free" class="btn btn-secondary"
+                    style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <span>Get Free Access</span>
+                    <div class="btn-icon">
+                      <i class="ph-light ph-arrow-right"></i>
+                    </div>
+                  </Link>
+
+                  <!-- Tier Highlights -->
+                  <ul class="pricing-features-list">
+                    <li class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>Basic case law search & lookup</span>
+                    </li>
+                    <li class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>High Courts judgment records</span>
+                    </li>
+                    <li class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>Labour Courts judgment records</span>
+                    </li>
+                    <li class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>Core case metadata & parties</span>
+                    </li>
+                    <li class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>POPIA Compliant Data Entries</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tier 2: 8OHM Case Law -->
+              <div class="pricing-card" id="card-developer">
+                <div class="pricing-card-header">
+                  <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || '8OHM Case Law' }}</h3>
+                  <p class="card-desc-small" style="margin-bottom: 20px;">
+                    {{ developerProduct.description || 'API access to all case law records and advanced extracted dataset attributes for your applications.' }}
+                  </p>
+
+                  <!-- Pricing Value & Period -->
+                  <div class="developer-pricing-options">
+                    <div class="developer-pricing-option active" style="cursor: default;">
+                      <div class="pricing-price-container">
+                        <span class="pricing-price-value">{{ formatZAR(developerPrice) }}</span>
+                        <div class="pricing-price-period">
+                          <span class="pricing-price-currency">ZAR</span>
+                          <span>Billed {{ frequency.value }}</span>
+                        </div>
+                      </div>
+                      <span class="developer-pricing-label">Live API Feed & Full Access</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: auto;">
+                  <!-- Tier Action Button -->
+                  <button type="button" @click="handleSubscribeDeveloper" aria-describedby="tier-developer"
+                    class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <span>Subscribe to API</span>
+                    <div class="btn-icon">
+                      <i class="ph-light ph-credit-card"></i>
+                    </div>
+                  </button>
+
+                  <!-- Tier Highlights -->
+                  <ul class="pricing-features-list">
+                    <li v-for="(feature, idx) in developerFeatures" :key="idx" class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>{{ feature }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tier 3: 8OHM Legal Analytics -->
+              <div class="pricing-card featured" id="card-analytics">
+                <div class="pricing-card-header">
+                  <div class="featured-badge">Recommended</div>
+                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || '8OHM Legal Analytics' }}</h3>
+                  <p class="card-desc-small" style="margin-bottom: 20px;">
+                    {{ analyticsProduct.description || 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.' }}
+                  </p>
+
+                  <!-- Pricing Value & Period -->
+                  <div class="developer-pricing-options">
+                    <div class="developer-pricing-option active" style="cursor: default;">
+                      <div class="pricing-price-container">
+                        <span class="pricing-price-value">{{ formatZAR(analyticsPrice) }}</span>
+                        <div class="pricing-price-period">
+                          <span class="pricing-price-currency">ZAR</span>
+                          <span>Billed {{ frequency.value }}</span>
+                        </div>
+                      </div>
+                      <span class="developer-pricing-label">Full Dashboard & Analytics API</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: auto;">
+                  <!-- Tier Action Button -->
+                  <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
+                    class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 16px;">
+                    <span>Subscribe to Legal Analytics</span>
+                    <div class="btn-icon">
+                      <i class="ph-light ph-credit-card"></i>
+                    </div>
+                  </button>
+
+                  <!-- Tier Highlights -->
+                  <ul class="pricing-features-list">
+                    <li v-for="(feature, idx) in analyticsFeatures" :key="idx" class="pricing-feature-item">
+                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
+                      <span>{{ feature }}</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Tier 4: Once-off Datasets -->
               <div class="pricing-card" id="card-dataset">
                 <div class="pricing-card-header">
-                  <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name }}</h3>
-                  <p class="card-desc-small" style="margin-bottom: 20px;">{{ onceOffProduct.description }}</p>
+                  <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name || 'Once-off Datasets' }}</h3>
+                  <p class="card-desc-small" style="margin-bottom: 20px;">
+                    {{ onceOffProduct.description || 'Raw sanitized case law datasets in bulk for AI training, local LLM fine-tuning, or offline research.' }}
+                  </p>
+
                   <!-- Dataset Selection -->
                   <div class="form-group" style="margin-bottom: 20px; text-align: left;">
                     <label for="dataset-tier-dataset"
@@ -249,147 +440,7 @@ onMounted(() => {
 
                   <!-- Tier Highlights -->
                   <ul class="pricing-features-list">
-                    <li v-for="(feature, idx) in onceOffProduct.features" :key="idx" class="pricing-feature-item">
-                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                      <span>{{ feature }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Card 2: Basic API -->
-              <div class="pricing-card" id="card-developer">
-                <div class="pricing-card-header">
-                  <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name }}</h3>
-                  <p class="card-desc-small" style="margin-bottom: 20px;">{{ developerProduct.description }}</p>
-
-                  <!-- Dataset Selection -->
-                  <div class="form-group" style="margin-bottom: 20px; text-align: left;">
-                    <label for="dataset-tier-developer"
-                      style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 8px; display: block; font-weight: 500;">Select
-                      Dataset:</label>
-                    <select id="dataset-tier-developer" v-model="developerDataset"
-                      style="width: 100%; padding: 8px 12px !important; border-radius: 8px; background: var(--bg-tertiary); border: 1px solid var(--color-accent-primary); color: var(--color-text-primary); font-size: 0.875rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s;">
-                      <option v-for="ds in datasets" :key="ds.value" :value="ds.value"
-                        style="background-color: #0a0a0f; color: var(--color-text-primary);">{{ ds.label }}</option>
-                      <option value="all" style="background-color: #0a0a0f; color: var(--color-text-primary);">All
-                        Datasets</option>
-                    </select>
-                  </div>
-
-                  <!-- Pricing Value & Period -->
-                  <div class="developer-pricing-options">
-                    <div class="developer-pricing-option active" style="cursor: default;">
-                      <div class="pricing-price-container">
-                        <span class="pricing-price-value">{{ formatZAR(developerPrice) }}</span>
-                        <div class="pricing-price-period">
-                          <span class="pricing-price-currency">ZAR</span>
-                          <span>Billed {{ frequency.value }}</span>
-                        </div>
-                      </div>
-                      <span class="developer-pricing-label">Live API Feed</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="margin-top: auto;">
-                  <!-- Tier Action Button -->
-                  <button type="button" @click="handleSubscribeDeveloper" aria-describedby="tier-developer"
-                    class="btn btn-secondary" style="width: 100%; justify-content: center; margin-top: 16px;">
-                    <span>Subscribe to API</span>
-                    <div class="btn-icon">
-                      <i class="ph-light ph-credit-card"></i>
-                    </div>
-                  </button>
-
-                  <!-- Tier Highlights -->
-                  <ul class="pricing-features-list">
-                    <li v-for="(feature, idx) in developerProduct.features" :key="idx" class="pricing-feature-item">
-                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                      <span>{{ feature }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Card 3: Analytics Dashboard -->
-              <div class="pricing-card featured" id="card-analytics">
-                <div class="pricing-card-header">
-                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name }}</h3>
-                  <p class="card-desc-small" style="margin-bottom: 20px;">{{ analyticsProduct.description }} <br><br>
-                  <div style="font-weight: 500; font-size: 0.875rem; color: var(--color-accent-primary);">Subscribe
-                    Annually before 31
-                    December 2026 and get full access to all current and future released Datasets!</div>
-                  </p>
-                  <!-- Pricing Value & Period -->
-                  <div class="developer-pricing-options">
-                    <div class="developer-pricing-option active" style="cursor: default;">
-                      <div class="pricing-price-container">
-                        <span class="pricing-price-value">{{ formatZAR(analyticsPrice) }}</span>
-                        <div class="pricing-price-period">
-                          <span class="pricing-price-currency">ZAR</span>
-                          <span>Billed {{ frequency.value }}</span>
-                        </div>
-                      </div>
-                      <span class="developer-pricing-label">Full Dashboard & API Access</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="margin-top: auto;">
-                  <!-- Tier Action Button -->
-                  <button type="button" @click="handleSubscribeAnalytics" aria-describedby="tier-analytics"
-                    class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 16px;">
-                    <span>Subscribe to Pro Analytics</span>
-                    <div class="btn-icon">
-                      <i class="ph-light ph-credit-card"></i>
-                    </div>
-                  </button>
-
-                  <!-- Tier Highlights -->
-                  <ul class="pricing-features-list">
-                    <li v-for="(feature, idx) in analyticsProduct.features" :key="idx" class="pricing-feature-item">
-                      <i class="ph-light ph-check-circle pricing-feature-icon"></i>
-                      <span>{{ feature }}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- Card 4: Managed Data Pipeline -->
-              <div class="pricing-card" id="card-pipeline">
-                <div class="pricing-card-header">
-                  <h3 id="tier-pipeline" class="pricing-tier-name">{{ pipelineProduct.name }}</h3>
-                  <p class="card-desc-small" style="margin-bottom: 20px;">{{ pipelineProduct.description }}</p>
-
-                  <!-- Pricing Value & Period -->
-                  <div class="developer-pricing-options">
-                    <div class="developer-pricing-option active" style="cursor: default;">
-                      <div class="pricing-price-container">
-                        <span class="pricing-price-value">{{ formatZAR(pipelinePrice) }}</span>
-                        <div class="pricing-price-period">
-                          <span class="pricing-price-currency">ZAR</span>
-                          <span>Billed {{ frequency.value }}</span>
-                        </div>
-                      </div>
-                      <span class="developer-pricing-label">Custom Implementation <br>(Retainer @ 20 hours p/m)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="margin-top: auto;">
-                  <!-- Tier Action Button -->
-                  <Link href="#contact" aria-describedby="tier-pipeline" class="btn btn-secondary"
-                    style="width: 100%; justify-content: center; margin-top: 16px;">
-                    <span>Enquire Now</span>
-                    <div class="btn-icon">
-                      <i class="ph-light ph-chat-circle-dots"></i>
-                    </div>
-                  </Link>
-
-                  <!-- Tier Highlights -->
-                  <ul class="pricing-features-list">
-                    <li v-for="(feature, idx) in pipelineProduct.features" :key="idx" class="pricing-feature-item">
+                    <li v-for="(feature, idx) in onceOffFeatures" :key="idx" class="pricing-feature-item">
                       <i class="ph-light ph-check-circle pricing-feature-icon"></i>
                       <span>{{ feature }}</span>
                     </li>
@@ -808,6 +859,77 @@ onMounted(() => {
 .pricing-card.featured:hover {
   border-color: var(--color-accent-primary);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 136, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.pricing-tier-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-accent-secondary, #8dd7da);
+  background: rgba(141, 215, 218, 0.08);
+  border: 1px solid rgba(141, 215, 218, 0.2);
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+.featured-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-accent-primary, #ff8800);
+  background: rgba(255, 136, 0, 0.1);
+  border: 1px solid rgba(255, 136, 0, 0.3);
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+.included-coverage-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border-outer);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.coverage-box-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.coverage-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coverage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.coverage-badge i {
+  color: var(--color-accent-primary);
 }
 
 .pricing-card-header {

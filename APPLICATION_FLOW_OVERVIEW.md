@@ -87,14 +87,14 @@ flowchart TD
 | **Middleware** | `has.dataset.access` → [DatasetAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/DatasetAccessMiddleware.php) |
 | **Protected resource** | `GET /downloads/{dataset}` → [DownloadController::download](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/DownloadController.php) — streams CSV file |
 
-#### Developer API Subscription (`slug: developer-api`)
+#### Developer API / 8OHM Case Law (`slug: developer-api`)
 
 | Aspect | Detail |
-|--------|--------|
-| **Entry point** | [Home.vue → handleSubscribeDeveloper](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Home.vue#L205-L212) |
-| **Options sent** | `{ dataset: 'ccma' \| 'all', frequency: 'monthly' \| 'annually' }` |
-| **Pricing logic** | [CartService::resolveUnitPrice](file:///home/tiaanf/Dev/ohmsite/app/Services/CartService.php#L175-L190) — Monthly = base; Annual = base × 10. `all` datasets adds R100/mo or R1000/yr per extra dataset. |
-| **Access gate** | [User::hasApiSubscriptionAccess](file:///home/tiaanf/Dev/ohmsite/app/Models/User.php#L119-L131) — checks for a paid order with this slug |
+|---|---|
+| **Entry point** | [PricingSection.vue → handleSubscribeDeveloper](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Home/Partials/PricingSection.vue) |
+| **Options sent** | `{ frequency: 'monthly' \| 'annually' }` |
+| **Pricing logic** | [CartService::resolveUnitPrice](file:///home/tiaanf/Dev/ohmsite/app/Services/CartService.php) — Monthly = base; Annual = base × 10. Includes full API access to all case law datasets. |
+| **Access gate** | [User::hasApiSubscriptionAccess](file:///home/tiaanf/Dev/ohmsite/app/Models/User.php) — checks for a paid order with this slug |
 | **Middleware** | `has.api.access` → [ApiAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/ApiAccessMiddleware.php) |
 | **Protected resource** | `GET /developer/docs` → [ApiDocsController::index](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/ApiDocsController.php) → [Developer/Docs.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Developer/Docs.vue) |
 
