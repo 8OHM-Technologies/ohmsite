@@ -243,15 +243,6 @@ onMounted(() => {
                     Essential public case law records with basic lookup capabilities and standard metadata.
                   </p>
 
-                  <!-- Included Coverage Box -->
-                  <div class="included-coverage-box" style="margin-bottom: 20px;">
-                    <span class="coverage-box-title">Includes basic information for:</span>
-                    <div class="coverage-badges">
-                      <span class="coverage-badge"><i class="ph-light ph-scales"></i> High Courts</span>
-                      <span class="coverage-badge"><i class="ph-light ph-gavel"></i> Labour Courts</span>
-                    </div>
-                  </div>
-
                   <!-- Pricing Value & Period -->
                   <div class="developer-pricing-options">
                     <div class="developer-pricing-option active" style="cursor: default;">
@@ -308,7 +299,8 @@ onMounted(() => {
                 <div class="pricing-card-header">
                   <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || '8OHM Case Law' }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
-                    {{ developerProduct.description || 'API access to all case law records and advanced extracted dataset attributes for your applications.' }}
+                    {{ developerProduct.description || 'API access to all case law records and advanced extracted
+                    dataset attributes for your applications.' }}
                   </p>
 
                   <!-- Pricing Value & Period -->
@@ -351,9 +343,10 @@ onMounted(() => {
                 <div class="pricing-card-header">
                   <div class="featured-badge">Recommended</div>
                   <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || '8OHM Legal Analytics'
-                    }}</h3>
+                  }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
-                    {{ analyticsProduct.description || 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.' }}
+                    {{ analyticsProduct.description || 'Complete no-code analytics platform and advanced legal
+                    intelligence for practitioners and firms.' }}
                   </p>
 
                   <!-- Pricing Value & Period -->
@@ -396,7 +389,8 @@ onMounted(() => {
                 <div class="pricing-card-header">
                   <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name || 'Once-off Datasets' }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
-                    {{ onceOffProduct.description || 'Raw sanitized case law datasets in bulk for AI training, local LLM fine - tuning, or offline research.' }}
+                    {{ onceOffProduct.description || 'Raw sanitized case law datasets in bulk for AI training, local LLM
+                    fine - tuning, or offline research.' }}
                   </p>
 
                   <!-- Dataset Selection -->

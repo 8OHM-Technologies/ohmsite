@@ -122,7 +122,7 @@ class InitialSeeder extends Seeder
                     'API access to all case law records (High Courts & Labour Courts)',
                     'Access to advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
                     'Structured OpenAPI-standard REST endpoints',
-                    'Standard API rate limits (1000 req/month)',
+                    'Standard API rate limits',
                     'Add-ons available to increase rate limits',
                     'POPIA Compliant Data Entries',
                 ],
@@ -139,7 +139,7 @@ class InitialSeeder extends Seeder
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
-                    'Higher API Limits (3000 req/month) & Analytics Endpoints',
+                    'Higher API Limits & Analytics Endpoints',
                     'Interactive Analytics Dashboard with advanced metrics and trends',
                     'Jurisprudence overview & judgment volume trend analysis',
                     'Precedents & citation network intelligence',
