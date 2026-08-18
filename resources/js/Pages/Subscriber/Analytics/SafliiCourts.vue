@@ -42,14 +42,12 @@ const filterReportable = ref('All');
 const searchQuery = ref('');
 
 const activeTab = ref('overview');
-const selectedCase = ref(null);
 const activePrecedentTab = ref('all');
 
 const tabs = [
     { id: 'overview', label: 'Jurisprudence Overview', icon: Layers },
     { id: 'precedents', label: 'Precedents & Citations Network', icon: BookOpen },
     { id: 'bench', label: 'Judicial Bench & Panels', icon: Users },
-    { id: 'cases', label: 'Case Intelligence & Ratio Decidendi', icon: Scale },
 ];
 
 const loadAnalytics = async () => {
@@ -110,7 +108,6 @@ const courtsBreakdown = computed(() => analyticsData.value?.courts_breakdown ?? 
 const timelineTrend = computed(() => analyticsData.value?.timeline_trend ?? { years: [], counts: [], avg_duration_days: [] });
 const precedentsIntel = computed(() => analyticsData.value?.precedents_intelligence ?? { top_cited: [], treatment_distribution: {}, density_distribution: {} });
 const benchIntel = computed(() => analyticsData.value?.bench_intelligence ?? { top_judges: [], panel_sizes: {} });
-const casesList = computed(() => analyticsData.value?.cases ?? []);
 const filterOptions = computed(() => analyticsData.value?.filter_options ?? { courts: [], judges: [], years: [] });
 
 // Visualizations
@@ -223,13 +220,9 @@ const panelSizeChartOptions = computed(() => {
 });
 const panelSizeSeries = computed(() => Object.values(benchIntel.value.panel_sizes || {}));
 
-const openCaseDossier = (caseItem) => {
-    selectedCase.value = caseItem;
-};
-
 const filterByJudgeQuick = (judgeName) => {
     filterJudge.value = judgeName;
-    activeTab.value = 'cases';
+    activeTab.value = 'overview';
 };
 </script>
 
@@ -488,248 +481,6 @@ const filterByJudgeQuick = (judgeName) => {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: CASE INTELLIGENCE & RATIO DECIDENDI EXPLORER -->
-            <div v-if="activeTab === 'cases' || activeTab === 'overview'" class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
-                    <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white">Judicial Decision Explorer & Dossier Index</h3>
-                        <p class="text-xs text-zinc-400">Searchable repository of {{ casesList.length }} detailed court judgments with legal summaries and rulings.</p>
-                    </div>
-                </div>
-
-                <div v-if="casesList.length === 0" class="py-16 text-center text-zinc-500 text-xs">
-                    No court cases found matching the selected filters or search query.
-                </div>
-
-                <div v-else class="space-y-3">
-                    <div v-for="c in casesList.slice(0, 20)" :key="c.id"
-                        class="bg-zinc-950/70 border border-white/5 rounded-2xl p-5 hover:border-admin-modern/30 transition-all space-y-3">
-                        <!-- Top Row: Badges & Dates -->
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-admin-modern/10 text-admin-modern border border-admin-modern/20">
-                                    {{ c.case_number }}
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
-                                    {{ c.court }}
-                                </span>
-                                <span v-if="c.reportable" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                    Reportable Precedent
-                                </span>
-                                <span v-if="c.duration_days !== null" class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                                    {{ c.duration_days }}d to Judgment
-                                </span>
-                            </div>
-
-                            <div class="flex items-center gap-3 text-xs text-zinc-400">
-                                <span v-if="c.judgment_date">{{ c.judgment_date }}</span>
-                                <button @click="openCaseDossier(c)"
-                                    class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
-                                    <span>View Dossier</span>
-                                    <Scale class="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Case Title -->
-                        <h4 class="text-sm font-bold text-white hover:text-admin-modern cursor-pointer" @click="openCaseDossier(c)">
-                            {{ c.title }}
-                        </h4>
-
-                        <!-- Ratio Decidendi / Summary Excerpt -->
-                        <div v-if="c.ratio_decidendi || c.summary" class="bg-zinc-900/60 p-3.5 rounded-xl border border-white/5 text-xs text-zinc-300">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
-                                Ratio Decidendi / Core Principle
-                            </span>
-                            <p class="line-clamp-2 leading-relaxed">
-                                {{ c.ratio_decidendi || c.summary }}
-                            </p>
-                        </div>
-
-                        <!-- Judges & Citations Footer -->
-                        <div class="flex flex-wrap items-center justify-between text-[11px] text-zinc-400 pt-2 border-t border-white/5">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-zinc-500">Bench:</span>
-                                <span v-if="c.judges && c.judges.length" class="text-zinc-300">{{ c.judges.join(', ') }}</span>
-                                <span v-else class="text-zinc-500">Appellate Court Panel</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span><strong class="text-admin-modern">{{ c.precedents_count }}</strong> Precedents Cited</span>
-                                <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
-                                    class="text-zinc-400 hover:text-white flex items-center gap-1">
-                                    <span>SAFLII</span>
-                                    <ExternalLink class="w-3 h-3" />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Comprehensive Case Dossier Modal -->
-        <div v-if="selectedCase" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-            <div class="bg-zinc-950 border border-white/10 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 custom-scrollbar shadow-2xl">
-                <!-- Modal Header -->
-                <div class="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
-                    <div class="space-y-1">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-admin-modern/10 text-admin-modern border border-admin-modern/20">
-                                {{ selectedCase.case_number }}
-                            </span>
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
-                                {{ selectedCase.court }}
-                            </span>
-                            <span v-if="selectedCase.reportable" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                Reportable Precedent
-                            </span>
-                        </div>
-                        <h2 class="text-base sm:text-lg font-black text-white mt-2 leading-snug">
-                            {{ selectedCase.title }}
-                        </h2>
-                    </div>
-                    <button @click="selectedCase = null" class="p-2 text-zinc-400 hover:text-white rounded-xl bg-white/5 hover:bg-white/10">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <!-- Case Metadata Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                    <div class="bg-zinc-900/50 p-3 rounded-2xl border border-white/5">
-                        <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Judgment Date</span>
-                        <span class="font-bold text-white mt-1 block">{{ selectedCase.judgment_date || 'N/A' }}</span>
-                    </div>
-                    <div class="bg-zinc-900/50 p-3 rounded-2xl border border-white/5">
-                        <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Hearing Date</span>
-                        <span class="font-bold text-white mt-1 block">{{ selectedCase.hearing_date || 'N/A' }}</span>
-                    </div>
-                    <div class="bg-zinc-900/50 p-3 rounded-2xl border border-white/5">
-                        <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Adjudication Duration</span>
-                        <span class="font-bold text-admin-modern mt-1 block">{{ selectedCase.duration_days !== null ? selectedCase.duration_days + ' days' : 'N/A' }}</span>
-                    </div>
-                    <div class="bg-zinc-900/50 p-3 rounded-2xl border border-white/5">
-                        <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Location</span>
-                        <span class="font-bold text-white mt-1 block truncate">{{ selectedCase.court_location }}</span>
-                    </div>
-                </div>
-
-                <!-- Judicial Bench & Litigants -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div class="bg-zinc-900/40 p-4 rounded-2xl border border-white/5 space-y-1">
-                        <span class="text-[10px] text-admin-modern font-bold uppercase tracking-wider">Judicial Bench</span>
-                        <p class="font-medium text-white">
-                            {{ selectedCase.judges && selectedCase.judges.length ? selectedCase.judges.join(', ') : 'Superior Court Appellate Bench' }}
-                        </p>
-                    </div>
-                    <div class="bg-zinc-900/40 p-4 rounded-2xl border border-white/5 space-y-1">
-                        <span class="text-[10px] text-admin-modern font-bold uppercase tracking-wider">Litigant Parties</span>
-                        <p class="font-medium text-white truncate"><strong>Applicant:</strong> {{ selectedCase.applicant }}</p>
-                        <p class="font-medium text-zinc-300 truncate"><strong>Respondent:</strong> {{ selectedCase.respondent }}</p>
-                    </div>
-                </div>
-
-                <!-- Core Legal Intelligence Sections -->
-                <div class="space-y-4">
-                    <!-- Ratio Decidendi -->
-                    <div v-if="selectedCase.ratio_decidendi" class="bg-amber-500/[0.04] border border-amber-500/20 p-5 rounded-2xl space-y-2">
-                        <div class="flex items-center gap-2">
-                            <Bookmark class="w-4 h-4 text-amber-400" />
-                            <span class="text-xs font-black uppercase tracking-wider text-amber-400">Ratio Decidendi (Binding Legal Principle)</span>
-                        </div>
-                        <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line">
-                            {{ selectedCase.ratio_decidendi }}
-                        </p>
-                    </div>
-
-                    <!-- Executive Summary -->
-                    <div v-if="selectedCase.summary" class="bg-zinc-900/60 border border-white/5 p-5 rounded-2xl space-y-2">
-                        <div class="flex items-center gap-2">
-                            <FileText class="w-4 h-4 text-admin-modern" />
-                            <span class="text-xs font-black uppercase tracking-wider text-admin-modern">Executive Case Summary</span>
-                        </div>
-                        <p class="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">
-                            {{ selectedCase.summary }}
-                        </p>
-                    </div>
-
-                    <!-- Obiter Dicta -->
-                    <div v-if="selectedCase.obiter_dicta" class="bg-purple-500/[0.04] border border-purple-500/20 p-5 rounded-2xl space-y-2">
-                        <div class="flex items-center gap-2">
-                            <Compass class="w-4 h-4 text-purple-400" />
-                            <span class="text-xs font-black uppercase tracking-wider text-purple-400">Obiter Dicta (Judicial Observations)</span>
-                        </div>
-                        <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line">
-                            {{ selectedCase.obiter_dicta }}
-                        </p>
-                    </div>
-
-                    <!-- Order / Relief -->
-                    <div v-if="selectedCase.order" class="bg-emerald-500/[0.04] border border-emerald-500/20 p-5 rounded-2xl space-y-2">
-                        <div class="flex items-center gap-2">
-                            <CheckCircle2 class="w-4 h-4 text-emerald-400" />
-                            <span class="text-xs font-black uppercase tracking-wider text-emerald-400">Formal Judicial Order & Relief Granted</span>
-                        </div>
-                        <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line font-mono text-[11px]">
-                            {{ selectedCase.order }}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Precedents Cited Table -->
-                <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-black uppercase tracking-wider text-white">
-                            Cited Legal Precedents & Authorities ({{ selectedCase.precedents_count }})
-                        </span>
-                    </div>
-
-                    <div v-if="!selectedCase.precedents_cited || !selectedCase.precedents_cited.length" class="text-xs text-zinc-500">
-                        No external precedent citations extracted for this decision.
-                    </div>
-
-                    <div v-else class="max-h-60 overflow-y-auto custom-scrollbar">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[9px]">
-                                    <th class="py-2 px-2">Authority / Citation</th>
-                                    <th class="py-2 px-2">Treatment</th>
-                                    <th class="py-2 px-2 text-right">Reference</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5 text-zinc-300">
-                                <tr v-for="p in selectedCase.precedents_cited" :key="p.case_name_citation" class="hover:bg-white/[0.02]">
-                                    <td class="py-2 px-2 font-medium text-white">{{ p.case_name_citation }}</td>
-                                    <td class="py-2 px-2">
-                                        <span class="px-2 py-0.5 rounded text-[9px] font-bold"
-                                            :class="p.treatment === 'Applied/Followed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20'">
-                                            {{ p.treatment || 'Referred' }}
-                                        </span>
-                                    </td>
-                                    <td class="py-2 px-2 text-right">
-                                        <a v-if="p.url" :href="p.url" target="_blank" rel="noopener noreferrer"
-                                            class="text-admin-modern hover:underline inline-flex items-center gap-1 text-[10px]">
-                                            LawCite <ExternalLink class="w-3 h-3" />
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Modal Actions -->
-                <div class="border-t border-white/10 pt-4 flex items-center justify-between">
-                    <a v-if="selectedCase.source_url" :href="selectedCase.source_url" target="_blank" rel="noopener noreferrer"
-                        class="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white flex items-center gap-2 transition-all">
-                        <span>Open Source on SAFLII</span>
-                        <ExternalLink class="w-3.5 h-3.5" />
-                    </a>
-                    <button @click="selectedCase = null" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
-                        Close Dossier
-                    </button>
                 </div>
             </div>
         </div>

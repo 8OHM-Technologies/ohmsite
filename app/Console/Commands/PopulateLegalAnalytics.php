@@ -159,7 +159,7 @@ class PopulateLegalAnalytics extends Command
                         }
 
                         $targetType = $vanityMatch?->target_type ?: ($target?->target_type ?: ($metaData['target_type'] ?? $extractedType));
-                        $targetName = $vanityMatch?->target_name ?: ($extractedCode ?: ($court ?: ($target?->target_name ?: 'Unknown')));
+                        $targetName = $vanityMatch?->target_name ?: ($metaData['target_name'] ?? ($extractedCode ?: ($court ?: ($target?->target_name ?: 'Unknown'))));
 
                         // Clean target name and target type to ensure they are never null or empty strings
                         $targetType = empty($targetType) ? 'cases' : $targetType;

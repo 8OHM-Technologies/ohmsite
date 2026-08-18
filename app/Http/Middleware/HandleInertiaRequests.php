@@ -2,9 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\CcmaAnalytics;
 use App\Models\Dataset;
-use App\Models\LegalAnalytics;
 use App\Models\ScrubbedRecord;
 use App\Services\CartService;
 use Illuminate\Http\Request;
@@ -73,33 +71,32 @@ class HandleInertiaRequests extends Middleware
                 try {
                     $totalRecords = ScrubbedRecord::count();
 
-                    $totalCases = LegalAnalytics::where('target_type', 'cases')->count()
-                        + CcmaAnalytics::count();
+                    $coeusQuery = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                        ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id');
 
-                    $totalGazettes = LegalAnalytics::whereIn('target_type', ['gaz', 'journals'])->count();
+                    $totalCases = (clone $coeusQuery)->where(function ($q) {
+                        $q->where('extracted_records.record_type', 'sabinet_ccma')
+                          ->orWhereRaw("extracted_records.data->>'category' = 'cases'");
+                    })->count();
 
-                    $totalCourtRolls = LegalAnalytics::where('target_type', 'other')->count();
+                    $totalGazettes = (clone $coeusQuery)
+                        ->whereRaw("extracted_records.data->>'category' IN ('journals', 'gaz')")
+                        ->count();
 
-                    // Date range from legal_analytics document_date and ccma_analytics award_date
-                    $minYear = LegalAnalytics::whereNotNull('document_date')
-                        ->selectRaw('MIN(EXTRACT(YEAR FROM document_date::date)::int) as yr')
-                        ->value('yr');
-                    $maxYear = LegalAnalytics::whereNotNull('document_date')
-                        ->selectRaw('MAX(EXTRACT(YEAR FROM document_date::date)::int) as yr')
-                        ->value('yr');
+                    $totalCourtRolls = (clone $coeusQuery)
+                        ->whereRaw("extracted_records.data->>'category' = 'other'")
+                        ->count();
 
-                    $ccmaMin = CcmaAnalytics::whereNotNull('award_date')
-                        ->selectRaw('MIN(EXTRACT(YEAR FROM award_date::date)::int) as yr')
-                        ->value('yr');
-                    $ccmaMax = CcmaAnalytics::whereNotNull('award_date')
-                        ->selectRaw('MAX(EXTRACT(YEAR FROM award_date::date)::int) as yr')
+                    $minYear = (clone $coeusQuery)->whereNotNull('extracted_records.document_date')
+                        ->selectRaw('MIN(EXTRACT(YEAR FROM extracted_records.document_date::date)::int) as yr')
                         ->value('yr');
 
-                    $globalMin = collect(array_filter([$minYear, $ccmaMin]))->min();
-                    $globalMax = collect(array_filter([$maxYear, $ccmaMax]))->max();
+                    $maxYear = (clone $coeusQuery)->whereNotNull('extracted_records.document_date')
+                        ->selectRaw('MAX(EXTRACT(YEAR FROM extracted_records.document_date::date)::int) as yr')
+                        ->value('yr');
 
-                    $dateRange = $globalMin && $globalMax
-                        ? ($globalMin === $globalMax ? (string) $globalMin : "{$globalMin} – {$globalMax}")
+                    $dateRange = $minYear && $maxYear
+                        ? ($minYear === $maxYear ? (string) $minYear : "{$minYear} – {$maxYear}")
                         : 'N/A';
 
                     return [

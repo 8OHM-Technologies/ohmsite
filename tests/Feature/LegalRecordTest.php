@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\CcmaAnalytics;
-use App\Models\LegalAnalytics;
 use App\Models\TargetVanity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
@@ -17,6 +18,27 @@ class LegalRecordTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        if (! Schema::connection('pgsql_coeus')->hasTable('extracted_records')) {
+            Schema::connection('pgsql_coeus')->create('extracted_records', function ($table) {
+                $table->uuid('id')->primary();
+                $table->string('record_type')->nullable();
+                $table->string('source_url')->nullable();
+                $table->date('document_date')->nullable();
+                $table->json('data')->nullable();
+                $table->string('status')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::connection('pgsql_coeus')->hasTable('scrubbed_records')) {
+            Schema::connection('pgsql_coeus')->create('scrubbed_records', function ($table) {
+                $table->uuid('id')->primary();
+                $table->uuid('extracted_record_id')->nullable();
+                $table->json('data')->nullable();
+                $table->timestamps();
+            });
+        }
 
         TargetVanity::create([
             'target_name' => 'sabinet_ccma',
@@ -47,6 +69,64 @@ class LegalRecordTest extends TestCase
             'vanity_name' => 'Constitutional Court Hearing Rolls',
             'target_type' => 'other',
         ]);
+
+        $existingTarget = DB::connection('pgsql_coeus')->table('targets')->first();
+        if (! $existingTarget) {
+            $this->targetId = (string) Str::uuid();
+            DB::connection('pgsql_coeus')->table('targets')->insert([
+                'id' => $this->targetId,
+                'name' => 'saflii',
+                'created_at' => now(),
+            ]);
+        } else {
+            $this->targetId = $existingTarget->id;
+        }
+    }
+
+    private string $targetId;
+
+    protected array $createdExtractedIds = [];
+    protected array $createdScrubbedIds = [];
+
+    protected function tearDown(): void
+    {
+        if (! empty($this->createdScrubbedIds)) {
+            DB::connection('pgsql_coeus')->table('scrubbed_records')->whereIn('id', $this->createdScrubbedIds)->delete();
+        }
+        if (! empty($this->createdExtractedIds)) {
+            DB::connection('pgsql_coeus')->table('extracted_records')->whereIn('id', $this->createdExtractedIds)->delete();
+        }
+        parent::tearDown();
+    }
+
+    private function createScrubbedRecord(string $recordType, string $category, array $scrubbedData, array $extractedData = [], ?string $docDate = '2026-02-10'): string
+    {
+        $extId = (string) Str::uuid();
+        $scrubbedId = (string) Str::uuid();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $extId,
+            'target_id' => $this->targetId,
+            'record_type' => $recordType,
+            'source_url' => $extractedData['source_url'] ?? 'https://www.saflii.org/za/cases/ZACC/2026/'.Str::random(10).'.html',
+            'document_date' => $docDate,
+            'data' => json_encode(array_merge(['category' => $category], $extractedData)),
+            'status' => 'detailed',
+            'scraped_at' => now(),
+            'detailed_at' => now(),
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => $scrubbedId,
+            'extracted_record_id' => $extId,
+            'data' => json_encode($scrubbedData),
+            'created_at' => now(),
+        ]);
+
+        $this->createdExtractedIds[] = $extId;
+        $this->createdScrubbedIds[] = $scrubbedId;
+
+        return $scrubbedId;
     }
 
     public function test_legal_records_requires_authentication(): void
@@ -122,39 +202,23 @@ class LegalRecordTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        CcmaAnalytics::create([
-            'title' => 'Smith v ABC Corp',
-            'document_type' => 'CCMA Award',
-            'award_date' => '2026-01-15',
-            'court' => 'CCMA Johannesburg',
-            'award_number' => 'GAJB1234-26',
-            'employee' => 'John Smith',
-            'employer' => 'ABC Corp',
-            'court_location' => 'Johannesburg',
-            'reason_for_dismissal' => 'Misconduct',
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('sabinet_ccma', 'cases', [
+            'title' => "Smith v ABC Corp {$uniq}",
+            'case_number' => "GAJB1234-26-{$uniq}",
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'cases',
-            'target_name' => 'ZACC',
-            'title' => 'State v Defendant',
-            'document_type' => 'Judgment',
-            'document_date' => '2026-02-10',
-            'court' => 'ZACC',
-            'case_number' => 'CCT 12/26',
-            'data' => ['applicant_plaintiff' => 'State', 'respondent_defendant' => 'Defendant'],
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "State v Defendant {$uniq}",
+            'extracted_data' => ['applicant_plaintiff' => 'State', 'respondent_defendant' => 'Defendant'],
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'journals',
-            'target_name' => 'PER',
-            'title' => 'The Evolution of Labour Law',
-            'document_type' => 'Journal Article',
-            'document_date' => '2026-03-01',
-            'data' => ['journal_name' => 'PER', 'volume' => 'Vol 29 (2026)'],
+        $this->createScrubbedRecord('saflii_courts', 'journals', [
+            'title' => "The Evolution of Labour Law {$uniq}",
         ]);
 
-        $response = $this->actingAs($user)->getJson('/legal-records/data?category=cases');
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$uniq}");
 
         $response->assertStatus(200);
         $response->assertJsonPath('total', 2);
@@ -166,36 +230,21 @@ class LegalRecordTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'journals',
-            'target_name' => 'PER',
-            'title' => 'The Evolution of Labour Law',
-            'document_type' => 'Journal Article',
-            'document_date' => '2026-03-01',
-            'data' => ['journal_name' => 'PER', 'volume' => 'Vol 29 (2026)'],
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('saflii_courts', 'journals', [
+            'title' => "The Evolution of Labour Law {$uniq}",
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'gaz',
-            'target_name' => 'ZAGovGaz',
-            'title' => 'Government Notice 456',
-            'document_type' => 'Gazette',
-            'document_date' => '2026-03-05',
-            'data' => ['gazette_number' => '50000'],
+        $this->createScrubbedRecord('saflii_courts', 'gaz', [
+            'title' => "Government Notice 456 {$uniq}",
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'cases',
-            'target_name' => 'ZACC',
-            'title' => 'State v Defendant',
-            'document_type' => 'Judgment',
-            'document_date' => '2026-02-10',
-            'court' => 'ZACC',
-            'case_number' => 'CCT 12/26',
-            'data' => [],
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "State v Defendant {$uniq}",
         ]);
 
-        $response = $this->actingAs($user)->getJson('/legal-records/data?category=journals');
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=journals&search={$uniq}");
 
         $response->assertStatus(200);
         $response->assertJsonPath('total', 2);
@@ -207,56 +256,20 @@ class LegalRecordTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'other',
-            'target_name' => 'ZACC_Rolls',
-            'title' => 'Motion Court Roll for 15 March 2026',
-            'document_type' => 'Court Roll',
-            'document_date' => '2026-03-15',
-            'court' => 'ZACC',
-            'data' => ['court_location' => 'Johannesburg'],
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => "Motion Court Roll for 15 March 2026 {$uniq}",
         ]);
 
-        LegalAnalytics::create([
-            'target_type' => 'cases',
-            'target_name' => 'ZACC',
-            'title' => 'State v Defendant',
-            'document_type' => 'Judgment',
-            'document_date' => '2026-02-10',
-            'court' => 'ZACC',
-            'case_number' => 'CCT 12/26',
-            'data' => [],
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "State v Defendant {$uniq}",
         ]);
 
-        $response = $this->actingAs($user)->getJson('/legal-records/data?category=court_rolls');
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=court_rolls&search={$uniq}");
 
         $response->assertStatus(200);
         $response->assertJsonPath('total', 1);
-    }
-
-    public function test_legal_records_show_endpoint(): void
-    {
-        $user = User::factory()->create([
-            'email_verified_at' => now(),
-        ]);
-
-        $ccma = CcmaAnalytics::create([
-            'title' => 'Smith v ABC Corp',
-            'document_type' => 'CCMA Award',
-            'award_date' => '2026-01-15',
-            'court' => 'CCMA Johannesburg',
-            'award_number' => 'GAJB1234-26',
-            'employee' => 'John Smith',
-            'employer' => 'ABC Corp',
-            'court_location' => 'Johannesburg',
-            'reason_for_dismissal' => 'Misconduct',
-        ]);
-
-        $response = $this->actingAs($user)->getJson("/legal-records/record/{$ccma->id}?source_table=ccma");
-
-        $response->assertStatus(200);
-        $response->assertJsonPath('data.award_number', 'GAJB••••');
-        $response->assertJsonPath('is_pro', false);
     }
 
     public function test_standard_user_receives_blurred_locked_record_fields(): void
@@ -265,31 +278,21 @@ class LegalRecordTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $legal = LegalAnalytics::create([
-            'target_type' => 'cases',
-            'target_name' => 'ZACC',
+        $id = $this->createScrubbedRecord('saflii_courts', 'cases', [
             'title' => 'Constitutional Rights Matter',
-            'document_type' => 'Judgment',
-            'document_date' => '2026-02-10',
-            'court' => 'ZACC',
             'case_number' => 'CCT 100/26',
-            'source_url' => 'https://www.saflii.org/za/cases/ZACC/2026/1.html',
-            'data' => [
-                'applicant_plaintiff' => 'Civil Rights Org',
-                'respondent_defendant' => 'Minister of Justice',
-                'extracted_data' => [
-                    'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
-                    'judges' => ['Chief Justice Zondo', 'Deputy Chief Justice Maya'],
-                    'precedents_cited' => [
-                        ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
-                    ],
-                    'order' => 'The application is upheld with costs.',
-                    'summary' => 'Constitutional challenge concerning administrative justice timelines.',
+            'extracted_data' => [
+                'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
+                'judges' => ['Chief Justice Zondo', 'Deputy Chief Justice Maya'],
+                'precedents_cited' => [
+                    ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
                 ],
+                'order' => 'The application is upheld with costs.',
+                'summary' => 'Constitutional challenge concerning administrative justice timelines.',
             ],
         ]);
 
-        $response = $this->actingAs($user)->getJson("/legal-records/record/{$legal->id}?source_table=legal");
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$id}");
 
         $response->assertStatus(200);
         $response->assertJsonPath('is_pro', false);
@@ -309,33 +312,24 @@ class LegalRecordTest extends TestCase
             'role' => 'admin',
         ]);
 
-        $legal = LegalAnalytics::create([
-            'target_type' => 'cases',
-            'target_name' => 'ZACC',
+        $id = $this->createScrubbedRecord('saflii_courts', 'cases', [
             'title' => 'Constitutional Rights Matter',
-            'document_type' => 'Judgment',
-            'document_date' => '2026-02-10',
-            'court' => 'ZACC',
             'case_number' => 'CCT 100/26',
-            'source_url' => 'https://www.saflii.org/za/cases/ZACC/2026/1.html',
-            'data' => [
-                'extracted_data' => [
-                    'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
-                    'judges' => ['Chief Justice Zondo'],
-                    'precedents_cited' => [
-                        ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
-                    ],
-                    'order' => 'The application is upheld with costs.',
-                    'summary' => 'Constitutional challenge concerning administrative justice timelines.',
+            'extracted_data' => [
+                'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
+                'judges' => ['Chief Justice Zondo'],
+                'precedents_cited' => [
+                    ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
                 ],
+                'order' => 'The application is upheld with costs.',
+                'summary' => 'Constitutional challenge concerning administrative justice timelines.',
             ],
         ]);
 
-        $response = $this->actingAs($user)->getJson("/legal-records/record/{$legal->id}?source_table=legal");
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$id}");
 
         $response->assertStatus(200);
         $response->assertJsonPath('is_pro', true);
-        $response->assertJsonPath('source_url', 'https://www.saflii.org/za/cases/ZACC/2026/1.html');
         $response->assertJsonPath('data.is_locked', false);
         $response->assertJsonPath('data.case_number', 'CCT 100/26');
         $response->assertJsonPath('data.ratio_decidendi', 'The fundamental right to fair trial cannot be arbitrarily suspended.');

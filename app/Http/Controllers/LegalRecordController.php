@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CcmaAnalytics;
-use App\Models\LegalAnalytics;
 use App\Models\TargetVanity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,7 +83,7 @@ class LegalRecordController extends Controller
     }
 
     /**
-     * Return paginated JSON records for PrimeVue lazy DataTable.
+     * Return paginated JSON records directly from scrubbed_records on pgsql_coeus connection.
      */
     public function data(Request $request): JsonResponse
     {
@@ -97,222 +95,61 @@ class LegalRecordController extends Controller
         $sortField = trim((string) $request->input('sort_field', 'created_at'));
         $sortOrder = (int) $request->input('sort_order', -1) === 1 ? 'asc' : 'desc';
 
-        $isPostgres = DB::connection()->getDriverName() === 'pgsql';
-        $like = $isPostgres ? 'ILIKE' : 'LIKE';
-
-        // Check target vanity to know if a specific source target is selected
-        $targetVanity = null;
-        if ($recordType !== '' && $recordType !== 'all') {
-            $targetVanity = TargetVanity::where('target_name', $recordType)->first();
-        }
-
         $user = auth()->user();
         $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
 
-        if ($targetVanity) {
-            if ($targetVanity->target_name === 'sabinet_ccma') {
-                // CCMA path
-                $query = CcmaAnalytics::query();
-                if ($search !== '') {
-                    $query->where(function ($q) use ($search, $like) {
-                        $q->where('title', $like, "%{$search}%")
-                          ->orWhere('award_number', $like, "%{$search}%")
-                          ->orWhere('court', $like, "%{$search}%")
-                          ->orWhere('employee', $like, "%{$search}%")
-                          ->orWhere('employer', $like, "%{$search}%")
-                          ->orWhere('reason_for_dismissal', $like, "%{$search}%");
-                    });
-                }
+        $query = DB::connection('pgsql_coeus')->table('scrubbed_records')
+            ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id')
+            ->select([
+                'scrubbed_records.id',
+                'scrubbed_records.extracted_record_id',
+                'scrubbed_records.data',
+                'extracted_records.record_type',
+                'extracted_records.source_url',
+                'extracted_records.document_date',
+                'extracted_records.data as er_data',
+                'scrubbed_records.created_at',
+            ]);
 
-                $total = $query->count();
-
-                if ($sortField === 'document_date') {
-                    $query->orderBy('award_date', $sortOrder);
-                } elseif ($sortField === 'case_number') {
-                    $query->orderBy('award_number', $sortOrder);
-                } elseif ($sortField === 'court') {
-                    $query->orderBy('court', $sortOrder);
-                } else {
-                    $query->orderBy('created_at', $sortOrder);
-                }
-
-                $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(fn ($row) => $this->formatCcmaRecord($row, $isPro));
-            } else {
-                // Specific Legal Analytics target
-                $query = LegalAnalytics::query()->where('target_name', $recordType);
-                if ($search !== '') {
-                    $query->where(function ($q) use ($search, $like, $isPostgres) {
-                        $q->where('title', $like, "%{$search}%")
-                          ->orWhere('case_number', $like, "%{$search}%")
-                          ->orWhere('court', $like, "%{$search}%");
-                        if ($isPostgres) {
-                            $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
-                        } else {
-                            $q->orWhere('data', 'LIKE', "%{$search}%");
-                        }
-                    });
-                }
-
-                $total = $query->count();
-
-                if ($sortField === 'document_date') {
-                    $query->orderBy('document_date', $sortOrder);
-                } elseif ($sortField === 'case_number') {
-                    $query->orderBy('case_number', $sortOrder);
-                } elseif ($sortField === 'court') {
-                    $query->orderBy('court', $sortOrder);
-                } else {
-                    $query->orderBy('created_at', $sortOrder);
-                }
-
-                $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
-            }
+        // Category filter
+        if ($category === 'cases') {
+            $query->where(function ($q) {
+                $q->where('extracted_records.record_type', 'sabinet_ccma')
+                  ->orWhereRaw("extracted_records.data->>'category' = 'cases'");
+            });
         } elseif ($category === 'journals') {
-            // Journals & Gazettes only (pure legal_analytics)
-            $query = LegalAnalytics::query()->whereIn('target_type', ['journals', 'gaz']);
-            if ($search !== '') {
-                $query->where(function ($q) use ($search, $like, $isPostgres) {
-                    $q->where('title', $like, "%{$search}%")
-                      ->orWhere('case_number', $like, "%{$search}%")
-                      ->orWhere('court', $like, "%{$search}%");
-                    if ($isPostgres) {
-                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
-                    } else {
-                        $q->orWhere('data', 'LIKE', "%{$search}%");
-                    }
-                });
-            }
-
-            $total = $query->count();
-
-            if ($sortField === 'document_date') {
-                $query->orderBy('document_date', $sortOrder);
-            } elseif ($sortField === 'case_number') {
-                $query->orderBy('case_number', $sortOrder);
-            } elseif ($sortField === 'court') {
-                $query->orderBy('court', $sortOrder);
-            } else {
-                $query->orderBy('created_at', $sortOrder);
-            }
-
-            $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
+            $query->whereRaw("extracted_records.data->>'category' IN ('journals', 'gaz')");
         } elseif ($category === 'court_rolls') {
-            // Court Rolls only (pure legal_analytics)
-            $query = LegalAnalytics::query()->where('target_type', 'other');
-            if ($search !== '') {
-                $query->where(function ($q) use ($search, $like, $isPostgres) {
-                    $q->where('title', $like, "%{$search}%")
-                      ->orWhere('case_number', $like, "%{$search}%")
-                      ->orWhere('court', $like, "%{$search}%");
-                    if ($isPostgres) {
-                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
-                    } else {
-                        $q->orWhere('data', 'LIKE', "%{$search}%");
-                    }
-                });
-            }
+            $query->whereRaw("extracted_records.data->>'category' = 'other'");
+        }
 
-            $total = $query->count();
-
-            if ($sortField === 'document_date') {
-                $query->orderBy('document_date', $sortOrder);
-            } elseif ($sortField === 'case_number') {
-                $query->orderBy('case_number', $sortOrder);
-            } elseif ($sortField === 'court') {
-                $query->orderBy('court', $sortOrder);
-            } else {
-                $query->orderBy('created_at', $sortOrder);
-            }
-
-            $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
-        } else {
-            // Cases or All (Union path)
-            $ccmaQuery = DB::table('ccma_analytics')
-                ->select([
-                    'id',
-                    'created_at',
-                    'title',
-                    'document_type as record_type',
-                    'award_date as document_date',
-                    'court',
-                    'award_number as case_number',
-                    'detail_url as source_url',
-                    'employee as applicant',
-                    'employer as respondent',
-                    'reason_for_dismissal as subjects',
-                    'forum as outcome',
-                    DB::raw("reason_for_dismissal as summary"),
-                    DB::raw("NULL as data"),
-                    DB::raw("'ccma' as source_table"),
-                ]);
-
-            $legalQuery = DB::table('legal_analytics')
-                ->select([
-                    'id',
-                    'created_at',
-                    'title',
-                    'document_type as record_type',
-                    'document_date',
-                    'court',
-                    'case_number',
-                    'source_url',
-                    DB::raw("NULL as applicant"),
-                    DB::raw("NULL as respondent"),
-                    DB::raw("NULL as subjects"),
-                    DB::raw("NULL as outcome"),
-                    DB::raw("NULL as summary"),
-                    'data',
-                    DB::raw("'legal' as source_table"),
-                ]);
-
-            if ($category === 'cases') {
-                $legalQuery->where('target_type', 'cases');
-            }
-
-            $unionQuery = $ccmaQuery->unionAll($legalQuery);
-            $query = DB::table(DB::raw("({$unionQuery->toSql()}) as combined"))
-                ->mergeBindings($unionQuery);
-
-            if ($search !== '') {
-                $query->where(function ($q) use ($search, $like, $isPostgres) {
-                    $q->where('title', $like, "%{$search}%")
-                      ->orWhere('case_number', $like, "%{$search}%")
-                      ->orWhere('court', $like, "%{$search}%")
-                      ->orWhere('applicant', $like, "%{$search}%")
-                      ->orWhere('respondent', $like, "%{$search}%");
-                    if ($isPostgres) {
-                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
-                    } else {
-                        $q->orWhere('data', 'LIKE', "%{$search}%");
-                    }
-                });
-            }
-
-            $total = $query->count();
-
-            if ($sortField === 'document_date') {
-                $query->orderBy('document_date', $sortOrder);
-            } elseif ($sortField === 'case_number') {
-                $query->orderBy('case_number', $sortOrder);
-            } elseif ($sortField === 'court') {
-                $query->orderBy('court', $sortOrder);
-            } else {
-                $query->orderBy('created_at', $sortOrder);
-            }
-
-            $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(function ($row) use ($isPro) {
-                if ($row->source_table === 'ccma') {
-                    return $this->formatCcmaRecord($row, $isPro);
-                }
-
-                return $this->formatLegalRecord($row, $isPro);
+        // Record type / target filter
+        if ($recordType !== '' && $recordType !== 'all') {
+            $query->where(function ($q) use ($recordType) {
+                $q->where('extracted_records.record_type', $recordType)
+                  ->orWhereRaw("extracted_records.data->>'target_name' = ?", [$recordType])
+                  ->orWhereRaw("scrubbed_records.data->'metadata'->>'target_name' = ?", [$recordType]);
             });
         }
+
+        // Search query
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw("scrubbed_records.data::text ILIKE ?", ["%{$search}%"])
+                  ->orWhereRaw("extracted_records.data::text ILIKE ?", ["%{$search}%"]);
+            });
+        }
+
+        $total = $query->count();
+
+        if ($sortField === 'document_date') {
+            $query->orderBy('extracted_records.document_date', $sortOrder);
+        } else {
+            $query->orderBy('scrubbed_records.created_at', $sortOrder);
+        }
+
+        $rows = $query->offset($offset)->limit($limit)->get();
+        $records = $rows->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro));
 
         return response()->json([
             'total' => $total,
@@ -322,99 +159,111 @@ class LegalRecordController extends Controller
     }
 
     /**
-     * Return single record full detail payload.
+     * Return single record full detail payload directly from scrubbed_records.
      */
     public function show(Request $request, string $id): JsonResponse
     {
-        $sourceTable = $request->input('source_table', 'legal');
         $user = auth()->user();
         $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
 
-        if ($sourceTable === 'ccma') {
-            $record = CcmaAnalytics::findOrFail($id);
-            $formatted = $this->formatCcmaRecord($record, $isPro);
+        $scrubbed = DB::connection('pgsql_coeus')->table('scrubbed_records')
+            ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id')
+            ->where(function ($q) use ($id) {
+                $q->where('scrubbed_records.id', $id)
+                  ->orWhere('scrubbed_records.extracted_record_id', $id);
+            })
+            ->select([
+                'scrubbed_records.id',
+                'scrubbed_records.extracted_record_id',
+                'scrubbed_records.data',
+                'extracted_records.record_type',
+                'extracted_records.source_url',
+                'extracted_records.document_date',
+                'extracted_records.data as er_data',
+            ])
+            ->first();
+
+        if ($scrubbed) {
+            $formatted = $this->formatScrubbedRecord($scrubbed, $isPro);
+
             return response()->json([
-                'id' => $record->id,
-                'source_table' => 'ccma',
-                'record_type' => $record->document_type,
-                'document_date' => $record->award_date ? $record->award_date->toDateString() : null,
-                'source_url' => $isPro ? $record->detail_url : null,
-                'is_pro' => $isPro,
-                'data' => $formatted,
-            ]);
-        } else {
-            $record = LegalAnalytics::findOrFail($id);
-            $formatted = $this->formatLegalRecord($record, $isPro);
-            return response()->json([
-                'id' => $record->id,
-                'source_table' => 'legal',
-                'record_type' => $record->document_type,
-                'document_date' => $record->document_date ? $record->document_date->toDateString() : null,
-                'source_url' => $isPro ? $record->source_url : null,
+                'id' => (string) $scrubbed->id,
+                'source_table' => 'scrubbed',
+                'record_type' => $scrubbed->record_type,
+                'document_date' => $formatted['document_date'] ?? null,
+                'source_url' => $isPro ? $formatted['source_url'] : null,
                 'is_pro' => $isPro,
                 'data' => $formatted,
             ]);
         }
+
+        abort(404, 'Record not found in scrubbed records.');
     }
 
     /**
-     * Format a legal analytics record into full structured dossier item.
+     * Format a scrubbed record from pgsql_coeus into a structured dossier item.
      */
-    private function formatLegalRecord($row, bool $isPro = true): array
+    private function formatScrubbedRecord($row, bool $isPro = true): array
     {
-        $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
-        $ext = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
+        $srData = is_array($row->data) ? $row->data : (json_decode($row->data ?? '{}', true) ?: []);
+        $erData = isset($row->er_data) ? (is_array($row->er_data) ? $row->er_data : json_decode($row->er_data ?? '{}', true)) : [];
+        $ext = is_array($srData['extracted_data'] ?? null) ? $srData['extracted_data'] : [];
+        $meta = is_array($srData['metadata'] ?? null) ? $srData['metadata'] : (is_array($erData['metadata'] ?? null) ? $erData['metadata'] : []);
 
-        $applicant = $ext['applicant_plaintiff'] ?? $payload['applicant_plaintiff'] ?? $ext['employee'] ?? $payload['employee'] ?? $payload['publisher'] ?? $payload['journal_name'] ?? null;
+        $title = $srData['title'] ?? $erData['title'] ?? $ext['title'] ?? 'Legal Matter';
+        $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? ($row->record_type === 'sabinet_ccma' ? 'CCMA' : 'Superior Court');
+        $caseNumber = $meta['case_number'] ?? $ext['case_number'] ?? $srData['case_number'] ?? $srData['award_number'] ?? null;
+        $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $meta['document_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
+        $hearingDate = $ext['hearing_date'] ?? $meta['hearing_date'] ?? null;
+
+        $applicant = $ext['applicant_plaintiff'] ?? $srData['applicant_plaintiff'] ?? $ext['employee'] ?? $srData['employee'] ?? $meta['publisher'] ?? null;
         if (is_array($applicant)) {
             $applicant = implode(', ', $applicant);
         }
 
-        $respondent = $ext['respondent_defendant'] ?? $payload['respondent_defendant'] ?? $ext['employer'] ?? $payload['employer'] ?? null;
+        $respondent = $ext['respondent_defendant'] ?? $srData['respondent_defendant'] ?? $ext['employer'] ?? $srData['employer'] ?? null;
         if (is_array($respondent)) {
             $respondent = implode(', ', $respondent);
         }
 
-        $judges = $ext['judges'] ?? $payload['judges'] ?? [];
-        if (!is_array($judges)) {
+        $judges = $ext['judges'] ?? $srData['judges'] ?? [];
+        if (! is_array($judges)) {
             $judges = $judges ? [$judges] : [];
         }
+        $judges = array_values(array_filter($judges, fn ($j) => ! empty($j) && ! str_starts_with((string) $j, '[Not explicitly')));
 
-        $precedentsCited = $ext['precedents_cited'] ?? $payload['precedents_cited'] ?? [];
-        if (!is_array($precedentsCited)) {
+        $precedentsCited = $ext['precedents_cited'] ?? $srData['precedents_cited'] ?? [];
+        if (! is_array($precedentsCited)) {
             $precedentsCited = [];
         }
 
-        $reportable = $ext['reportable'] ?? $payload['reportable'] ?? true;
-        $durationDays = isset($ext['duration_days']) ? (int) $ext['duration_days'] : (isset($payload['duration_days']) ? (int) $payload['duration_days'] : null);
-        $courtLocation = $ext['court_location'] ?? $payload['court_location'] ?? null;
-        $ratioDecidendi = $ext['ratio_decidendi'] ?? $payload['ratio_decidendi'] ?? null;
-        $obiterDicta = $ext['obiter_dicta'] ?? $payload['obiter_dicta'] ?? null;
-        $order = $ext['order'] ?? $payload['order'] ?? null;
-        $summary = $payload['ai_summary'] ?? $ext['summary'] ?? $payload['summary'] ?? $payload['abstract'] ?? null;
-        $subjects = $ext['reason_for_dismissal'] ?? $payload['reason_for_dismissal'] ?? $ext['subjects'] ?? $payload['subjects'] ?? $ext['subject'] ?? $payload['subject'] ?? null;
-        $outcome = $ext['result'] ?? $payload['result'] ?? $order ?? $ext['holding'] ?? $payload['holding'] ?? null;
-
-        $docDate = $row->document_date ? substr((string) $row->document_date, 0, 10) : null;
-        $judgmentDate = $ext['judgment_date'] ?? $payload['judgment_date'] ?? $docDate;
-        $hearingDate = $ext['hearing_date'] ?? $payload['hearing_date'] ?? null;
+        $reportable = isset($ext['reportable']) ? (bool) $ext['reportable'] : true;
+        $durationDays = isset($ext['duration_days']) ? (int) $ext['duration_days'] : null;
+        $courtLocation = $ext['court_location'] ?? $meta['court_location'] ?? null;
+        $ratioDecidendi = $ext['ratio_decidendi'] ?? $srData['ratio_decidendi'] ?? null;
+        $obiterDicta = $ext['obiter_dicta'] ?? $srData['obiter_dicta'] ?? null;
+        $order = $ext['order'] ?? $srData['order'] ?? null;
+        $summary = $srData['ai_summary'] ?? $ext['summary'] ?? $srData['summary'] ?? $srData['abstract'] ?? $ext['reason_for_dismissal'] ?? $srData['reason_for_dismissal'] ?? null;
+        $subjects = $ext['reason_for_dismissal'] ?? $srData['reason_for_dismissal'] ?? $ext['subjects'] ?? $srData['subjects'] ?? null;
+        $outcome = $ext['result'] ?? $order ?? $ext['holding'] ?? null;
+        $sourceUrl = $row->source_url ?? $ext['source_url'] ?? $meta['source_url'] ?? null;
 
         if (! $isPro) {
-            $maskedCaseNumber = $row->case_number ? (strlen($row->case_number) > 4 ? substr($row->case_number, 0, 4).'••••' : '••••') : null;
+            $maskedCaseNumber = $caseNumber ? (strlen($caseNumber) > 4 ? substr($caseNumber, 0, 4).'••••' : '••••') : null;
             $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
 
             return [
-                'id' => $row->id,
-                'source_table' => 'legal',
-                'record_type' => $row->document_type ?? $row->record_type ?? 'saflii_courts',
+                'id' => (string) $row->id,
+                'source_table' => 'scrubbed',
+                'record_type' => $row->record_type ?? 'saflii_courts',
                 'is_locked' => true,
                 'is_pro' => false,
                 'document_date' => $maskedDate,
                 'judgment_date' => $maskedDate,
                 'hearing_date' => $hearingDate ? substr((string) $hearingDate, 0, 4).'-••-••' : null,
-                'court' => $row->court,
+                'court' => $court,
                 'case_number' => $maskedCaseNumber,
-                'title' => $row->title,
+                'title' => $title,
                 'source_url' => null,
                 'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
                 'respondent' => $respondent ? 'Respondent (Locked - Pro Required)' : null,
@@ -434,18 +283,18 @@ class LegalRecordController extends Controller
         }
 
         return [
-            'id' => $row->id,
-            'source_table' => 'legal',
-            'record_type' => $row->document_type ?? $row->record_type ?? 'saflii_courts',
+            'id' => (string) $row->id,
+            'source_table' => 'scrubbed',
+            'record_type' => $row->record_type ?? 'saflii_courts',
             'is_locked' => false,
             'is_pro' => true,
             'document_date' => $docDate,
-            'judgment_date' => $judgmentDate,
+            'judgment_date' => $docDate,
             'hearing_date' => $hearingDate,
-            'court' => $row->court,
-            'case_number' => $row->case_number,
-            'title' => $row->title,
-            'source_url' => $row->source_url,
+            'court' => $court,
+            'case_number' => $caseNumber,
+            'title' => $title,
+            'source_url' => $sourceUrl,
             'applicant' => $applicant,
             'respondent' => $respondent,
             'subjects' => $subjects,
@@ -460,102 +309,6 @@ class LegalRecordController extends Controller
             'reportable' => (bool) $reportable,
             'duration_days' => $durationDays,
             'court_location' => $courtLocation,
-        ];
-    }
-
-    /**
-     * Format a CCMA record into structured dossier item.
-     */
-    private function formatCcmaRecord($row, bool $isPro = true): array
-    {
-        $docDate = $row->award_date ?? $row->document_date ?? null;
-        if ($docDate) {
-            $docDate = substr((string) $docDate, 0, 10);
-        }
-
-        $hearingDate = null;
-        if (isset($row->hearing_start) && $row->hearing_start) {
-            $hearingDate = substr((string) $row->hearing_start, 0, 10);
-        }
-
-        if (! $isPro) {
-            $maskedCaseNumber = $row->award_number ?? $row->case_number ?? null;
-            if ($maskedCaseNumber && strlen($maskedCaseNumber) > 4) {
-                $maskedCaseNumber = substr($maskedCaseNumber, 0, 4).'••••';
-            }
-            $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
-
-            return [
-                'id' => $row->id,
-                'source_table' => 'ccma',
-                'record_type' => $row->document_type ?? $row->record_type ?? 'CCMA Awards',
-                'is_locked' => true,
-                'is_pro' => false,
-                'document_date' => $maskedDate,
-                'award_date' => $maskedDate,
-                'judgment_date' => $maskedDate,
-                'hearing_date' => $hearingDate ? substr((string) $hearingDate, 0, 4).'-••-••' : null,
-                'court' => $row->court ?? 'CCMA',
-                'case_number' => $maskedCaseNumber,
-                'award_number' => $maskedCaseNumber,
-                'title' => $row->title,
-                'source_url' => null,
-                'detail_url' => null,
-                'applicant' => ($row->employee ?? $row->applicant) ? 'Employee (Locked)' : null,
-                'employee' => ($row->employee ?? $row->applicant) ? 'Employee (Locked)' : null,
-                'respondent' => ($row->employer ?? $row->respondent) ? 'Employer (Locked)' : null,
-                'employer' => ($row->employer ?? $row->respondent) ? 'Employer (Locked)' : null,
-                'subjects' => $row->reason_for_dismissal ?? $row->subjects ?? null,
-                'reason_for_dismissal' => $row->reason_for_dismissal ?? $row->subjects ?? null,
-                'outcome' => $row->forum ?? $row->court ?? 'CCMA',
-                'forum' => $row->forum ?? $row->court ?? 'CCMA',
-                'summary' => $row->reason_for_dismissal ?? $row->summary ?? null,
-                'ratio_decidendi' => null,
-                'obiter_dicta' => null,
-                'order' => null,
-                'judges' => [],
-                'precedents_count' => 0,
-                'precedents_cited' => [],
-                'reportable' => false,
-                'duration_days' => null,
-                'court_location' => $row->court_location ?? null,
-            ];
-        }
-
-        return [
-            'id' => $row->id,
-            'source_table' => 'ccma',
-            'record_type' => $row->document_type ?? $row->record_type ?? 'CCMA Awards',
-            'is_locked' => false,
-            'is_pro' => true,
-            'document_date' => $docDate,
-            'award_date' => $docDate,
-            'judgment_date' => $docDate,
-            'hearing_date' => $hearingDate,
-            'court' => $row->court ?? 'CCMA',
-            'case_number' => $row->award_number ?? $row->case_number ?? null,
-            'award_number' => $row->award_number ?? $row->case_number ?? null,
-            'title' => $row->title,
-            'source_url' => $row->detail_url ?? $row->source_url ?? null,
-            'detail_url' => $row->detail_url ?? $row->source_url ?? null,
-            'applicant' => $row->employee ?? $row->applicant ?? null,
-            'employee' => $row->employee ?? $row->applicant ?? null,
-            'respondent' => $row->employer ?? $row->respondent ?? null,
-            'employer' => $row->employer ?? $row->respondent ?? null,
-            'subjects' => $row->reason_for_dismissal ?? $row->subjects ?? null,
-            'reason_for_dismissal' => $row->reason_for_dismissal ?? $row->subjects ?? null,
-            'outcome' => $row->forum ?? $row->court ?? 'CCMA',
-            'forum' => $row->forum ?? $row->court ?? 'CCMA',
-            'summary' => $row->reason_for_dismissal ?? $row->summary ?? null,
-            'ratio_decidendi' => null,
-            'obiter_dicta' => null,
-            'order' => null,
-            'judges' => [],
-            'precedents_count' => 0,
-            'precedents_cited' => [],
-            'reportable' => false,
-            'duration_days' => null,
-            'court_location' => $row->court_location ?? null,
         ];
     }
 }
