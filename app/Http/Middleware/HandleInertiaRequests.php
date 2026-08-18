@@ -78,21 +78,21 @@ class HandleInertiaRequests extends Middleware
 
                     $totalGazettes = LegalAnalytics::whereIn('target_type', ['gaz', 'journals'])->count();
 
-                    $totalCourtRolls = CcmaAnalytics::count();
+                    $totalCourtRolls = LegalAnalytics::where('target_type', 'other')->count();
 
-                    // Date range from legal_analytics document_date
+                    // Date range from legal_analytics document_date and ccma_analytics award_date
                     $minYear = LegalAnalytics::whereNotNull('document_date')
-                        ->selectRaw('MIN(EXTRACT(YEAR FROM document_date)::int) as yr')
+                        ->selectRaw('MIN(EXTRACT(YEAR FROM document_date::date)::int) as yr')
                         ->value('yr');
                     $maxYear = LegalAnalytics::whereNotNull('document_date')
-                        ->selectRaw('MAX(EXTRACT(YEAR FROM document_date)::int) as yr')
+                        ->selectRaw('MAX(EXTRACT(YEAR FROM document_date::date)::int) as yr')
                         ->value('yr');
 
                     $ccmaMin = CcmaAnalytics::whereNotNull('award_date')
-                        ->selectRaw('MIN(EXTRACT(YEAR FROM award_date)::int) as yr')
+                        ->selectRaw('MIN(EXTRACT(YEAR FROM award_date::date)::int) as yr')
                         ->value('yr');
                     $ccmaMax = CcmaAnalytics::whereNotNull('award_date')
-                        ->selectRaw('MAX(EXTRACT(YEAR FROM award_date)::int) as yr')
+                        ->selectRaw('MAX(EXTRACT(YEAR FROM award_date::date)::int) as yr')
                         ->value('yr');
 
                     $globalMin = collect(array_filter([$minYear, $ccmaMin]))->min();

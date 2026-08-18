@@ -33,12 +33,12 @@ class PopulateAnalyticsCommandTest extends TestCase
         // Create the entities, targets, extracted_records, and scrubbed_records tables in the test pgsql_coeus connection
         $db = DB::connection('pgsql_coeus');
         $db->statement('CREATE TABLE entities (id VARCHAR(36) PRIMARY KEY, name VARCHAR(255) UNIQUE, identifier VARCHAR(50), created_at TIMESTAMP)');
-        $db->statement('CREATE TABLE targets (id VARCHAR(36) PRIMARY KEY, entity_id VARCHAR(36), target_name VARCHAR(255), location VARCHAR(255), created_at TIMESTAMP)');
+        $db->statement('CREATE TABLE targets (id VARCHAR(36) PRIMARY KEY, entity_id VARCHAR(36), target_name VARCHAR(255), target_type VARCHAR(50), location VARCHAR(255), created_at TIMESTAMP)');
         $db->statement('CREATE TABLE extracted_records (id VARCHAR(36) PRIMARY KEY, target_id VARCHAR(36), document_date DATE, record_type VARCHAR(100), data TEXT, requires_human_review BOOLEAN DEFAULT FALSE, review_reason TEXT, source_url TEXT, status VARCHAR(50), extracted_at TIMESTAMP, processed_at TIMESTAMP, cleaned_at TIMESTAMP)');
         $db->statement('CREATE TABLE scrubbed_records (id VARCHAR(36) PRIMARY KEY, extracted_record_id VARCHAR(36), data TEXT, created_at TIMESTAMP)');
     }
 
-    private function createTarget(): string
+    private function createTarget(?string $targetName = null, string $targetType = 'cases'): string
     {
         $entityId = Str::uuid()->toString();
         $targetId = Str::uuid()->toString();
@@ -52,7 +52,8 @@ class PopulateAnalyticsCommandTest extends TestCase
         DB::connection('pgsql_coeus')->table('targets')->insert([
             'id' => $targetId,
             'entity_id' => $entityId,
-            'target_name' => 'Test Target '.$targetId,
+            'target_name' => $targetName ?? ('Test Target '.$targetId),
+            'target_type' => $targetType,
             'location' => 'https://example.com',
             'created_at' => now(),
         ]);
@@ -270,7 +271,7 @@ class PopulateAnalyticsCommandTest extends TestCase
     public function test_populates_legal_saflii_data_correctly(): void
     {
         Storage::fake('local');
-        $targetId = $this->createTarget();
+        $targetId = $this->createTarget('ZACC', 'cases');
         $id = Str::uuid()->toString();
 
         DB::connection('pgsql_coeus')->table('extracted_records')->insert([
@@ -293,25 +294,41 @@ class PopulateAnalyticsCommandTest extends TestCase
             'id' => Str::uuid()->toString(),
             'extracted_record_id' => $id,
             'data' => json_encode([
+                'title' => 'State v Zuma and Others',
                 'metadata' => [
                     'entity_name' => 'Saflii',
                     'target_name' => 'ZACC',
                     'document_date' => '2026-06-18',
                     'record_type' => 'Judgment',
+                    'case_number' => 'CCT 12/25',
                 ],
-                'applicant_plaintiff' => 'State',
-                'respondent_defendant' => ['Zuma', 'Ministers of Justice'],
-                'hearing_date' => '2026-06-12',
-                'dataset_number' => 'CCT 12/25',
-                'reportable' => false,
-                'subjects' => ['Criminal Law', 'Constitutional Law'],
-                'court' => 'Constitutional Court',
-                'judges' => ['Zondo CJ', 'Goliath AJ'],
-                'court_location' => 'Johannesburg',
-                'result' => 'Application for leave to appeal dismissed.',
-                'summary' => 'The applicant, ID number [RSA ID], sought urgent relief regarding...',
-                'keywords' => ['leave to appeal', 'constitutional challenge'],
-                'formatted_text' => 'Constitutional Court of South Africa...\nCase no: CCT 12/25...',
+                'extracted_data' => [
+                    'applicant_plaintiff' => 'State',
+                    'respondent_defendant' => ['Zuma', 'Ministers of Justice'],
+                    'hearing_date' => '2026-06-12',
+                    'judgment_date' => '2026-06-18',
+                    'reportable' => false,
+                    'court' => 'Constitutional Court',
+                    'judges' => ['Zondo CJ', 'Goliath AJ'],
+                    'court_location' => 'Johannesburg',
+                    'ratio_decidendi' => 'Core binding legal rule established by the majority.',
+                    'precedents_cited' => [
+                        [
+                            'case_name_citation' => 'S v Makwanyane',
+                            'treatment' => 'Applied/Followed',
+                            'reasoning' => 'Foundational human rights precedent.',
+                            'url' => 'https://www.saflii.org/za/cases/ZACC/1995/3.html',
+                        ],
+                    ],
+                    'obiter_dicta' => 'Observations on constitutional values.',
+                    'order' => 'Application for leave to appeal dismissed.',
+                    'summary' => 'The applicant, ID number [RSA ID], sought urgent relief regarding...',
+                    'keywords' => ['leave to appeal', 'constitutional challenge'],
+                ],
+                'data_quality_flags' => [
+                    'requires_human_review' => false,
+                    'review_reason' => null,
+                ],
             ]),
             'created_at' => now(),
         ]);
@@ -325,7 +342,9 @@ class PopulateAnalyticsCommandTest extends TestCase
         $analytic = LegalAnalytics::first();
         $this->assertNotNull($analytic);
         $this->assertEquals('State v Zuma and Others', $analytic->title);
-        $this->assertEquals('saflii_courts', $analytic->document_type);
+        $this->assertEquals('Judgment', $analytic->document_type);
+        $this->assertEquals('cases', $analytic->target_type);
+        $this->assertEquals('ZACC', $analytic->target_name);
         $this->assertEquals('2026-06-18', $analytic->document_date->toDateString());
         $this->assertEquals('Constitutional Court', $analytic->court);
         $this->assertEquals('CCT 12/25', $analytic->case_number);
@@ -333,13 +352,162 @@ class PopulateAnalyticsCommandTest extends TestCase
         $this->assertEquals('Zuma, Ministers of Justice', $analytic->respondent);
         $this->assertEquals('Application for leave to appeal dismissed.', $analytic->outcome);
         $this->assertEquals('Johannesburg', $analytic->court_location);
-        $this->assertEquals('Criminal Law, Constitutional Law', $analytic->subjects);
+        $this->assertEquals('leave to appeal, constitutional challenge', $analytic->subjects);
+        $this->assertEquals('Core binding legal rule established by the majority.', $analytic->ratio_decidendi);
+        $this->assertEquals('Observations on constitutional values.', $analytic->obiter_dicta);
+        $this->assertEquals(['Zondo CJ', 'Goliath AJ'], $analytic->judges);
 
         // Verify dataset files were generated
         Storage::disk('local')->assertExists('datasets/8ohm_saflii_dataset.csv');
         Storage::disk('local')->assertExists('datasets/8ohm_saflii_dataset.json');
         Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.csv');
         Storage::disk('local')->assertExists('datasets/8ohm_all_dataset.json');
+    }
+
+    public function test_populates_legal_saflii_journal_record_correctly(): void
+    {
+        Storage::fake('local');
+        $targetId = $this->createTarget('PER', 'journals');
+        $id = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2025-01-15',
+            'record_type' => 'saflii_courts',
+            'source_url' => 'https://www.saflii.org/za/journals/PER/2025/1.html',
+            'data' => json_encode(['title' => 'Constitutional Law in Practice']),
+            'requires_human_review' => false,
+            'status' => 'detailed',
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id,
+            'data' => json_encode([
+                'title' => 'Constitutional Law in Practice',
+                'formatted_text' => '# Constitutional Law in Practice\n\nAbstract: An exploration of modern jurisprudence.',
+                'data_quality_flags' => [
+                    'requires_human_review' => false,
+                ],
+            ]),
+            'created_at' => now(),
+        ]);
+
+        $this->artisan('legal-analytics:populate')
+            ->expectsOutput('Starting population of legal analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 1 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        $analytic = LegalAnalytics::first();
+        $this->assertNotNull($analytic);
+        $this->assertEquals('Constitutional Law in Practice', $analytic->title);
+        $this->assertEquals('journals', $analytic->target_type);
+        $this->assertEquals('PER', $analytic->target_name);
+        $this->assertEquals('https://www.saflii.org/za/journals/PER/2025/1.html', $analytic->source_url);
+    }
+
+    public function test_legal_analytics_skips_unscrubbed_records(): void
+    {
+        $targetId = $this->createTarget('ZACC', 'cases');
+        $id = Str::uuid()->toString();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id,
+            'target_id' => $targetId,
+            'document_date' => '2026-06-18',
+            'record_type' => 'saflii_courts',
+            'data' => json_encode([
+                'title' => 'Unscrubbed Raw Record',
+            ]),
+            'requires_human_review' => false,
+            'status' => 'detailed',
+        ]);
+
+        // No scrubbed_records row exists
+
+        $this->artisan('legal-analytics:populate')
+            ->expectsOutput('Starting population of legal analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 0 records. Deleted 0 obsolete records.')
+            ->assertExitCode(0);
+
+        $this->assertEquals(0, LegalAnalytics::count());
+    }
+
+    public function test_legal_analytics_deletes_obsolete_records(): void
+    {
+        $targetId = $this->createTarget('ZACC', 'cases');
+        $id = Str::uuid()->toString();
+
+        LegalAnalytics::create([
+            'extracted_record_id' => $id,
+            'target_type' => 'cases',
+            'target_name' => 'ZACC',
+            'title' => 'Obsolete Record',
+            'document_type' => 'saflii_courts',
+            'document_date' => '2026-01-01',
+            'court' => 'Constitutional Court',
+        ]);
+
+        $this->assertEquals(1, LegalAnalytics::count());
+
+        $this->artisan('legal-analytics:populate')
+            ->expectsOutput('Starting population of legal analytics database. Max limit: 1000 records.')
+            ->expectsOutput('Successfully processed 0 records. Deleted 1 obsolete records.')
+            ->assertExitCode(0);
+
+        $this->assertEquals(0, LegalAnalytics::count());
+    }
+
+    public function test_legal_analytics_creates_backup_before_changes(): void
+    {
+        $targetId = $this->createTarget('ZACC', 'cases');
+        $id1 = Str::uuid()->toString();
+        $id2 = Str::uuid()->toString();
+
+        // Setup first scrubbed record
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id1,
+            'target_id' => $targetId,
+            'document_date' => '2026-01-01',
+            'record_type' => 'saflii_courts',
+            'data' => json_encode(['title' => 'Case 1']),
+            'requires_human_review' => false,
+            'status' => 'detailed',
+        ]);
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id1,
+            'data' => json_encode(['title' => 'Case 1']),
+            'created_at' => now(),
+        ]);
+
+        // First run
+        $this->artisan('legal-analytics:populate')->assertExitCode(0);
+        $this->assertEquals(1, LegalAnalytics::count());
+
+        // Setup second scrubbed record
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $id2,
+            'target_id' => $targetId,
+            'document_date' => '2026-02-01',
+            'record_type' => 'saflii_courts',
+            'data' => json_encode(['title' => 'Case 2']),
+            'requires_human_review' => false,
+            'status' => 'detailed',
+        ]);
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => Str::uuid()->toString(),
+            'extracted_record_id' => $id2,
+            'data' => json_encode(['title' => 'Case 2']),
+            'created_at' => now(),
+        ]);
+
+        // Second run
+        $this->artisan('legal-analytics:populate')->assertExitCode(0);
+        $this->assertEquals(2, LegalAnalytics::count());
+        $this->assertEquals(1, DB::table('backup_legal_analytics')->count());
+        $this->assertEquals('Case 1', DB::table('backup_legal_analytics')->first()->title);
     }
 
     public function test_skips_already_processed_records(): void

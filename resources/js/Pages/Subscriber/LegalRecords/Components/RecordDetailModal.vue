@@ -7,7 +7,13 @@ import {
   ExternalLink,
   CheckCircle2,
   AlertTriangle,
-  FileCheck
+  Bookmark,
+  Compass,
+  FileText,
+  Clock,
+  MapPin,
+  Users,
+  BookOpen
 } from 'lucide-vue-next';
 import Modal from '@/Components/Modal.vue';
 import Skeleton from 'primevue/skeleton';
@@ -59,43 +65,6 @@ const COURT_NAMES_MAP: Record<string, string> = {
   'ZAECHC': 'Eastern Cape High Court'
 };
 
-const COURT_LOCATIONS_MAP: Record<string, string> = {
-  'ZACC': 'Johannesburg',
-  'ZASCA': 'Bloemfontein',
-  'ZAGPPHC': 'Pretoria',
-  'ZAGPJHC': 'Johannesburg',
-  'ZAWCHC': 'Cape Town',
-  'ZAFSHC': 'Bloemfontein',
-  'ZAKZNDHC': 'Durban',
-  'ZAKZNHC': 'Pietermaritzburg',
-  'ZAECGHC': 'Grahamstown',
-  'ZAECPEHC': 'Port Elizabeth',
-  'ZAECELHC': 'East London',
-  'ZAECBHC': 'Bhisho',
-  'ZALMPPHC': 'Polokwane',
-  'ZANWHC': 'Mahikeng',
-  'ZANCHC': 'Kimberley',
-  'ZALC': 'Johannesburg',
-  'ZALAC': 'Johannesburg',
-  'ZACAC': 'Johannesburg',
-  'ZAEQC': 'Johannesburg',
-  'ZALCC': 'Johannesburg',
-  'ZATC': 'Johannesburg',
-  'ZAECC': 'Bloemfontein',
-  'ZALCJHB': 'Johannesburg',
-  'ZALCPE': 'Port Elizabeth',
-  'ZALCCT': 'Cape Town',
-  'ZALCD': 'Durban',
-  'ZALMPTHC': 'Thohoyandou',
-  'ZAMPMHC': 'Middelburg',
-  'ZAMPMBHC': 'Mbombela',
-  'ZAKZDHC': 'Durban',
-  'ZAKZPHC': 'Pietermaritzburg',
-  'ZAGPHC': 'Pretoria',
-  'ZAKZHC': 'Pietermaritzburg',
-  'ZAECHC': 'Grahamstown'
-};
-
 const formatCourtName = (court: any): string => {
   if (!court) return '';
   const cStr = String(court).trim();
@@ -106,402 +75,232 @@ const formatCourtName = (court: any): string => {
   return cStr;
 };
 
-const getCourtLocation = (recordData: any): string => {
-  if (!recordData) return '';
-  if (recordData.court_location) return String(recordData.court_location);
-  if (recordData.court) {
-    const courtUpper = String(recordData.court).toUpperCase().trim();
-    if (COURT_LOCATIONS_MAP[courtUpper]) {
-      return COURT_LOCATIONS_MAP[courtUpper];
-    }
-  }
-  return '';
-};
+const dataObj = computed(() => {
+  if (!props.recordDetail) return {};
+  return props.recordDetail.data || props.recordDetail;
+});
 
-const EXCLUDED_KEYS = new Set([
-  'auth_ok',
-  'content_loaded',
-  'detail_url',
-  'detail_title',
-  'index_scraped_at',
-  'preview_image_url',
-  'details_scraped_at',
-  'scraped_at',
-  'source_url',
-  'url',
-  'worker_id',
-  'case_id',
-  'metadata'
-]);
-
-const SPECIAL_LAYOUT_KEYS = new Set([
-  'result',
-  'order',
-  'holding',
-  'reason_for_dismissal',
-  'dismissal_reason',
-  'reasons_for_dismissal',
-  'summary',
-  'ai_summary',
-  'headnotes',
-  'abstract',
-  'full_text',
-  'center_content',
-  'text',
-  'content',
-  'raw_text',
-  'judgment_text',
-  'judgment',
-  'title',
-  'name',
-  'heading'
-]);
-
-const getDocumentType = (record: any): 'case' | 'gazette' | 'journal' | 'court_roll' => {
-  if (!record) return 'case';
-  const url = (record.source_url || '').toLowerCase();
-  const type = (record.record_type || '').toLowerCase();
-
-  if (url.includes('/gaz/') || url.includes('gazette') || type.includes('gazette') || type.includes('gaz')) {
-    return 'gazette';
-  }
-  if (url.includes('/journals/') || url.includes('journal') || type.includes('journal')) {
-    return 'journal';
-  }
-  if (url.includes('/rolls/') || url.includes('/other/') || url.includes('courtroll') || url.includes('roll') || type.includes('roll')) {
-    return 'court_roll';
-  }
-  return 'case';
-};
-
-const getDocumentBodyText = (recordData: any) => {
-  if (!recordData) return '';
-  return (
-    recordData.full_text ||
-    recordData.center_content ||
-    recordData.text ||
-    recordData.content ||
-    recordData.raw_text ||
-    recordData.judgment_text ||
-    recordData.judgment ||
-    ''
-  );
-};
-
-const getDocumentSummary = (recordData: any) => {
-  if (!recordData) return '';
-  return recordData.ai_summary || recordData.summary || recordData.headnotes || recordData.abstract || '';
-};
-
-const getDocumentHolding = (recordData: any) => {
-  if (!recordData) return '';
-  return recordData.result || recordData.order || recordData.holding || '';
-};
-
-const getDocumentDismissal = (recordData: any) => {
-  if (!recordData) return '';
-  return recordData.reason_for_dismissal || recordData.dismissal_reason || recordData.reasons_for_dismissal || '';
-};
-
-const formatValue = (val: any) => {
-  if (val === null || val === undefined) return '';
-  if (typeof val === 'object') return JSON.stringify(val, null, 2);
-  return String(val);
-};
-
-const getFilteredMetadata = (recordData: any) => {
-  if (!recordData) return [];
-
-  const courtForumValues: string[] = [];
-  const courtForumKeysToExclude = new Set<string>();
-
-  for (const key of Object.keys(recordData)) {
-    const val = recordData[key];
-    if (val === null || val === undefined || val === '') continue;
-    const kNorm = key.toLowerCase().replace(/_/g, ' ').trim();
-    if (
-      kNorm === 'court' ||
-      kNorm === 'forum' ||
-      kNorm === 'court forum' ||
-      kNorm === 'court/forum' ||
-      kNorm === 'forum/court' ||
-      kNorm === 'court / forum'
-    ) {
-      courtForumKeysToExclude.add(key);
-      const valStr = formatCourtName(val);
-      if (valStr && !courtForumValues.includes(valStr)) {
-        courtForumValues.push(valStr);
-      }
-    }
-  }
-
-  const items: { label: string; value: any }[] = [];
-
-  if (courtForumValues.length > 0) {
-    items.push({
-      label: 'Court/Forum',
-      value: courtForumValues.join(' / '),
-    });
-  }
-
-  for (const key of Object.keys(recordData)) {
-    const val = recordData[key];
-    if (val === null || val === undefined || val === '') continue;
-    if (EXCLUDED_KEYS.has(key) || SPECIAL_LAYOUT_KEYS.has(key) || courtForumKeysToExclude.has(key)) {
-      continue;
-    }
-
-    const label = key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-    items.push({ label, value: val });
-  }
-
-  return items.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
-};
+const title = computed(() => dataObj.value.title || dataObj.value.name || 'Legal Record Dossier');
+const caseNumber = computed(() => dataObj.value.case_number || dataObj.value.award_number || null);
+const court = computed(() => formatCourtName(dataObj.value.court) || dataObj.value.court || 'Court Authority');
+const courtLocation = computed(() => dataObj.value.court_location || 'National Jurisdiction');
+const judgmentDate = computed(() => dataObj.value.judgment_date || dataObj.value.award_date || dataObj.value.document_date || props.recordDetail?.document_date || 'N/A');
+const hearingDate = computed(() => dataObj.value.hearing_date || dataObj.value.hearing_start || 'N/A');
+const durationDays = computed(() => dataObj.value.duration_days ?? null);
+const applicant = computed(() => dataObj.value.applicant || dataObj.value.employee || 'N/A');
+const respondent = computed(() => dataObj.value.respondent || dataObj.value.employer || 'N/A');
+const judges = computed(() => {
+  const j = dataObj.value.judges;
+  if (Array.isArray(j)) return j;
+  if (typeof j === 'string' && j) return [j];
+  return [];
+});
+const reportable = computed(() => Boolean(dataObj.value.reportable));
+const ratioDecidendi = computed(() => dataObj.value.ratio_decidendi || null);
+const summary = computed(() => dataObj.value.summary || dataObj.value.ai_summary || null);
+const obiterDicta = computed(() => dataObj.value.obiter_dicta || null);
+const order = computed(() => dataObj.value.order || dataObj.value.holding || dataObj.value.result || null);
+const dismissalReason = computed(() => dataObj.value.reason_for_dismissal || dataObj.value.subjects || null);
+const precedentsCited = computed(() => {
+  const p = dataObj.value.precedents_cited;
+  return Array.isArray(p) ? p : [];
+});
+const precedentsCount = computed(() => dataObj.value.precedents_count ?? precedentsCited.value.length);
+const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?.source_url || null);
 </script>
 
 <template>
-  <Modal :show="show" @close="emit('close')" maxWidth="5xl">
-    <div class="relative bg-zinc-950 text-white overflow-hidden max-h-[95vh] flex flex-col">
-      <!-- Top Sticky Header -->
-      <div
-        class="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-10">
-        <div class="flex items-center gap-2">
-          <Scale class="w-5 h-5 text-admin-modern" />
-          <span class="text-xs font-black uppercase tracking-widest text-zinc-400">Legal Document Intelligence</span>
+  <Modal :show="show" @close="emit('close')" maxWidth="4xl">
+    <div class="relative bg-zinc-950 text-white overflow-hidden max-h-[92vh] flex flex-col rounded-3xl border border-white/10 shadow-2xl">
+      <!-- Top Header -->
+      <div class="flex items-start justify-between gap-4 p-6 sm:p-8 border-b border-white/10 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-10">
+        <div class="space-y-2 flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span v-if="caseNumber"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+              {{ caseNumber }}
+            </span>
+            <span
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
+              {{ court }}
+            </span>
+            <span v-if="reportable"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Reportable Precedent
+            </span>
+          </div>
+          <h2 class="text-base sm:text-lg font-black text-white leading-snug break-words">
+            {{ title }}
+          </h2>
         </div>
         <button @click="emit('close')"
-          class="p-1.5 bg-zinc-800/80 border border-white/10 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-all"
-          title="Close Document">
-          <X class="w-4 h-4" />
+          class="p-2 text-zinc-400 hover:text-white rounded-xl bg-white/5 hover:bg-white/10 transition-all shrink-0 cursor-pointer"
+          title="Close Dossier">
+          <X class="w-5 h-5" />
         </button>
       </div>
 
       <!-- Scrollable content area -->
-      <div class="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
+      <div class="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar space-y-6">
         <!-- Loading State -->
-        <div v-if="loading" class="space-y-6">
-          <Skeleton width="60%" height="2rem" class="bg-zinc-800/60" />
-          <Skeleton width="40%" height="1.2rem" class="bg-zinc-800/60" />
-          <Skeleton width="100%" height="16rem" class="bg-zinc-800/60 rounded-xl" />
+        <div v-if="loading" class="space-y-4">
+          <Skeleton width="100%" height="4rem" class="bg-zinc-800/60 rounded-2xl" />
+          <Skeleton width="100%" height="6rem" class="bg-zinc-800/60 rounded-2xl" />
+          <Skeleton width="100%" height="12rem" class="bg-zinc-800/60 rounded-2xl" />
         </div>
 
-        <!-- Document Detail Loaded -->
+        <!-- Loaded Content -->
         <div v-else-if="recordDetail" class="space-y-6">
-
-          <!-- 1. COURT ROLLS LAYOUT (Compact, schedule style) -->
-          <div v-if="getDocumentType(recordDetail) === 'court_roll'" class="space-y-4">
-            <div class="flex items-start gap-4 p-5 rounded-2xl bg-zinc-900/60 border border-white/5 shadow-inner">
-              <div
-                class="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/10 text-admin-modern shrink-0">
-                <Calendar class="w-5 h-5" />
-              </div>
-              <div class="space-y-2 flex-1">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span
-                    class="px-2 py-0.5 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern text-[9px] font-black uppercase tracking-widest rounded">Court
-                    Roll</span>
-                  <span v-if="recordDetail?.document_date"
-                    class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">{{
-                      recordDetail.document_date
-                    }}</span>
-                  <span v-if="getCourtLocation(recordDetail?.data)"
-                    class="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">&bull; {{
-                      getCourtLocation(recordDetail.data) }}</span>
-                </div>
-                <h2 class="text-lg font-black uppercase tracking-tight text-white leading-snug">
-                  {{ recordDetail?.data?.title || recordDetail?.data?.name || 'Court Roll Schedule' }}
-                </h2>
-                <p class="text-xs font-bold text-zinc-400">
-                  <span class="text-zinc-600 uppercase tracking-widest text-[9px] mr-1">Forum:</span>
-                  {{ formatCourtName(recordDetail?.data?.court) || recordDetail?.record_type }}
-                </p>
-              </div>
+          <!-- Case Metadata 4-Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5">
+              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Judgment Date</span>
+              <span class="font-bold text-white mt-1 block">{{ judgmentDate }}</span>
             </div>
-
-            <!-- Compact Text Block -->
-            <div v-if="getDocumentBodyText(recordDetail?.data)"
-              class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-300 whitespace-pre-line max-h-[350px] overflow-y-auto custom-scrollbar">
-              {{ getDocumentBodyText(recordDetail.data) }}
+            <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5">
+              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Hearing Date</span>
+              <span class="font-bold text-white mt-1 block">{{ hearingDate }}</span>
             </div>
-
-            <!-- Clean minimal detail list -->
-            <div
-              class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-zinc-900/30 p-4 rounded-xl border border-white/5">
-              <div v-for="item in getFilteredMetadata(recordDetail?.data)" :key="item.label"
-                class="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
-                <span class="font-mono text-zinc-300 font-bold truncate max-w-[200px]">{{ formatValue(item.value) }}</span>
-              </div>
-              <div v-if="recordDetail?.source_url"
-                class="flex items-center justify-between py-1 col-span-1 sm:col-span-2 border-t border-white/5 mt-1 pt-2">
-                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Source Link</span>
-                <a :href="recordDetail.source_url" target="_blank"
-                  class="text-admin-modern hover:underline flex items-center gap-1 font-bold">
-                  Go to Original
-                  <ExternalLink class="w-3 h-3" />
-                </a>
-              </div>
+            <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5">
+              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Adjudication Duration</span>
+              <span class="font-bold text-primary mt-1 block">{{ durationDays !== null ? durationDays + ' days' : 'N/A' }}</span>
+            </div>
+            <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5">
+              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Location</span>
+              <span class="font-bold text-white mt-1 block truncate">{{ courtLocation }}</span>
             </div>
           </div>
 
-          <!-- 2. GAZETTE & JOURNAL LAYOUT (Formatted, premium printed text document) -->
-          <div v-else-if="['gazette', 'journal'].includes(getDocumentType(recordDetail))"
-            class="max-w-3xl mx-auto space-y-8 py-2">
-
-            <!-- Document Header Block -->
-            <div class="border-b-2 border-white/10 pb-6 text-center space-y-4">
-              <div class="flex items-center justify-center gap-2">
-                <span
-                  class="px-3 py-1 bg-white text-black text-[9px] font-black uppercase tracking-[0.2em] rounded-full">
-                  {{ getDocumentType(recordDetail) === 'gazette' ? 'Official Gazette Notice' : 'Academic Law Journal' }}
-                </span>
-              </div>
-
-              <h1
-                class="font-serif text-3xl sm:text-4xl font-black text-white tracking-tight leading-snug max-w-2xl mx-auto">
-                {{ recordDetail?.data?.title || recordDetail?.data?.name || 'Publication Document' }}
-              </h1>
-
-              <!-- Formal Sub-Header -->
-              <div
-                class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                <span v-if="recordDetail?.data?.publisher || recordDetail?.data?.journal_name"
-                  class="flex items-center gap-1">
-                  <span class="text-zinc-600">Publisher:</span>
-                  {{ recordDetail.data.publisher || recordDetail.data.journal_name }}
-                </span>
-                <span v-if="getCourtLocation(recordDetail?.data)" class="flex items-center gap-1">
-                  <span class="text-zinc-600">Location:</span>
-                  {{ getCourtLocation(recordDetail.data) }}
-                </span>
-                <span v-if="recordDetail?.data?.gazette_number || recordDetail?.data?.volume"
-                  class="flex items-center gap-1">
-                  <span class="text-zinc-600">Reference:</span>
-                  <code>{{ recordDetail.data.gazette_number || recordDetail.data.volume }}</code>
-                </span>
-                <span v-if="recordDetail?.document_date" class="flex items-center gap-1">
-                  <span class="text-zinc-600">Date:</span>
-                  {{ recordDetail.document_date }}
-                </span>
-              </div>
-
-              <!-- Abstract / Summary Callout in reader layout -->
-              <div v-if="getDocumentSummary(recordDetail?.data)"
-                class="text-left bg-zinc-900/40 border border-white/5 p-5 rounded-2xl max-w-2xl mx-auto">
-                <p class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2">Abstract / Executive
-                  Summary
-                </p>
-                <p class="text-xs leading-relaxed text-zinc-300 font-medium whitespace-pre-line">{{
-                  getDocumentSummary(recordDetail.data) }}</p>
-              </div>
+          <!-- Judicial Bench & Litigants -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="bg-zinc-900/40 p-4 rounded-2xl border border-white/5 space-y-1">
+              <span class="text-[10px] text-primary font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Users class="w-3.5 h-3.5" /> Judicial Bench
+              </span>
+              <p class="font-medium text-white">
+                {{ judges.length ? judges.join(', ') : 'Superior Court Appellate Bench / CCMA Commissioner' }}
+              </p>
             </div>
-
-            <!-- Main Reading Body (No table, premium formatted document look and feel) -->
-            <div v-if="getDocumentBodyText(recordDetail?.data)"
-              class="prose prose-invert font-serif max-w-none text-zinc-200 leading-relaxed text-base space-y-6 whitespace-pre-line px-2 sm:px-6">
-              {{ getDocumentBodyText(recordDetail.data) }}
-            </div>
-
-            <!-- End of Document Footer / Details section (subtle, clean) -->
-            <div class="border-t border-white/10 pt-6 mt-10">
-              <div
-                class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                <div class="flex flex-wrap gap-2">
-                  <span v-for="item in getFilteredMetadata(recordDetail?.data)" :key="item.label"
-                    class="px-2.5 py-1 bg-zinc-900/60 border border-white/5 rounded-lg text-zinc-400">
-                    <strong>{{ item.label }}:</strong> {{ formatValue(item.value) }}
-                  </span>
-                </div>
-                <a v-if="recordDetail?.source_url" :href="recordDetail.source_url" target="_blank"
-                  class="text-admin-modern hover:underline flex items-center gap-1 shrink-0 font-black tracking-widest text-[9px]">
-                  Go to Source
-                  <ExternalLink class="w-3.5 h-3.5" />
-                </a>
-              </div>
+            <div class="bg-zinc-900/40 p-4 rounded-2xl border border-white/5 space-y-1">
+              <span class="text-[10px] text-primary font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <Scale class="w-3.5 h-3.5" /> Litigant Parties
+              </span>
+              <p class="font-medium text-white truncate"><strong>Applicant / Employee:</strong> {{ applicant }}</p>
+              <p class="font-medium text-zinc-300 truncate"><strong>Respondent / Employer:</strong> {{ respondent }}</p>
             </div>
           </div>
 
-          <!-- 3. CASE LAW / COURT JUDGMENTS LAYOUT (Default detailed case view) -->
-          <div v-else class="space-y-6">
-            <!-- Title & Metadata Header -->
-            <div class="border-b border-white/10 pb-6">
-              <h2 class="text-2xl font-black uppercase tracking-tight text-white mb-3">
-                {{ recordDetail?.data?.title || recordDetail?.data?.name || 'Legal Record Details' }}
-              </h2>
-              <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-zinc-300">
-                <span v-if="recordDetail?.data?.court" class="flex items-center gap-1">
-                  <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Forum:</span> {{
-                    formatCourtName(recordDetail.data.court) }}
-                </span>
-                <span v-if="getCourtLocation(recordDetail?.data)" class="flex items-center gap-1">
-                  <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Location:</span> {{
-                    getCourtLocation(recordDetail.data) }}
-                </span>
-                <span v-if="recordDetail?.data?.case_number" class="flex items-center gap-1">
-                  <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Case #:</span> {{
-                    recordDetail.data.case_number }}
-                </span>
-                <span v-if="recordDetail?.document_date" class="flex items-center gap-1">
-                  <span class="text-zinc-500 uppercase tracking-widest text-[9px]">Date:</span> {{
-                    recordDetail.document_date }}
-                </span>
-                <a v-if="recordDetail?.source_url" :href="recordDetail.source_url" target="_blank"
-                  class="text-admin-modern hover:underline flex items-center gap-1">
-                  Original Source
-                  <ExternalLink class="w-3.5 h-3.5" />
-                </a>
+          <!-- Core Legal Intelligence Sections -->
+          <div class="space-y-4">
+            <!-- Ratio Decidendi -->
+            <div v-if="ratioDecidendi" class="bg-amber-500/[0.04] border border-amber-500/20 p-5 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2">
+                <Bookmark class="w-4 h-4 text-amber-400" />
+                <span class="text-xs font-black uppercase tracking-wider text-amber-400">Ratio Decidendi (Binding Legal Principle)</span>
               </div>
+              <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line">
+                {{ ratioDecidendi }}
+              </p>
             </div>
 
-            <!-- Highlight Callout Boxes (Result / Holding / Order) -->
-            <div v-if="getDocumentHolding(recordDetail.data)"
-              class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium space-y-1">
-              <div class="flex items-center gap-2 text-emerald-400 font-black uppercase text-[10px] tracking-widest">
-                <CheckCircle2 class="w-4 h-4" /> Holding & Final Order
+            <!-- Executive Summary -->
+            <div v-if="summary" class="bg-zinc-900/60 border border-white/5 p-5 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2">
+                <FileText class="w-4 h-4 text-primary" />
+                <span class="text-xs font-black uppercase tracking-wider text-primary">Executive Summary</span>
               </div>
-              <p class="leading-relaxed">{{ getDocumentHolding(recordDetail.data) }}</p>
+              <p class="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">
+                {{ summary }}
+              </p>
             </div>
 
-            <div v-if="getDocumentDismissal(recordDetail.data)"
-              class="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium space-y-1">
-              <div class="flex items-center gap-2 text-rose-400 font-black uppercase text-[10px] tracking-widest">
-                <AlertTriangle class="w-4 h-4" /> Reason for Dismissal
+            <!-- Reason for Dismissal / Subjects (for CCMA/Labour) -->
+            <div v-if="dismissalReason && !ratioDecidendi" class="bg-rose-500/[0.04] border border-rose-500/20 p-5 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2">
+                <AlertTriangle class="w-4 h-4 text-rose-400" />
+                <span class="text-xs font-black uppercase tracking-wider text-rose-400">Dispute Classification &amp; Ground</span>
               </div>
-              <p class="leading-relaxed">{{ getDocumentDismissal(recordDetail.data) }}</p>
+              <p class="text-xs text-zinc-200 leading-relaxed">
+                {{ dismissalReason }}
+              </p>
             </div>
 
-            <div v-if="getDocumentSummary(recordDetail.data)"
-              class="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium space-y-1">
-              <div class="flex items-center gap-2 text-amber-400 font-black uppercase text-[10px] tracking-widest">
-                <FileCheck class="w-4 h-4" /> Summary & Headnotes
+            <!-- Obiter Dicta -->
+            <div v-if="obiterDicta" class="bg-purple-500/[0.04] border border-purple-500/20 p-5 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2">
+                <Compass class="w-4 h-4 text-purple-400" />
+                <span class="text-xs font-black uppercase tracking-wider text-purple-400">Obiter Dicta (Judicial Observations)</span>
               </div>
-              <p class="whitespace-pre-line leading-relaxed">{{ getDocumentSummary(recordDetail.data) }}</p>
+              <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line">
+                {{ obiterDicta }}
+              </p>
             </div>
 
-            <!-- Full Judgment Text Viewer -->
-            <div v-if="getDocumentBodyText(recordDetail.data)" class="space-y-2">
-              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Full Judgment Text</h3>
-              <div
-                class="p-6 rounded-2xl bg-black/60 border border-white/10 font-serif text-sm leading-relaxed text-zinc-200 whitespace-pre-line max-h-[500px] overflow-y-auto custom-scrollbar">
-                {{ getDocumentBodyText(recordDetail.data) }}
+            <!-- Order / Relief -->
+            <div v-if="order" class="bg-emerald-500/[0.04] border border-emerald-500/20 p-5 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2">
+                <CheckCircle2 class="w-4 h-4 text-emerald-400" />
+                <span class="text-xs font-black uppercase tracking-wider text-emerald-400">Formal Judicial Order &amp; Relief Granted</span>
               </div>
-            </div>
-
-            <!-- Metadata Attributes Grid (Alphabetically sorted, filtered) -->
-            <div v-if="getFilteredMetadata(recordDetail.data).length > 0" class="space-y-2">
-              <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Document Metadata Attributes</h3>
-              <div
-                class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-black/40 p-5 rounded-2xl border border-white/10">
-                <div v-for="item in getFilteredMetadata(recordDetail.data)" :key="item.label"
-                  class="flex flex-col gap-0.5">
-                  <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">{{ item.label }}</span>
-                  <span class="font-mono text-zinc-200 break-all">{{ formatValue(item.value) }}</span>
-                </div>
-              </div>
+              <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line font-mono text-[11px]">
+                {{ order }}
+              </p>
             </div>
           </div>
 
+          <!-- Precedents Cited Table -->
+          <div v-if="precedentsCited && precedentsCited.length" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                <BookOpen class="w-4 h-4 text-primary" />
+                Cited Legal Precedents &amp; Authorities ({{ precedentsCount }})
+              </span>
+            </div>
+
+            <div class="max-h-60 overflow-y-auto custom-scrollbar">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[9px]">
+                    <th class="py-2 px-2">Authority / Citation</th>
+                    <th class="py-2 px-2">Treatment</th>
+                    <th class="py-2 px-2 text-right">Reference</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-zinc-300">
+                  <tr v-for="p in precedentsCited" :key="p.case_name_citation || p.citation" class="hover:bg-white/[0.02]">
+                    <td class="py-2 px-2 font-medium text-white">{{ p.case_name_citation || p.citation }}</td>
+                    <td class="py-2 px-2">
+                      <span class="px-2 py-0.5 rounded text-[9px] font-bold"
+                        :class="p.treatment === 'Applied/Followed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-primary/10 text-primary border border-primary/20'">
+                        {{ p.treatment || 'Referred' }}
+                      </span>
+                    </td>
+                    <td class="py-2 px-2 text-right">
+                      <a v-if="p.url" :href="p.url" target="_blank" rel="noopener noreferrer"
+                        class="text-primary hover:underline inline-flex items-center gap-1 text-[10px]">
+                        LawCite <ExternalLink class="w-3 h-3" />
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Modal Actions Footer -->
+      <div class="p-4 sm:px-8 border-t border-white/10 bg-zinc-900/60 flex items-center justify-between">
+        <div>
+          <a v-if="sourceUrl" :href="sourceUrl" target="_blank" rel="noopener noreferrer"
+            class="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white flex items-center gap-2 transition-all">
+            <span>Open Source Record</span>
+            <ExternalLink class="w-3.5 h-3.5" />
+          </a>
+        </div>
+        <button @click="emit('close')" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
+          Close Dossier
+        </button>
       </div>
     </div>
   </Modal>

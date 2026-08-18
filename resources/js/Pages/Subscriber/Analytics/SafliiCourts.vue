@@ -320,8 +320,8 @@ const filterByJudgeQuick = (judgeName) => {
             <!-- Tab Navigation Bar -->
             <div class="flex items-center gap-2 border-b border-white/5 pb-2 overflow-x-auto custom-scrollbar">
                 <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
-                    class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0"
-                    :class="activeTab === tab.id ? 'bg-admin-modern text-black shadow-lg shadow-admin-modern/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
+                    class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 cursor-pointer"
+                    :class="activeTab === tab.id ? 'btn btn-primary font-bold shadow-lg shadow-primary/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
                     <component :is="tab.icon" class="w-4 h-4" />
                     {{ tab.label }}
                 </button>
@@ -527,7 +527,7 @@ const filterByJudgeQuick = (judgeName) => {
                             <div class="flex items-center gap-3 text-xs text-zinc-400">
                                 <span v-if="c.judgment_date">{{ c.judgment_date }}</span>
                                 <button @click="openCaseDossier(c)"
-                                    class="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl bg-admin-modern text-black hover:bg-admin-modern-hover transition-all flex items-center gap-1.5 shadow-md shadow-admin-modern/10">
+                                    class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
                                     <span>View Dossier</span>
                                     <Scale class="w-3.5 h-3.5" />
                                 </button>
@@ -727,7 +727,7 @@ const filterByJudgeQuick = (judgeName) => {
                         <span>Open Source on SAFLII</span>
                         <ExternalLink class="w-3.5 h-3.5" />
                     </a>
-                    <button @click="selectedCase = null" class="px-5 py-2.5 rounded-xl text-xs font-black bg-admin-modern text-black hover:bg-admin-modern-hover transition-all">
+                    <button @click="selectedCase = null" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
                         Close Dossier
                     </button>
                 </div>

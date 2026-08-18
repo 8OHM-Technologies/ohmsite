@@ -10,12 +10,21 @@ import {
   Search,
   Eye,
   RefreshCw,
-  Database
+  Database,
+  LayoutGrid,
+  List,
+  ExternalLink,
+  Users,
+  BookOpen,
+  Bookmark,
+  Clock,
+  Sparkles
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Skeleton from 'primevue/skeleton';
+import Paginator from 'primevue/paginator';
 import type { DataTablePageEvent, DataTableSortEvent, DataTableFilterEvent } from 'primevue/datatable';
 
 type DataTableLazyLoadEvent = DataTablePageEvent | DataTableSortEvent | DataTableFilterEvent;
@@ -49,6 +58,8 @@ interface RecordSummary {
   source_table: string;
   record_type: string;
   document_date: string | null;
+  judgment_date?: string | null;
+  hearing_date?: string | null;
   court: string;
   case_number: string | null;
   title: string;
@@ -58,6 +69,14 @@ interface RecordSummary {
   subjects: string | null;
   outcome: string | null;
   summary: string | null;
+  ratio_decidendi?: string | null;
+  obiter_dicta?: string | null;
+  order?: string | null;
+  judges?: string[];
+  precedents_count?: number;
+  reportable?: boolean;
+  duration_days?: number | null;
+  court_location?: string | null;
 }
 
 const records = ref<RecordSummary[]>([]);
@@ -65,12 +84,18 @@ const totalRecords = ref(0);
 const loading = ref(false);
 const searchQuery = ref('');
 const selectedRecordType = ref('');
+const viewMode = ref<'cards' | 'table'>('cards');
 
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
 
-const lazyParams = ref<Partial<DataTableLazyLoadEvent>>({
+const lazyParams = ref<{
+  first: number;
+  rows: number;
+  sortField: string;
+  sortOrder: number;
+}>({
   first: 0,
   rows: 25,
   sortField: 'created_at',
@@ -79,14 +104,19 @@ const lazyParams = ref<Partial<DataTableLazyLoadEvent>>({
 
 let searchDebounceTimer: any = null;
 
-const loadLazyRecords = async (event?: DataTableLazyLoadEvent) => {
+const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page: number; first: number; rows: number }) => {
   loading.value = true;
-  const currentParams = event || lazyParams.value;
+  if (event) {
+    if (event.first !== undefined) lazyParams.value.first = event.first;
+    if (event.rows !== undefined) lazyParams.value.rows = event.rows;
+    if ('sortField' in event && event.sortField !== undefined) lazyParams.value.sortField = event.sortField as string;
+    if ('sortOrder' in event && event.sortOrder !== undefined) lazyParams.value.sortOrder = event.sortOrder as number;
+  }
 
-  const first = currentParams.first || 0;
-  const rows = currentParams.rows || 25;
-  const sortField = (currentParams.sortField as string) || 'created_at';
-  const sortOrder = currentParams.sortOrder || -1;
+  const first = lazyParams.value.first || 0;
+  const rows = lazyParams.value.rows || 25;
+  const sortField = lazyParams.value.sortField || 'created_at';
+  const sortOrder = lazyParams.value.sortOrder || -1;
 
   try {
     const response = await axios.get('/legal-records/data', {
@@ -111,7 +141,12 @@ const loadLazyRecords = async (event?: DataTableLazyLoadEvent) => {
 };
 
 const onLazy = (event: DataTableLazyLoadEvent) => {
-  lazyParams.value = event;
+  loadLazyRecords(event);
+};
+
+const onPageChange = (event: any) => {
+  lazyParams.value.first = event.first;
+  lazyParams.value.rows = event.rows;
   loadLazyRecords(event);
 };
 
@@ -208,7 +243,7 @@ onMounted(() => {
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-xl bg-admin-modern/10 border border-admin-modern/20 flex items-center justify-center text-admin-modern shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
             <Scale class="w-5 h-5" />
           </div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
@@ -217,15 +252,31 @@ onMounted(() => {
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            Open Access South African Case Law from the Constitutional Court, Supreme Court of Appeal, High Courts, and CCMA Awards
+            Open Access South African Case Law from Superior Courts, High Courts, and CCMA Awards
           </p>
         </div>
       </div>
 
       <div class="flex items-center gap-3">
+        <!-- View Mode Switcher -->
+        <div class="flex items-center bg-black/60 border border-white/10 rounded-xl p-1">
+          <button @click="viewMode = 'cards'"
+            class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            :class="viewMode === 'cards' ? 'btn btn-primary font-bold shadow-md shadow-primary/20' : 'text-zinc-400 hover:text-white'">
+            <LayoutGrid class="w-3.5 h-3.5" />
+            <span class="hidden sm:inline">Dossier Cards</span>
+          </button>
+          <button @click="viewMode = 'table'"
+            class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            :class="viewMode === 'table' ? 'btn btn-primary font-bold shadow-md shadow-primary/20' : 'text-zinc-400 hover:text-white'">
+            <List class="w-3.5 h-3.5" />
+            <span class="hidden sm:inline">Table Grid</span>
+          </button>
+        </div>
+
         <span
-          class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-admin-modern shadow-md">
-          <span class="w-2 h-2 rounded-full bg-admin-modern animate-pulse"></span>
+          class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary shadow-md">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           {{ totalRecords.toLocaleString() }} Active Records
         </span>
       </div>
@@ -240,15 +291,15 @@ onMounted(() => {
         <div class="relative flex-1 max-w-2xl">
           <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input type="text" v-model="searchQuery" @input="onSearchInput"
-            placeholder="Search by Case #, Applicant, Respondent, Court, or Keywords..."
-            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50 placeholder:text-zinc-500 shadow-inner" />
+            placeholder="Search by Case #, Applicant, Respondent, Court, or Legal Keywords..."
+            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
         </div>
 
         <!-- Court / Source Dropdown Selection -->
         <div class="flex flex-wrap items-center gap-3">
           <div class="relative min-w-[260px]">
             <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
-              class="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:ring-1 focus:ring-admin-modern/50 focus:border-admin-modern/50">
+              class="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50">
               <option value="">All Courts &amp; CCMA</option>
               <option v-for="filter in filters" :key="filter.target_name" :value="filter.target_name">
                 {{ filter.vanity_name }}
@@ -257,7 +308,7 @@ onMounted(() => {
           </div>
 
           <button @click="loadLazyRecords()"
-            class="p-3 bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-xl transition-all flex items-center justify-center"
+            class="p-3 bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-xl transition-all flex items-center justify-center cursor-pointer"
             title="Refresh Dataset">
             <RefreshCw class="w-4 h-4" />
           </button>
@@ -265,12 +316,129 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- PrimeVue DataTable Container -->
-    <div class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
+    <!-- VIEW MODE 1: JUDICIAL DECISION EXPLORER & DOSSIER INDEX (CARDS VIEW) -->
+    <div v-if="viewMode === 'cards'" class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
+            <Sparkles class="w-4 h-4 text-primary" />
+            Judicial Decision Explorer &amp; Dossier Index
+          </h3>
+          <p class="text-xs text-zinc-400">
+            Searchable repository of detailed court judgments with ratio decidendi, judges, citations, and complete dossiers.
+          </p>
+        </div>
+      </div>
+
+      <!-- Loading State Skeleton -->
+      <div v-if="loading" class="space-y-4">
+        <div v-for="i in 4" :key="i" class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between">
+            <Skeleton width="30%" height="1.5rem" class="bg-zinc-800" />
+            <Skeleton width="15%" height="1.5rem" class="bg-zinc-800" />
+          </div>
+          <Skeleton width="70%" height="1.8rem" class="bg-zinc-800" />
+          <Skeleton width="100%" height="4rem" class="bg-zinc-800 rounded-xl" />
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="records.length === 0" class="bg-zinc-900/40 rounded-[2rem] border border-white/5 py-20 text-center flex flex-col items-center">
+        <div class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
+          <Database class="w-8 h-8 text-zinc-600" />
+        </div>
+        <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No case records found</h3>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or court filter</p>
+      </div>
+
+      <!-- Dossier Cards Grid -->
+      <div v-else class="space-y-4">
+        <div v-for="c in records" :key="c.id"
+          class="bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all p-6 rounded-2xl space-y-4 group">
+          <!-- Card Header Badges & View Dossier Button -->
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span v-if="c.case_number"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                {{ c.case_number }}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
+                {{ formatCourtName(c.court) }}
+              </span>
+              <span v-if="c.reportable"
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Reportable Precedent
+              </span>
+              <span v-if="c.duration_days !== null && c.duration_days !== undefined"
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
+                <Clock class="w-3 h-3" /> {{ c.duration_days }}d to Judgment
+              </span>
+            </div>
+
+            <div class="flex items-center gap-3 text-xs text-zinc-400">
+              <span v-if="c.document_date || c.judgment_date" class="font-bold font-mono text-[11px] text-zinc-400">
+                {{ c.document_date || c.judgment_date }}
+              </span>
+              <button @click="viewRecordDetail(c)"
+                class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
+                <span>View Dossier</span>
+                <Scale class="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Case Title -->
+          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)">
+            {{ c.title }}
+          </h4>
+
+          <!-- Ratio Decidendi / Summary Excerpt -->
+          <div v-if="c.ratio_decidendi || c.summary" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1 mb-1.5">
+              <Bookmark class="w-3.5 h-3.5" />
+              {{ c.ratio_decidendi ? 'Ratio Decidendi / Core Principle' : 'Executive Summary / Matter' }}
+            </span>
+            <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300">
+              {{ c.ratio_decidendi || c.summary }}
+            </p>
+          </div>
+
+          <!-- Card Footer (Bench & Precedent Count) -->
+          <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
+            <div class="flex items-center gap-2">
+              <Users class="w-3.5 h-3.5 text-zinc-500" />
+              <span class="text-zinc-300 font-medium">
+                {{ c.judges && c.judges.length ? c.judges.join(', ') : (c.applicant && c.respondent ? c.applicant + ' v ' + c.respondent : 'Bench / Commissioner Panel') }}
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4 text-[11px]">
+              <span v-if="c.precedents_count !== undefined && c.precedents_count > 0" class="flex items-center gap-1 text-primary font-bold">
+                <BookOpen class="w-3.5 h-3.5" />
+                {{ c.precedents_count }} Citations
+              </span>
+              <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
+                class="hover:text-white flex items-center gap-1 transition text-zinc-400">
+                <span>SAFLII Link</span>
+                <ExternalLink class="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paginator for Cards View -->
+        <div class="bg-zinc-900/40 rounded-2xl border border-white/5 p-4 flex justify-center">
+          <Paginator :first="lazyParams.first" :rows="lazyParams.rows" :totalRecords="totalRecords"
+            :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange" class="p-datatable-dark-custom" />
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW MODE 2: PRIME VUE DATATABLE -->
+    <div v-else class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
       <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" @page="onLazy"
-        @sort="onLazy" @filter="onLazy" paginator :rows="25" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
-        stateStorage="local" stateKey="legal-records-cases-datatable-state" tableStyle="min-width: 60rem"
-        class="p-datatable-dark-custom">
+        @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows" :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
+        tableStyle="min-width: 60rem" class="p-datatable-dark-custom">
         <template #empty>
           <div class="py-20 text-center flex flex-col items-center">
             <div
@@ -285,7 +453,7 @@ onMounted(() => {
         <Column field="case_number" header="Case Reference" sortable style="width: 18%">
           <template #body="{ data }">
             <span v-if="data.case_number"
-              class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-white/10 text-white rounded-lg inline-block shadow-sm">
+              class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
               {{ data.case_number }}
             </span>
             <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
@@ -295,10 +463,10 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="court" header="Court / Forum" sortable style="width: 18%">
+        <Column field="court" header="Court / Forum" sortable style="width: 20%">
           <template #body="{ data }">
             <span
-              class="px-3 py-1 bg-admin-modern/10 border border-admin-modern/30 text-admin-modern font-black text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
+              class="px-3 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
               {{ formatCourtName(data.court) }}
             </span>
           </template>
@@ -307,10 +475,10 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="document_date" header="Date" sortable style="width: 14%">
+        <Column field="document_date" header="Date" sortable style="width: 12%">
           <template #body="{ data }">
-            <span class="text-xs font-bold text-zinc-300 tracking-wider">
-              {{ data.document_date || 'N/A' }}
+            <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
+              {{ data.document_date || data.judgment_date || 'N/A' }}
             </span>
           </template>
           <template #loading>
@@ -318,15 +486,15 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="title" header="Title / Matter" style="width: 38%">
+        <Column field="title" header="Title / Matter" style="width: 36%">
           <template #body="{ data }">
             <div
-              class="font-black text-sm text-white uppercase tracking-tight hover:text-admin-modern transition cursor-pointer"
+              class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
               @click="viewRecordDetail(data)">
               {{ data.title }}
             </div>
-            <div v-if="data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1">
-              {{ data.summary }}
+            <div v-if="data.ratio_decidendi || data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1">
+              {{ data.ratio_decidendi || data.summary }}
             </div>
           </template>
           <template #loading>
@@ -334,12 +502,12 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column header="Actions" style="width: 12%" class="text-right">
+        <Column header="Actions" style="width: 14%" class="text-right">
           <template #body="{ data }">
             <button @click="viewRecordDetail(data)"
-              class="w-full sm:w-auto bg-white text-black px-4 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-admin-modern hover:text-black transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5">
-              <Eye class="w-3.5 h-3.5" />
-              View
+              class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
+              <Scale class="w-3.5 h-3.5" />
+              <span>Dossier</span>
             </button>
           </template>
         </Column>
@@ -418,10 +586,10 @@ onMounted(() => {
 }
 
 .p-datatable-dark-custom .p-paginator .p-paginator-page.p-highlight {
-  background: #ffffff !important;
+  background: var(--color-primary, #ff8800) !important;
   color: #000000 !important;
   font-weight: 900 !important;
-  border-color: #ffffff !important;
+  border-color: var(--color-primary, #ff8800) !important;
 }
 
 .p-datatable-dark-custom .p-paginator svg,

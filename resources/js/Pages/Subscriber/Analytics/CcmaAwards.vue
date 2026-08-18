@@ -378,8 +378,8 @@ const employerSignatureSeries = computed(() => profileEmployerStats.value?.signa
             <!-- Tab Selector -->
             <div class="flex items-center gap-2 border-b border-white/5 pb-2 overflow-x-auto custom-scrollbar">
                 <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
-                    class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0"
-                    :class="activeTab === tab.id ? 'bg-admin-modern text-black shadow-lg shadow-admin-modern/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
+                    class="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 cursor-pointer"
+                    :class="activeTab === tab.id ? 'btn btn-primary font-bold shadow-lg shadow-primary/20' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
                     <component :is="tab.icon" class="w-4 h-4" />
                     {{ tab.label }}
                 </button>

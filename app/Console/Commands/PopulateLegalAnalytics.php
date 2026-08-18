@@ -3,9 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\CcmaAnalytics;
-use App\Models\LegalAnalytics;
 use App\Models\ExtractedRecord;
+use App\Models\LegalAnalytics;
 use App\Models\ScrubbedRecord;
+use App\Models\TargetVanity;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,14 +19,14 @@ class PopulateLegalAnalytics extends Command
      *
      * @var string
      */
-    protected $signature = 'legal-analytics:populate {--limit=1000 : The maximum number of records to process}';
+    protected $signature = 'legal-analytics:populate {--limit=1000 : The maximum number of records to process} {--fresh : Truncate and re-sync all records from scratch}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Populate the legal analytics database from detailed SAFLII records in batches';
+    protected $description = 'Populate the legal analytics database from scrubbed records in batches';
 
     /**
      * Execute the console command.
@@ -44,17 +45,23 @@ class PopulateLegalAnalytics extends Command
     private function doHandle(): int
     {
         $limit = (int) $this->option('limit');
+        $fresh = (bool) $this->option('fresh');
+
+        if ($fresh) {
+            $this->info("Fresh mode enabled: truncating local legal_analytics table...");
+            LegalAnalytics::truncate();
+        }
 
         $this->info("Starting population of legal analytics database. Max limit: {$limit} records.");
 
         // 1. Retrieve all local extracted_record_id values from legal_analytics
-        $localIds = LegalAnalytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
+        $localIds = $fresh ? [] : LegalAnalytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
         $localIdsMap = array_flip($localIds);
 
-        // 2. Retrieve all detailed saflii record IDs from coeus (very small memory footprint for IDs only)
-        $coeusIds = ExtractedRecord::where('record_type', '!=', 'sabinet_ccma')
-            ->where('status', 'detailed')
-            ->pluck('id')
+        // 2. Retrieve all valid IDs from scrubbed_records (where extracted_records.record_type != 'sabinet_ccma')
+        $coeusIds = ScrubbedRecord::join('extracted_records', 'scrubbed_records.extracted_record_id', '=', 'extracted_records.id')
+            ->where('extracted_records.record_type', '!=', 'sabinet_ccma')
+            ->pluck('scrubbed_records.extracted_record_id')
             ->toArray();
         $coeusIdsMap = array_flip($coeusIds);
 
@@ -112,14 +119,13 @@ class PopulateLegalAnalytics extends Command
 
             // Fetch, parse, and insert records in small, isolated database batches of 10 to prevent memory exhaustion
             foreach (array_chunk($newIdsToProcess, 10) as $chunkIds) {
-                $records = ExtractedRecord::with(['scrubbedRecord', 'target'])
-                    ->whereIn('id', $chunkIds)
+                $records = ScrubbedRecord::with(['extractedRecord.target'])
+                    ->whereIn('extracted_record_id', $chunkIds)
                     ->get();
 
                 $chunkPrepared = [];
-                foreach ($records as $record) {
-                    // Prefer scrubbed data if available, fall back to raw extracted data
-                    $payload = $record->scrubbedRecord ? $record->scrubbedRecord->data : $record->data;
+                foreach ($records as $scrubbedRecord) {
+                    $payload = $scrubbedRecord->data;
 
                     if (empty($payload)) {
                         $skippedCount++;
@@ -127,22 +133,39 @@ class PopulateLegalAnalytics extends Command
                     }
 
                     try {
-                        $target = $record->target;
-                        $targetType = $target ? $target->target_type : 'cases';
-                        $targetName = $target ? $target->target_name : 'Unknown';
+                        $extractedRecord = $scrubbedRecord->extractedRecord;
+                        $target = $extractedRecord?->target;
+
+                        $extData = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
+                        $metaData = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
+
+                        $sourceUrl = $extractedRecord?->source_url ?? $payload['url'] ?? $payload['source_url'] ?? null;
+
+                        $extractedCode = null;
+                        $extractedType = 'cases';
+                        if (!empty($sourceUrl) && preg_match('/\/(cases|journals|gazettes|other|rolls)\/([A-Za-z0-9_-]+)\//i', $sourceUrl, $m)) {
+                            $extractedType = strtolower($m[1]) === 'gazettes' ? 'gaz' : (strtolower($m[1]) === 'rolls' ? 'other' : strtolower($m[1]));
+                            $extractedCode = $m[2];
+                        }
+
+                        $court = $extData['court'] ?? $payload['court'] ?? $metaData['entity_name'] ?? $extractedCode;
+
+                        $vanityMatch = null;
+                        if ($extractedCode || $court) {
+                            $codeCandidate = $extractedCode ?: $court;
+                            $vanityMatch = TargetVanity::where('target_name', $codeCandidate)
+                                ->orWhere('target_name', strtoupper($codeCandidate))
+                                ->first();
+                        }
+
+                        $targetType = $vanityMatch?->target_type ?: ($target?->target_type ?: ($metaData['target_type'] ?? $extractedType));
+                        $targetName = $vanityMatch?->target_name ?: ($extractedCode ?: ($court ?: ($target?->target_name ?: 'Unknown')));
 
                         // Clean target name and target type to ensure they are never null or empty strings
                         $targetType = empty($targetType) ? 'cases' : $targetType;
                         $targetName = empty($targetName) ? 'Unknown' : $targetName;
 
-                        $extData = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
-                        $metaData = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
-
                         $title = $payload['title'] ?? $payload['name'] ?? null;
-                        if (empty($title) && ! empty($record->data)) {
-                            $rawPayload = is_string($record->data) ? json_decode($record->data, true) : (array)$record->data;
-                            $title = $rawPayload['title'] ?? $rawPayload['name'] ?? null;
-                        }
                         if (empty($title)) {
                             $applicant = $extData['applicant_plaintiff'] ?? $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
                             $respondent = $extData['respondent_defendant'] ?? $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
@@ -156,22 +179,26 @@ class PopulateLegalAnalytics extends Command
                                 $title = $applicant . ' v ' . $respondent;
                             }
                         }
-                        $title = $title ?: ('Record #' . substr($record->id, 0, 8));
+                        if (empty($title) && ! empty($extractedRecord?->data)) {
+                            $rawPayload = is_string($extractedRecord->data) ? json_decode($extractedRecord->data, true) : (array) $extractedRecord->data;
+                            $title = $rawPayload['title'] ?? $rawPayload['name'] ?? null;
+                        }
+                        $title = $title ?: ('Record #' . substr($scrubbedRecord->extracted_record_id, 0, 8));
 
-                        $documentDate = $record->document_date ? $record->document_date->toDateString() : ($extData['judgment_date'] ?? $metaData['document_date'] ?? $payload['judgment_date'] ?? $payload['date'] ?? null);
-                        $court = $extData['court'] ?? $payload['court'] ?? $targetName;
-                        $caseNumber = $metaData['case_number'] ?? $payload['case_number'] ?? $payload['dataset_number'] ?? $payload['gazette_number'] ?? $payload['volume'] ?? null;
+                        $documentType = $metaData['record_type'] ?? $extractedRecord?->record_type ?? 'saflii_courts';
+                        $documentDate = $extractedRecord?->document_date ? $extractedRecord->document_date->toDateString() : ($extData['judgment_date'] ?? $extData['hearing_date'] ?? $metaData['document_date'] ?? $payload['judgment_date'] ?? $payload['date'] ?? null);
+                        $caseNumber = $metaData['case_number'] ?? $extData['case_number'] ?? $payload['case_number'] ?? $payload['dataset_number'] ?? $payload['gazette_number'] ?? $payload['volume'] ?? null;
 
                         $chunkPrepared[] = [
-                            'extracted_record_id' => $record->id,
+                            'extracted_record_id' => $scrubbedRecord->extracted_record_id,
                             'target_type' => $targetType,
                             'target_name' => $targetName,
                             'title' => $title,
-                            'document_type' => $record->record_type,
+                            'document_type' => $documentType,
                             'document_date' => $documentDate,
-                            'court' => $court,
+                            'court' => $court ?: $targetName,
                             'case_number' => $caseNumber,
-                            'source_url' => $record->source_url,
+                            'source_url' => $sourceUrl,
                             'data' => json_encode($payload),
                             'created_at' => now(),
                             'updated_at' => now(),

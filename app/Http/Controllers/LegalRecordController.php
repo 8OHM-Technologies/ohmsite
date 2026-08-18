@@ -134,23 +134,7 @@ class LegalRecordController extends Controller
                 }
 
                 $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(function ($row) {
-                    return [
-                        'id' => $row->id,
-                        'source_table' => 'ccma',
-                        'record_type' => $row->document_type,
-                        'document_date' => $row->award_date ? $row->award_date->toDateString() : null,
-                        'court' => $row->court,
-                        'case_number' => $row->award_number,
-                        'title' => $row->title,
-                        'source_url' => $row->detail_url,
-                        'applicant' => $row->employee,
-                        'respondent' => $row->employer,
-                        'subjects' => $row->reason_for_dismissal,
-                        'outcome' => $row->forum,
-                        'summary' => $row->reason_for_dismissal,
-                    ];
-                });
+                $records = $rows->map(fn ($row) => $this->formatCcmaRecord($row));
             } else {
                 // Specific Legal Analytics target
                 $query = LegalAnalytics::query()->where('target_name', $recordType);
@@ -180,35 +164,7 @@ class LegalRecordController extends Controller
                 }
 
                 $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(function ($row) {
-                    $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
-                    $applicant = $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
-                    if (is_array($applicant)) {
-                        $applicant = implode(', ', $applicant);
-                    }
-                    $respondent = $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
-                    if (is_array($respondent)) {
-                        $respondent = implode(', ', $respondent);
-                    }
-                    $subjects = $payload['reason_for_dismissal'] ?? $payload['subjects'] ?? $payload['subject'] ?? null;
-                    $outcome = $payload['result'] ?? $payload['order'] ?? $payload['holding'] ?? null;
-
-                    return [
-                        'id' => $row->id,
-                        'source_table' => 'legal',
-                        'record_type' => $row->document_type,
-                        'document_date' => $row->document_date ? $row->document_date->toDateString() : null,
-                        'court' => $row->court,
-                        'case_number' => $row->case_number,
-                        'title' => $row->title,
-                        'source_url' => $row->source_url,
-                        'applicant' => $applicant,
-                        'respondent' => $respondent,
-                        'subjects' => $subjects,
-                        'outcome' => $outcome,
-                        'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? null,
-                    ];
-                });
+                $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
             }
         } elseif ($category === 'journals') {
             // Journals & Gazettes only (pure legal_analytics)
@@ -239,24 +195,7 @@ class LegalRecordController extends Controller
             }
 
             $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(function ($row) {
-                $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
-                return [
-                    'id' => $row->id,
-                    'source_table' => 'legal',
-                    'record_type' => $row->document_type,
-                    'document_date' => $row->document_date ? $row->document_date->toDateString() : null,
-                    'court' => $row->court,
-                    'case_number' => $row->case_number,
-                    'title' => $row->title,
-                    'source_url' => $row->source_url,
-                    'applicant' => $payload['publisher'] ?? $payload['journal_name'] ?? null,
-                    'respondent' => null,
-                    'subjects' => $payload['subject'] ?? $payload['subjects'] ?? null,
-                    'outcome' => null,
-                    'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? $payload['abstract'] ?? null,
-                ];
-            });
+            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
         } elseif ($category === 'court_rolls') {
             // Court Rolls only (pure legal_analytics)
             $query = LegalAnalytics::query()->where('target_type', 'other');
@@ -286,24 +225,7 @@ class LegalRecordController extends Controller
             }
 
             $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(function ($row) {
-                $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
-                return [
-                    'id' => $row->id,
-                    'source_table' => 'legal',
-                    'record_type' => $row->document_type,
-                    'document_date' => $row->document_date ? $row->document_date->toDateString() : null,
-                    'court' => $row->court,
-                    'case_number' => $row->case_number,
-                    'title' => $row->title,
-                    'source_url' => $row->source_url,
-                    'applicant' => null,
-                    'respondent' => null,
-                    'subjects' => null,
-                    'outcome' => null,
-                    'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? null,
-                ];
-            });
+            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
         } else {
             // Cases or All (Union path)
             $ccmaQuery = DB::table('ccma_analytics')
@@ -320,7 +242,7 @@ class LegalRecordController extends Controller
                     'employer as respondent',
                     'reason_for_dismissal as subjects',
                     'forum as outcome',
-                    DB::raw("NULL as summary"),
+                    DB::raw("reason_for_dismissal as summary"),
                     DB::raw("NULL as data"),
                     DB::raw("'ccma' as source_table"),
                 ]);
@@ -382,53 +304,10 @@ class LegalRecordController extends Controller
             $rows = $query->offset($offset)->limit($limit)->get();
             $records = $rows->map(function ($row) {
                 if ($row->source_table === 'ccma') {
-                    return [
-                        'id' => $row->id,
-                        'source_table' => 'ccma',
-                        'record_type' => $row->record_type,
-                        'document_date' => $row->document_date ? substr((string)$row->document_date, 0, 10) : null,
-                        'court' => $row->court,
-                        'case_number' => $row->case_number,
-                        'title' => $row->title,
-                        'source_url' => $row->source_url,
-                        'applicant' => $row->applicant,
-                        'respondent' => $row->respondent,
-                        'subjects' => $row->subjects,
-                        'outcome' => $row->outcome,
-                        'summary' => $row->subjects,
-                    ];
-                } else {
-                    $payload = is_string($row->data) ? json_decode($row->data, true) : (array)$row->data;
-
-                    $applicant = $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
-                    if (is_array($applicant)) {
-                        $applicant = implode(', ', $applicant);
-                    }
-
-                    $respondent = $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
-                    if (is_array($respondent)) {
-                        $respondent = implode(', ', $respondent);
-                    }
-
-                    $subjects = $payload['reason_for_dismissal'] ?? $payload['subjects'] ?? $payload['subject'] ?? null;
-                    $outcome = $payload['result'] ?? $payload['order'] ?? $payload['holding'] ?? null;
-
-                    return [
-                        'id' => $row->id,
-                        'source_table' => 'legal',
-                        'record_type' => $row->record_type,
-                        'document_date' => $row->document_date ? substr((string)$row->document_date, 0, 10) : null,
-                        'court' => $row->court,
-                        'case_number' => $row->case_number,
-                        'title' => $row->title,
-                        'source_url' => $row->source_url,
-                        'applicant' => $applicant,
-                        'respondent' => $respondent,
-                        'subjects' => $subjects,
-                        'outcome' => $outcome,
-                        'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? null,
-                    ];
+                    return $this->formatCcmaRecord($row);
                 }
+
+                return $this->formatLegalRecord($row);
             });
         }
 
@@ -447,37 +326,146 @@ class LegalRecordController extends Controller
 
         if ($sourceTable === 'ccma') {
             $record = CcmaAnalytics::findOrFail($id);
-            $payload = [
-                'title' => $record->title,
-                'award_number' => $record->award_number,
-                'court' => $record->court,
-                'award_date' => $record->award_date ? $record->award_date->toDateString() : null,
-                'employee' => $record->employee,
-                'employer' => $record->employer,
-                'court_location' => $record->court_location,
-                'reason_for_dismissal' => $record->reason_for_dismissal,
-                'forum' => $record->forum,
-                'detail_url' => $record->detail_url,
-            ];
+            $formatted = $this->formatCcmaRecord($record);
             return response()->json([
                 'id' => $record->id,
                 'source_table' => 'ccma',
                 'record_type' => $record->document_type,
                 'document_date' => $record->award_date ? $record->award_date->toDateString() : null,
                 'source_url' => $record->detail_url,
-                'data' => $payload,
+                'data' => $formatted,
             ]);
         } else {
             $record = LegalAnalytics::findOrFail($id);
-            $payload = is_array($record->data) ? $record->data : json_decode($record->data ?? '{}', true);
+            $formatted = $this->formatLegalRecord($record);
             return response()->json([
                 'id' => $record->id,
                 'source_table' => 'legal',
                 'record_type' => $record->document_type,
                 'document_date' => $record->document_date ? $record->document_date->toDateString() : null,
                 'source_url' => $record->source_url,
-                'data' => $payload,
+                'data' => $formatted,
             ]);
         }
+    }
+
+    /**
+     * Format a legal analytics record into full structured dossier item.
+     */
+    private function formatLegalRecord($row): array
+    {
+        $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
+        $ext = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
+
+        $applicant = $ext['applicant_plaintiff'] ?? $payload['applicant_plaintiff'] ?? $ext['employee'] ?? $payload['employee'] ?? $payload['publisher'] ?? $payload['journal_name'] ?? null;
+        if (is_array($applicant)) {
+            $applicant = implode(', ', $applicant);
+        }
+
+        $respondent = $ext['respondent_defendant'] ?? $payload['respondent_defendant'] ?? $ext['employer'] ?? $payload['employer'] ?? null;
+        if (is_array($respondent)) {
+            $respondent = implode(', ', $respondent);
+        }
+
+        $judges = $ext['judges'] ?? $payload['judges'] ?? [];
+        if (!is_array($judges)) {
+            $judges = $judges ? [$judges] : [];
+        }
+
+        $precedentsCited = $ext['precedents_cited'] ?? $payload['precedents_cited'] ?? [];
+        if (!is_array($precedentsCited)) {
+            $precedentsCited = [];
+        }
+
+        $reportable = $ext['reportable'] ?? $payload['reportable'] ?? true;
+        $durationDays = isset($ext['duration_days']) ? (int) $ext['duration_days'] : (isset($payload['duration_days']) ? (int) $payload['duration_days'] : null);
+        $courtLocation = $ext['court_location'] ?? $payload['court_location'] ?? null;
+        $ratioDecidendi = $ext['ratio_decidendi'] ?? $payload['ratio_decidendi'] ?? null;
+        $obiterDicta = $ext['obiter_dicta'] ?? $payload['obiter_dicta'] ?? null;
+        $order = $ext['order'] ?? $payload['order'] ?? null;
+        $summary = $payload['ai_summary'] ?? $ext['summary'] ?? $payload['summary'] ?? $payload['abstract'] ?? null;
+        $subjects = $ext['reason_for_dismissal'] ?? $payload['reason_for_dismissal'] ?? $ext['subjects'] ?? $payload['subjects'] ?? $ext['subject'] ?? $payload['subject'] ?? null;
+        $outcome = $ext['result'] ?? $payload['result'] ?? $order ?? $ext['holding'] ?? $payload['holding'] ?? null;
+
+        $docDate = $row->document_date ? substr((string) $row->document_date, 0, 10) : null;
+        $judgmentDate = $ext['judgment_date'] ?? $payload['judgment_date'] ?? $docDate;
+        $hearingDate = $ext['hearing_date'] ?? $payload['hearing_date'] ?? null;
+
+        return [
+            'id' => $row->id,
+            'source_table' => 'legal',
+            'record_type' => $row->document_type ?? $row->record_type ?? 'saflii_courts',
+            'document_date' => $docDate,
+            'judgment_date' => $judgmentDate,
+            'hearing_date' => $hearingDate,
+            'court' => $row->court,
+            'case_number' => $row->case_number,
+            'title' => $row->title,
+            'source_url' => $row->source_url,
+            'applicant' => $applicant,
+            'respondent' => $respondent,
+            'subjects' => $subjects,
+            'outcome' => $outcome,
+            'summary' => $summary,
+            'ratio_decidendi' => $ratioDecidendi,
+            'obiter_dicta' => $obiterDicta,
+            'order' => $order,
+            'judges' => $judges,
+            'precedents_count' => count($precedentsCited),
+            'precedents_cited' => $precedentsCited,
+            'reportable' => (bool) $reportable,
+            'duration_days' => $durationDays,
+            'court_location' => $courtLocation,
+        ];
+    }
+
+    /**
+     * Format a CCMA record into structured dossier item.
+     */
+    private function formatCcmaRecord($row): array
+    {
+        $docDate = $row->award_date ?? $row->document_date ?? null;
+        if ($docDate) {
+            $docDate = substr((string) $docDate, 0, 10);
+        }
+
+        $hearingDate = null;
+        if (isset($row->hearing_start) && $row->hearing_start) {
+            $hearingDate = substr((string) $row->hearing_start, 0, 10);
+        }
+
+        return [
+            'id' => $row->id,
+            'source_table' => 'ccma',
+            'record_type' => $row->document_type ?? $row->record_type ?? 'CCMA Awards',
+            'document_date' => $docDate,
+            'award_date' => $docDate,
+            'judgment_date' => $docDate,
+            'hearing_date' => $hearingDate,
+            'court' => $row->court ?? 'CCMA',
+            'case_number' => $row->award_number ?? $row->case_number ?? null,
+            'award_number' => $row->award_number ?? $row->case_number ?? null,
+            'title' => $row->title,
+            'source_url' => $row->detail_url ?? $row->source_url ?? null,
+            'detail_url' => $row->detail_url ?? $row->source_url ?? null,
+            'applicant' => $row->employee ?? $row->applicant ?? null,
+            'employee' => $row->employee ?? $row->applicant ?? null,
+            'respondent' => $row->employer ?? $row->respondent ?? null,
+            'employer' => $row->employer ?? $row->respondent ?? null,
+            'subjects' => $row->reason_for_dismissal ?? $row->subjects ?? null,
+            'reason_for_dismissal' => $row->reason_for_dismissal ?? $row->subjects ?? null,
+            'outcome' => $row->forum ?? $row->court ?? 'CCMA',
+            'forum' => $row->forum ?? $row->court ?? 'CCMA',
+            'summary' => $row->reason_for_dismissal ?? $row->summary ?? null,
+            'ratio_decidendi' => null,
+            'obiter_dicta' => null,
+            'order' => null,
+            'judges' => [],
+            'precedents_count' => 0,
+            'precedents_cited' => [],
+            'reportable' => false,
+            'duration_days' => null,
+            'court_location' => $row->court_location ?? null,
+        ];
     }
 }
