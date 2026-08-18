@@ -255,6 +255,104 @@ class LegalRecordTest extends TestCase
         $response = $this->actingAs($user)->getJson("/legal-records/record/{$ccma->id}?source_table=ccma");
 
         $response->assertStatus(200);
-        $response->assertJsonPath('data.award_number', 'GAJB1234-26');
+        $response->assertJsonPath('data.award_number', 'GAJB••••');
+        $response->assertJsonPath('is_pro', false);
+    }
+
+    public function test_standard_user_receives_blurred_locked_record_fields(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $legal = LegalAnalytics::create([
+            'target_type' => 'cases',
+            'target_name' => 'ZACC',
+            'title' => 'Constitutional Rights Matter',
+            'document_type' => 'Judgment',
+            'document_date' => '2026-02-10',
+            'court' => 'ZACC',
+            'case_number' => 'CCT 100/26',
+            'source_url' => 'https://www.saflii.org/za/cases/ZACC/2026/1.html',
+            'data' => [
+                'applicant_plaintiff' => 'Civil Rights Org',
+                'respondent_defendant' => 'Minister of Justice',
+                'extracted_data' => [
+                    'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
+                    'judges' => ['Chief Justice Zondo', 'Deputy Chief Justice Maya'],
+                    'precedents_cited' => [
+                        ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
+                    ],
+                    'order' => 'The application is upheld with costs.',
+                    'summary' => 'Constitutional challenge concerning administrative justice timelines.',
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$legal->id}?source_table=legal");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('is_pro', false);
+        $response->assertJsonPath('source_url', null);
+        $response->assertJsonPath('data.is_locked', true);
+        $response->assertJsonPath('data.title', 'Constitutional Rights Matter');
+        $response->assertJsonPath('data.summary', 'Constitutional challenge concerning administrative justice timelines.');
+        $this->assertStringContainsString('••••', (string) $response->json('data.case_number'));
+        $this->assertStringContainsString('Pro', (string) $response->json('data.ratio_decidendi'));
+        $response->assertJsonPath('data.precedents_cited', []);
+    }
+
+    public function test_subscribed_user_receives_complete_unredacted_dossier(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $legal = LegalAnalytics::create([
+            'target_type' => 'cases',
+            'target_name' => 'ZACC',
+            'title' => 'Constitutional Rights Matter',
+            'document_type' => 'Judgment',
+            'document_date' => '2026-02-10',
+            'court' => 'ZACC',
+            'case_number' => 'CCT 100/26',
+            'source_url' => 'https://www.saflii.org/za/cases/ZACC/2026/1.html',
+            'data' => [
+                'extracted_data' => [
+                    'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
+                    'judges' => ['Chief Justice Zondo'],
+                    'precedents_cited' => [
+                        ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
+                    ],
+                    'order' => 'The application is upheld with costs.',
+                    'summary' => 'Constitutional challenge concerning administrative justice timelines.',
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$legal->id}?source_table=legal");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('is_pro', true);
+        $response->assertJsonPath('source_url', 'https://www.saflii.org/za/cases/ZACC/2026/1.html');
+        $response->assertJsonPath('data.is_locked', false);
+        $response->assertJsonPath('data.case_number', 'CCT 100/26');
+        $response->assertJsonPath('data.ratio_decidendi', 'The fundamental right to fair trial cannot be arbitrarily suspended.');
+        $response->assertJsonPath('data.judges.0', 'Chief Justice Zondo');
+        $response->assertJsonPath('data.precedents_cited.0.case_name_citation', 'Makwanyane [1995] ZACC 3');
+    }
+
+    public function test_standard_registered_user_is_blocked_from_subscriber_analytics(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->get('/subscriber/analytics/saflii');
+        $response->assertRedirect(route('subscriptions.index'));
+
+        $responseCcma = $this->actingAs($user)->get('/subscriber/analytics/ccma');
+        $responseCcma->assertRedirect(route('subscriptions.index'));
     }
 }

@@ -15,7 +15,9 @@ import {
   ExternalLink,
   MapPin,
   Clock,
-  Sparkles
+  Sparkles,
+  Lock,
+  ArrowRight
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -29,6 +31,8 @@ type DataTableLazyLoadEvent = DataTablePageEvent | DataTableSortEvent | DataTabl
 interface AuthUser {
   id: number;
   role: string;
+  is_subscribed?: boolean;
+  has_pro_access?: boolean;
   first_name?: string;
   last_name?: string;
   email?: string;
@@ -48,6 +52,11 @@ const props = defineProps<{
 const page = usePage();
 const user = computed(() => (page.props.auth?.user as unknown as AuthUser | null) || null);
 const isAdmin = computed(() => user.value && user.value.role === 'admin');
+const isPro = computed(() => {
+  if (isAdmin.value) return true;
+  if (user.value?.is_subscribed || user.value?.has_pro_access) return true;
+  return false;
+});
 const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberLayout);
 
 interface RecordSummary {
@@ -267,6 +276,22 @@ onMounted(() => {
           {{ totalRecords.toLocaleString() }} Active Schedules
         </span>
       </div>
+    </div>
+
+    <!-- Standard Tier Upgrade Notice Banner (if not Pro) -->
+    <div v-if="!isPro" class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
+      <div class="space-y-1.5 max-w-2xl">
+        <div class="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-wider">
+          <Sparkles class="w-4 h-4" /> Standard Registered Preview Mode
+        </div>
+        <p class="text-xs text-zinc-300 leading-relaxed">
+          You are viewing basic hearing schedule overviews. Detailed roll cause lists and full judicial dossiers require an active Pro subscription.
+        </p>
+      </div>
+      <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
+        <span>Upgrade Plan at Pricing</span>
+        <ArrowRight class="w-4 h-4" />
+      </a>
     </div>
 
     <!-- Filter & Search Controls Container -->

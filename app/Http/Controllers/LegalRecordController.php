@@ -106,6 +106,9 @@ class LegalRecordController extends Controller
             $targetVanity = TargetVanity::where('target_name', $recordType)->first();
         }
 
+        $user = auth()->user();
+        $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
+
         if ($targetVanity) {
             if ($targetVanity->target_name === 'sabinet_ccma') {
                 // CCMA path
@@ -134,7 +137,7 @@ class LegalRecordController extends Controller
                 }
 
                 $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(fn ($row) => $this->formatCcmaRecord($row));
+                $records = $rows->map(fn ($row) => $this->formatCcmaRecord($row, $isPro));
             } else {
                 // Specific Legal Analytics target
                 $query = LegalAnalytics::query()->where('target_name', $recordType);
@@ -164,7 +167,7 @@ class LegalRecordController extends Controller
                 }
 
                 $rows = $query->offset($offset)->limit($limit)->get();
-                $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
+                $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
             }
         } elseif ($category === 'journals') {
             // Journals & Gazettes only (pure legal_analytics)
@@ -195,7 +198,7 @@ class LegalRecordController extends Controller
             }
 
             $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
+            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
         } elseif ($category === 'court_rolls') {
             // Court Rolls only (pure legal_analytics)
             $query = LegalAnalytics::query()->where('target_type', 'other');
@@ -225,7 +228,7 @@ class LegalRecordController extends Controller
             }
 
             $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row));
+            $records = $rows->map(fn ($row) => $this->formatLegalRecord($row, $isPro));
         } else {
             // Cases or All (Union path)
             $ccmaQuery = DB::table('ccma_analytics')
@@ -302,18 +305,19 @@ class LegalRecordController extends Controller
             }
 
             $rows = $query->offset($offset)->limit($limit)->get();
-            $records = $rows->map(function ($row) {
+            $records = $rows->map(function ($row) use ($isPro) {
                 if ($row->source_table === 'ccma') {
-                    return $this->formatCcmaRecord($row);
+                    return $this->formatCcmaRecord($row, $isPro);
                 }
 
-                return $this->formatLegalRecord($row);
+                return $this->formatLegalRecord($row, $isPro);
             });
         }
 
         return response()->json([
             'total' => $total,
             'records' => $records,
+            'is_pro' => $isPro,
         ]);
     }
 
@@ -323,27 +327,31 @@ class LegalRecordController extends Controller
     public function show(Request $request, string $id): JsonResponse
     {
         $sourceTable = $request->input('source_table', 'legal');
+        $user = auth()->user();
+        $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
 
         if ($sourceTable === 'ccma') {
             $record = CcmaAnalytics::findOrFail($id);
-            $formatted = $this->formatCcmaRecord($record);
+            $formatted = $this->formatCcmaRecord($record, $isPro);
             return response()->json([
                 'id' => $record->id,
                 'source_table' => 'ccma',
                 'record_type' => $record->document_type,
                 'document_date' => $record->award_date ? $record->award_date->toDateString() : null,
-                'source_url' => $record->detail_url,
+                'source_url' => $isPro ? $record->detail_url : null,
+                'is_pro' => $isPro,
                 'data' => $formatted,
             ]);
         } else {
             $record = LegalAnalytics::findOrFail($id);
-            $formatted = $this->formatLegalRecord($record);
+            $formatted = $this->formatLegalRecord($record, $isPro);
             return response()->json([
                 'id' => $record->id,
                 'source_table' => 'legal',
                 'record_type' => $record->document_type,
                 'document_date' => $record->document_date ? $record->document_date->toDateString() : null,
-                'source_url' => $record->source_url,
+                'source_url' => $isPro ? $record->source_url : null,
+                'is_pro' => $isPro,
                 'data' => $formatted,
             ]);
         }
@@ -352,7 +360,7 @@ class LegalRecordController extends Controller
     /**
      * Format a legal analytics record into full structured dossier item.
      */
-    private function formatLegalRecord($row): array
+    private function formatLegalRecord($row, bool $isPro = true): array
     {
         $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
         $ext = is_array($payload['extracted_data'] ?? null) ? $payload['extracted_data'] : [];
@@ -391,10 +399,46 @@ class LegalRecordController extends Controller
         $judgmentDate = $ext['judgment_date'] ?? $payload['judgment_date'] ?? $docDate;
         $hearingDate = $ext['hearing_date'] ?? $payload['hearing_date'] ?? null;
 
+        if (! $isPro) {
+            $maskedCaseNumber = $row->case_number ? (strlen($row->case_number) > 4 ? substr($row->case_number, 0, 4).'••••' : '••••') : null;
+            $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
+
+            return [
+                'id' => $row->id,
+                'source_table' => 'legal',
+                'record_type' => $row->document_type ?? $row->record_type ?? 'saflii_courts',
+                'is_locked' => true,
+                'is_pro' => false,
+                'document_date' => $maskedDate,
+                'judgment_date' => $maskedDate,
+                'hearing_date' => $hearingDate ? substr((string) $hearingDate, 0, 4).'-••-••' : null,
+                'court' => $row->court,
+                'case_number' => $maskedCaseNumber,
+                'title' => $row->title,
+                'source_url' => null,
+                'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
+                'respondent' => $respondent ? 'Respondent (Locked - Pro Required)' : null,
+                'subjects' => $subjects,
+                'outcome' => $outcome ? 'Judicial Order (Locked - Pro Required)' : null,
+                'summary' => $summary,
+                'ratio_decidendi' => $ratioDecidendi ? 'The binding legal principles (Ratio Decidendi) and judicial reasoning for this matter are available exclusively with a Pro Case Law or Pro Analytics subscription. Upgrade your account to inspect full headnotes, cited authorities, and procedural history.' : null,
+                'obiter_dicta' => $obiterDicta ? 'Judicial observations and obiter dicta are reserved for Pro Subscribers.' : null,
+                'order' => $order ? 'Formal court order details and relief granted are locked. Upgrade to Pro to inspect unredacted orders.' : null,
+                'judges' => count($judges) > 0 ? ['Presiding Bench (Locked - Pro Required)'] : [],
+                'precedents_count' => count($precedentsCited),
+                'precedents_cited' => [],
+                'reportable' => (bool) $reportable,
+                'duration_days' => $durationDays,
+                'court_location' => $courtLocation,
+            ];
+        }
+
         return [
             'id' => $row->id,
             'source_table' => 'legal',
             'record_type' => $row->document_type ?? $row->record_type ?? 'saflii_courts',
+            'is_locked' => false,
+            'is_pro' => true,
             'document_date' => $docDate,
             'judgment_date' => $judgmentDate,
             'hearing_date' => $hearingDate,
@@ -422,7 +466,7 @@ class LegalRecordController extends Controller
     /**
      * Format a CCMA record into structured dossier item.
      */
-    private function formatCcmaRecord($row): array
+    private function formatCcmaRecord($row, bool $isPro = true): array
     {
         $docDate = $row->award_date ?? $row->document_date ?? null;
         if ($docDate) {
@@ -434,10 +478,56 @@ class LegalRecordController extends Controller
             $hearingDate = substr((string) $row->hearing_start, 0, 10);
         }
 
+        if (! $isPro) {
+            $maskedCaseNumber = $row->award_number ?? $row->case_number ?? null;
+            if ($maskedCaseNumber && strlen($maskedCaseNumber) > 4) {
+                $maskedCaseNumber = substr($maskedCaseNumber, 0, 4).'••••';
+            }
+            $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
+
+            return [
+                'id' => $row->id,
+                'source_table' => 'ccma',
+                'record_type' => $row->document_type ?? $row->record_type ?? 'CCMA Awards',
+                'is_locked' => true,
+                'is_pro' => false,
+                'document_date' => $maskedDate,
+                'award_date' => $maskedDate,
+                'judgment_date' => $maskedDate,
+                'hearing_date' => $hearingDate ? substr((string) $hearingDate, 0, 4).'-••-••' : null,
+                'court' => $row->court ?? 'CCMA',
+                'case_number' => $maskedCaseNumber,
+                'award_number' => $maskedCaseNumber,
+                'title' => $row->title,
+                'source_url' => null,
+                'detail_url' => null,
+                'applicant' => ($row->employee ?? $row->applicant) ? 'Employee (Locked)' : null,
+                'employee' => ($row->employee ?? $row->applicant) ? 'Employee (Locked)' : null,
+                'respondent' => ($row->employer ?? $row->respondent) ? 'Employer (Locked)' : null,
+                'employer' => ($row->employer ?? $row->respondent) ? 'Employer (Locked)' : null,
+                'subjects' => $row->reason_for_dismissal ?? $row->subjects ?? null,
+                'reason_for_dismissal' => $row->reason_for_dismissal ?? $row->subjects ?? null,
+                'outcome' => $row->forum ?? $row->court ?? 'CCMA',
+                'forum' => $row->forum ?? $row->court ?? 'CCMA',
+                'summary' => $row->reason_for_dismissal ?? $row->summary ?? null,
+                'ratio_decidendi' => null,
+                'obiter_dicta' => null,
+                'order' => null,
+                'judges' => [],
+                'precedents_count' => 0,
+                'precedents_cited' => [],
+                'reportable' => false,
+                'duration_days' => null,
+                'court_location' => $row->court_location ?? null,
+            ];
+        }
+
         return [
             'id' => $row->id,
             'source_table' => 'ccma',
             'record_type' => $row->document_type ?? $row->record_type ?? 'CCMA Awards',
+            'is_locked' => false,
+            'is_pro' => true,
             'document_date' => $docDate,
             'award_date' => $docDate,
             'judgment_date' => $docDate,

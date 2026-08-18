@@ -204,7 +204,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="root">
+  <div ref="root" id="pricing">
     <section class="features-section container reveal-item" id="services" aria-label="Datasets Pricing">
       <div class="section-header">
         <div class="eyebrow-badge secondary">

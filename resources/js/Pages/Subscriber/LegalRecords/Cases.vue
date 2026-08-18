@@ -18,7 +18,9 @@ import {
   BookOpen,
   Bookmark,
   Clock,
-  Sparkles
+  Sparkles,
+  Lock,
+  ArrowRight
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -32,6 +34,8 @@ type DataTableLazyLoadEvent = DataTablePageEvent | DataTableSortEvent | DataTabl
 interface AuthUser {
   id: number;
   role: string;
+  is_subscribed?: boolean;
+  has_pro_access?: boolean;
   first_name?: string;
   last_name?: string;
   email?: string;
@@ -51,6 +55,11 @@ const props = defineProps<{
 const page = usePage();
 const user = computed(() => (page.props.auth?.user as unknown as AuthUser | null) || null);
 const isAdmin = computed(() => user.value && user.value.role === 'admin');
+const isPro = computed(() => {
+  if (isAdmin.value) return true;
+  if (user.value?.is_subscribed || user.value?.has_pro_access) return true;
+  return false;
+});
 const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberLayout);
 
 interface RecordSummary {
@@ -282,6 +291,22 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Standard Tier Upgrade Notice Banner (if not Pro) -->
+    <div v-if="!isPro" class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
+      <div class="space-y-1.5 max-w-2xl">
+        <div class="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-wider">
+          <Sparkles class="w-4 h-4" /> Standard Registered Preview Mode
+        </div>
+        <p class="text-xs text-zinc-300 leading-relaxed">
+          You are viewing basic case titles and summaries. Binding <strong class="text-white">Ratio Decidendi</strong>, judicial bench details, full precedent citation networks, and unredacted formal court orders require an active Pro subscription.
+        </p>
+      </div>
+      <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
+        <span>Upgrade Plan at Pricing</span>
+        <ArrowRight class="w-4 h-4" />
+      </a>
+    </div>
+
     <!-- Filter & Search Controls Container -->
     <div
       class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8 space-y-6 mb-8">
@@ -373,6 +398,10 @@ onMounted(() => {
                 class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
                 <Clock class="w-3 h-3" /> {{ c.duration_days }}d to Judgment
               </span>
+              <span v-if="!isPro"
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                <Lock class="w-3 h-3" /> Preview
+              </span>
             </div>
 
             <div class="flex items-center gap-3 text-xs text-zinc-400">
@@ -387,19 +416,19 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Case Title -->
+          <!-- Case Title (Always Visible) -->
           <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)">
             {{ c.title }}
           </h4>
 
-          <!-- Ratio Decidendi / Summary Excerpt -->
-          <div v-if="c.ratio_decidendi || c.summary" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
+          <!-- Summary / Ratio Decidendi Excerpt -->
+          <div v-if="c.summary || c.ratio_decidendi" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
             <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1 mb-1.5">
               <Bookmark class="w-3.5 h-3.5" />
-              {{ c.ratio_decidendi ? 'Ratio Decidendi / Core Principle' : 'Executive Summary / Matter' }}
+              {{ c.ratio_decidendi && isPro ? 'Ratio Decidendi / Core Principle' : 'Executive Summary / Matter' }}
             </span>
             <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300">
-              {{ c.ratio_decidendi || c.summary }}
+              {{ c.summary || c.ratio_decidendi }}
             </p>
           </div>
 
@@ -417,10 +446,14 @@ onMounted(() => {
                 <BookOpen class="w-3.5 h-3.5" />
                 {{ c.precedents_count }} Citations
               </span>
-              <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
+              <a v-if="isPro && c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
                 class="hover:text-white flex items-center gap-1 transition text-zinc-400">
                 <span>SAFLII Link</span>
                 <ExternalLink class="w-3 h-3" />
+              </a>
+              <a v-else-if="!isPro" href="/#pricing" class="text-primary hover:underline flex items-center gap-1 font-bold">
+                <Lock class="w-3 h-3" />
+                <span>Unlock Pro</span>
               </a>
             </div>
           </div>

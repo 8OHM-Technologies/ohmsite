@@ -44,6 +44,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'api_limit_override',
     ];
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'is_subscribed',
+        'has_pro_access',
+    ];
+
+    public function getIsSubscribedAttribute(): bool
+    {
+        return $this->isSubscribed();
+    }
+
+    public function getHasProAccessAttribute(): bool
+    {
+        return $this->hasLegalProAccess();
+    }
+
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -104,7 +124,24 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->orders()
             ->where('payment_status', 'paid')
             ->whereHas('items.product', function ($query) {
-                $query->where('slug', 'pro-analytics');
+                $query->whereIn('slug', ['pro-analytics', 'pro-case-law']);
+            })
+            ->exists();
+    }
+
+    /**
+     * Check if the user has access to full Pro Case Law / Legal Intelligence.
+     */
+    public function hasLegalProAccess(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->orders()
+            ->where('payment_status', 'paid')
+            ->whereHas('items.product', function ($query) {
+                $query->whereIn('slug', ['pro-analytics', 'pro-case-law', 'developer-api']);
             })
             ->exists();
     }
