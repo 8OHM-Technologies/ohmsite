@@ -55,10 +55,19 @@ const isAnalyticsUrl = computed(() => {
 
 const isAnalyticsExpanded = ref(true);
 
+const isLegalRecordsUrl = computed(() => {
+    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
+    return current === 'legal-records' || current.startsWith('legal-records/');
+});
+
+const isLegalRecordsExpanded = ref(true);
+
 const searchItems = [
     { name: 'CCMA Awards Analytics', href: route('subscriber.analytics.ccma'), keywords: ['ccma', 'awards', 'labour', 'labor', 'dismissal', 'arbitration', 'analytics', 'stats', 'trends'] },
     { name: 'SAFLII Courts Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
-    { name: 'Legal Records', href: route('legal-records.index'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
+    { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
+    { name: 'Law Journals & Gazettes', href: route('legal-records.journals'), keywords: ['journals', 'gazettes', 'gazette', 'law review', 'per', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
+    { name: 'Court Rolls & Schedules', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list', 'motion', 'trial'] },
 ];
 
 const handleSearch = () => {
@@ -193,19 +202,66 @@ const datasetStats = computed(() => {
 
                 <!-- Navigation -->
                 <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 custom-scrollbar">
-                    <!-- Legal Records Direct Link -->
-                    <div>
-                        <Link :href="route('legal-records.index')"
-                            class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
+                    <!-- Expandable Legal Records Menu -->
+                    <div class="space-y-1">
+                        <button type="button" @click="isLegalRecordsExpanded = !isLegalRecordsExpanded"
+                            class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
                             :class="[
-                                isUrl(route('legal-records.index'))
-                                    ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
+                                isLegalRecordsUrl
+                                    ? 'text-white bg-white/[0.04]'
                                     : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
                             ]">
-                            <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
-                                :class="[isUrl(route('legal-records.index')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                            Legal Records
-                        </Link>
+                            <div class="flex items-center">
+                                <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                    :class="[isLegalRecordsUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Legal Records</span>
+                            </div>
+                            <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
+                                :class="{ 'transform rotate-180 text-admin-modern': isLegalRecordsExpanded }" />
+                        </button>
+
+                        <!-- Legal Records Sub-menu Items -->
+                        <div v-show="isLegalRecordsExpanded"
+                            class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <!-- Case Law -->
+                            <Link :href="route('legal-records.cases')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Scale class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Case Law
+                            </Link>
+
+                            <!-- Journals & Gazettes -->
+                            <Link :href="route('legal-records.journals')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.journals'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Journals &amp; Gazettes
+                            </Link>
+
+                            <!-- Court Rolls -->
+                            <Link :href="route('legal-records.court-rolls')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.court-rolls'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Calendar class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.court-rolls')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Court Rolls
+                            </Link>
+                        </div>
                     </div>
 
                     <!-- Expandable Analytics Menu -->
@@ -227,7 +283,8 @@ const datasetStats = computed(() => {
                         </button>
 
                         <!-- Sub-menu Items -->
-                        <div v-show="isAnalyticsExpanded" class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div v-show="isAnalyticsExpanded"
+                            class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                             <!-- CCMA Awards -->
                             <Link :href="route('subscriber.analytics.ccma')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
@@ -285,7 +342,8 @@ const datasetStats = computed(() => {
                 <!-- Top Row: Stats (or Mobile Logo) on Left, Profile/Notifications on Right -->
                 <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-4 lg:hidden">
-                        <button @click="isSidebarOpen = true" class="p-2 text-zinc-400 hover:text-white transition-colors">
+                        <button @click="isSidebarOpen = true"
+                            class="p-2 text-zinc-400 hover:text-white transition-colors">
                             <Menu class="w-6 h-6" />
                         </button>
                         <img src="/assets/images/8OHM_Logo.webp" alt="Logo" class="h-6" />
@@ -398,7 +456,8 @@ const datasetStats = computed(() => {
                                         <div
                                             class="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                             <div>
-                                                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white">Alert
+                                                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white">
+                                                    Alert
                                                     Center</h4>
                                                 <p
                                                     class="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">
@@ -415,7 +474,8 @@ const datasetStats = computed(() => {
                                                     class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
                                                     <Bell class="w-5 h-5 text-zinc-700" />
                                                 </div>
-                                                <p class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                                                <p
+                                                    class="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
                                                     System Clear</p>
                                             </div>
 
@@ -478,7 +538,8 @@ const datasetStats = computed(() => {
 
                             <template #content>
                                 <div class="px-4 py-3 border-b border-white/5 lg:hidden">
-                                    <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}</p>
+                                    <p class="text-xs font-bold text-white">{{ user.first_name }} {{ user.last_name }}
+                                    </p>
                                     <p class="text-[10px] text-zinc-500 truncate">{{ user.email }}</p>
                                 </div>
                                 <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>

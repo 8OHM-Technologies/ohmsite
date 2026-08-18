@@ -83,6 +83,11 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 - **SAFLII Courts Jurisprudence Intelligence**: Superior court analytics (Constitutional Court & Competition Appeal Court), precedent citation networks, citation treatment breakdown (Applied, Referred, Distinguished), judicial bench analysis, and comprehensive case dossier viewer with *Ratio Decidendi* and *Obiter Dicta* extraction.
 - Instant exports of sanitized datasets.
 
+### 3. Open Access Legal Records
+- **Case Law & Judgments**: Superior court case law (Constitutional Court, Supreme Court of Appeal, High Courts) and CCMA arbitration awards with procedural summaries, holdings, dismissal reasons, and full judgment viewer.
+- **Law Journals & Gazettes**: Academic law journals (PER, De Rebus, AHRLJ, ADRY, etc.) and official Government/Provincial Gazettes with formatted document reader layout.
+- **Court Rolls & Schedules**: Motion court hearing schedules, cause lists, and court roll calendar tracking.
+
 ---
 
 ## 📡 Monitoring & Telegram Notifications

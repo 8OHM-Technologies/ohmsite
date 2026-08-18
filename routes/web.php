@@ -86,6 +86,9 @@ use App\Http\Controllers\LegalRecordController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/legal-records', [LegalRecordController::class, 'index'])->name('legal-records.index');
+    Route::get('/legal-records/cases', [LegalRecordController::class, 'cases'])->name('legal-records.cases');
+    Route::get('/legal-records/journals', [LegalRecordController::class, 'journals'])->name('legal-records.journals');
+    Route::get('/legal-records/court-rolls', [LegalRecordController::class, 'courtRolls'])->name('legal-records.court-rolls');
     Route::get('/legal-records/data', [LegalRecordController::class, 'data'])->name('legal-records.data');
     Route::get('/legal-records/record/{id}', [LegalRecordController::class, 'show'])->name('legal-records.show');
 });

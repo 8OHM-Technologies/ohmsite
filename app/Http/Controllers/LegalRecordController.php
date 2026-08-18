@@ -14,19 +14,72 @@ use Inertia\Response as InertiaResponse;
 class LegalRecordController extends Controller
 {
     /**
-     * Display the legal record index view.
+     * Display the legal record index view (defaults to cases).
      */
     public function index(Request $request): InertiaResponse
     {
-        $filters = TargetVanity::orderBy('vanity_name')->get()->map(function ($vanity) {
-            return [
-                'target_name' => $vanity->target_name,
-                'vanity_name' => $vanity->vanity_name,
-                'target_type' => $vanity->target_type,
-            ];
-        });
+        return $this->cases($request);
+    }
 
-        return Inertia::render('LegalRecords/Index', [
+    /**
+     * Display the Case Law & Court Judgments view.
+     */
+    public function cases(Request $request): InertiaResponse
+    {
+        $filters = TargetVanity::where('target_type', 'cases')
+            ->orderBy('vanity_name')
+            ->get()
+            ->map(function ($vanity) {
+                return [
+                    'target_name' => $vanity->target_name,
+                    'vanity_name' => $vanity->vanity_name,
+                    'target_type' => $vanity->target_type,
+                ];
+            });
+
+        return Inertia::render('Subscriber/LegalRecords/Cases', [
+            'filters' => $filters,
+        ]);
+    }
+
+    /**
+     * Display the Law Journals & Official Gazettes view.
+     */
+    public function journals(Request $request): InertiaResponse
+    {
+        $filters = TargetVanity::whereIn('target_type', ['journals', 'gaz'])
+            ->orderBy('vanity_name')
+            ->get()
+            ->map(function ($vanity) {
+                return [
+                    'target_name' => $vanity->target_name,
+                    'vanity_name' => $vanity->vanity_name,
+                    'target_type' => $vanity->target_type,
+                ];
+            });
+
+        return Inertia::render('Subscriber/LegalRecords/Journals', [
+            'filters' => $filters,
+        ]);
+    }
+
+    /**
+     * Display the Court Rolls & Hearing Schedules view.
+     */
+    public function courtRolls(Request $request): InertiaResponse
+    {
+        $filters = TargetVanity::where('target_type', 'other')
+            ->orderBy('vanity_name')
+            ->get()
+            ->map(function ($vanity) {
+                return [
+                    'target_name' => $vanity->target_name,
+                    'vanity_name' => $vanity->vanity_name,
+                    'target_type' => $vanity->target_type,
+                ];
+            });
+
+        return Inertia::render('Subscriber/LegalRecords/CourtRolls', [
             'filters' => $filters,
         ]);
     }
@@ -39,11 +92,15 @@ class LegalRecordController extends Controller
         $offset = max(0, (int) $request->input('offset', 0));
         $limit = min(100, max(1, (int) $request->input('limit', 25)));
         $search = trim((string) $request->input('search', ''));
+        $category = trim((string) $request->input('category', 'all'));
         $recordType = trim((string) $request->input('record_type', ''));
         $sortField = trim((string) $request->input('sort_field', 'created_at'));
         $sortOrder = (int) $request->input('sort_order', -1) === 1 ? 'asc' : 'desc';
 
-        // Check target vanity to know the source table
+        $isPostgres = DB::connection()->getDriverName() === 'pgsql';
+        $like = $isPostgres ? 'ILIKE' : 'LIKE';
+
+        // Check target vanity to know if a specific source target is selected
         $targetVanity = null;
         if ($recordType !== '' && $recordType !== 'all') {
             $targetVanity = TargetVanity::where('target_name', $recordType)->first();
@@ -54,13 +111,13 @@ class LegalRecordController extends Controller
                 // CCMA path
                 $query = CcmaAnalytics::query();
                 if ($search !== '') {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('title', 'ILIKE', "%{$search}%")
-                          ->orWhere('award_number', 'ILIKE', "%{$search}%")
-                          ->orWhere('court', 'ILIKE', "%{$search}%")
-                          ->orWhere('employee', 'ILIKE', "%{$search}%")
-                          ->orWhere('employer', 'ILIKE', "%{$search}%")
-                          ->orWhere('reason_for_dismissal', 'ILIKE', "%{$search}%");
+                    $query->where(function ($q) use ($search, $like) {
+                        $q->where('title', $like, "%{$search}%")
+                          ->orWhere('award_number', $like, "%{$search}%")
+                          ->orWhere('court', $like, "%{$search}%")
+                          ->orWhere('employee', $like, "%{$search}%")
+                          ->orWhere('employer', $like, "%{$search}%")
+                          ->orWhere('reason_for_dismissal', $like, "%{$search}%");
                     });
                 }
 
@@ -95,14 +152,18 @@ class LegalRecordController extends Controller
                     ];
                 });
             } else {
-                // Legal path
+                // Specific Legal Analytics target
                 $query = LegalAnalytics::query()->where('target_name', $recordType);
                 if ($search !== '') {
-                    $query->where(function ($q) use ($search) {
-                        $q->where('title', 'ILIKE', "%{$search}%")
-                          ->orWhere('case_number', 'ILIKE', "%{$search}%")
-                          ->orWhere('court', 'ILIKE', "%{$search}%")
-                          ->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                    $query->where(function ($q) use ($search, $like, $isPostgres) {
+                        $q->where('title', $like, "%{$search}%")
+                          ->orWhere('case_number', $like, "%{$search}%")
+                          ->orWhere('court', $like, "%{$search}%");
+                        if ($isPostgres) {
+                            $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                        } else {
+                            $q->orWhere('data', 'LIKE', "%{$search}%");
+                        }
                     });
                 }
 
@@ -120,6 +181,18 @@ class LegalRecordController extends Controller
 
                 $rows = $query->offset($offset)->limit($limit)->get();
                 $records = $rows->map(function ($row) {
+                    $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
+                    $applicant = $payload['applicant_plaintiff'] ?? $payload['employee'] ?? null;
+                    if (is_array($applicant)) {
+                        $applicant = implode(', ', $applicant);
+                    }
+                    $respondent = $payload['respondent_defendant'] ?? $payload['employer'] ?? null;
+                    if (is_array($respondent)) {
+                        $respondent = implode(', ', $respondent);
+                    }
+                    $subjects = $payload['reason_for_dismissal'] ?? $payload['subjects'] ?? $payload['subject'] ?? null;
+                    $outcome = $payload['result'] ?? $payload['order'] ?? $payload['holding'] ?? null;
+
                     return [
                         'id' => $row->id,
                         'source_table' => 'legal',
@@ -129,16 +202,110 @@ class LegalRecordController extends Controller
                         'case_number' => $row->case_number,
                         'title' => $row->title,
                         'source_url' => $row->source_url,
-                        'applicant' => $row->applicant,
-                        'respondent' => $row->respondent,
-                        'subjects' => $row->subjects,
-                        'outcome' => $row->outcome,
-                        'summary' => $row->data['ai_summary'] ?? $row->data['summary'] ?? null,
+                        'applicant' => $applicant,
+                        'respondent' => $respondent,
+                        'subjects' => $subjects,
+                        'outcome' => $outcome,
+                        'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? null,
                     ];
                 });
             }
+        } elseif ($category === 'journals') {
+            // Journals & Gazettes only (pure legal_analytics)
+            $query = LegalAnalytics::query()->whereIn('target_type', ['journals', 'gaz']);
+            if ($search !== '') {
+                $query->where(function ($q) use ($search, $like, $isPostgres) {
+                    $q->where('title', $like, "%{$search}%")
+                      ->orWhere('case_number', $like, "%{$search}%")
+                      ->orWhere('court', $like, "%{$search}%");
+                    if ($isPostgres) {
+                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                    } else {
+                        $q->orWhere('data', 'LIKE', "%{$search}%");
+                    }
+                });
+            }
+
+            $total = $query->count();
+
+            if ($sortField === 'document_date') {
+                $query->orderBy('document_date', $sortOrder);
+            } elseif ($sortField === 'case_number') {
+                $query->orderBy('case_number', $sortOrder);
+            } elseif ($sortField === 'court') {
+                $query->orderBy('court', $sortOrder);
+            } else {
+                $query->orderBy('created_at', $sortOrder);
+            }
+
+            $rows = $query->offset($offset)->limit($limit)->get();
+            $records = $rows->map(function ($row) {
+                $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
+                return [
+                    'id' => $row->id,
+                    'source_table' => 'legal',
+                    'record_type' => $row->document_type,
+                    'document_date' => $row->document_date ? $row->document_date->toDateString() : null,
+                    'court' => $row->court,
+                    'case_number' => $row->case_number,
+                    'title' => $row->title,
+                    'source_url' => $row->source_url,
+                    'applicant' => $payload['publisher'] ?? $payload['journal_name'] ?? null,
+                    'respondent' => null,
+                    'subjects' => $payload['subject'] ?? $payload['subjects'] ?? null,
+                    'outcome' => null,
+                    'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? $payload['abstract'] ?? null,
+                ];
+            });
+        } elseif ($category === 'court_rolls') {
+            // Court Rolls only (pure legal_analytics)
+            $query = LegalAnalytics::query()->where('target_type', 'other');
+            if ($search !== '') {
+                $query->where(function ($q) use ($search, $like, $isPostgres) {
+                    $q->where('title', $like, "%{$search}%")
+                      ->orWhere('case_number', $like, "%{$search}%")
+                      ->orWhere('court', $like, "%{$search}%");
+                    if ($isPostgres) {
+                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                    } else {
+                        $q->orWhere('data', 'LIKE', "%{$search}%");
+                    }
+                });
+            }
+
+            $total = $query->count();
+
+            if ($sortField === 'document_date') {
+                $query->orderBy('document_date', $sortOrder);
+            } elseif ($sortField === 'case_number') {
+                $query->orderBy('case_number', $sortOrder);
+            } elseif ($sortField === 'court') {
+                $query->orderBy('court', $sortOrder);
+            } else {
+                $query->orderBy('created_at', $sortOrder);
+            }
+
+            $rows = $query->offset($offset)->limit($limit)->get();
+            $records = $rows->map(function ($row) {
+                $payload = is_array($row->data) ? $row->data : (is_string($row->data) ? json_decode($row->data, true) : []);
+                return [
+                    'id' => $row->id,
+                    'source_table' => 'legal',
+                    'record_type' => $row->document_type,
+                    'document_date' => $row->document_date ? $row->document_date->toDateString() : null,
+                    'court' => $row->court,
+                    'case_number' => $row->case_number,
+                    'title' => $row->title,
+                    'source_url' => $row->source_url,
+                    'applicant' => null,
+                    'respondent' => null,
+                    'subjects' => null,
+                    'outcome' => null,
+                    'summary' => $payload['ai_summary'] ?? $payload['summary'] ?? null,
+                ];
+            });
         } else {
-            // Union/Combined path
+            // Cases or All (Union path)
             $ccmaQuery = DB::table('ccma_analytics')
                 ->select([
                     'id',
@@ -154,7 +321,7 @@ class LegalRecordController extends Controller
                     'reason_for_dismissal as subjects',
                     'forum as outcome',
                     DB::raw("NULL as summary"),
-                    DB::raw("NULL::jsonb as data"),
+                    DB::raw("NULL as data"),
                     DB::raw("'ccma' as source_table"),
                 ]);
 
@@ -168,7 +335,7 @@ class LegalRecordController extends Controller
                     'court',
                     'case_number',
                     'source_url',
-                    DB::raw("NULL as applicant"), // Fallback in PHP
+                    DB::raw("NULL as applicant"),
                     DB::raw("NULL as respondent"),
                     DB::raw("NULL as subjects"),
                     DB::raw("NULL as outcome"),
@@ -177,18 +344,26 @@ class LegalRecordController extends Controller
                     DB::raw("'legal' as source_table"),
                 ]);
 
+            if ($category === 'cases') {
+                $legalQuery->where('target_type', 'cases');
+            }
+
             $unionQuery = $ccmaQuery->unionAll($legalQuery);
             $query = DB::table(DB::raw("({$unionQuery->toSql()}) as combined"))
                 ->mergeBindings($unionQuery);
 
             if ($search !== '') {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'ILIKE', "%{$search}%")
-                      ->orWhere('case_number', 'ILIKE', "%{$search}%")
-                      ->orWhere('court', 'ILIKE', "%{$search}%")
-                      ->orWhere('applicant', 'ILIKE', "%{$search}%")
-                      ->orWhere('respondent', 'ILIKE', "%{$search}%")
-                      ->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                $query->where(function ($q) use ($search, $like, $isPostgres) {
+                    $q->where('title', $like, "%{$search}%")
+                      ->orWhere('case_number', $like, "%{$search}%")
+                      ->orWhere('court', $like, "%{$search}%")
+                      ->orWhere('applicant', $like, "%{$search}%")
+                      ->orWhere('respondent', $like, "%{$search}%");
+                    if ($isPostgres) {
+                        $q->orWhereRaw("data::text ILIKE ?", ["%{$search}%"]);
+                    } else {
+                        $q->orWhere('data', 'LIKE', "%{$search}%");
+                    }
                 });
             }
 
@@ -211,7 +386,7 @@ class LegalRecordController extends Controller
                         'id' => $row->id,
                         'source_table' => 'ccma',
                         'record_type' => $row->record_type,
-                        'document_date' => $row->document_date ? substr($row->document_date, 0, 10) : null,
+                        'document_date' => $row->document_date ? substr((string)$row->document_date, 0, 10) : null,
                         'court' => $row->court,
                         'case_number' => $row->case_number,
                         'title' => $row->title,
@@ -242,7 +417,7 @@ class LegalRecordController extends Controller
                         'id' => $row->id,
                         'source_table' => 'legal',
                         'record_type' => $row->record_type,
-                        'document_date' => $row->document_date ? substr($row->document_date, 0, 10) : null,
+                        'document_date' => $row->document_date ? substr((string)$row->document_date, 0, 10) : null,
                         'court' => $row->court,
                         'case_number' => $row->case_number,
                         'title' => $row->title,
@@ -272,7 +447,6 @@ class LegalRecordController extends Controller
 
         if ($sourceTable === 'ccma') {
             $record = CcmaAnalytics::findOrFail($id);
-            // Construct a standardized payload matching CCMA structures
             $payload = [
                 'title' => $record->title,
                 'award_number' => $record->award_number,
