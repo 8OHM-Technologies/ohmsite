@@ -191,7 +191,7 @@ class LegalRecordController extends Controller
                 'source_table' => 'scrubbed',
                 'record_type' => $scrubbed->record_type,
                 'document_date' => $formatted['document_date'] ?? null,
-                'source_url' => $isPro ? $formatted['source_url'] : null,
+                'source_url' => $formatted['source_url'] ?? null,
                 'is_pro' => $isPro,
                 'data' => $formatted,
             ]);
