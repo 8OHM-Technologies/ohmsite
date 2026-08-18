@@ -67,7 +67,7 @@ const developerFeatures = computed(() => {
       'API access to all case law records (High Courts & Labour Courts)',
       'Access to advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
       'Structured OpenAPI-standard REST endpoints',
-      'Standard API rate limits (1000 req/month)',
+      'Standard API rate limits',
       'Add-ons available to increase rate limits',
       'POPIA Compliant Data Entries',
     ];
@@ -77,7 +77,7 @@ const analyticsFeatures = computed(() => {
   return analyticsProduct.value.features?.length
     ? analyticsProduct.value.features
     : [
-      'Higher API Limits (3000 req/month) & Analytics Endpoints',
+      'Higher API Limits & Analytics Endpoints',
       'Interactive Analytics Dashboard with advanced metrics and trends',
       'Jurisprudence overview & judgment volume trend analysis',
       'Precedents & citation network intelligence',
@@ -95,6 +95,7 @@ const onceOffFeatures = computed(() => {
     : [
       '20+ Years of sanitized, structured case law data',
       'Available in JSON or CSV formats',
+      'Includes all advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
       'Ideal for AI training & research pipelines',
       'POPIA Compliant Data Entries',
     ];
@@ -349,7 +350,8 @@ onMounted(() => {
               <div class="pricing-card featured" id="card-analytics">
                 <div class="pricing-card-header">
                   <div class="featured-badge">Recommended</div>
-                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || '8OHM Legal Analytics' }}</h3>
+                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || '8OHM Legal Analytics'
+                    }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
                     {{ analyticsProduct.description || 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.' }}
                   </p>
@@ -394,7 +396,7 @@ onMounted(() => {
                 <div class="pricing-card-header">
                   <h3 id="tier-dataset" class="pricing-tier-name">{{ onceOffProduct.name || 'Once-off Datasets' }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
-                    {{ onceOffProduct.description || 'Raw sanitized case law datasets in bulk for AI training, local LLM fine-tuning, or offline research.' }}
+                    {{ onceOffProduct.description || 'Raw sanitized case law datasets in bulk for AI training, local LLM fine - tuning, or offline research.' }}
                   </p>
 
                   <!-- Dataset Selection -->
