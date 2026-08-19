@@ -107,7 +107,7 @@ const lazyParams = ref<{
 }>({
   first: 0,
   rows: 25,
-  sortField: 'created_at',
+  sortField: 'document_date',
   sortOrder: -1
 });
 
@@ -124,8 +124,8 @@ const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page:
 
   const first = lazyParams.value.first || 0;
   const rows = lazyParams.value.rows || 25;
-  const sortField = lazyParams.value.sortField || 'created_at';
-  const sortOrder = lazyParams.value.sortOrder || -1;
+  const sortField = lazyParams.value.sortField || 'document_date';
+  const sortOrder = lazyParams.value.sortOrder ?? -1;
 
   try {
     const response = await axios.get('/legal-records/data', {
@@ -469,8 +469,9 @@ onMounted(() => {
 
     <!-- VIEW MODE 2: PRIME VUE DATATABLE -->
     <div v-else class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
-      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" @page="onLazy"
-        @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows" :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
+      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" :sortField="lazyParams.sortField"
+        :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows"
+        :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
         tableStyle="min-width: 60rem" class="p-datatable-dark-custom">
         <template #empty>
           <div class="py-20 text-center flex flex-col items-center">

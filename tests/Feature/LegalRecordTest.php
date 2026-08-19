@@ -87,6 +87,7 @@ class LegalRecordTest extends TestCase
     private string $targetId;
 
     protected array $createdExtractedIds = [];
+
     protected array $createdScrubbedIds = [];
 
     protected function tearDown(): void
@@ -273,6 +274,52 @@ class LegalRecordTest extends TestCase
         $response->assertJsonPath('total', 1);
     }
 
+    public function test_legal_records_data_endpoint_sorts_by_document_date_desc_by_default(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Older Case {$uniq}",
+        ], [], '2020-01-15');
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Newer Case {$uniq}",
+        ], [], '2026-03-01');
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Mid Date Case {$uniq}",
+        ], [], '2023-06-20');
+
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertCount(3, $records);
+        $this->assertSame("Newer Case {$uniq}", $records[0]['title']);
+        $this->assertSame('2026-••-••', $records[0]['document_date']);
+        $this->assertSame("Mid Date Case {$uniq}", $records[1]['title']);
+        $this->assertSame('2023-••-••', $records[1]['document_date']);
+        $this->assertSame("Older Case {$uniq}", $records[2]['title']);
+        $this->assertSame('2020-••-••', $records[2]['document_date']);
+
+        // Test with Pro User (Unmasked)
+        $proUser = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $proResponse = $this->actingAs($proUser)->getJson("/legal-records/data?category=cases&search={$uniq}");
+        $proResponse->assertStatus(200);
+        $proRecords = $proResponse->json('records');
+        $this->assertSame('2026-03-01', $proRecords[0]['document_date']);
+        $this->assertSame('2023-06-20', $proRecords[1]['document_date']);
+        $this->assertSame('2020-01-15', $proRecords[2]['document_date']);
+    }
+
     public function test_standard_user_receives_blurred_locked_record_fields(): void
     {
         $user = User::factory()->create([
@@ -440,11 +487,11 @@ class LegalRecordTest extends TestCase
     public function test_dataset_summary_uses_cache_and_can_be_invalidated(): void
     {
         Cache::put('dataset_summary', [
-            'total_records'     => 999,
-            'total_cases'       => 111,
-            'total_gazettes'    => 222,
+            'total_records' => 999,
+            'total_cases' => 111,
+            'total_gazettes' => 222,
             'total_court_rolls' => 333,
-            'date_range'        => '2000 – 2026',
+            'date_range' => '2000 – 2026',
         ], 3600);
 
         $user = User::factory()->create([
@@ -467,4 +514,3 @@ class LegalRecordTest extends TestCase
         $this->assertFalse(Cache::has('dataset_summary'));
     }
 }
-

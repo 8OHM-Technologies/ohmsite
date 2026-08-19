@@ -92,7 +92,7 @@ class LegalRecordController extends Controller
         $search = trim((string) $request->input('search', ''));
         $category = trim((string) $request->input('category', 'all'));
         $recordType = trim((string) $request->input('record_type', ''));
-        $sortField = trim((string) $request->input('sort_field', 'created_at'));
+        $sortField = trim((string) $request->input('sort_field', 'document_date'));
         $sortOrder = (int) $request->input('sort_order', -1) === 1 ? 'asc' : 'desc';
 
         $user = auth()->user();
@@ -115,7 +115,7 @@ class LegalRecordController extends Controller
         if ($category === 'cases') {
             $query->where(function ($q) {
                 $q->where('extracted_records.record_type', 'sabinet_ccma')
-                  ->orWhereRaw("extracted_records.data->>'category' = 'cases'");
+                    ->orWhereRaw("extracted_records.data->>'category' = 'cases'");
             });
         } elseif ($category === 'journals') {
             $query->whereRaw("extracted_records.data->>'category' IN ('journals', 'gaz')");
@@ -127,25 +127,35 @@ class LegalRecordController extends Controller
         if ($recordType !== '' && $recordType !== 'all') {
             $query->where(function ($q) use ($recordType) {
                 $q->where('extracted_records.record_type', $recordType)
-                  ->orWhereRaw("extracted_records.data->>'target_name' = ?", [$recordType])
-                  ->orWhereRaw("scrubbed_records.data->'metadata'->>'target_name' = ?", [$recordType]);
+                    ->orWhereRaw("extracted_records.data->>'target_name' = ?", [$recordType])
+                    ->orWhereRaw("scrubbed_records.data->'metadata'->>'target_name' = ?", [$recordType]);
             });
         }
 
         // Search query
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->whereRaw("scrubbed_records.data::text ILIKE ?", ["%{$search}%"])
-                  ->orWhereRaw("extracted_records.data::text ILIKE ?", ["%{$search}%"]);
+                $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('extracted_records.data::text ILIKE ?', ["%{$search}%"]);
             });
         }
 
         $total = $query->count();
 
         if ($sortField === 'document_date') {
-            $query->orderBy('extracted_records.document_date', $sortOrder);
-        } else {
+            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+                ->orderBy('scrubbed_records.created_at', 'desc');
+        } elseif ($sortField === 'created_at') {
             $query->orderBy('scrubbed_records.created_at', $sortOrder);
+        } elseif ($sortField === 'case_number') {
+            $query->orderByRaw("COALESCE(scrubbed_records.data->'metadata'->>'case_number', scrubbed_records.data->'extracted_data'->>'case_number', scrubbed_records.data->>'case_number', '') {$sortOrder}")
+                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
+        } elseif ($sortField === 'court') {
+            $query->orderByRaw("COALESCE(scrubbed_records.data->'extracted_data'->>'court', scrubbed_records.data->'metadata'->>'court', scrubbed_records.data->'metadata'->>'target_name', extracted_records.record_type, '') {$sortOrder}")
+                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
+        } else {
+            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+                ->orderBy('scrubbed_records.created_at', 'desc');
         }
 
         $rows = $query->offset($offset)->limit($limit)->get();
@@ -170,7 +180,7 @@ class LegalRecordController extends Controller
             ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id')
             ->where(function ($q) use ($id) {
                 $q->where('scrubbed_records.id', $id)
-                  ->orWhere('scrubbed_records.extracted_record_id', $id);
+                    ->orWhere('scrubbed_records.extracted_record_id', $id);
             })
             ->select([
                 'scrubbed_records.id',
