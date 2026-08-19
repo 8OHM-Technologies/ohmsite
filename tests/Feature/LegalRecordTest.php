@@ -402,4 +402,34 @@ class LegalRecordTest extends TestCase
         $responseCcma = $this->actingAs($user)->get('/subscriber/analytics/ccma');
         $responseCcma->assertRedirect(route('subscriptions.index'));
     }
+
+    public function test_dataset_summary_shared_prop_returns_breakdown_counts(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $this->createScrubbedRecord('sabinet_ccma', 'cases', [
+            'title' => 'Test CCMA Case 1',
+        ]);
+        $this->createScrubbedRecord('saflii_courts', 'journals', [
+            'title' => 'Test Journal 1',
+        ]);
+        $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => 'Test Court Roll 1',
+        ]);
+
+        $response = $this->actingAs($user)->get('/legal-records/cases');
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Subscriber/LegalRecords/Cases')
+            ->has('dataset_summary')
+            ->where('dataset_summary.total_records', fn ($val) => $val >= 3)
+            ->where('dataset_summary.total_cases', fn ($val) => $val >= 1)
+            ->where('dataset_summary.total_gazettes', fn ($val) => $val >= 1)
+            ->where('dataset_summary.total_court_rolls', fn ($val) => $val >= 1)
+        );
+    }
 }
+
