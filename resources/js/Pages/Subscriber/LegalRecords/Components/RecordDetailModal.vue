@@ -256,8 +256,8 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             <!-- 2. Ratio Decidendi (BLURRED + CTA IF STANDARD TIER) -->
             <div v-if="ratioDecidendi || !isPro"
               class="relative rounded-2xl overflow-hidden border border-amber-500/20 bg-amber-500/[0.04]">
-              <div class="p-5 space-y-12"
-                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none': !isPro }">
+              <div class="p-5 space-y-2"
+                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
                 <div class="flex items-center gap-2">
                   <Bookmark class="w-4 h-4 text-amber-400" />
                   <span class="text-xs font-black uppercase tracking-wider text-amber-400">Ratio Decidendi (Binding
@@ -305,8 +305,8 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             <!-- 3. Obiter Dicta -->
             <div v-if="obiterDicta || (!isPro && isPro !== null)"
               class="relative rounded-2xl overflow-hidden border border-purple-500/20 bg-purple-500/[0.04]">
-              <div class="p-5 space-y-12"
-                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none': !isPro }">
+              <div class="p-5 space-y-2"
+                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
                 <div class="flex items-center gap-2">
                   <Compass class="w-4 h-4 text-purple-400" />
                   <span class="text-xs font-black uppercase tracking-wider text-purple-400">Obiter Dicta (Judicial
@@ -327,8 +327,8 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             <!-- 4. Formal Judicial Order & Relief -->
             <div v-if="order || (!isPro && isPro !== null)"
               class="relative rounded-2xl overflow-hidden border border-emerald-500/20 bg-emerald-500/[0.04]">
-              <div class="p-5 space-y-12"
-                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none': !isPro }">
+              <div class="p-5 space-y-2"
+                :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
                 <div class="flex items-center gap-2">
                   <CheckCircle2 class="w-4 h-4 text-emerald-400" />
                   <span class="text-xs font-black uppercase tracking-wider text-emerald-400">Formal Judicial Order &amp;
