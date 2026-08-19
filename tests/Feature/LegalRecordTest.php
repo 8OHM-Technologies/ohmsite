@@ -337,6 +337,59 @@ class LegalRecordTest extends TestCase
         $response->assertJsonPath('data.precedents_cited.0.case_name_citation', 'Makwanyane [1995] ZACC 3');
     }
 
+    public function test_journal_record_returns_publication_fields_and_formatted_text(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $id = $this->createScrubbedRecord('saflii_courts', 'journals', [
+            'title' => 'The Evolution of Modern Labour Law Jurisprudence',
+            'citation' => '2026 PER 45',
+            'author' => 'Prof. S. van der Merwe',
+            'full_text' => "Paragraph 1: Introduction to constitutional employment rights.\n\nParagraph 2: Detailed comparative analysis.",
+            'summary' => 'Comprehensive legal review of modern labor dynamics.',
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('is_pro', true);
+        $response->assertJsonPath('data.category', 'journals');
+        $response->assertJsonPath('data.title', 'The Evolution of Modern Labour Law Jurisprudence');
+        $response->assertJsonPath('data.citation', '2026 PER 45');
+        $response->assertJsonPath('data.author', 'Prof. S. van der Merwe');
+        $this->assertStringContainsString('Paragraph 1', (string) $response->json('data.full_text'));
+        $response->assertJsonPath('data.summary', 'Comprehensive legal review of modern labor dynamics.');
+    }
+
+    public function test_court_roll_record_returns_schedule_entries_and_category(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $id = $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => 'Motion Court Roll for 15 March 2026',
+            'roll_entries' => [
+                ['item_no' => 1, 'case_number' => '12345/26', 'parties' => 'Alpha v Beta', 'nature' => 'Summary Judgment', 'courtroom' => '4A'],
+                ['item_no' => 2, 'case_number' => '12346/26', 'parties' => 'Gamma v Delta', 'nature' => 'Rule 43 Application', 'courtroom' => '4B'],
+            ],
+            'summary' => 'Daily motion court hearings before Justice Mokgoro.',
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('is_pro', true);
+        $response->assertJsonPath('data.category', 'other');
+        $response->assertJsonPath('data.title', 'Motion Court Roll for 15 March 2026');
+        $response->assertJsonPath('data.roll_entries.0.case_number', '12345/26');
+        $response->assertJsonPath('data.roll_entries.1.parties', 'Gamma v Delta');
+    }
+
     public function test_standard_registered_user_is_blocked_from_subscriber_analytics(): void
     {
         $user = User::factory()->create([

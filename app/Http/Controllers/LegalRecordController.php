@@ -248,6 +248,31 @@ class LegalRecordController extends Controller
         $outcome = $ext['result'] ?? $order ?? $ext['holding'] ?? null;
         $sourceUrl = $row->source_url ?? $ext['source_url'] ?? $meta['source_url'] ?? null;
 
+        $category = $ext['category'] ?? $srData['category'] ?? $erData['category'] ?? null;
+        if (! $category) {
+            if ($row->record_type === 'sabinet_ccma') {
+                $category = 'cases';
+            } elseif (str_contains($row->record_type ?? '', 'gaz')) {
+                $category = 'gaz';
+            } elseif (str_contains($row->record_type ?? '', 'journal')) {
+                $category = 'journals';
+            } elseif (str_contains($row->record_type ?? '', 'roll')) {
+                $category = 'court_rolls';
+            } else {
+                $category = 'cases';
+            }
+        }
+
+        $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? null;
+        $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? null;
+        $author = $ext['author'] ?? $srData['author'] ?? $meta['author'] ?? $meta['publisher'] ?? $applicant ?? null;
+        $citation = $ext['citation'] ?? $srData['citation'] ?? $meta['citation'] ?? $caseNumber ?? null;
+
+        $rollEntries = $ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? [];
+        if (! is_array($rollEntries)) {
+            $rollEntries = [];
+        }
+
         if (! $isPro) {
             $maskedCaseNumber = $caseNumber ? (strlen($caseNumber) > 4 ? substr($caseNumber, 0, 4).'••••' : '••••') : null;
             $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
@@ -256,6 +281,7 @@ class LegalRecordController extends Controller
                 'id' => (string) $row->id,
                 'source_table' => 'scrubbed',
                 'record_type' => $row->record_type ?? 'saflii_courts',
+                'category' => $category,
                 'is_locked' => true,
                 'is_pro' => false,
                 'document_date' => $maskedDate,
@@ -267,9 +293,14 @@ class LegalRecordController extends Controller
                 'source_url' => null,
                 'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
                 'respondent' => $respondent ? 'Respondent (Locked - Pro Required)' : null,
+                'author' => $author ? 'Author (Locked - Pro Required)' : null,
+                'citation' => $citation ? 'Citation (Locked - Pro Required)' : null,
                 'subjects' => $subjects,
                 'outcome' => $outcome ? 'Judicial Order (Locked - Pro Required)' : null,
                 'summary' => $summary,
+                'full_text' => $fullText ? (strlen($fullText) > 600 ? substr($fullText, 0, 600) : $fullText) : null,
+                'center_content' => null,
+                'roll_entries' => count($rollEntries) > 3 ? array_slice($rollEntries, 0, 3) : $rollEntries,
                 'ratio_decidendi' => $ratioDecidendi ? 'The binding legal principles (Ratio Decidendi) and judicial reasoning for this matter are available exclusively with a Pro Case Law or Pro Analytics subscription. Upgrade your account to inspect full headnotes, cited authorities, and procedural history.' : null,
                 'obiter_dicta' => $obiterDicta ? 'Judicial observations and obiter dicta are reserved for Pro Subscribers.' : null,
                 'order' => $order ? 'Formal court order details and relief granted are locked. Upgrade to Pro to inspect unredacted orders.' : null,
@@ -286,6 +317,7 @@ class LegalRecordController extends Controller
             'id' => (string) $row->id,
             'source_table' => 'scrubbed',
             'record_type' => $row->record_type ?? 'saflii_courts',
+            'category' => $category,
             'is_locked' => false,
             'is_pro' => true,
             'document_date' => $docDate,
@@ -297,9 +329,14 @@ class LegalRecordController extends Controller
             'source_url' => $sourceUrl,
             'applicant' => $applicant,
             'respondent' => $respondent,
+            'author' => $author,
+            'citation' => $citation,
             'subjects' => $subjects,
             'outcome' => $outcome,
             'summary' => $summary,
+            'full_text' => $fullText,
+            'center_content' => $centerContent,
+            'roll_entries' => $rollEntries,
             'ratio_decidendi' => $ratioDecidendi,
             'obiter_dicta' => $obiterDicta,
             'order' => $order,

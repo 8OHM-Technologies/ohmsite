@@ -509,6 +509,7 @@ onMounted(() => {
       :show="detailModalVisible"
       :loading="detailLoading"
       :record-detail="selectedDetail"
+      category="court_rolls"
       @close="detailModalVisible = false"
     />
   </component>

@@ -464,6 +464,7 @@ onMounted(() => {
       :show="detailModalVisible"
       :loading="detailLoading"
       :record-detail="selectedDetail"
+      category="journals"
       @close="detailModalVisible = false"
     />
   </component>
