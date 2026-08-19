@@ -9,6 +9,7 @@ use App\Models\ScrubbedRecord;
 use App\Models\TargetVanity;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -237,6 +238,8 @@ class PopulateLegalAnalytics extends Command
 
         // Generate the CSV and JSON dataset files
         $this->generateDatasetFiles();
+
+        Cache::forget('dataset_summary');
 
         return self::SUCCESS;
     }

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\TargetVanity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -405,6 +406,8 @@ class LegalRecordTest extends TestCase
 
     public function test_dataset_summary_shared_prop_returns_breakdown_counts(): void
     {
+        Cache::forget('dataset_summary');
+
         $user = User::factory()->create([
             'email_verified_at' => now(),
             'role' => 'admin',
@@ -430,6 +433,38 @@ class LegalRecordTest extends TestCase
             ->where('dataset_summary.total_gazettes', fn ($val) => $val >= 1)
             ->where('dataset_summary.total_court_rolls', fn ($val) => $val >= 1)
         );
+
+        $this->assertTrue(Cache::has('dataset_summary'));
+    }
+
+    public function test_dataset_summary_uses_cache_and_can_be_invalidated(): void
+    {
+        Cache::put('dataset_summary', [
+            'total_records'     => 999,
+            'total_cases'       => 111,
+            'total_gazettes'    => 222,
+            'total_court_rolls' => 333,
+            'date_range'        => '2000 – 2026',
+        ], 3600);
+
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($user)->get('/legal-records/cases');
+        $response->assertStatus(200);
+        $response->assertInertia(fn (Assert $page) => $page
+            ->component('Subscriber/LegalRecords/Cases')
+            ->where('dataset_summary.total_records', 999)
+            ->where('dataset_summary.total_cases', 111)
+            ->where('dataset_summary.total_gazettes', 222)
+            ->where('dataset_summary.total_court_rolls', 333)
+            ->where('dataset_summary.date_range', '2000 – 2026')
+        );
+
+        Cache::forget('dataset_summary');
+        $this->assertFalse(Cache::has('dataset_summary'));
     }
 }
 
