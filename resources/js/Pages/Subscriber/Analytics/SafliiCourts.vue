@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import SubscriberLayout from '@/Layouts/SubscriberLayout.vue';
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
+import Skeleton from 'primevue/skeleton';
 import {
     Scale,
     Gavel,
@@ -322,166 +323,290 @@ const filterByJudgeQuick = (judgeName) => {
 
             <!-- TAB 1: JURISPRUDENCE OVERVIEW -->
             <div v-if="activeTab === 'overview'" class="space-y-6">
-                <!-- KPI Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
+                <!-- Skeleton State for Tab 1 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <!-- KPI Grid Skeleton -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div v-for="i in 4" :key="i" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl space-y-3">
+                            <div class="flex items-center justify-between">
+                                <Skeleton width="45%" height="0.8rem" class="bg-zinc-800" />
+                                <Skeleton width="1.25rem" height="1.25rem" shape="circle" class="bg-zinc-800" />
+                            </div>
+                            <Skeleton width="60%" height="2.25rem" class="bg-zinc-800" />
+                            <Skeleton width="75%" height="0.75rem" class="bg-zinc-800" />
+                        </div>
+                    </div>
+
+                    <!-- Courts Distribution Row Skeleton -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div v-for="i in 3" :key="i" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl flex items-center justify-between">
+                            <div class="space-y-2 w-2/3">
+                                <Skeleton width="40%" height="0.75rem" class="bg-zinc-800" />
+                                <Skeleton width="70%" height="1.25rem" class="bg-zinc-800" />
+                                <Skeleton width="50%" height="0.75rem" class="bg-zinc-800" />
+                            </div>
+                            <div class="space-y-1.5 w-1/4 flex flex-col items-end">
+                                <Skeleton width="70%" height="1.75rem" class="bg-zinc-800" />
+                                <Skeleton width="90%" height="0.6rem" class="bg-zinc-800" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 30-Year Jurisprudence Timeline Skeleton -->
+                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                        <div class="space-y-2">
+                            <Skeleton width="40%" height="1.25rem" class="bg-zinc-800" />
+                            <Skeleton width="60%" height="0.85rem" class="bg-zinc-800" />
+                        </div>
+                        <Skeleton width="100%" height="320px" class="bg-zinc-800/40 rounded-xl" />
+                    </div>
+                </template>
+
+                <!-- Loaded State for Tab 1 -->
+                <template v-else>
+                    <!-- KPI Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Judgments</span>
+                                <Scale class="w-4 h-4 text-admin-modern" />
+                            </div>
+                            <div class="text-3xl font-black text-white mt-2">{{ totals.total_cases }}</div>
+                            <p class="text-[10px] text-zinc-500 mt-1">ZACC & ZACAC Appellate Decisions</p>
+                        </div>
+
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Reportable Rate</span>
+                                <Award class="w-4 h-4 text-emerald-400" />
+                            </div>
+                            <div class="text-3xl font-black text-emerald-400 mt-2">{{ totals.reportable_percentage }}%</div>
+                            <p class="text-[10px] text-zinc-500 mt-1">{{ totals.reportable_count }} precedent-setting judgments</p>
+                        </div>
+
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Precedents Network</span>
+                                <BookOpen class="w-4 h-4 text-purple-400" />
+                            </div>
+                            <div class="text-3xl font-black text-purple-400 mt-2">{{ totals.total_precedents.toLocaleString() }}</div>
+                            <p class="text-[10px] text-zinc-500 mt-1">Avg {{ totals.avg_precedents_per_case }} citations per decision</p>
+                        </div>
+
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Adjudication Velocity</span>
+                                <Clock class="w-4 h-4 text-rose-400" />
+                            </div>
+                            <div class="text-3xl font-black text-rose-400 mt-2">{{ totals.avg_hearing_to_judgment_days }} <span class="text-xs font-normal text-zinc-400">days</span></div>
+                            <p class="text-[10px] text-zinc-500 mt-1">Hearing to judgment delivery avg</p>
+                        </div>
+                    </div>
+
+                    <!-- Courts Distribution Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div v-for="c in courtsBreakdown" :key="c.court" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl flex items-center justify-between">
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-admin-modern">Court Authority</span>
+                                <h4 class="text-sm font-bold text-white">{{ c.court }}</h4>
+                                <p class="text-xs text-zinc-400">{{ c.count }} Judgments published</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-white">{{ c.percentage }}%</div>
+                                <span class="text-[10px] text-zinc-500 font-bold uppercase">Jurisdiction Share</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 30-Year Jurisprudence Timeline Area Chart -->
+                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Judgments</span>
-                            <Scale class="w-4 h-4 text-admin-modern" />
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">Jurisprudential Timeline & Adjudication Speed (1995–2026)</h3>
+                                <p class="text-xs text-zinc-400 mt-0.5">Annual volume of published judgments alongside average days from hearing to decision.</p>
+                            </div>
                         </div>
-                        <div class="text-3xl font-black text-white mt-2">{{ totals.total_cases }}</div>
-                        <p class="text-[10px] text-zinc-500 mt-1">ZACC & ZACAC Appellate Decisions</p>
+                        <VueApexCharts type="area" height="320" :options="timelineChartOptions" :series="timelineSeries" />
                     </div>
-
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Reportable Rate</span>
-                            <Award class="w-4 h-4 text-emerald-400" />
-                        </div>
-                        <div class="text-3xl font-black text-emerald-400 mt-2">{{ totals.reportable_percentage }}%</div>
-                        <p class="text-[10px] text-zinc-500 mt-1">{{ totals.reportable_count }} precedent-setting judgments</p>
-                    </div>
-
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Precedents Network</span>
-                            <BookOpen class="w-4 h-4 text-purple-400" />
-                        </div>
-                        <div class="text-3xl font-black text-purple-400 mt-2">{{ totals.total_precedents.toLocaleString() }}</div>
-                        <p class="text-[10px] text-zinc-500 mt-1">Avg {{ totals.avg_precedents_per_case }} citations per decision</p>
-                    </div>
-
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Adjudication Velocity</span>
-                            <Clock class="w-4 h-4 text-rose-400" />
-                        </div>
-                        <div class="text-3xl font-black text-rose-400 mt-2">{{ totals.avg_hearing_to_judgment_days }} <span class="text-xs font-normal text-zinc-400">days</span></div>
-                        <p class="text-[10px] text-zinc-500 mt-1">Hearing to judgment delivery avg</p>
-                    </div>
-                </div>
-
-                <!-- Courts Distribution Row -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div v-for="c in courtsBreakdown" :key="c.court" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl flex items-center justify-between">
-                        <div class="space-y-1">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-admin-modern">Court Authority</span>
-                            <h4 class="text-sm font-bold text-white">{{ c.court }}</h4>
-                            <p class="text-xs text-zinc-400">{{ c.count }} Judgments published</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-2xl font-black text-white">{{ c.percentage }}%</div>
-                            <span class="text-[10px] text-zinc-500 font-bold uppercase">Jurisdiction Share</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 30-Year Jurisprudence Timeline Area Chart -->
-                <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Jurisprudential Timeline & Adjudication Speed (1995–2026)</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Annual volume of published judgments alongside average days from hearing to decision.</p>
-                        </div>
-                    </div>
-                    <VueApexCharts type="area" height="320" :options="timelineChartOptions" :series="timelineSeries" />
-                </div>
+                </template>
             </div>
 
             <!-- TAB 2: PRECEDENTS & CITATIONS NETWORK -->
             <div v-if="activeTab === 'precedents'" class="space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Precedent Treatment Breakdown -->
+                <!-- Skeleton State for Tab 2 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <div class="space-y-2">
+                                <Skeleton width="50%" height="1.25rem" class="bg-zinc-800" />
+                                <Skeleton width="80%" height="0.8rem" class="bg-zinc-800" />
+                            </div>
+                            <Skeleton width="100%" height="280px" class="bg-zinc-800/40 rounded-xl" />
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
+                            <div class="space-y-2">
+                                <Skeleton width="40%" height="1.25rem" class="bg-zinc-800" />
+                                <Skeleton width="70%" height="0.8rem" class="bg-zinc-800" />
+                            </div>
+                            <Skeleton width="100%" height="280px" class="bg-zinc-800/40 rounded-xl" />
+                        </div>
+                    </div>
+
+                    <!-- Top Cited Authorities Skeleton Grid -->
                     <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
-                        <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Treatment of Citations</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">How cited precedents and statutes were applied, referred, or distinguished.</p>
+                        <div class="flex items-center justify-between">
+                            <Skeleton width="35%" height="1.25rem" class="bg-zinc-800" />
+                            <Skeleton width="15%" height="0.85rem" class="bg-zinc-800" />
                         </div>
-                        <VueApexCharts type="donut" height="280" :options="treatmentsChartOptions" :series="treatmentsSeries" />
-                    </div>
-
-                    <!-- Right: Citation Density Distribution -->
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
-                        <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Citation Intensity Distribution</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Number of decisions by volume of precedents and statutory sections cited.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div v-for="i in 6" :key="i" class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl space-y-3">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2 w-3/4">
+                                        <Skeleton width="1.25rem" height="1.25rem" shape="circle" class="bg-zinc-800" />
+                                        <Skeleton width="80%" height="1rem" class="bg-zinc-800" />
+                                    </div>
+                                    <Skeleton width="20%" height="1.2rem" class="bg-zinc-800" />
+                                </div>
+                                <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                                    <Skeleton width="50%" height="0.75rem" class="bg-zinc-800" />
+                                    <Skeleton width="25%" height="0.75rem" class="bg-zinc-800" />
+                                </div>
+                            </div>
                         </div>
-                        <VueApexCharts type="bar" height="280" :options="densityChartOptions" :series="densitySeries" />
                     </div>
-                </div>
+                </template>
 
-                <!-- Top Cited Authorities Leaderboard -->
-                <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white">Most Cited Landmark Authorities & Acts</h3>
-                        <span class="text-xs text-zinc-500 font-bold uppercase">Top 15 References</span>
+                <!-- Loaded State for Tab 2 -->
+                <template v-else>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: Precedent Treatment Breakdown -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">Treatment of Citations</h3>
+                                <p class="text-xs text-zinc-400 mt-0.5">How cited precedents and statutes were applied, referred, or distinguished.</p>
+                            </div>
+                            <VueApexCharts type="donut" height="280" :options="treatmentsChartOptions" :series="treatmentsSeries" />
+                        </div>
+
+                        <!-- Right: Citation Density Distribution -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">Citation Intensity Distribution</h3>
+                                <p class="text-xs text-zinc-400 mt-0.5">Number of decisions by volume of precedents and statutory sections cited.</p>
+                            </div>
+                            <VueApexCharts type="bar" height="280" :options="densityChartOptions" :series="densitySeries" />
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        <div v-for="(p, idx) in precedentsIntel.top_cited" :key="p.citation"
-                            class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl space-y-2 hover:border-admin-modern/30 transition-all group">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-mono font-bold text-zinc-400 group-hover:text-admin-modern">
-                                        {{ idx + 1 }}
-                                    </span>
-                                    <span class="font-bold text-xs text-white group-hover:text-admin-modern transition-colors line-clamp-1">
-                                        {{ p.citation }}
+                    <!-- Top Cited Authorities Leaderboard -->
+                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Most Cited Landmark Authorities & Acts</h3>
+                            <span class="text-xs text-zinc-500 font-bold uppercase">Top 15 References</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div v-for="(p, idx) in precedentsIntel.top_cited" :key="p.citation"
+                                class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl space-y-2 hover:border-admin-modern/30 transition-all group">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center text-[10px] font-mono font-bold text-zinc-400 group-hover:text-admin-modern">
+                                            {{ idx + 1 }}
+                                        </span>
+                                        <span class="font-bold text-xs text-white group-hover:text-admin-modern transition-colors line-clamp-1">
+                                            {{ p.citation }}
+                                        </span>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-black bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shrink-0">
+                                        {{ p.count }} citations
                                     </span>
                                 </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-black bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shrink-0">
-                                    {{ p.count }} citations
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-white/5">
-                                <span>Primary Treatment: <strong class="text-zinc-300">{{ p.treatment }}</strong></span>
-                                <a v-if="p.url" :href="p.url" target="_blank" rel="noopener noreferrer"
-                                    class="text-admin-modern hover:underline flex items-center gap-1">
-                                    LawCite <ExternalLink class="w-3 h-3" />
-                                </a>
+                                <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-white/5">
+                                    <span>Primary Treatment: <strong class="text-zinc-300">{{ p.treatment }}</strong></span>
+                                    <a v-if="p.url" :href="p.url" target="_blank" rel="noopener noreferrer"
+                                        class="text-admin-modern hover:underline flex items-center gap-1">
+                                        LawCite <ExternalLink class="w-3 h-3" />
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
 
             <!-- TAB 3: JUDICIAL BENCH & PANELS -->
             <div v-if="activeTab === 'bench'" class="space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Panel Sizes -->
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
-                        <div>
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Bench Composition</h3>
-                            <p class="text-xs text-zinc-400 mt-0.5">Distribution of single-judge vs appellate bench panels.</p>
-                        </div>
-                        <VueApexCharts type="donut" height="280" :options="panelSizeChartOptions" :series="panelSizeSeries" />
-                    </div>
-
-                    <!-- Right: Most Active Judges Leaderboard -->
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">Active Presiding Judges & Justices</h3>
-                                <p class="text-xs text-zinc-400 mt-0.5">Judges ranked by judgment authoring and panel appearances.</p>
+                <!-- Skeleton State for Tab 3 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <div class="space-y-2">
+                                <Skeleton width="45%" height="1.25rem" class="bg-zinc-800" />
+                                <Skeleton width="75%" height="0.8rem" class="bg-zinc-800" />
                             </div>
-                            <span class="text-xs text-zinc-500 font-bold uppercase">{{ benchIntel.top_judges.length }} Judges</span>
+                            <Skeleton width="100%" height="280px" class="bg-zinc-800/40 rounded-xl" />
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div v-for="j in benchIntel.top_judges" :key="j.name"
-                                class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-admin-modern/30 transition-all">
-                                <div>
-                                    <h5 class="text-xs font-bold text-white">{{ j.name }}</h5>
-                                    <p class="text-[10px] text-zinc-400 mt-0.5">Avg {{ j.avg_precedents }} citations cited in decisions</p>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="space-y-2 w-1/2">
+                                    <Skeleton width="60%" height="1.25rem" class="bg-zinc-800" />
+                                    <Skeleton width="80%" height="0.8rem" class="bg-zinc-800" />
                                 </div>
-                                <button @click="filterByJudgeQuick(j.name)"
-                                    class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-admin-modern/10 text-admin-modern border border-admin-modern/20 hover:bg-admin-modern hover:text-black transition-all">
-                                    {{ j.cases_count }} Cases
-                                </button>
+                                <Skeleton width="20%" height="0.85rem" class="bg-zinc-800" />
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div v-for="i in 6" :key="i" class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                                    <div class="space-y-2 w-2/3">
+                                        <Skeleton width="70%" height="1rem" class="bg-zinc-800" />
+                                        <Skeleton width="90%" height="0.75rem" class="bg-zinc-800" />
+                                    </div>
+                                    <Skeleton width="25%" height="1.75rem" class="bg-zinc-800 rounded-lg" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </template>
+
+                <!-- Loaded State for Tab 3 -->
+                <template v-else>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: Panel Sizes -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-white">Bench Composition</h3>
+                                <p class="text-xs text-zinc-400 mt-0.5">Distribution of single-judge vs appellate bench panels.</p>
+                            </div>
+                            <VueApexCharts type="donut" height="280" :options="panelSizeChartOptions" :series="panelSizeSeries" />
+                        </div>
+
+                        <!-- Right: Most Active Judges Leaderboard -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-bold uppercase tracking-wider text-white">Active Presiding Judges & Justices</h3>
+                                    <p class="text-xs text-zinc-400 mt-0.5">Judges ranked by judgment authoring and panel appearances.</p>
+                                </div>
+                                <span class="text-xs text-zinc-500 font-bold uppercase">{{ benchIntel.top_judges.length }} Judges</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div v-for="j in benchIntel.top_judges" :key="j.name"
+                                    class="bg-zinc-950/60 border border-white/5 p-4 rounded-xl flex items-center justify-between hover:border-admin-modern/30 transition-all">
+                                    <div>
+                                        <h5 class="text-xs font-bold text-white">{{ j.name }}</h5>
+                                        <p class="text-[10px] text-zinc-400 mt-0.5">Avg {{ j.avg_precedents }} citations cited in decisions</p>
+                                    </div>
+                                    <button @click="filterByJudgeQuick(j.name)"
+                                        class="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-admin-modern/10 text-admin-modern border border-admin-modern/20 hover:bg-admin-modern hover:text-black transition-all">
+                                        {{ j.cases_count }} Cases
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </SubscriberLayout>

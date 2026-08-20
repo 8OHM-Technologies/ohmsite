@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import SubscriberLayout from '@/Layouts/SubscriberLayout.vue';
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
+import Skeleton from 'primevue/skeleton';
 import {
     Calendar,
     Clock,
@@ -387,46 +388,79 @@ const employerSignatureSeries = computed(() => profileEmployerStats.value?.signa
 
             <!-- TAB 1: EXECUTIVE OVERVIEW -->
             <div v-if="activeTab === 'overview'" class="space-y-6">
-                <!-- KPI Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Arbitrations</span>
-                        <div class="text-2xl font-black text-white mt-1">{{ totalCasesCount }}</div>
-                        <span class="text-[10px] text-emerald-400 font-medium">Filtered dataset sample</span>
+                <!-- Skeleton State for Tab 1 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <!-- KPI Grid Skeleton -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div v-for="i in 4" :key="i" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl space-y-3">
+                            <Skeleton width="45%" height="0.8rem" class="bg-zinc-800" />
+                            <Skeleton width="55%" height="2rem" class="bg-zinc-800" />
+                            <Skeleton width="70%" height="0.75rem" class="bg-zinc-800" />
+                        </div>
                     </div>
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Hearing Duration</span>
-                        <div class="text-2xl font-black text-admin-modern mt-1">{{ avgHearingDuration }} <span class="text-xs font-normal text-zinc-400">days</span></div>
-                        <span class="text-[10px] text-zinc-400 font-medium">Session to conclusion</span>
-                    </div>
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Decision Velocity</span>
-                        <div class="text-2xl font-black text-purple-400 mt-1">{{ avgTimeToAward }} <span class="text-xs font-normal text-zinc-400">days</span></div>
-                        <span class="text-[10px] text-zinc-400 font-medium">Hearing end to award date</span>
-                    </div>
-                    <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Ingestion Latency</span>
-                        <div class="text-2xl font-black text-rose-400 mt-1">{{ avgDataLatency }} <span class="text-xs font-normal text-zinc-400">days</span></div>
-                        <span class="text-[10px] text-zinc-400 font-medium">Award issue to scrape date</span>
-                    </div>
-                </div>
 
-                <!-- Charts Row -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Primary Dispute Categories</h3>
-                        <VueApexCharts type="donut" height="300" :options="disputeTypeChartOptions" :series="disputeTypeSeries" />
+                    <!-- Charts Row Skeleton -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <Skeleton width="45%" height="1.25rem" class="bg-zinc-800" />
+                            <Skeleton width="100%" height="300px" class="bg-zinc-800/40 rounded-xl" />
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <Skeleton width="60%" height="1.25rem" class="bg-zinc-800" />
+                            <Skeleton width="100%" height="300px" class="bg-zinc-800/40 rounded-xl" />
+                        </div>
                     </div>
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Seasonal Arbitration Inflow & Retrenchment Spikes</h3>
-                        <VueApexCharts type="area" height="300" :options="monthlyTrendOptions" :series="monthlyTrendSeries" />
+                </template>
+
+                <!-- Loaded State for Tab 1 -->
+                <template v-else>
+                    <!-- KPI Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Arbitrations</span>
+                            <div class="text-2xl font-black text-white mt-1">{{ totalCasesCount }}</div>
+                            <span class="text-[10px] text-emerald-400 font-medium">Filtered dataset sample</span>
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Hearing Duration</span>
+                            <div class="text-2xl font-black text-admin-modern mt-1">{{ avgHearingDuration }} <span class="text-xs font-normal text-zinc-400">days</span></div>
+                            <span class="text-[10px] text-zinc-400 font-medium">Session to conclusion</span>
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Decision Velocity</span>
+                            <div class="text-2xl font-black text-purple-400 mt-1">{{ avgTimeToAward }} <span class="text-xs font-normal text-zinc-400">days</span></div>
+                            <span class="text-[10px] text-zinc-400 font-medium">Hearing end to award date</span>
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Avg Ingestion Latency</span>
+                            <div class="text-2xl font-black text-rose-400 mt-1">{{ avgDataLatency }} <span class="text-xs font-normal text-zinc-400">days</span></div>
+                            <span class="text-[10px] text-zinc-400 font-medium">Award issue to scrape date</span>
+                        </div>
                     </div>
-                </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Primary Dispute Categories</h3>
+                            <VueApexCharts type="donut" height="300" :options="disputeTypeChartOptions" :series="disputeTypeSeries" />
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Seasonal Arbitration Inflow & Retrenchment Spikes</h3>
+                            <VueApexCharts type="area" height="300" :options="monthlyTrendOptions" :series="monthlyTrendSeries" />
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <!-- TAB 2: PROCEDURAL VELOCITY -->
             <div v-if="activeTab === 'velocity'" class="space-y-6">
-                <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
+                <!-- Skeleton State for Tab 2 -->
+                <div v-if="analyticsLoading || !analyticsData" class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                    <Skeleton width="55%" height="1.25rem" class="bg-zinc-800" />
+                    <Skeleton width="100%" height="340px" class="bg-zinc-800/40 rounded-xl" />
+                </div>
+                <!-- Loaded State for Tab 2 -->
+                <div v-else class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Regional Process Efficiency (Hearing, Award & Publishing Delay)</h3>
                     <VueApexCharts type="bar" height="340" :options="velocityChartOptions" :series="velocitySeries" />
                 </div>
@@ -434,89 +468,144 @@ const employerSignatureSeries = computed(() => profileEmployerStats.value?.signa
 
             <!-- TAB 3: SPATIAL & LABOR TRENDS -->
             <div v-if="activeTab === 'trends'" class="space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Geographical Dispute Distribution by Province</h3>
-                        <VueApexCharts type="bar" height="320" :options="provincialDensityOptions" :series="provincialDensitySeries" />
-                    </div>
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Industry Sector Benchmarking</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[10px]">
-                                        <th class="py-2">Industry Sector</th>
-                                        <th class="py-2">Cases</th>
-                                        <th class="py-2">Avg Hearing</th>
-                                        <th class="py-2">Avg Award</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-white/5 text-zinc-300">
-                                    <tr v-for="ind in industryBenchmarking" :key="ind.name">
-                                        <td class="py-2.5 font-medium text-white">{{ ind.name }}</td>
-                                        <td class="py-2.5">{{ ind.count }} ({{ ind.share }}%)</td>
-                                        <td class="py-2.5">{{ ind.avgHearing }}d</td>
-                                        <td class="py-2.5">{{ ind.avgAward }}d</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- Skeleton State for Tab 3 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <Skeleton width="50%" height="1.25rem" class="bg-zinc-800" />
+                            <Skeleton width="100%" height="320px" class="bg-zinc-800/40 rounded-xl" />
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                            <Skeleton width="45%" height="1.25rem" class="bg-zinc-800" />
+                            <div class="space-y-3 pt-2">
+                                <div v-for="i in 6" :key="i" class="flex justify-between items-center py-2 border-b border-white/5">
+                                    <Skeleton width="35%" height="1rem" class="bg-zinc-800" />
+                                    <Skeleton width="20%" height="1rem" class="bg-zinc-800" />
+                                    <Skeleton width="15%" height="1rem" class="bg-zinc-800" />
+                                    <Skeleton width="15%" height="1rem" class="bg-zinc-800" />
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
+
+                <!-- Loaded State for Tab 3 -->
+                <template v-else>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Geographical Dispute Distribution by Province</h3>
+                            <VueApexCharts type="bar" height="320" :options="provincialDensityOptions" :series="provincialDensitySeries" />
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Industry Sector Benchmarking</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[10px]">
+                                            <th class="py-2">Industry Sector</th>
+                                            <th class="py-2">Cases</th>
+                                            <th class="py-2">Avg Hearing</th>
+                                            <th class="py-2">Avg Award</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/5 text-zinc-300">
+                                        <tr v-for="ind in industryBenchmarking" :key="ind.name">
+                                            <td class="py-2.5 font-medium text-white">{{ ind.name }}</td>
+                                            <td class="py-2.5">{{ ind.count }} ({{ ind.share }}%)</td>
+                                            <td class="py-2.5">{{ ind.avgHearing }}d</td>
+                                            <td class="py-2.5">{{ ind.avgAward }}d</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <!-- TAB 4: EMPLOYER RISK PROFILING -->
             <div v-if="activeTab === 'employer-risk'" class="space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Left: Top Repeat Appellants -->
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-1">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Most Frequent Respondent Employers</h3>
-                        <div class="space-y-2">
-                            <button v-for="emp in repeatAppellants" :key="emp.name" @click="selectedEmployer = emp.name"
-                                class="w-full text-left p-3 rounded-xl border transition-all text-xs"
-                                :class="selectedEmployer === emp.name ? 'bg-admin-modern/10 border-admin-modern/30 text-white' : 'bg-white/[0.02] border-white/5 text-zinc-400 hover:text-white hover:bg-white/5'">
-                                <div class="font-bold truncate text-white">{{ emp.name }}</div>
-                                <div class="flex items-center justify-between text-[10px] text-zinc-400 mt-1">
-                                    <span>{{ emp.industry }}</span>
-                                    <span class="font-bold text-admin-modern">{{ emp.count }} cases</span>
+                <!-- Skeleton State for Tab 4 -->
+                <template v-if="analyticsLoading || !analyticsData">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-1 space-y-4">
+                            <Skeleton width="60%" height="1.25rem" class="bg-zinc-800" />
+                            <div class="space-y-2">
+                                <div v-for="i in 5" :key="i" class="p-3 rounded-xl border border-white/5 bg-white/[0.02] space-y-2">
+                                    <Skeleton width="70%" height="1rem" class="bg-zinc-800" />
+                                    <div class="flex justify-between">
+                                        <Skeleton width="45%" height="0.75rem" class="bg-zinc-800" />
+                                        <Skeleton width="25%" height="0.75rem" class="bg-zinc-800" />
+                                    </div>
                                 </div>
-                            </button>
+                            </div>
+                        </div>
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-6">
+                            <div class="space-y-2 border-b border-white/5 pb-4">
+                                <Skeleton width="40%" height="1.5rem" class="bg-zinc-800" />
+                                <Skeleton width="30%" height="0.85rem" class="bg-zinc-800" />
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <Skeleton v-for="i in 3" :key="i" width="100%" height="4.5rem" class="bg-zinc-800/40 rounded-xl" />
+                            </div>
+                            <Skeleton width="100%" height="260px" class="bg-zinc-800/40 rounded-xl" />
                         </div>
                     </div>
+                </template>
 
-                    <!-- Right: Selected Employer Profile -->
-                    <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-6">
-                        <div v-if="!profileEmployerStats" class="py-16 text-center text-zinc-500 text-xs">
-                            Select an employer from the list to view their risk profile & dispute signature.
+                <!-- Loaded State for Tab 4 -->
+                <template v-else>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: Top Repeat Appellants -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-1">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-white mb-4">Most Frequent Respondent Employers</h3>
+                            <div class="space-y-2">
+                                <button v-for="emp in repeatAppellants" :key="emp.name" @click="selectedEmployer = emp.name"
+                                    class="w-full text-left p-3 rounded-xl border transition-all text-xs"
+                                    :class="selectedEmployer === emp.name ? 'bg-admin-modern/10 border-admin-modern/30 text-white' : 'bg-white/[0.02] border-white/5 text-zinc-400 hover:text-white hover:bg-white/5'">
+                                    <div class="font-bold truncate text-white">{{ emp.name }}</div>
+                                    <div class="flex items-center justify-between text-[10px] text-zinc-400 mt-1">
+                                        <span>{{ emp.industry }}</span>
+                                        <span class="font-bold text-admin-modern">{{ emp.count }} cases</span>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
-                        <div v-else class="space-y-6">
-                            <div class="border-b border-white/5 pb-4">
-                                <h4 class="text-base font-black text-white">{{ selectedEmployer }}</h4>
-                                <p class="text-xs text-zinc-400">Total Arbitrations in Records: <span class="text-admin-modern font-bold">{{ profileEmployerStats.count }}</span></p>
-                            </div>
 
-                            <div class="grid grid-cols-3 gap-3 text-center">
-                                <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
-                                    <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Avg Hearing</span>
-                                    <div class="text-base font-black text-white mt-1">{{ profileEmployerStats.avgHearing }}d</div>
-                                </div>
-                                <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
-                                    <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Avg Award Time</span>
-                                    <div class="text-base font-black text-admin-modern mt-1">{{ profileEmployerStats.avgAward }}d</div>
-                                </div>
-                                <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
-                                    <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Primary Risk</span>
-                                    <div class="text-xs font-black text-rose-400 mt-1 truncate">{{ profileEmployerStats.primaryDispute }}</div>
-                                </div>
+                        <!-- Right: Selected Employer Profile -->
+                        <div class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl lg:col-span-2 space-y-6">
+                            <div v-if="!profileEmployerStats" class="py-16 text-center text-zinc-500 text-xs">
+                                Select an employer from the list to view their risk profile & dispute signature.
                             </div>
+                            <div v-else class="space-y-6">
+                                <div class="border-b border-white/5 pb-4">
+                                    <h4 class="text-base font-black text-white">{{ selectedEmployer }}</h4>
+                                    <p class="text-xs text-zinc-400">Total Arbitrations in Records: <span class="text-admin-modern font-bold">{{ profileEmployerStats.count }}</span></p>
+                                </div>
 
-                            <div>
-                                <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Dispute Signature Breakdown</h5>
-                                <VueApexCharts type="donut" height="260" :options="employerSignatureChartOptions" :series="employerSignatureSeries" />
+                                <div class="grid grid-cols-3 gap-3 text-center">
+                                    <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
+                                        <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Avg Hearing</span>
+                                        <div class="text-base font-black text-white mt-1">{{ profileEmployerStats.avgHearing }}d</div>
+                                    </div>
+                                    <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
+                                        <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Avg Award Time</span>
+                                        <div class="text-base font-black text-admin-modern mt-1">{{ profileEmployerStats.avgAward }}d</div>
+                                    </div>
+                                    <div class="bg-zinc-950 p-3 rounded-xl border border-white/5">
+                                        <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Primary Risk</span>
+                                        <div class="text-xs font-black text-rose-400 mt-1 truncate">{{ profileEmployerStats.primaryDispute }}</div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">Dispute Signature Breakdown</h5>
+                                    <VueApexCharts type="donut" height="260" :options="employerSignatureChartOptions" :series="employerSignatureSeries" />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
 
             <!-- Live Cases Table Section -->
@@ -525,7 +614,21 @@ const employerSignatureSeries = computed(() => profileEmployerStats.value?.signa
                     <h3 class="text-sm font-bold uppercase tracking-wider text-white">Recent Arbitration Awards Stream</h3>
                     <span class="text-xs text-zinc-500 font-medium">Showing {{ enrichedCases.length }} records</span>
                 </div>
-                <div class="overflow-x-auto">
+
+                <!-- Skeleton state for Table -->
+                <div v-if="analyticsLoading || !analyticsData" class="space-y-3">
+                    <div v-for="i in 8" :key="i" class="flex items-center justify-between py-3 px-3 border-b border-white/5 bg-zinc-950/20 rounded-lg">
+                        <Skeleton width="15%" height="1.2rem" class="bg-zinc-800" />
+                        <Skeleton width="25%" height="1.2rem" class="bg-zinc-800" />
+                        <Skeleton width="15%" height="1.2rem" class="bg-zinc-800" />
+                        <Skeleton width="15%" height="1.2rem" class="bg-zinc-800" />
+                        <Skeleton width="12%" height="1.2rem" class="bg-zinc-800" />
+                        <Skeleton width="8%" height="1.5rem" class="bg-zinc-800 rounded-lg" />
+                    </div>
+                </div>
+
+                <!-- Loaded Table -->
+                <div v-else class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
                         <thead>
                             <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[10px]">
