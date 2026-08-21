@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Dataset;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class DemoControllerTest extends TestCase
@@ -23,7 +23,7 @@ class DemoControllerTest extends TestCase
                 [
                     'title' => 'Sample Case',
                     'employer' => 'Sample Employer',
-                ]
+                ],
             ],
         ]);
 

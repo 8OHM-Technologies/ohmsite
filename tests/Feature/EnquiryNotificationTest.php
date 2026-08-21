@@ -3,12 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Notifications\NewUserRegistered;
-use App\Notifications\WebsiteEnquiryReceived;
 use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Telegraph as TelegraphCore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -74,7 +73,7 @@ class EnquiryNotificationTest extends TestCase
         Telegraph::assertSent("✉️ <b>New Website Enquiry!</b>\n\n<b>Name:</b> John Doe\n<b>Email:</b> johndoe@example.com\n<b>Division:</b> General\n\n<b>Message:</b>\n<code>Hello, I have a question.</code>");
 
         // Verify forwarding HTTP request
-        Http::assertSent(function ($request) use ($payload) {
+        Http::assertSent(function ($request) {
             return $request->url() === 'https://control-plane.8ohm.co.za/api/send-website-enquiry'
                 && $request->method() === 'POST'
                 && $request['name'] === 'John Doe'
@@ -89,7 +88,7 @@ class EnquiryNotificationTest extends TestCase
      */
     public function test_user_registration_sends_notification_to_admins(): void
     {
-        \Illuminate\Support\Facades\Mail::fake();
+        Mail::fake();
 
         Telegraph::fake([
             TelegraphCore::ENDPOINT_MESSAGE => ['result' => ['message_id' => 999]],

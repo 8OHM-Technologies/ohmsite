@@ -3,9 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CcmaAnalytics;
-use App\Models\BackupCcmaAnalytics;
 use App\Models\LegalAnalytics;
-use App\Models\BackupLegalAnalytics;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;

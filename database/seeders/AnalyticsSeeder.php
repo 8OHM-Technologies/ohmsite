@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Analytics;
+use App\Models\Dataset;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
@@ -13,7 +14,7 @@ class AnalyticsSeeder extends Seeder
      */
     public function run(): void
     {
-        $dataset = \App\Models\Dataset::where('slug', 'ccma')->first();
+        $dataset = Dataset::where('slug', 'ccma')->first();
         $cases = $dataset ? ($dataset->demo_data ?? []) : [];
 
         if (empty($cases)) {

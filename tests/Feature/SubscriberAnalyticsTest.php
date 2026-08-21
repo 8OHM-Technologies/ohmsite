@@ -17,26 +17,31 @@ class SubscriberAnalyticsTest extends TestCase
 
     protected function subscribeUser(User $user): void
     {
+        if (! $user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
         $product = Product::factory()->create([
             'name' => 'Analytics Dashboard',
             'slug' => 'pro-analytics',
         ]);
         $order = Order::create([
-            'user_id'        => $user->id,
-            'email'          => $user->email,
-            'first_name'     => 'John',
-            'last_name'      => 'Doe',
-            'address'        => '123 Street',
-            'city'           => 'Johannesburg',
-            'country'        => 'South Africa',
-            'phone'          => '123456789',
-            'total_amount'   => $product->price,
-            'status'         => 'confirmed',
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'address' => '123 Street',
+            'city' => 'Johannesburg',
+            'country' => 'South Africa',
+            'phone' => '123456789',
+            'total_amount' => $product->price,
+            'status' => 'confirmed',
             'payment_status' => 'paid',
         ]);
         $order->items()->create([
             'product_id' => $product->id,
-            'quantity'   => 1,
+            'quantity' => 1,
             'unit_price' => $product->price,
         ]);
     }
@@ -154,8 +159,8 @@ class SubscriberAnalyticsTest extends TestCase
         $this->subscribeUser($user);
 
         CcmaAnalytics::factory()->count(3)->create([
-            'employer'             => 'TestCorp Ltd',
-            'court_location'       => 'Gauteng [Johannesburg]',
+            'employer' => 'TestCorp Ltd',
+            'court_location' => 'Gauteng [Johannesburg]',
             'reason_for_dismissal' => 'MISCONDUCT',
         ]);
 
@@ -193,12 +198,12 @@ class SubscriberAnalyticsTest extends TestCase
         $this->subscribeUser($user);
 
         LegalAnalytics::factory()->create([
-            'target_name'   => 'ZACC',
-            'target_type'   => 'cases',
-            'court'         => 'Constitutional Court of South Africa',
-            'case_number'   => 'CCT 01/20',
+            'target_name' => 'ZACC',
+            'target_type' => 'cases',
+            'court' => 'Constitutional Court of South Africa',
+            'case_number' => 'CCT 01/20',
             'document_date' => '2020-05-15',
-            'data'          => [
+            'data' => [
                 'extracted_data' => [
                     'court' => 'Constitutional Court of South Africa',
                     'reportable' => true,
@@ -206,10 +211,10 @@ class SubscriberAnalyticsTest extends TestCase
                     'ratio_decidendi' => 'Section 27 enforces right to access.',
                     'judges' => ['Cameron J', 'Froneman J'],
                     'precedents_cited' => [
-                        ['case_name_citation' => '[1999] ZACC 17', 'treatment' => 'Applied/Followed']
+                        ['case_name_citation' => '[1999] ZACC 17', 'treatment' => 'Applied/Followed'],
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $response = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts');
@@ -243,7 +248,7 @@ class SubscriberAnalyticsTest extends TestCase
 
         LegalAnalytics::factory()->count(4)->create([
             'target_name' => 'ZACC',
-            'court'       => 'ZACC',
+            'court' => 'ZACC',
         ]);
 
         $response = $this->actingAs($user)->getJson('/subscriber/analytics/data?target_name=ZACC');

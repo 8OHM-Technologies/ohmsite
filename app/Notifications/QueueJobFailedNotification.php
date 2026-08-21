@@ -17,8 +17,7 @@ class QueueJobFailedNotification extends Notification
         public string $jobName,
         public string $exceptionMessage,
         public ?int $attempts = null,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

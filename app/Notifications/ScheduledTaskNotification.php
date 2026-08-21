@@ -17,8 +17,7 @@ class ScheduledTaskNotification extends Notification
         public ?string $output = null,
         public ?float $runtimeInSeconds = null,
         public ?int $exitCode = null,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -50,7 +49,7 @@ class ScheduledTaskNotification extends Notification
             $html .= "<b>Exit Code:</b> <code>{$this->exitCode}</code>\n";
         }
 
-        if (!empty($this->output)) {
+        if (! empty($this->output)) {
             $sanitizedOutput = htmlspecialchars(Str::limit($this->output, 500), ENT_QUOTES, 'UTF-8');
             $label = $isSuccess ? 'Output' : 'Error Details';
             $html .= "\n<b>{$label}:</b>\n<pre>{$sanitizedOutput}</pre>";

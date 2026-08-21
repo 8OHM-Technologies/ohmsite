@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class LegalAnalytics extends Model
 {
@@ -32,11 +32,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $val = $ext['applicant_plaintiff'] ?? $this->data['applicant_plaintiff'] ?? $ext['employee'] ?? $this->data['employee'] ?? null;
+
                 return is_array($val) ? implode(', ', $val) : $val;
             }
         );
@@ -49,11 +50,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $val = $ext['respondent_defendant'] ?? $this->data['respondent_defendant'] ?? $ext['employer'] ?? $this->data['employer'] ?? null;
+
                 return is_array($val) ? implode(', ', $val) : $val;
             }
         );
@@ -66,10 +68,11 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
+
                 return $ext['court_location'] ?? $this->data['court_location'] ?? null;
             }
         );
@@ -82,11 +85,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $val = $ext['reason_for_dismissal'] ?? $this->data['reason_for_dismissal'] ?? $ext['subjects'] ?? $this->data['subjects'] ?? $ext['keywords'] ?? $this->data['keywords'] ?? null;
+
                 return is_array($val) ? implode(', ', $val) : $val;
             }
         );
@@ -99,11 +103,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $val = $ext['result'] ?? $this->data['result'] ?? $ext['order'] ?? $this->data['order'] ?? $ext['holding'] ?? $this->data['holding'] ?? null;
+
                 return is_array($val) ? implode(', ', $val) : $val;
             }
         );
@@ -116,10 +121,11 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
+
                 return $ext['summary'] ?? $this->data['summary'] ?? null;
             }
         );
@@ -132,10 +138,11 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
+
                 return $ext['ratio_decidendi'] ?? $this->data['ratio_decidendi'] ?? null;
             }
         );
@@ -148,10 +155,11 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
+
                 return $ext['obiter_dicta'] ?? $this->data['obiter_dicta'] ?? null;
             }
         );
@@ -164,10 +172,11 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return $value;
                 }
                 $ext = $this->data['extracted_data'] ?? [];
+
                 return $ext['order'] ?? $this->data['order'] ?? null;
             }
         );
@@ -180,11 +189,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return is_array($value) ? $value : [$value];
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $j = $ext['judges'] ?? $this->data['judges'] ?? [];
+
                 return is_array($j) ? $j : ($j ? [$j] : []);
             }
         );
@@ -197,11 +207,12 @@ class LegalAnalytics extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!empty($value)) {
+                if (! empty($value)) {
                     return is_array($value) ? $value : [];
                 }
                 $ext = $this->data['extracted_data'] ?? [];
                 $p = $ext['precedents_cited'] ?? $this->data['precedents_cited'] ?? [];
+
                 return is_array($p) ? $p : [];
             }
         );
@@ -224,6 +235,7 @@ class LegalAnalytics extends Model
                 if (isset($this->data['reportable'])) {
                     return (bool) $this->data['reportable'];
                 }
+
                 return true;
             }
         );

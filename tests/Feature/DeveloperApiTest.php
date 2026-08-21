@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\CcmaAnalytics;
 use App\Models\ApiKey;
+use App\Models\CcmaAnalytics;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;

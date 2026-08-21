@@ -7,7 +7,7 @@ use App\Models\LegalAnalytics;
 use App\Models\ScrubbedRecord;
 use App\Models\TargetVanity;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriberAnalyticsService
 {
@@ -36,9 +36,28 @@ class SubscriberAnalyticsService
      */
     public function getSafliiCourtsPayload(array $filters = []): array
     {
+        if (app()->runningUnitTests()) {
+            return $this->computeSafliiCourtsPayload($filters);
+        }
+
+        $cacheKey = 'subscriber:analytics:saflii:'.md5(serialize($filters));
+
+        return Cache::remember($cacheKey, 900, function () use ($filters) {
+            return $this->computeSafliiCourtsPayload($filters);
+        });
+    }
+
+    /**
+     * Compute comprehensive SAFLII Courts jurisprudence analytics payload.
+     *
+     * @param  array{court?: string, judge?: string, year?: string, reportable?: string, search?: string}  $filters
+     * @return array<string, mixed>
+     */
+    private function computeSafliiCourtsPayload(array $filters = []): array
+    {
         $courtFilter = $filters['court'] ?? 'All';
         $judgeFilter = $filters['judge'] ?? 'All';
-        $yearFilter  = $filters['year'] ?? 'All';
+        $yearFilter = $filters['year'] ?? 'All';
         $reportableFilter = $filters['reportable'] ?? 'All';
         $searchFilter = trim($filters['search'] ?? '');
 
@@ -46,8 +65,7 @@ class SubscriberAnalyticsService
         $legalQuery = LegalAnalytics::query()
             ->where(function ($q) {
                 $q->where('target_type', 'cases')
-                  ->orWhereIn('target_name', ['ZACC', 'ZACAC', 'saflii_courts'])
-                  ->orWhere('document_type', 'LIKE', '%court%');
+                    ->orWhereIn('target_name', ['ZACC', 'ZACAC', 'saflii_courts']);
             });
 
         $legalRecords = $legalQuery->get();
@@ -61,14 +79,14 @@ class SubscriberAnalyticsService
                 $meta = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
 
                 $judges = $ext['judges'] ?? $payload['judges'] ?? [];
-                if (!is_array($judges)) {
+                if (! is_array($judges)) {
                     $judges = $judges ? [$judges] : [];
                 }
                 // Filter out generic placeholder strings
-                $judges = array_values(array_filter($judges, fn ($j) => !empty($j) && !str_starts_with((string)$j, '[Not explicitly')));
+                $judges = array_values(array_filter($judges, fn ($j) => ! empty($j) && ! str_starts_with((string) $j, '[Not explicitly')));
 
                 $precedents = $ext['precedents_cited'] ?? $payload['precedents_cited'] ?? [];
-                if (!is_array($precedents)) {
+                if (! is_array($precedents)) {
                     $precedents = [];
                 }
 
@@ -98,7 +116,7 @@ class SubscriberAnalyticsService
                     'hearing_date' => $hDateStr,
                     'judgment_date' => $jDateStr,
                     'duration_days' => $durationDays,
-                    'reportable' => isset($ext['reportable']) ? (bool)$ext['reportable'] : (isset($payload['reportable']) ? (bool)$payload['reportable'] : true),
+                    'reportable' => isset($ext['reportable']) ? (bool) $ext['reportable'] : (isset($payload['reportable']) ? (bool) $payload['reportable'] : true),
                     'judges' => $judges,
                     'applicant' => $rec->applicant ?: ($ext['applicant_plaintiff'] ?? 'N/A'),
                     'respondent' => $rec->respondent ?: (is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'N/A')),
@@ -127,13 +145,13 @@ class SubscriberAnalyticsService
                     $meta = is_array($payload['metadata'] ?? null) ? $payload['metadata'] : [];
 
                     $judges = $ext['judges'] ?? $payload['judges'] ?? [];
-                    if (!is_array($judges)) {
+                    if (! is_array($judges)) {
                         $judges = $judges ? [$judges] : [];
                     }
-                    $judges = array_values(array_filter($judges, fn ($j) => !empty($j) && !str_starts_with((string)$j, '[Not explicitly')));
+                    $judges = array_values(array_filter($judges, fn ($j) => ! empty($j) && ! str_starts_with((string) $j, '[Not explicitly')));
 
                     $precedents = $ext['precedents_cited'] ?? $payload['precedents_cited'] ?? [];
-                    if (!is_array($precedents)) {
+                    if (! is_array($precedents)) {
                         $precedents = [];
                     }
 
@@ -163,7 +181,7 @@ class SubscriberAnalyticsService
                         'hearing_date' => $hDateStr,
                         'judgment_date' => $jDateStr,
                         'duration_days' => $durationDays,
-                        'reportable' => isset($ext['reportable']) ? (bool)$ext['reportable'] : true,
+                        'reportable' => isset($ext['reportable']) ? (bool) $ext['reportable'] : true,
                         'judges' => $judges,
                         'applicant' => $ext['applicant_plaintiff'] ?? 'N/A',
                         'respondent' => is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'N/A'),
@@ -233,9 +251,9 @@ class SubscriberAnalyticsService
 
             // Precedents citations
             foreach ($item['precedents_cited'] as $prec) {
-                $cName = trim((string)($prec['case_name_citation'] ?? ''));
+                $cName = trim((string) ($prec['case_name_citation'] ?? ''));
                 if ($cName) {
-                    if (!isset($precedentsFrequency[$cName])) {
+                    if (! isset($precedentsFrequency[$cName])) {
                         $precedentsFrequency[$cName] = [
                             'citation' => $cName,
                             'count' => 0,
@@ -272,7 +290,7 @@ class SubscriberAnalyticsService
             if ($item['document_date']) {
                 $yr = substr($item['document_date'], 0, 4);
                 if ($yr) {
-                    if (!isset($yearsData[$yr])) {
+                    if (! isset($yearsData[$yr])) {
                         $yearsData[$yr] = ['count' => 0, 'duration_sum' => 0, 'duration_count' => 0];
                     }
                     $yearsData[$yr]['count']++;
@@ -297,7 +315,7 @@ class SubscriberAnalyticsService
 
             foreach ($jList as $j) {
                 $allJudges[$j] = true;
-                if (!isset($judgeStats[$j])) {
+                if (! isset($judgeStats[$j])) {
                     $judgeStats[$j] = ['name' => $j, 'cases_count' => 0, 'precedents_sum' => 0];
                 }
                 $judgeStats[$j]['cases_count']++;
@@ -345,12 +363,12 @@ class SubscriberAnalyticsService
                 }
             }
             if ($judgeFilter !== 'All') {
-                if (!in_array($judgeFilter, $item['judges'], true)) {
+                if (! in_array($judgeFilter, $item['judges'], true)) {
                     return false;
                 }
             }
             if ($yearFilter !== 'All') {
-                if (!$item['document_date'] || !str_starts_with($item['document_date'], $yearFilter)) {
+                if (! $item['document_date'] || ! str_starts_with($item['document_date'], $yearFilter)) {
                     return false;
                 }
             }
@@ -363,18 +381,19 @@ class SubscriberAnalyticsService
             if ($searchFilter !== '') {
                 $needle = strtolower($searchFilter);
                 $haystack = strtolower(
-                    $item['title'] . ' ' .
-                    $item['case_number'] . ' ' .
-                    $item['applicant'] . ' ' .
-                    $item['respondent'] . ' ' .
-                    ($item['summary'] ?? '') . ' ' .
-                    ($item['ratio_decidendi'] ?? '') . ' ' .
+                    $item['title'].' '.
+                    $item['case_number'].' '.
+                    $item['applicant'].' '.
+                    $item['respondent'].' '.
+                    ($item['summary'] ?? '').' '.
+                    ($item['ratio_decidendi'] ?? '').' '.
                     ($item['order'] ?? '')
                 );
                 if (strpos($haystack, $needle) === false) {
                     return false;
                 }
             }
+
             return true;
         }));
 
@@ -423,9 +442,28 @@ class SubscriberAnalyticsService
      */
     public function getCcmaPayload(array $filters = []): array
     {
+        if (app()->runningUnitTests()) {
+            return $this->computeCcmaPayload($filters);
+        }
+
+        $cacheKey = 'subscriber:analytics:ccma:'.md5(serialize($filters));
+
+        return Cache::remember($cacheKey, 900, function () use ($filters) {
+            return $this->computeCcmaPayload($filters);
+        });
+    }
+
+    /**
+     * Compute aggregated CCMA analytics payload for the given filter params.
+     *
+     * @param  array{province: string, category: string, month: string, employer: string}  $filters
+     * @return array<string, mixed>
+     */
+    private function computeCcmaPayload(array $filters = []): array
+    {
         $province = $filters['province'] ?? 'All';
         $category = $filters['category'] ?? 'All';
-        $month    = $filters['month'] ?? 'All';
+        $month = $filters['month'] ?? 'All';
         $employer = $filters['employer'] ?? 'All';
 
         $baseQuery = CcmaAnalytics::query();
@@ -509,15 +547,15 @@ class SubscriberAnalyticsService
 
         $provinces = $allRows->map(fn ($r) => $this->parseProvince($r->court_location))->filter()->unique()->sort()->values()->all();
         $employers = $allRows->map(fn ($r) => $r->employer)->filter()->unique()->sort()->values()->all();
-        $months    = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         return [
-            'type'       => 'ccma',
-            'cases'      => $rows->values()->all(),
+            'type' => 'ccma',
+            'cases' => $rows->values()->all(),
             'filter_options' => [
                 'provinces' => $provinces,
                 'employers' => $employers,
-                'months'    => $months,
+                'months' => $months,
             ],
         ];
     }
@@ -529,13 +567,31 @@ class SubscriberAnalyticsService
      */
     public function getLegalPayload(string $targetName): array
     {
+        if (app()->runningUnitTests()) {
+            return $this->computeLegalPayload($targetName);
+        }
+
+        $cacheKey = 'subscriber:analytics:legal:'.md5($targetName);
+
+        return Cache::remember($cacheKey, 900, function () use ($targetName) {
+            return $this->computeLegalPayload($targetName);
+        });
+    }
+
+    /**
+     * Compute server-side aggregated analytics payload for a given SAFLII target.
+     *
+     * @return array<string, mixed>
+     */
+    private function computeLegalPayload(string $targetName): array
+    {
         $vanity = TargetVanity::where('target_name', $targetName)->first();
 
         $base = LegalAnalytics::where('target_name', $targetName);
 
-        $total          = (clone $base)->count();
+        $total = (clone $base)->count();
         $withCaseNumber = (clone $base)->whereNotNull('case_number')->where('case_number', '!=', '')->count();
-        $withDate       = (clone $base)->whereNotNull('document_date')->count();
+        $withDate = (clone $base)->whereNotNull('document_date')->count();
 
         // Fetch the lightweight columns needed for aggregation
         $allRows = (clone $base)
@@ -555,11 +611,11 @@ class SubscriberAnalyticsService
 
         // Volume by month name
         $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        $byMonth    = [];
+        $byMonth = [];
         foreach ($allRows as $row) {
             $mo = (int) substr((string) $row->document_date, 5, 2);
             if ($mo >= 1 && $mo <= 12) {
-                $name           = $monthNames[$mo - 1];
+                $name = $monthNames[$mo - 1];
                 $byMonth[$name] = ($byMonth[$name] ?? 0) + 1;
             }
         }
@@ -592,20 +648,20 @@ class SubscriberAnalyticsService
             ->toArray();
 
         return [
-            'type'        => 'legal',
+            'type' => 'legal',
             'target_name' => $targetName,
             'vanity_name' => $vanity?->vanity_name ?? $targetName,
             'target_type' => $vanity?->target_type ?? 'cases',
-            'totals'      => [
-                'total'           => $total,
+            'totals' => [
+                'total' => $total,
                 'with_case_number' => $withCaseNumber,
-                'with_date'       => $withDate,
+                'with_date' => $withDate,
             ],
-            'by_year'          => $byYear,
-            'by_month'         => $byMonth,
+            'by_year' => $byYear,
+            'by_month' => $byMonth,
             'by_document_type' => $byDocumentType,
-            'top_courts'       => $topCourts,
-            'recent'           => $recent,
+            'top_courts' => $topCourts,
+            'recent' => $recent,
         ];
     }
 

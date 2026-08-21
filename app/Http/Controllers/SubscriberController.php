@@ -42,21 +42,21 @@ class SubscriberController extends Controller
 
         if ($type === 'saflii_courts' || $targetName === 'saflii_courts' || $targetName === 'courts') {
             $filters = [
-                'court'      => (string) $request->input('court', 'All'),
-                'judge'      => (string) $request->input('judge', 'All'),
-                'year'       => (string) $request->input('year', 'All'),
+                'court' => (string) $request->input('court', 'All'),
+                'judge' => (string) $request->input('judge', 'All'),
+                'year' => (string) $request->input('year', 'All'),
                 'reportable' => (string) $request->input('reportable', 'All'),
-                'search'     => (string) $request->input('search', ''),
+                'search' => (string) $request->input('search', ''),
             ];
 
             return response()->json($this->analytics->getSafliiCourtsPayload($filters));
         }
 
-        if ($targetName === 'sabinet_ccma' || $type === 'ccma' || (!$targetName && !$type)) {
+        if ($targetName === 'sabinet_ccma' || $type === 'ccma' || (! $targetName && ! $type)) {
             $filters = [
                 'province' => (string) $request->input('province', 'All'),
                 'category' => (string) $request->input('category', 'All'),
-                'month'    => (string) $request->input('month', 'All'),
+                'month' => (string) $request->input('month', 'All'),
                 'employer' => (string) $request->input('employer', 'All'),
             ];
 

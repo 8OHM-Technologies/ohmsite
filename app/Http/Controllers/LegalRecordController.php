@@ -107,7 +107,6 @@ class LegalRecordController extends Controller
                 'extracted_records.record_type',
                 'extracted_records.source_url',
                 'extracted_records.document_date',
-                'extracted_records.data as er_data',
                 'scrubbed_records.created_at',
             ]);
 
@@ -159,7 +158,7 @@ class LegalRecordController extends Controller
         }
 
         $rows = $query->offset($offset)->limit($limit)->get();
-        $records = $rows->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro));
+        $records = $rows->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro, false));
 
         return response()->json([
             'total' => $total,
@@ -194,7 +193,7 @@ class LegalRecordController extends Controller
             ->first();
 
         if ($scrubbed) {
-            $formatted = $this->formatScrubbedRecord($scrubbed, $isPro);
+            $formatted = $this->formatScrubbedRecord($scrubbed, $isPro, true);
 
             return response()->json([
                 'id' => (string) $scrubbed->id,
@@ -213,7 +212,7 @@ class LegalRecordController extends Controller
     /**
      * Format a scrubbed record from pgsql_coeus into a structured dossier item.
      */
-    private function formatScrubbedRecord($row, bool $isPro = true): array
+    private function formatScrubbedRecord($row, bool $isPro = true, bool $isDetail = false): array
     {
         $srData = is_array($row->data) ? $row->data : (json_decode($row->data ?? '{}', true) ?: []);
         $erData = isset($row->er_data) ? (is_array($row->er_data) ? $row->er_data : json_decode($row->er_data ?? '{}', true)) : [];
@@ -273,15 +272,21 @@ class LegalRecordController extends Controller
             }
         }
 
-        $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? null;
-        $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? null;
+        // Only parse full text and heavy content when single-record detail is requested
+        $fullText = null;
+        $centerContent = null;
+        $rollEntries = [];
+        if ($isDetail) {
+            $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? null;
+            $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? null;
+            $rollEntries = $ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? [];
+            if (! is_array($rollEntries)) {
+                $rollEntries = [];
+            }
+        }
+
         $author = $ext['author'] ?? $srData['author'] ?? $meta['author'] ?? $meta['publisher'] ?? $applicant ?? null;
         $citation = $ext['citation'] ?? $srData['citation'] ?? $meta['citation'] ?? $caseNumber ?? null;
-
-        $rollEntries = $ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? [];
-        if (! is_array($rollEntries)) {
-            $rollEntries = [];
-        }
 
         if (! $isPro) {
             $maskedCaseNumber = $caseNumber ? (strlen($caseNumber) > 4 ? substr($caseNumber, 0, 4).'••••' : '••••') : null;
@@ -352,7 +357,7 @@ class LegalRecordController extends Controller
             'order' => $order,
             'judges' => $judges,
             'precedents_count' => count($precedentsCited),
-            'precedents_cited' => $precedentsCited,
+            'precedents_cited' => $isDetail ? $precedentsCited : [],
             'reportable' => (bool) $reportable,
             'duration_days' => $durationDays,
             'court_location' => $courtLocation,

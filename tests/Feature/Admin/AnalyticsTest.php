@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AnalyticsTest extends TestCase
@@ -63,10 +64,10 @@ class AnalyticsTest extends TestCase
                     'total_scraped' => 393,
                     'active_scraped_count' => 391,
                     'scrape_rate_per_hour' => 571.1,
-                    'uptime_seconds' => 2464
-                ]
+                    'uptime_seconds' => 2464,
+                ],
             ]),
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
 
         $response = $this->actingAs($admin)->get(route('admin.analytics.index'));
@@ -81,8 +82,8 @@ class AnalyticsTest extends TestCase
 
     public function test_admin_can_refresh_scraping_metrics()
     {
-        \Illuminate\Support\Facades\Http::fake([
-            'https://control-plane.8ohm.co.za/api/pipelines/analytics/*' => \Illuminate\Support\Facades\Http::response(['status' => 'ok'], 200),
+        Http::fake([
+            'https://control-plane.8ohm.co.za/api/pipelines/analytics/*' => Http::response(['status' => 'ok'], 200),
         ]);
 
         $admin = User::factory()->create([
@@ -93,7 +94,7 @@ class AnalyticsTest extends TestCase
         $response = $this->actingAs($admin)->post(route('admin.analytics.refresh-scraping'));
 
         $response->assertRedirect();
-        \Illuminate\Support\Facades\Http::assertSent(function ($request) {
+        Http::assertSent(function ($request) {
             return str_contains($request->url(), 'https://control-plane.8ohm.co.za/api/pipelines/analytics/');
         });
     }

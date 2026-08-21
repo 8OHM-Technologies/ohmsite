@@ -134,7 +134,7 @@ class DatasetManagementTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.datasets.index'));
-        
+
         $dataset = Dataset::where('slug', 'json-dataset')->first();
         $this->assertNotNull($dataset);
         $this->assertEquals([['key' => 'value']], $dataset->demo_data);

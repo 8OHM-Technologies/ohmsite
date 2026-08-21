@@ -13,11 +13,9 @@ class WebsiteEnquiryReceived extends Notification
     /**
      * Create a new notification instance.
      *
-     * @param array{name: string, email: string, division: string, message: string} $enquiry
+     * @param  array{name: string, email: string, division: string, message: string}  $enquiry
      */
-    public function __construct(public array $enquiry)
-    {
-    }
+    public function __construct(public array $enquiry) {}
 
     /**
      * Get the notification's delivery channels.
@@ -43,8 +41,8 @@ class WebsiteEnquiryReceived extends Notification
         $html = "✉️ <b>New Website Enquiry!</b>\n\n".
             "<b>Name:</b> {$this->enquiry['name']}\n".
             "<b>Email:</b> {$this->enquiry['email']}\n".
-            "<b>Division:</b> ".ucfirst($this->enquiry['division'])."\n\n".
-            "<b>Message:</b>\n<code>".e($this->enquiry['message'])."</code>";
+            '<b>Division:</b> '.ucfirst($this->enquiry['division'])."\n\n".
+            "<b>Message:</b>\n<code>".e($this->enquiry['message']).'</code>';
 
         return TelegraphMessage::make($html)->html();
     }

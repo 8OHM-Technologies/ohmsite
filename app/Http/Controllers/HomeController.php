@@ -115,7 +115,7 @@ class HomeController extends Controller
     public function datasetSample(string $slug)
     {
         $dataset = Dataset::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        
+
         $data = $dataset->demo_data ?? [];
 
         $keysToRemove = [
@@ -124,7 +124,7 @@ class HomeController extends Controller
             'detail_title',
             'employee',
             'preview_image_url',
-            'details_scraped_at'
+            'details_scraped_at',
         ];
 
         if (is_array($data)) {
@@ -135,6 +135,7 @@ class HomeController extends Controller
                             unset($item[$key]);
                         }
                     }
+
                     return $item;
                 }, $data);
             } else {

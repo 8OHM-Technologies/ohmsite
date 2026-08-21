@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ExtractedRecord extends Model
 {
@@ -74,7 +76,7 @@ class ExtractedRecord extends Model
     /**
      * Relation to Target.
      */
-    public function target(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function target(): BelongsTo
     {
         return $this->belongsTo(Target::class, 'target_id', 'id');
     }
@@ -82,7 +84,7 @@ class ExtractedRecord extends Model
     /**
      * Relation to ScrubbedRecord.
      */
-    public function scrubbedRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function scrubbedRecord(): HasOne
     {
         return $this->hasOne(ScrubbedRecord::class, 'extracted_record_id', 'id');
     }
@@ -90,7 +92,7 @@ class ExtractedRecord extends Model
     /**
      * Relation to ParsedRecord.
      */
-    public function parsedRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function parsedRecord(): HasOne
     {
         return $this->hasOne(ParsedRecord::class, 'extracted_record_id', 'id');
     }

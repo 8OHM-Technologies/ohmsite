@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ScrapingPipelineMetrics;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -186,14 +187,12 @@ class AnalyticsService
 
     /**
      * Get scraping pipeline metrics from coeus database.
-     *
-     * @return array
      */
     public function getScrapingPipelineMetrics(): array
     {
         $this->enforceAdmin();
 
-        return \App\Models\ScrapingPipelineMetrics::all()->map(function ($metric) {
+        return ScrapingPipelineMetrics::all()->map(function ($metric) {
             return [
                 'id' => $metric->id,
                 'pipeline_name' => $metric->pipeline_name,

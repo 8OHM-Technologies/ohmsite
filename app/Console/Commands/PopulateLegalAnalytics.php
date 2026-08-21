@@ -3,12 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\CcmaAnalytics;
-use App\Models\ExtractedRecord;
 use App\Models\LegalAnalytics;
 use App\Models\ScrubbedRecord;
 use App\Models\TargetVanity;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -37,8 +35,9 @@ class PopulateLegalAnalytics extends Command
         try {
             return $this->doHandle();
         } catch (\Throwable $e) {
-            $this->error("FATAL EXCEPTION: " . $e->getMessage());
-            $this->error("At file: " . $e->getFile() . " line " . $e->getLine());
+            $this->error('FATAL EXCEPTION: '.$e->getMessage());
+            $this->error('At file: '.$e->getFile().' line '.$e->getLine());
+
             return self::FAILURE;
         }
     }
@@ -49,7 +48,7 @@ class PopulateLegalAnalytics extends Command
         $fresh = (bool) $this->option('fresh');
 
         if ($fresh) {
-            $this->info("Fresh mode enabled: truncating local legal_analytics table...");
+            $this->info('Fresh mode enabled: truncating local legal_analytics table...');
             LegalAnalytics::truncate();
         }
 
@@ -130,6 +129,7 @@ class PopulateLegalAnalytics extends Command
 
                     if (empty($payload)) {
                         $skippedCount++;
+
                         continue;
                     }
 
@@ -144,7 +144,7 @@ class PopulateLegalAnalytics extends Command
 
                         $extractedCode = null;
                         $extractedType = 'cases';
-                        if (!empty($sourceUrl) && preg_match('/\/(cases|journals|gazettes|other|rolls)\/([A-Za-z0-9_-]+)\//i', $sourceUrl, $m)) {
+                        if (! empty($sourceUrl) && preg_match('/\/(cases|journals|gazettes|other|rolls)\/([A-Za-z0-9_-]+)\//i', $sourceUrl, $m)) {
                             $extractedType = strtolower($m[1]) === 'gazettes' ? 'gaz' : (strtolower($m[1]) === 'rolls' ? 'other' : strtolower($m[1]));
                             $extractedCode = $m[2];
                         }
@@ -177,14 +177,14 @@ class PopulateLegalAnalytics extends Command
                                 $respondent = implode(', ', $respondent);
                             }
                             if ($applicant && $respondent) {
-                                $title = $applicant . ' v ' . $respondent;
+                                $title = $applicant.' v '.$respondent;
                             }
                         }
                         if (empty($title) && ! empty($extractedRecord?->data)) {
                             $rawPayload = is_string($extractedRecord->data) ? json_decode($extractedRecord->data, true) : (array) $extractedRecord->data;
                             $title = $rawPayload['title'] ?? $rawPayload['name'] ?? null;
                         }
-                        $title = $title ?: ('Record #' . substr($scrubbedRecord->extracted_record_id, 0, 8));
+                        $title = $title ?: ('Record #'.substr($scrubbedRecord->extracted_record_id, 0, 8));
 
                         $documentType = $metaData['record_type'] ?? $extractedRecord?->record_type ?? 'saflii_courts';
                         $documentDate = $extractedRecord?->document_date ? $extractedRecord->document_date->toDateString() : ($extData['judgment_date'] ?? $extData['hearing_date'] ?? $metaData['document_date'] ?? $payload['judgment_date'] ?? $payload['date'] ?? null);
@@ -217,7 +217,7 @@ class PopulateLegalAnalytics extends Command
                     } catch (\Throwable $e) {
                         $sample = $chunkPrepared[0] ?? [];
                         unset($sample['data']);
-                        throw new \Exception("INSERT FAILURE: " . $e->getMessage() . " | Sample row metadata: " . json_encode($sample));
+                        throw new \Exception('INSERT FAILURE: '.$e->getMessage().' | Sample row metadata: '.json_encode($sample));
                     }
                 }
 
@@ -228,7 +228,7 @@ class PopulateLegalAnalytics extends Command
             }
         });
 
-        $this->info("Successfully processed {$processedCount} records. Deleted " . count($deletedIds) . " obsolete records.");
+        $this->info("Successfully processed {$processedCount} records. Deleted ".count($deletedIds).' obsolete records.');
         if ($skippedCount > 0) {
             $this->warn("Skipped {$skippedCount} records due to empty data payload.");
         }
@@ -297,7 +297,7 @@ class PopulateLegalAnalytics extends Command
                 CcmaAnalytics::query()->chunk(10, function ($ccmaItems) use (&$csvData, &$jsonData) {
                     foreach ($ccmaItems as $item) {
                         $row = [
-                            'CCMA_' . $item->id,
+                            'CCMA_'.$item->id,
                             $item->award_number,
                             $item->title,
                             $item->employer,
@@ -312,7 +312,7 @@ class PopulateLegalAnalytics extends Command
                         $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val ?? '').'"', $row));
 
                         $jsonData[] = [
-                            'id' => 'CCMA_' . $item->id,
+                            'id' => 'CCMA_'.$item->id,
                             'case_reference' => $item->award_number,
                             'title' => $item->title,
                             'employer' => $item->employer,
@@ -331,7 +331,7 @@ class PopulateLegalAnalytics extends Command
                 LegalAnalytics::query()->chunk(10, function ($legalItems) use (&$csvData, &$jsonData) {
                     foreach ($legalItems as $item) {
                         $row = [
-                            'LEGAL_' . $item->id,
+                            'LEGAL_'.$item->id,
                             $item->case_number,
                             $item->title,
                             $item->respondent,
@@ -346,7 +346,7 @@ class PopulateLegalAnalytics extends Command
                         $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val ?? '').'"', $row));
 
                         $jsonData[] = [
-                            'id' => 'LEGAL_' . $item->id,
+                            'id' => 'LEGAL_'.$item->id,
                             'case_reference' => $item->case_number,
                             'title' => $item->title,
                             'employer' => $item->respondent,

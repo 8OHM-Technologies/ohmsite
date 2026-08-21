@@ -47,9 +47,9 @@ class SendTelegramNotification extends Command
 
         $format = $this->option('markdown') ? 'markdown' : 'html';
         $chatId = $this->option('chat') ?: config('telegraph.chat_id');
-        $direct = $this->option('direct') || !empty($this->option('chat'));
+        $direct = $this->option('direct') || ! empty($this->option('chat'));
 
-        if (!$direct) {
+        if (! $direct) {
             try {
                 $admin = User::where('role', 'admin')->first();
 
@@ -67,6 +67,7 @@ class SendTelegramNotification extends Command
 
         if (empty($chatId)) {
             $this->error('No Telegram chat ID configured. Please set TELEGRAM_CHAT_ID in your .env file or pass it using the --chat option.');
+
             return self::FAILURE;
         }
 
@@ -79,11 +80,13 @@ class SendTelegramNotification extends Command
             : $telegraph->html($message)->send();
 
         if ($response->telegraphError()) {
-            $this->error('Failed to send notification: ' . ($response->json('description') ?? 'Unknown error'));
+            $this->error('Failed to send notification: '.($response->json('description') ?? 'Unknown error'));
+
             return self::FAILURE;
         }
 
         $this->info('Notification sent successfully directly via Telegram bot!');
+
         return self::SUCCESS;
     }
 }

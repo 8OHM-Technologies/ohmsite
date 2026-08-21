@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Listeners\PaystackWebhookListener;
+use App\Listeners\TelegramSystemEventsSubscriber;
 use Binkode\Paystack\Events\Hook;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -38,8 +39,7 @@ class AppServiceProvider extends ServiceProvider
             PaystackWebhookListener::class
         );
 
-        Event::subscribe(\App\Listeners\TelegramSystemEventsSubscriber::class);
-
+        Event::subscribe(TelegramSystemEventsSubscriber::class);
 
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());

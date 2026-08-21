@@ -5,6 +5,7 @@ use App\Http\Middleware\ApiAccessMiddleware;
 use App\Http\Middleware\DatasetAccessMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SubscribedMiddleware;
+use App\Services\TelegramAlertService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -38,8 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi(); // For Sanctum
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->reportable(function (\Throwable $e): void {
-            \App\Services\TelegramAlertService::reportException($e);
+        $exceptions->reportable(function (Throwable $e): void {
+            TelegramAlertService::reportException($e);
         });
     })->create();
-

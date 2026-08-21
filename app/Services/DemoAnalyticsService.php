@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
+use App\Models\Dataset;
 
 class DemoAnalyticsService
 {
@@ -11,7 +11,7 @@ class DemoAnalyticsService
      */
     public function getDashboardPayload(): array
     {
-        $dataset = \App\Models\Dataset::where('slug', 'ccma')->first();
+        $dataset = Dataset::where('slug', 'ccma')->first();
         $cases = $dataset ? ($dataset->demo_data ?? []) : [];
 
         return [

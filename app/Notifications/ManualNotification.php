@@ -16,8 +16,7 @@ class ManualNotification extends Notification
     public function __construct(
         public string $message,
         public string $format = 'html'
-    ) {
-    }
+    ) {}
 
     /**
      * Get the notification's delivery channels.

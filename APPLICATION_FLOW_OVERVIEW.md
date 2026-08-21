@@ -113,9 +113,10 @@ flowchart TD
 
 | Aspect | Detail |
 |--------|--------|
-| **Data Source** | Exclusively queries raw `scrubbed_records` joined with `extracted_records` on the `pgsql_coeus` database connection |
+| **Data Source** | Queries raw `scrubbed_records` joined with `extracted_records` on the `pgsql_coeus` database connection (optimized with partial PostgreSQL indexes on `scrubbed_at IS NOT NULL` to avoid 550k+ row table scans). |
 | **Access Tier** | **Standard Registered Users**: Full access to explore Case Law, Journals/Gazettes, and Court Rolls with Title and Summary clearly readable. Advanced judicial insights (*Ratio Decidendi*, *Obiter Dicta*, full Bench, orders, precedents cited, source URLs) are blurred with glassmorphism overlays and upgrade CTAs to `/#pricing`.<br>**Pro Case Law / Analytics Subscribers / Admins**: Unlocked, full unredacted legal dossiers |
 | **Routes** | `GET /legal-records/cases` → [Cases.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/LegalRecords/Cases.vue)<br>`GET /legal-records/journals` → [Journals.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/LegalRecords/Journals.vue)<br>`GET /legal-records/court-rolls` → [CourtRolls.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/LegalRecords/CourtRolls.vue)<br>`GET /legal-records/data` & `/legal-records/record/{id}` → [LegalRecordController.php](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/LegalRecordController.php) |
+| **Payload Optimization** | List queries (`GET /legal-records/data`) emit lightweight row projections (~25 KB per page) by omitting heavy unredacted text blobs, while full judgment texts, cited precedents, and ratio decidendi are fetched on-demand in the detail modal (`GET /legal-records/record/{id}`). |
 
 ---
 

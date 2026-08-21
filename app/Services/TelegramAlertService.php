@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Notifications\SystemErrorNotification;
 use DefStudio\Telegraph\Facades\Telegraph;
+use DefStudio\Telegraph\Notifications\TelegraphMessage;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Notifications\Notification;
@@ -168,7 +169,7 @@ class TelegramAlertService
         if (! empty($chatId) && method_exists($notification, 'toTelegraph')) {
             try {
                 $telegraphMessage = $notification->toTelegraph((object) []);
-                if ($telegraphMessage instanceof \DefStudio\Telegraph\Notifications\TelegraphMessage) {
+                if ($telegraphMessage instanceof TelegraphMessage) {
                     $telegraphMessage->toTelegraph($chatId)->send();
                 }
             } catch (Throwable $directException) {

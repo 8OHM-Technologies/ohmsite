@@ -15,8 +15,7 @@ class SecurityLockoutNotification extends Notification
         public ?string $ip = null,
         public ?string $identifier = null,
         public ?string $userAgent = null,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {

@@ -11,9 +11,7 @@ class NewUserRegistered extends Notification
 {
     use Queueable;
 
-    public function __construct(public User $user)
-    {
-    }
+    public function __construct(public User $user) {}
 
     /**
      * Get the notification's delivery channels.
@@ -44,7 +42,7 @@ class NewUserRegistered extends Notification
             "<b>Name:</b> {$this->user->first_name} {$this->user->last_name}\n".
             "<b>Email:</b> {$this->user->email}\n".
             "<b>Company:</b> {$company}\n".
-            "<b>Phone:</b> <code>".e($phone)."</code>\n".
+            '<b>Phone:</b> <code>'.e($phone)."</code>\n".
             "<b>Country:</b> {$country}";
 
         return TelegraphMessage::make($html)->html();

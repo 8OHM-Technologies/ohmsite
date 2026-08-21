@@ -21,8 +21,7 @@ class SystemErrorNotification extends Notification
         public ?string $ip = null,
         public ?int $userId = null,
         public int $occurrences = 1,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -55,7 +54,7 @@ class SystemErrorNotification extends Notification
             $ipPart = $this->ip ? "IP: {$this->ip}" : '';
             $userPart = $this->userId ? "User #{$this->userId}" : '';
             $meta = implode(' | ', array_filter([$ipPart, $userPart]));
-            if (!empty($meta)) {
+            if (! empty($meta)) {
                 $html .= "<b>Client:</b> <code>{$meta}</code>\n";
             }
         }

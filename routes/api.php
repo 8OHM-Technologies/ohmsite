@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CaseController;
+use App\Http\Controllers\Api\EnquiryController;
 use App\Http\Middleware\VerifyDeveloperApiKey;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ Route::get('/health', function () {
     }
 });
 
-Route::post('/send-website-enquiry', [\App\Http\Controllers\Api\EnquiryController::class, 'store']);
+Route::post('/send-website-enquiry', [EnquiryController::class, 'store']);
 
 Route::middleware(VerifyDeveloperApiKey::class)->prefix('v1')->group(function () {
     Route::get('/cases', [CaseController::class, 'index']);

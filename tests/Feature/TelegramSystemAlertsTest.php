@@ -4,9 +4,6 @@ namespace Tests\Feature;
 
 use App\Listeners\TelegramSystemEventsSubscriber;
 use App\Models\User;
-use App\Notifications\QueueJobFailedNotification;
-use App\Notifications\ScheduledTaskNotification;
-use App\Notifications\SecurityLockoutNotification;
 use App\Notifications\SystemErrorNotification;
 use App\Services\TelegramAlertService;
 use DefStudio\Telegraph\Facades\Telegraph;
@@ -20,8 +17,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -116,7 +111,7 @@ class TelegramSystemAlertsTest extends TestCase
 
         $event = new ScheduledTaskFailed($task, new \Exception('Failed to process CSV file'));
 
-        $subscriber = new TelegramSystemEventsSubscriber();
+        $subscriber = new TelegramSystemEventsSubscriber;
         $subscriber->handleScheduledTaskFailed($event);
 
         Telegraph::assertSent('❌ <b>Scheduled Task Failed!</b>', false);
@@ -137,7 +132,7 @@ class TelegramSystemAlertsTest extends TestCase
 
         $event = new ScheduledTaskFinished($task, 3.45);
 
-        $subscriber = new TelegramSystemEventsSubscriber();
+        $subscriber = new TelegramSystemEventsSubscriber;
         $subscriber->handleScheduledTaskFinished($event);
 
         Telegraph::assertSent('⏱️ <b>Scheduled Task Succeeded</b>', false);
@@ -160,7 +155,7 @@ class TelegramSystemAlertsTest extends TestCase
 
         $event = new JobFailed('redis', $job, new \Exception('Disk full'));
 
-        $subscriber = new TelegramSystemEventsSubscriber();
+        $subscriber = new TelegramSystemEventsSubscriber;
         $subscriber->handleJobFailed($event);
 
         Telegraph::assertSent('💥 <b>Queue Job Failed!</b>', false);
@@ -185,7 +180,7 @@ class TelegramSystemAlertsTest extends TestCase
 
         $event = new Lockout($request);
 
-        $subscriber = new TelegramSystemEventsSubscriber();
+        $subscriber = new TelegramSystemEventsSubscriber;
         $subscriber->handleLockout($event);
 
         Telegraph::assertSent('🛡️ <b>Security Alert: Auth Lockout!</b>', false);

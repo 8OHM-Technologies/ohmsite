@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Models\Dataset;
-use App\Models\ScrubbedRecord;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -107,20 +106,20 @@ class HandleInertiaRequests extends Middleware
                             : 'N/A';
 
                         return [
-                            'total_records'     => (int) ($summary->total_records ?? 0),
-                            'total_cases'       => (int) ($summary->total_cases ?? 0),
-                            'total_gazettes'    => (int) ($summary->total_gazettes ?? 0),
+                            'total_records' => (int) ($summary->total_records ?? 0),
+                            'total_cases' => (int) ($summary->total_cases ?? 0),
+                            'total_gazettes' => (int) ($summary->total_gazettes ?? 0),
                             'total_court_rolls' => (int) ($summary->total_court_rolls ?? 0),
-                            'date_range'        => $dateRange,
+                            'date_range' => $dateRange,
                         ];
                     });
                 } catch (\Throwable $e) {
                     return [
-                        'total_records'     => 0,
-                        'total_cases'       => 0,
-                        'total_gazettes'    => 0,
+                        'total_records' => 0,
+                        'total_cases' => 0,
+                        'total_gazettes' => 0,
                         'total_court_rolls' => 0,
-                        'date_range'        => 'N/A',
+                        'date_range' => 'N/A',
                     ];
                 }
             },

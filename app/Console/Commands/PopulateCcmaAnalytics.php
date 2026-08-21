@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\CcmaAnalytics;
 use App\Models\LegalAnalytics;
-use App\Models\ExtractedRecord;
 use App\Models\ScrubbedRecord;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -99,10 +98,10 @@ class PopulateCcmaAnalytics extends Command
                     $employee = $extractedData['employee'] ?? null;
                     $employer = $extractedData['employer'] ?? null;
                     $title = $payload['title'] ?? null;
-                    if (!$title && $employee) {
-                        $title = $employee . ($employer ? ' v ' . $employer : '');
+                    if (! $title && $employee) {
+                        $title = $employee.($employer ? ' v '.$employer : '');
                     }
-                    if (!$title) {
+                    if (! $title) {
                         $title = 'Unknown';
                     }
 
@@ -200,8 +199,6 @@ class PopulateCcmaAnalytics extends Command
             });
         }
 
-
-
         $processedCount = count($preparedRecords);
         $deletedCount = count($deletedIds);
         $this->info("Successfully processed {$processedCount} records. Deleted {$deletedCount} obsolete records.");
@@ -267,7 +264,7 @@ class PopulateCcmaAnalytics extends Command
 
                 foreach ($ccmaItems as $item) {
                     $row = [
-                        'CCMA_' . $item->id,
+                        'CCMA_'.$item->id,
                         $item->award_number,
                         $item->title,
                         $item->employer,
@@ -282,7 +279,7 @@ class PopulateCcmaAnalytics extends Command
                     $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
 
                     $jsonData[] = [
-                        'id' => 'CCMA_' . $item->id,
+                        'id' => 'CCMA_'.$item->id,
                         'case_reference' => $item->award_number,
                         'title' => $item->title,
                         'employer' => $item->employer,
@@ -298,7 +295,7 @@ class PopulateCcmaAnalytics extends Command
 
                 foreach ($legalItems as $item) {
                     $row = [
-                        'LEGAL_' . $item->id,
+                        'LEGAL_'.$item->id,
                         $item->case_number,
                         $item->title,
                         $item->respondent,
@@ -313,7 +310,7 @@ class PopulateCcmaAnalytics extends Command
                     $csvData[] = implode(',', array_map(fn ($val) => '"'.str_replace('"', '""', $val).'"', $row));
 
                     $jsonData[] = [
-                        'id' => 'LEGAL_' . $item->id,
+                        'id' => 'LEGAL_'.$item->id,
                         'case_reference' => $item->case_number,
                         'title' => $item->title,
                         'employer' => $item->respondent,

@@ -36,7 +36,9 @@ This platform is a data-centric SaaS and digital licensing platform tailored for
 - **Frontend**: Inertia.js (Vue 3 client-side SPA state management)
 - **Routing**: Ziggy (Laravel routes in Vue)
 - **Auth**: Laravel Breeze (Breeze scaffolding) + Laravel Socialite (OAuth)
-- **Database**: MySQL (Production) & SQLite (In-Memory for Tests)
+- **Database**: PostgreSQL (`laravel` & `pgsql_coeus` on Production) & SQLite (In-Memory for Tests)
+- **Caching**: Redis (Aggregated analytics & high-throughput dataset caching)
+- **Web Server**: Nginx with Gzip compression and FastCGI buffer tuning
 - **CI/CD**: GitHub Actions
 
 ---

@@ -83,13 +83,13 @@ class InitialSeeder extends Seeder
                         'award_date' => '2026-02-15',
                         'court' => 'Labour Court',
                         'court_location' => 'Johannesburg',
-                        'details_scraped_at' => '2026-07-12T21:51:07.123456'
-                    ]
+                        'details_scraped_at' => '2026-07-12T21:51:07.123456',
+                    ],
                 ],
             ]
         );
 
-         Dataset::updateOrCreate(
+        Dataset::updateOrCreate(
             ['slug' => 'high-court'],
             [
                 'name' => 'High Court Case Law',
@@ -102,8 +102,8 @@ class InitialSeeder extends Seeder
                         'award_date' => '2026-02-15',
                         'court' => 'Labour Court',
                         'court_location' => 'Johannesburg',
-                        'details_scraped_at' => '2026-07-12T21:51:07.123456'
-                    ]
+                        'details_scraped_at' => '2026-07-12T21:51:07.123456',
+                    ],
                 ],
             ]
         );

@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\NewUserRegistered;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -56,9 +58,9 @@ class RegisteredUserController extends Controller
         // Notify admins
         try {
             $admins = User::where('role', 'admin')->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewUserRegistered($user));
+            Notification::send($admins, new NewUserRegistered($user));
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send Telegram notification for user registration: '.$e->getMessage());
+            Log::error('Failed to send Telegram notification for user registration: '.$e->getMessage());
         }
 
         return redirect()->route('login')->with('status', __('Registration successful! Please check your email for a confirmation link to verify your account before logging in.'));

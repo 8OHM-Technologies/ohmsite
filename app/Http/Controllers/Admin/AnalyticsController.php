@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\AnalyticsService;
 use Carbon\Carbon;
-use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use App\Services\AnalyticsService;
 use Inertia\Inertia;
 
 class AnalyticsController extends Controller
@@ -163,7 +163,7 @@ class AnalyticsController extends Controller
      * Trigger a fresh analytics calculation on the control plane and return
      * the updated scraping metrics to the Inertia page via a partial reload.
      */
-    public function refreshScrapingMetrics(): \Illuminate\Http\RedirectResponse
+    public function refreshScrapingMetrics(): RedirectResponse
     {
         try {
             Http::timeout(60)->get('https://control-plane.8ohm.co.za/api/pipelines/analytics/', [
