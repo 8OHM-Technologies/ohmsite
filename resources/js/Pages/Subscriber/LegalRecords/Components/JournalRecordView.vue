@@ -79,7 +79,7 @@ const copyContent = async () => {
       </div>
       <a href="/#pricing"
         class="btn btn-primary px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-1.5 shrink-0">
-        <span>Upgrade to Pro</span>
+        <span>Unlock Now</span>
         <ArrowRight class="w-3.5 h-3.5" />
       </a>
     </div>
@@ -176,15 +176,13 @@ const copyContent = async () => {
       <!-- Text Body Area -->
       <div class="p-6 sm:p-8 relative">
         <!-- If full text is available -->
-        <div v-if="formattedParagraphs.length > 0" class="space-y-4"
-          :class="[
-            fontSize === 'sm' ? 'text-xs leading-relaxed' : '',
-            fontSize === 'base' ? 'text-sm leading-relaxed' : '',
-            fontSize === 'lg' ? 'text-base leading-loose' : '',
-            !isPro ? 'max-h-96 overflow-hidden relative select-none' : ''
-          ]">
-          <p v-for="(para, idx) in formattedParagraphs" :key="idx"
-            class="text-zinc-200 font-sans tracking-wide">
+        <div v-if="formattedParagraphs.length > 0" class="space-y-4" :class="[
+          fontSize === 'sm' ? 'text-xs leading-relaxed' : '',
+          fontSize === 'base' ? 'text-sm leading-relaxed' : '',
+          fontSize === 'lg' ? 'text-base leading-loose' : '',
+          !isPro ? 'max-h-96 overflow-hidden relative select-none' : ''
+        ]">
+          <p v-for="(para, idx) in formattedParagraphs" :key="idx" class="text-zinc-200 font-sans tracking-wide">
             {{ para }}
           </p>
 
@@ -199,7 +197,8 @@ const copyContent = async () => {
               Full Publication Reading Mode Locked
             </h4>
             <p class="text-xs text-zinc-400 max-w-md">
-              Upgrade to a Pro subscription to read unredacted articles, complete statutory notices, and download original files.
+              Upgrade to a Pro subscription to read unredacted articles, complete statutory notices, and download
+              original files.
             </p>
             <a href="/#pricing"
               class="btn btn-primary px-5 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 mt-2">
@@ -211,13 +210,15 @@ const copyContent = async () => {
 
         <!-- Fallback if no full text is stored in database -->
         <div v-else class="py-12 flex flex-col items-center justify-center text-center space-y-4">
-          <div class="w-12 h-12 rounded-2xl bg-zinc-800/60 border border-white/5 flex items-center justify-center text-zinc-400">
+          <div
+            class="w-12 h-12 rounded-2xl bg-zinc-800/60 border border-white/5 flex items-center justify-center text-zinc-400">
             <FileText class="w-6 h-6 text-zinc-500" />
           </div>
           <div class="space-y-1 max-w-md">
             <h4 class="text-sm font-bold text-white uppercase tracking-wider">Indexed Publication Notice</h4>
             <p class="text-xs text-zinc-400 leading-relaxed">
-              The full publication body is hosted on the primary forum repository. You can inspect the complete source document directly at the original provider.
+              The full publication body is hosted on the primary forum repository. You can inspect the complete source
+              document directly at the original provider.
             </p>
           </div>
           <a v-if="sourceUrl" :href="sourceUrl" target="_blank" rel="noopener noreferrer"

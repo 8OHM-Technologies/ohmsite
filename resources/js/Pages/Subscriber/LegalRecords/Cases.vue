@@ -302,7 +302,7 @@ onMounted(() => {
         </p>
       </div>
       <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
-        <span>Upgrade Plan at Pricing</span>
+        <span>Unlock Now</span>
         <ArrowRight class="w-4 h-4" />
       </a>
     </div>

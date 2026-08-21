@@ -184,6 +184,7 @@ onMounted(() => {
 </script>
 
 <template>
+
   <Head title="8OHM | Law Journals &amp; Gazettes" />
 
   <component :is="LayoutComponent">
@@ -191,7 +192,8 @@ onMounted(() => {
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+          <div
+            class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
             <BookOpen class="w-5 h-5" />
           </div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
@@ -231,17 +233,20 @@ onMounted(() => {
     </div>
 
     <!-- Standard Tier Upgrade Notice Banner (if not Pro) -->
-    <div v-if="!isPro" class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
+    <div v-if="!isPro"
+      class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
       <div class="space-y-1.5 max-w-2xl">
         <div class="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-wider">
           <Sparkles class="w-4 h-4" /> Standard Registered Preview Mode
         </div>
         <p class="text-xs text-zinc-300 leading-relaxed">
-          You are viewing basic journal abstracts and publication notices. Full-text analytical indexing and complete source dossiers require an active Pro subscription.
+          You are viewing basic journal abstracts and publication notices. Full-text analytical indexing and complete
+          source dossiers require an active Pro subscription.
         </p>
       </div>
-      <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
-        <span>Upgrade Plan at Pricing</span>
+      <a href="/#pricing"
+        class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
+        <span>Unlock Now</span>
         <ArrowRight class="w-4 h-4" />
       </a>
     </div>
@@ -307,12 +312,14 @@ onMounted(() => {
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="records.length === 0" class="bg-zinc-900/40 rounded-[2rem] border border-white/5 py-20 text-center flex flex-col items-center">
+      <div v-else-if="records.length === 0"
+        class="bg-zinc-900/40 rounded-[2rem] border border-white/5 py-20 text-center flex flex-col items-center">
         <div class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
           <Database class="w-8 h-8 text-zinc-600" />
         </div>
         <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No publications found</h3>
-        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or filter</p>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or
+          filter</p>
       </div>
 
       <!-- Dossier Cards Grid -->
@@ -325,7 +332,8 @@ onMounted(() => {
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
                 {{ c.case_number }}
               </span>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
                 {{ c.applicant || c.court || c.record_type }}
               </span>
             </div>
@@ -343,7 +351,8 @@ onMounted(() => {
           </div>
 
           <!-- Title -->
-          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)">
+          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer"
+            @click="viewRecordDetail(c)">
             {{ c.title }}
           </h4>
 
@@ -359,7 +368,8 @@ onMounted(() => {
           </div>
 
           <!-- Footer -->
-          <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
+          <div
+            class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
             <span class="text-zinc-400 text-[11px]">
               Publisher / Source: <strong class="text-white">{{ c.applicant || c.court }}</strong>
             </span>
@@ -380,11 +390,13 @@ onMounted(() => {
     </div>
 
     <!-- VIEW MODE 2: PRIME VUE DATATABLE -->
-    <div v-else class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
-      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" :sortField="lazyParams.sortField"
-        :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows"
-        :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
-        tableStyle="min-width: 60rem" class="p-datatable-dark-custom">
+    <div v-else
+      class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
+      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading"
+        :sortField="lazyParams.sortField" :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy"
+        @filter="onLazy" paginator :rows="lazyParams.rows" :first="lazyParams.first"
+        :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id" tableStyle="min-width: 60rem"
+        class="p-datatable-dark-custom">
         <template #empty>
           <div class="py-20 text-center flex flex-col items-center">
             <div
@@ -392,7 +404,8 @@ onMounted(() => {
               <Database class="w-8 h-8 text-zinc-600" />
             </div>
             <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No publications found</h3>
-            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or filters</p>
+            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or
+              filters</p>
           </div>
         </template>
 
@@ -461,13 +474,8 @@ onMounted(() => {
     </div>
 
     <!-- Document Detail Modal -->
-    <RecordDetailModal
-      :show="detailModalVisible"
-      :loading="detailLoading"
-      :record-detail="selectedDetail"
-      category="journals"
-      @close="detailModalVisible = false"
-    />
+    <RecordDetailModal :show="detailModalVisible" :loading="detailLoading" :record-detail="selectedDetail"
+      category="journals" @close="detailModalVisible = false" />
   </component>
 </template>
 

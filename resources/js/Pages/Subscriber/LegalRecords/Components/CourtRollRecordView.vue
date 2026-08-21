@@ -139,7 +139,7 @@ const filteredRollEntries = computed(() => {
       </div>
       <a href="/#pricing"
         class="btn btn-primary px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-1.5 shrink-0">
-        <span>Upgrade to Pro</span>
+        <span>Unlock Now</span>
         <ArrowRight class="w-3.5 h-3.5" />
       </a>
     </div>
@@ -190,30 +190,24 @@ const filteredRollEntries = computed(() => {
     <!-- Court Roll Schedule Table Container -->
     <div class="bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden space-y-0">
       <!-- Table Controls Bar -->
-      <div class="p-4 sm:px-6 border-b border-white/5 bg-zinc-900/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div
+        class="p-4 sm:px-6 border-b border-white/5 bg-zinc-900/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <!-- Search within Roll -->
         <div class="relative flex-1 max-w-md">
           <Search class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
-          <input
-            type="text"
-            v-model="rollSearch"
-            placeholder="Filter matters, case numbers, or parties..."
-            class="w-full bg-black/50 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500"
-          />
+          <input type="text" v-model="rollSearch" placeholder="Filter matters, case numbers, or parties..."
+            class="w-full bg-black/50 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500" />
         </div>
 
         <!-- View Switcher (Table vs Raw Text) -->
         <div class="flex items-center gap-2">
-          <button
-            @click="rollViewMode = 'table'"
+          <button @click="rollViewMode = 'table'"
             class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
             :class="rollViewMode === 'table' ? 'bg-primary text-black font-black' : 'text-zinc-400 hover:text-white bg-black/40 border border-white/10'">
             <List class="w-3.5 h-3.5" />
             <span>Table Format</span>
           </button>
-          <button
-            v-if="fullText"
-            @click="rollViewMode = 'text'"
+          <button v-if="fullText" @click="rollViewMode = 'text'"
             class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
             :class="rollViewMode === 'text' ? 'bg-primary text-black font-black' : 'text-zinc-400 hover:text-white bg-black/40 border border-white/10'">
             <FileText class="w-3.5 h-3.5" />
@@ -224,10 +218,7 @@ const filteredRollEntries = computed(() => {
 
       <!-- VIEW 1: TABLE FORMAT -->
       <div v-if="rollViewMode === 'table'" class="p-2 sm:p-4 overflow-x-auto relative">
-        <DataTable
-          :value="filteredRollEntries"
-          dataKey="id"
-          class="p-datatable-dark-custom text-xs"
+        <DataTable :value="filteredRollEntries" dataKey="id" class="p-datatable-dark-custom text-xs"
           tableStyle="min-width: 50rem">
           <template #empty>
             <div class="py-12 text-center text-zinc-400 text-xs">
@@ -243,7 +234,8 @@ const filteredRollEntries = computed(() => {
 
           <Column field="case_number" header="Case Reference" style="width: 22%">
             <template #body="{ data }">
-              <span class="font-mono font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded text-[11px] inline-block">
+              <span
+                class="font-mono font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded text-[11px] inline-block">
                 {{ data.case_number }}
               </span>
             </template>
@@ -296,7 +288,8 @@ const filteredRollEntries = computed(() => {
       </div>
 
       <!-- VIEW 2: RAW TEXT SCHEDULE -->
-      <div v-else class="p-6 font-mono text-xs text-zinc-300 bg-black/40 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto custom-scrollbar">
+      <div v-else
+        class="p-6 font-mono text-xs text-zinc-300 bg-black/40 whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto custom-scrollbar">
         {{ fullText }}
       </div>
     </div>

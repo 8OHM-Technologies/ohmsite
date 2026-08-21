@@ -71,7 +71,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
       </div>
       <a href="/#pricing"
         class="btn btn-primary px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-1.5 shrink-0">
-        <span>Upgrade to Pro Case Law</span>
+        <span>Unlock Now</span>
         <ArrowRight class="w-3.5 h-3.5" />
       </a>
     </div>

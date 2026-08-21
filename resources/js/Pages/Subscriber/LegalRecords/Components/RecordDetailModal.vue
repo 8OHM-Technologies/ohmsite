@@ -212,7 +212,7 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
           <a v-if="!isPro" href="/#pricing"
             class="btn btn-primary px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-primary/20">
             <Sparkles class="w-3.5 h-3.5" />
-            <span>Upgrade to Pro</span>
+            <span>Unlock Now</span>
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
         </div>
