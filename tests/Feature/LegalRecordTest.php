@@ -28,7 +28,12 @@ class LegalRecordTest extends TestCase
                 $table->date('document_date')->nullable();
                 $table->json('data')->nullable();
                 $table->string('status')->nullable();
+                $table->timestamp('scrubbed_at')->nullable();
                 $table->timestamps();
+            });
+        } elseif (! Schema::connection('pgsql_coeus')->hasColumn('extracted_records', 'scrubbed_at')) {
+            Schema::connection('pgsql_coeus')->table('extracted_records', function ($table) {
+                $table->timestamp('scrubbed_at')->nullable();
             });
         }
 
@@ -114,6 +119,7 @@ class LegalRecordTest extends TestCase
             'document_date' => $docDate,
             'data' => json_encode(array_merge(['category' => $category], $extractedData)),
             'status' => 'detailed',
+            'scrubbed_at' => now(),
             'scraped_at' => now(),
             'detailed_at' => now(),
         ]);
