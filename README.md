@@ -90,6 +90,9 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 - **Law Journals & Gazettes**: Academic law journals (PER, De Rebus, AHRLJ, ADRY, etc.) and official Government/Provincial Gazettes with formatted document reader layout.
 - **Court Rolls & Schedules**: Motion court hearing schedules, cause lists, and court roll calendar tracking.
 
+### 4. Interactive Demo Analytics (`/demo`)
+- **Public Legal Analytics Showcase**: Interactive, full-featured demo highlighting SAFLII Superior Courts jurisprudence intelligence, precedent citation networks, judicial bench composition, and extracted *Ratio Decidendi* case dossiers without requiring an upfront subscription.
+
 ---
 
 ## 📡 Monitoring & Telegram Notifications

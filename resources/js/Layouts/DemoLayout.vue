@@ -6,7 +6,7 @@ import Toast from '@/Components/Toast.vue';
 import {
     LogOut,
     Database,
-    Briefcase,
+    Scale,
     Calendar
 } from 'lucide-vue-next';
 
@@ -21,27 +21,28 @@ const datasetStats = computed(() => {
     if (!rawCases || rawCases.length === 0) {
         return {
             total: 0,
-            employers: 0,
+            courts: 0,
             dateRange: 'N/A'
         };
     }
 
     const total = rawCases.length;
 
-    // Unique employers count
-    const employersSet = new Set();
+    // Unique courts count
+    const courtsSet = new Set();
     rawCases.forEach(c => {
-        if (c.employer) {
-            employersSet.add(c.employer.trim().toLowerCase());
+        const courtName = c.court || c.target_name;
+        if (courtName) {
+            courtsSet.add(courtName.trim().toLowerCase());
         }
     });
-    const employers = employersSet.size;
+    const courts = courtsSet.size;
 
-    // Get min & max years from award_date or hearing dates
+    // Get min & max years from judgment_date, document_date, award_date or hearing dates
     let minYear = null;
     let maxYear = null;
     rawCases.forEach(c => {
-        const dateStr = c.award_date || c.hearing_start;
+        const dateStr = c.judgment_date || c.document_date || c.award_date || c.hearing_date || c.hearing_start;
         if (dateStr) {
             const year = new Date(dateStr.split('T')[0]).getFullYear();
             if (!isNaN(year)) {
@@ -58,7 +59,7 @@ const datasetStats = computed(() => {
 
     return {
         total,
-        employers,
+        courts,
         dateRange
     };
 });
@@ -124,7 +125,7 @@ onUnmounted(() => {
                         </h1>
                         <p
                             class="text-zinc-500 mt-1 sm:mt-2 font-bold uppercase tracking-widest text-[8px] sm:text-[10px]">
-                            South African CCMA Arbitration & Dispute Intelligence (Demo)
+                            South African Superior Courts & Jurisprudence Intelligence (Demo)
                         </p>
                     </div>
                 </div>
@@ -141,7 +142,7 @@ onUnmounted(() => {
                         <div class="flex flex-col">
                             <span
                                 class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Total
-                                Records</span>
+                                Judgments</span>
                             <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
                                 datasetStats.total.toLocaleString() }}</span>
                         </div>
@@ -150,17 +151,17 @@ onUnmounted(() => {
                     <!-- Divider -->
                     <div class="h-8 w-px bg-white/10 shrink-0"></div>
 
-                    <!-- Unique Employers -->
+                    <!-- Unique Courts -->
                     <div class="flex items-center gap-2.5">
                         <div
                             class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                            <Briefcase class="w-4 h-4" />
+                            <Scale class="w-4 h-4" />
                         </div>
                         <div class="flex flex-col">
                             <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Employers</span>
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Courts / Benches</span>
                             <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                datasetStats.employers.toLocaleString() }}</span>
+                                datasetStats.courts.toLocaleString() }}</span>
                         </div>
                     </div>
 
@@ -175,8 +176,7 @@ onUnmounted(() => {
                         </div>
                         <div class="flex flex-col">
                             <span
-                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Date
-                                Range</span>
+                                class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Timeline</span>
                             <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
                                 datasetStats.dateRange }}</span>
                         </div>

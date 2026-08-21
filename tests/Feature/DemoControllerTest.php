@@ -16,13 +16,16 @@ class DemoControllerTest extends TestCase
     public function test_demo_page_loads_and_passes_cases(): void
     {
         Dataset::create([
-            'name' => 'CCMA Arbitration Awards',
-            'slug' => 'ccma',
+            'name' => 'Superior Courts Case Law',
+            'slug' => 'high-court',
             'is_active' => true,
             'demo_data' => [
                 [
-                    'title' => 'Sample Case',
-                    'employer' => 'Sample Employer',
+                    'title' => 'Sample Constitutional Judgment',
+                    'court' => 'Constitutional Court of South Africa',
+                    'case_number' => 'CCT 01/21',
+                    'ratio_decidendi' => 'Constitutional rights interpretation',
+                    'judges' => ['Judge A', 'Judge B'],
                 ],
             ],
         ]);
@@ -39,6 +42,7 @@ class DemoControllerTest extends TestCase
         $cases = $response->original->getData()['page']['props']['cases'];
         $this->assertNotEmpty($cases);
         $this->assertArrayHasKey('title', $cases[0]);
-        $this->assertArrayHasKey('employer', $cases[0]);
+        $this->assertArrayHasKey('court', $cases[0]);
+        $this->assertArrayHasKey('case_number', $cases[0]);
     }
 }

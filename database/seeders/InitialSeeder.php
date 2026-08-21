@@ -76,16 +76,7 @@ class InitialSeeder extends Seeder
                 'name' => 'Labour Court Case Law',
                 'description' => 'Sanitized, structured Labour Court judgments.',
                 'is_active' => true,
-                'demo_data' => [
-                    [
-                        'title' => 'Labour Court Sample Case 1',
-                        'document_type' => 'Labour Court Judgments',
-                        'award_date' => '2026-02-15',
-                        'court' => 'Labour Court',
-                        'court_location' => 'Johannesburg',
-                        'details_scraped_at' => '2026-07-12T21:51:07.123456',
-                    ],
-                ],
+                'demo_data' => $demoData,
             ]
         );
 
@@ -95,16 +86,7 @@ class InitialSeeder extends Seeder
                 'name' => 'High Court Case Law',
                 'description' => 'Sanitized, structured High Court judgments.',
                 'is_active' => true,
-                'demo_data' => [
-                    [
-                        'title' => 'High Court Sample Case 1',
-                        'document_type' => 'Labour Court Judgments',
-                        'award_date' => '2026-02-15',
-                        'court' => 'Labour Court',
-                        'court_location' => 'Johannesburg',
-                        'details_scraped_at' => '2026-07-12T21:51:07.123456',
-                    ],
-                ],
+                'demo_data' => $demoData,
             ]
         );
 
