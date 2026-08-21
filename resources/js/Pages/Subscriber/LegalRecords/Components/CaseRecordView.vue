@@ -141,7 +141,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
       <!-- 2. Ratio Decidendi (BLURRED + CTA IF STANDARD TIER) -->
       <div v-if="ratioDecidendi || !isPro"
         class="relative rounded-2xl overflow-hidden border border-amber-500/20 bg-amber-500/[0.04]">
-        <div class="p-5 space-y-2"
+        <div class="p-6 space-y-2"
           :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
           <div class="flex items-center gap-2">
             <Bookmark class="w-4 h-4 text-amber-400" />
@@ -190,7 +190,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
       <!-- 3. Obiter Dicta -->
       <div v-if="obiterDicta || (!isPro && isPro !== null)"
         class="relative rounded-2xl overflow-hidden border border-purple-500/20 bg-purple-500/[0.04]">
-        <div class="p-5 space-y-2"
+        <div class="p-6 space-y-2"
           :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
           <div class="flex items-center gap-2">
             <Compass class="w-4 h-4 text-purple-400" />
@@ -204,7 +204,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
         <div v-if="!isPro"
           class="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center">
           <span class="text-[11px] font-bold text-zinc-300 flex items-center gap-1.5">
-            <Lock class="w-3.5 h-3.5 text-purple-400" /> Obiter Dicta Locked (Pro Subscription Required)
+            <Lock class="w-3.5 h-3.5 text-purple-400" /> Obiter Dicta Locked
           </span>
         </div>
       </div>
@@ -212,7 +212,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
       <!-- 4. Formal Judicial Order & Relief -->
       <div v-if="order || (!isPro && isPro !== null)"
         class="relative rounded-2xl overflow-hidden border border-emerald-500/20 bg-emerald-500/[0.04]">
-        <div class="p-5 space-y-2"
+        <div class="p-6 space-y-2"
           :class="{ 'filter blur-[4px] select-none opacity-40 pointer-events-none space-y-12': !isPro }">
           <div class="flex items-center gap-2">
             <CheckCircle2 class="w-4 h-4 text-emerald-400" />
