@@ -256,7 +256,7 @@ class LegalRecordController extends Controller
         $meta = is_array($srData['metadata'] ?? null) ? $srData['metadata'] : (is_array($erData['metadata'] ?? null) ? $erData['metadata'] : []);
 
         $title = $srData['title'] ?? $erData['title'] ?? $ext['title'] ?? 'Legal Matter';
-        $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? ($row->record_type === 'sabinet_ccma' ? 'CCMA' : 'Superior Court');
+        $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? null;
         $caseNumber = $meta['case_number'] ?? $ext['case_number'] ?? $srData['case_number'] ?? $srData['award_number'] ?? null;
         $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $ext['hearing_date'] ?? $meta['document_date'] ?? $meta['hearing_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
         $hearingDate = $ext['hearing_date'] ?? $meta['hearing_date'] ?? null;

@@ -12,41 +12,10 @@ const props = defineProps({
 });
 
 const defaultRoadmap = [
-    { status: 'Live', date: 'Current', title: 'CCMA Arbitration Awards', description: 'Comprehensive CCMA Awards & Judgment records.', icon: 'ph-check-circle', iconClass: 'text-green-500' },
-    { status: 'Upcoming', date: 'Q3 2026', title: 'SA Labour Court Case Law', description: 'Comprehensive case law from the Labour and Labour Appeal Courts.', icon: 'ph-spinner', iconClass: 'text-blue-500' },
-    { status: 'Upcoming', date: 'Q4 2026', title: 'SA High Court Case Law', description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.', icon: 'ph-calendar-blank', iconClass: 'text-orange-500' },
-    { status: 'Planned', date: 'Q1 2027', title: 'Tribunals and Other Courts Case Law', description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
-    { status: 'Planned', date: '2027', title: 'Legislative Expansion', description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
-    { status: 'Ultimate Goal', date: '2027', title: 'LaybaLaw AI', description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.', icon: 'ph-robot', iconClass: 'text-red-500' },
+    { status: 'Live', date: 'Current', title: 'South African Case Law', description: 'Comprehensive SA Case Law from all courts', icon: 'ph-check-circle', iconClass: 'text-green-500' },
+    { status: 'Planned', date: 'Q4-2027', title: 'Legislative Expansion', description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
+    { status: 'Planned', date: '2027', title: 'LaybaLaw AI', description: 'AI Assistant for South African Labour Law & CCMA - Helping average South Africans navigate labour law and other legal disputes.', icon: 'ph-robot', iconClass: 'text-red-500' },
 ];
-
-const defaultSectionHeaders = {
-    services: {
-        eyebrow: 'Data Solutions and IT Consulting',
-        title: 'SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals',
-        subtitle: 'Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon) via download and API, or explore trends visually using our analytics dashboard.',
-    },
-    philosophy: {
-        eyebrow: 'Why Infinity Ohm?',
-        title: 'Our Philosophy',
-        subtitle: 'Strategic engineering, absolute data ownership, and open standards.',
-    },
-    ohmbase: {
-        eyebrow: 'DIY Smart Home Blueprints',
-        title: 'OhmBase',
-        subtitle: 'The business data architectures we build are born from our philosophy of absolute digital sovereignty. Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build their own self-hosted, cloud-free smart home ecosystems.',
-    },
-    faq: {
-        eyebrow: 'FAQs',
-        title: 'Frequently Asked Questions',
-        subtitle: '',
-    },
-    contact: {
-        eyebrow: 'Contact',
-        title: 'Enquire Now',
-        subtitle: 'Have questions about our South African public data feeds, custom analytics dashboards, or DIY hardware waitlists? Reach out below.',
-    },
-};
 
 const iconOptions = [
     { value: 'ph-check-circle', label: '✓ Check Circle (Live)' },

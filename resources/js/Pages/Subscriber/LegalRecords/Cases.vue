@@ -325,7 +325,7 @@ onMounted(() => {
           <div class="relative min-w-[260px]">
             <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
               class="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50">
-              <option value="">All Courts &amp; CCMA</option>
+              <option value="">All Courts</option>
               <option v-for="filter in filters" :key="filter.target_name" :value="filter.target_name">
                 {{ filter.vanity_name }}
               </option>

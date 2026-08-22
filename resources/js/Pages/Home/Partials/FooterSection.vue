@@ -98,22 +98,17 @@ const socialNavigation = [
               <li>
                 <Link :href="route('home') + '#services'"
                   class="text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors duration-300">
-                  CCMA Datasets</Link>
+                  Pro Case Law</Link>
               </li>
               <li>
                 <Link :href="route('home') + '#services'"
                   class="text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors duration-300">
-                  Developer API</Link>
-              </li>
-              <li>
-                <Link :href="route('home') + '#services'"
-                  class="text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors duration-300">
-                  Pro Dashboard</Link>
+                  Pro Legal Analytics</Link>
               </li>
               <li>
                 <a :href="route('home') + '#contact'"
                   class="text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-primary transition-colors duration-300">Custom
-                  Pipelines</a>
+                  Data Engineering</a>
               </li>
             </ul>
           </div>

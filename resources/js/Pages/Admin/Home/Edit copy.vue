@@ -12,30 +12,27 @@ const props = defineProps({
 });
 
 const defaultRoadmap = [
-    { status: 'Live', date: 'Current', title: 'CCMA Arbitration Awards', description: 'Comprehensive CCMA Awards & Judgment records.', icon: 'ph-check-circle', iconClass: 'text-green-500' },
-    { status: 'Upcoming', date: 'Q3 2026', title: 'SA Labour Court Case Law', description: 'Comprehensive case law from the Labour and Labour Appeal Courts.', icon: 'ph-spinner', iconClass: 'text-blue-500' },
-    { status: 'Upcoming', date: 'Q4 2026', title: 'SA High Court Case Law', description: 'Comprehensive case law from the High Court, Supreme Court of Appeal, and the Constitutional Court.', icon: 'ph-calendar-blank', iconClass: 'text-orange-500' },
-    { status: 'Planned', date: 'Q1 2027', title: 'Tribunals and Other Courts Case Law', description: 'Comprehensive case law from the various SA Tribunals, as well as smaller courts including the Equality, Electoral and Tax Courts.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
-    { status: 'Planned', date: '2027', title: 'Legislative Expansion', description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
-    { status: 'Ultimate Goal', date: '2027', title: 'LaybaLaw AI', description: 'South African Labour Law & CCMA AI Assistant - Help average South Africans navigate disputes with their employers.', icon: 'ph-robot', iconClass: 'text-red-500' },
+    { status: 'Live', date: 'Current', title: 'South African Case Law', description: 'Comprehensive SA Case Law from all courts', icon: 'ph-check-circle', iconClass: 'text-green-500' },
+    { status: 'Planned', date: 'Q4-2027', title: 'Legislative Expansion', description: 'Expansion of our Legal dataset to include acts, bills, government gazettes and other legislative documents.', icon: 'ph-rocket-launch', iconClass: 'text-yellow-500' },
+    { status: 'Planned', date: '2027', title: 'LaybaLaw AI', description: 'AI Assistant for South African Labour Law & CCMA - Helping average South Africans navigate labour law and other legal disputes.', icon: 'ph-robot', iconClass: 'text-red-500' },
 ];
 
 const defaultSectionHeaders = {
     services: {
         eyebrow: 'Data Solutions and IT Consulting',
         title: 'SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals',
-        subtitle: 'Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon) via download and API, or explore trends visually using our analytics dashboard.',
+        subtitle: 'Access structured South African public legal data via download and API, or explore trends visually using our analytics dashboard.',
     },
     philosophy: {
         eyebrow: 'Why Infinity Ohm?',
         title: 'Our Philosophy',
         subtitle: 'Strategic engineering, absolute data ownership, and open standards.',
     },
-    ohmbase: {
-        eyebrow: 'DIY Smart Home Blueprints',
-        title: 'OhmBase',
-        subtitle: 'The business data architectures we build are born from our philosophy of absolute digital sovereignty. Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build their own self-hosted, cloud-free smart home ecosystems.',
-    },
+    // ohmbase: {
+    //     eyebrow: 'DIY Smart Home Blueprints',
+    //     title: 'OhmBase',
+    //     subtitle: 'The business data architectures we build are born from our philosophy of absolute digital sovereignty. Explore our open-source blueprints and Smart Home/IoT hardware store, designed to help individuals build their own self-hosted, cloud-free smart home ecosystems.',
+    // },
     faq: {
         eyebrow: 'FAQs',
         title: 'Frequently Asked Questions',
@@ -428,8 +425,7 @@ const submit = () => {
                                         d="M5 15l7-7 7 7" />
                                 </svg>
                             </button>
-                            <button @click="moveRoadmapItem(index, 1)"
-                                :disabled="index === form.roadmap.length - 1"
+                            <button @click="moveRoadmapItem(index, 1)" :disabled="index === form.roadmap.length - 1"
                                 class="text-zinc-500 hover:text-white transition-all bg-zinc-900 rounded-xl p-2 shadow-sm border border-white/10 disabled:opacity-30 disabled:cursor-not-allowed">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -529,8 +525,7 @@ const submit = () => {
 
                         <!-- Section label -->
                         <div class="flex items-center gap-3 mb-6">
-                            <div
-                                class="w-2 h-2 bg-admin-modern rounded-full shadow-[0_0_8px_rgba(159,232,112,0.5)]">
+                            <div class="w-2 h-2 bg-admin-modern rounded-full shadow-[0_0_8px_rgba(159,232,112,0.5)]">
                             </div>
                             <span class="text-[10px] font-black uppercase tracking-widest text-white">{{ key
                                 }} Section</span>

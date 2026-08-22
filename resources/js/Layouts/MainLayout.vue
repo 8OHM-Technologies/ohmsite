@@ -44,7 +44,8 @@ onUnmounted(() => {
         class="min-h-screen bg-black text-white font-sans overflow-x-hidden scroll-smooth selection:bg-white selection:text-black relative">
 
         <Head :title="title">
-            <meta head-key="description" name="description" :content="description || 'Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence'" />
+            <meta head-key="description" name="description"
+                :content="description || 'Analytics Platform for South African Public Legal Data'" />
             <link v-if="canonical" head-key="canonical" rel="canonical" :href="canonical" />
         </Head>
 
@@ -69,7 +70,8 @@ onUnmounted(() => {
         <footer class="pt-20 pb-10 border-t border-white/5 text-center relative z-10">
             <img src="/assets/images/8OHM_Logo.webp" class="h-8 mx-auto opacity-20 mb-8" />
             <div class="text-zinc-700 text-[10px] font-black uppercase tracking-[0.5em]">
-                © 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. All rights reserved.
+                &copy; 2026 Infinity Ohm Technologies (Pty) Ltd t/a 8OHM. CIPC Reg No:
+          2026/408257/07. All rights reserved.
             </div>
         </footer>
     </div>

@@ -13,12 +13,6 @@ class TargetVanitySeeder extends Seeder
     public function run(): void
     {
         $vanities = [
-            // CCMA
-            [
-                'target_name' => 'sabinet_ccma',
-                'vanity_name' => 'CCMA Awards',
-                'target_type' => 'cases',
-            ],
             // Courts (cases)
             [
                 'target_name' => 'ZACC',
