@@ -153,20 +153,43 @@ class LegalRecordController extends Controller
                 return (clone $query)->count();
             });
 
+        $isPgsql = DB::connection('pgsql_coeus')->getDriverName() === 'pgsql';
+        $docDateSql = $isPgsql
+            ? "COALESCE(
+                NULLIF(scrubbed_records.data->'extracted_data'->>'judgment_date', ''),
+                NULLIF(scrubbed_records.data->'extracted_data'->>'award_date', ''),
+                NULLIF(scrubbed_records.data->'extracted_data'->>'hearing_date', ''),
+                NULLIF(scrubbed_records.data->'metadata'->>'document_date', ''),
+                NULLIF(scrubbed_records.data->'metadata'->>'hearing_date', ''),
+                NULLIF(extracted_records.data->'metadata'->>'document_date', ''),
+                NULLIF(extracted_records.data->'metadata'->>'hearing_date', ''),
+                extracted_records.document_date::text
+            )"
+            : "COALESCE(
+                json_extract(scrubbed_records.data, '$.extracted_data.judgment_date'),
+                json_extract(scrubbed_records.data, '$.extracted_data.award_date'),
+                json_extract(scrubbed_records.data, '$.extracted_data.hearing_date'),
+                json_extract(scrubbed_records.data, '$.metadata.document_date'),
+                json_extract(scrubbed_records.data, '$.metadata.hearing_date'),
+                json_extract(extracted_records.data, '$.metadata.document_date'),
+                json_extract(extracted_records.data, '$.metadata.hearing_date'),
+                extracted_records.document_date
+            )";
+
         if ($sortField === 'document_date') {
-            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+            $query->orderByRaw("{$docDateSql} {$sortOrder} NULLS LAST")
                 ->orderBy('scrubbed_records.created_at', 'desc');
         } elseif ($sortField === 'created_at') {
             $query->orderBy('scrubbed_records.created_at', $sortOrder)
-                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
+                ->orderByRaw("{$docDateSql} desc NULLS LAST");
         } elseif ($sortField === 'case_number') {
             $query->orderByRaw("COALESCE(scrubbed_records.data->'metadata'->>'case_number', scrubbed_records.data->'extracted_data'->>'case_number', scrubbed_records.data->>'case_number', '') {$sortOrder}")
-                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
+                ->orderByRaw("{$docDateSql} desc NULLS LAST");
         } elseif ($sortField === 'court') {
             $query->orderByRaw("COALESCE(scrubbed_records.data->'extracted_data'->>'court', scrubbed_records.data->'metadata'->>'court', scrubbed_records.data->'metadata'->>'target_name', extracted_records.record_type, '') {$sortOrder}")
-                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
+                ->orderByRaw("{$docDateSql} desc NULLS LAST");
         } else {
-            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+            $query->orderByRaw("{$docDateSql} {$sortOrder} NULLS LAST")
                 ->orderBy('scrubbed_records.created_at', 'desc');
         }
 
@@ -235,7 +258,7 @@ class LegalRecordController extends Controller
         $title = $srData['title'] ?? $erData['title'] ?? $ext['title'] ?? 'Legal Matter';
         $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? ($row->record_type === 'sabinet_ccma' ? 'CCMA' : 'Superior Court');
         $caseNumber = $meta['case_number'] ?? $ext['case_number'] ?? $srData['case_number'] ?? $srData['award_number'] ?? null;
-        $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $meta['document_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
+        $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $ext['hearing_date'] ?? $meta['document_date'] ?? $meta['hearing_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
         $hearingDate = $ext['hearing_date'] ?? $meta['hearing_date'] ?? null;
 
         $applicant = $ext['applicant_plaintiff'] ?? $srData['applicant_plaintiff'] ?? $ext['employee'] ?? $srData['employee'] ?? $meta['publisher'] ?? null;

@@ -187,7 +187,7 @@ class PopulateLegalAnalytics extends Command
                         $title = $title ?: ('Record #'.substr($scrubbedRecord->extracted_record_id, 0, 8));
 
                         $documentType = $metaData['record_type'] ?? $extractedRecord?->record_type ?? 'saflii_courts';
-                        $documentDate = $extractedRecord?->document_date ? $extractedRecord->document_date->toDateString() : ($extData['judgment_date'] ?? $extData['hearing_date'] ?? $metaData['document_date'] ?? $payload['judgment_date'] ?? $payload['date'] ?? null);
+                        $documentDate = $extData['judgment_date'] ?? $extData['award_date'] ?? $extData['hearing_date'] ?? $metaData['document_date'] ?? $metaData['hearing_date'] ?? ($extractedRecord?->document_date ? $extractedRecord->document_date->toDateString() : ($payload['judgment_date'] ?? $payload['date'] ?? null));
                         $caseNumber = $metaData['case_number'] ?? $extData['case_number'] ?? $payload['case_number'] ?? $payload['dataset_number'] ?? $payload['gazette_number'] ?? $payload['volume'] ?? null;
 
                         $chunkPrepared[] = [

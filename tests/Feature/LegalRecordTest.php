@@ -394,6 +394,51 @@ class LegalRecordTest extends TestCase
         $this->assertSame('2022-05-10', $records[2]['document_date']);
     }
 
+    public function test_legal_records_sorts_correctly_when_document_date_is_in_extracted_json_payload(): void
+    {
+        $proUser = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        // All 3 records have the SAME base extracted_records.document_date (e.g. scraper default '2000-01-01')
+        // but have different extracted_data.judgment_date in JSON
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case July {$uniq}",
+            'extracted_data' => [
+                'judgment_date' => '2026-07-27',
+            ],
+        ], [], '2000-01-01');
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case March {$uniq}",
+            'extracted_data' => [
+                'judgment_date' => '2026-03-03',
+            ],
+        ], [], '2000-01-01');
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case May {$uniq}",
+            'extracted_data' => [
+                'judgment_date' => '2026-05-28',
+            ],
+        ], [], '2000-01-01');
+
+        $response = $this->actingAs($proUser)->getJson("/legal-records/data?category=cases&search={$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertCount(3, $records);
+        $this->assertSame("Case July {$uniq}", $records[0]['title']);
+        $this->assertSame('2026-07-27', $records[0]['document_date']);
+        $this->assertSame("Case May {$uniq}", $records[1]['title']);
+        $this->assertSame('2026-05-28', $records[1]['document_date']);
+        $this->assertSame("Case March {$uniq}", $records[2]['title']);
+        $this->assertSame('2026-03-03', $records[2]['document_date']);
+    }
+
     public function test_standard_user_receives_blurred_locked_record_fields(): void
     {
         $user = User::factory()->create([
