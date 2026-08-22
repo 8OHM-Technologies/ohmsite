@@ -1,6 +1,10 @@
 @plugin "@tailwindcss/forms";
 
 @import "tailwindcss";
+@import "@phosphor-icons/web/regular";
+@import "@phosphor-icons/web/light";
+@import "@phosphor-icons/web/fill";
+@import "@phosphor-icons/web/bold";
 
 /* ── 8OHM.co.za Global Styles ── */
 :root {

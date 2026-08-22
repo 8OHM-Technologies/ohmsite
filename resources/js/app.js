@@ -7,8 +7,6 @@ import { createGtm } from '@gtm-support/vue-gtm'
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { createPinia } from 'pinia';
-import PhosphorIcons from "@phosphor-icons/vue"
-
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 
@@ -27,7 +25,6 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(pinia)
-            .use(PhosphorIcons)
             .use(PrimeVue, {
                 theme: {
                     preset: Aura,
