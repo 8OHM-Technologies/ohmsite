@@ -326,6 +326,74 @@ class LegalRecordTest extends TestCase
         $this->assertSame('2020-01-15', $proRecords[2]['document_date']);
     }
 
+    public function test_legal_records_data_endpoint_sorts_journals_and_gazettes_by_document_date_desc(): void
+    {
+        $proUser = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('ZAGovGaz', 'gaz', [
+            'title' => "Government Gazette 2021 {$uniq}",
+        ], [], '2021-04-10');
+
+        $this->createScrubbedRecord('PER', 'journals', [
+            'title' => "Law Journal 2025 {$uniq}",
+        ], [], '2025-08-15');
+
+        $this->createScrubbedRecord('ZAGovGaz', 'gaz', [
+            'title' => "Government Gazette 2024 {$uniq}",
+        ], [], '2024-02-01');
+
+        $response = $this->actingAs($proUser)->getJson("/legal-records/data?category=journals&search={$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertCount(3, $records);
+        $this->assertSame("Law Journal 2025 {$uniq}", $records[0]['title']);
+        $this->assertSame('2025-08-15', $records[0]['document_date']);
+        $this->assertSame("Government Gazette 2024 {$uniq}", $records[1]['title']);
+        $this->assertSame('2024-02-01', $records[1]['document_date']);
+        $this->assertSame("Government Gazette 2021 {$uniq}", $records[2]['title']);
+        $this->assertSame('2021-04-10', $records[2]['document_date']);
+    }
+
+    public function test_legal_records_data_endpoint_sorts_court_rolls_by_document_date_desc(): void
+    {
+        $proUser = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => "Motion Roll Old {$uniq}",
+        ], [], '2022-05-10');
+
+        $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => "Motion Roll Recent {$uniq}",
+        ], [], '2026-01-20');
+
+        $this->createScrubbedRecord('saflii_courts', 'other', [
+            'title' => "Motion Roll Mid {$uniq}",
+        ], [], '2024-11-12');
+
+        $response = $this->actingAs($proUser)->getJson("/legal-records/data?category=court_rolls&search={$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertCount(3, $records);
+        $this->assertSame("Motion Roll Recent {$uniq}", $records[0]['title']);
+        $this->assertSame('2026-01-20', $records[0]['document_date']);
+        $this->assertSame("Motion Roll Mid {$uniq}", $records[1]['title']);
+        $this->assertSame('2024-11-12', $records[1]['document_date']);
+        $this->assertSame("Motion Roll Old {$uniq}", $records[2]['title']);
+        $this->assertSame('2022-05-10', $records[2]['document_date']);
+    }
+
     public function test_standard_user_receives_blurred_locked_record_fields(): void
     {
         $user = User::factory()->create([

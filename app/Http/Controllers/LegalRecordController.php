@@ -94,7 +94,8 @@ class LegalRecordController extends Controller
         $category = trim((string) $request->input('category', 'all'));
         $recordType = trim((string) $request->input('record_type', ''));
         $sortField = trim((string) $request->input('sort_field', 'document_date'));
-        $sortOrder = (int) $request->input('sort_order', -1) === 1 ? 'asc' : 'desc';
+        $rawSortOrder = $request->input('sort_order', -1);
+        $sortOrder = in_array($rawSortOrder, [1, '1', 'asc', 'ASC'], true) ? 'asc' : 'desc';
 
         $user = auth()->user();
         $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
@@ -153,9 +154,11 @@ class LegalRecordController extends Controller
             });
 
         if ($sortField === 'document_date') {
-            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST");
+            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+                ->orderBy('scrubbed_records.created_at', 'desc');
         } elseif ($sortField === 'created_at') {
-            $query->orderBy('scrubbed_records.created_at', $sortOrder);
+            $query->orderBy('scrubbed_records.created_at', $sortOrder)
+                ->orderByRaw('extracted_records.document_date desc NULLS LAST');
         } elseif ($sortField === 'case_number') {
             $query->orderByRaw("COALESCE(scrubbed_records.data->'metadata'->>'case_number', scrubbed_records.data->'extracted_data'->>'case_number', scrubbed_records.data->>'case_number', '') {$sortOrder}")
                 ->orderByRaw('extracted_records.document_date desc NULLS LAST');
@@ -163,7 +166,8 @@ class LegalRecordController extends Controller
             $query->orderByRaw("COALESCE(scrubbed_records.data->'extracted_data'->>'court', scrubbed_records.data->'metadata'->>'court', scrubbed_records.data->'metadata'->>'target_name', extracted_records.record_type, '') {$sortOrder}")
                 ->orderByRaw('extracted_records.document_date desc NULLS LAST');
         } else {
-            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST");
+            $query->orderByRaw("extracted_records.document_date {$sortOrder} NULLS LAST")
+                ->orderBy('scrubbed_records.created_at', 'desc');
         }
 
         $rows = $query->offset($offset)->limit($limit)->get();
