@@ -35,7 +35,7 @@ const courtLocation = computed(() => dataObj.value.court_location || 'National J
 const judgmentDate = computed(() => dataObj.value.judgment_date || dataObj.value.award_date || dataObj.value.document_date || props.recordDetail?.document_date || 'N/A');
 const hearingDate = computed(() => dataObj.value.hearing_date || dataObj.value.hearing_start || 'N/A');
 const durationDays = computed(() => dataObj.value.duration_days ?? null);
-const applicant = computed(() => dataObj.value.applicant || dataObj.value.employee || 'N/A');
+const applicant = computed(() => dataObj.value.applicant || 'N/A');
 const respondent = computed(() => dataObj.value.respondent || dataObj.value.employer || 'N/A');
 const judges = computed(() => {
   const j = dataObj.value.judges;
@@ -117,8 +117,8 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
           <span class="text-[10px] text-primary font-bold uppercase tracking-wider flex items-center gap-1.5">
             <Scale class="w-3.5 h-3.5" /> Litigant Parties
           </span>
-          <p class="font-medium text-white truncate"><strong>Applicant / Employee:</strong> {{ applicant }}</p>
-          <p class="font-medium text-zinc-300 truncate"><strong>Respondent / Employer:</strong> {{ respondent }}
+          <p class="font-medium text-white truncate"><strong>Applicant:</strong> {{ applicant }}</p>
+          <p class="font-medium text-zinc-300 truncate"><strong>Respondent:</strong> {{ respondent }}
           </p>
         </div>
       </div>
