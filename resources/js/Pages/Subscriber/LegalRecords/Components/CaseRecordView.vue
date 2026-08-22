@@ -232,41 +232,69 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
       </div>
     </div>
 
-    <!-- Precedents Cited Table -->
+    <!-- Footnotes & Precedents Cited Table -->
     <div class="relative rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5 p-5 space-y-3">
       <div class="flex items-center justify-between">
         <span class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
           <BookOpen class="w-4 h-4 text-primary" />
-          Cited Legal Precedents &amp; Authorities ({{ isPro ? precedentsCount : (precedentsCount || 'Pro') }})
+          Footnotes &amp; Cited Precedents ({{ isPro ? precedentsCount : (precedentsCount || 'Pro') }})
         </span>
       </div>
 
       <div v-if="isPro && precedentsCited && precedentsCited.length"
-        class="max-h-60 overflow-y-auto custom-scrollbar">
+        class="max-h-80 overflow-y-auto custom-scrollbar">
         <table class="w-full text-left text-xs">
           <thead>
             <tr class="border-b border-white/10 text-zinc-400 font-bold uppercase text-[9px]">
-              <th class="py-2 px-2">Authority / Citation</th>
+              <th class="py-2 px-2">Authority / Reference</th>
               <th class="py-2 px-2">Treatment</th>
               <th class="py-2 px-2 text-right">Reference</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5 text-zinc-300">
-            <tr v-for="p in precedentsCited" :key="p.case_name_citation || p.citation"
+            <tr v-for="(p, pIdx) in precedentsCited" :key="p.raw_citation || p.case_name_citation || pIdx"
               class="hover:bg-white/[0.02]">
-              <td class="py-2 px-2 font-medium text-white">{{ p.case_name_citation || p.citation }}</td>
-              <td class="py-2 px-2">
-                <span class="px-2 py-0.5 rounded text-[9px] font-bold"
-                  :class="p.treatment === 'Applied/Followed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-primary/10 text-primary border border-primary/20'">
-                  {{ p.treatment || 'Referred' }}
+              <td class="py-2.5 px-2">
+                <div class="font-medium text-white text-xs">
+                  {{ p.case_name || p.raw_citation || p.case_name_citation || 'Unspecified Legal Reference' }}
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                  <span v-if="p.neutral_citation"
+                    class="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-mono text-[9px]">
+                    {{ p.neutral_citation }}
+                  </span>
+                  <span v-if="p.case_number"
+                    class="px-1.5 py-0.5 rounded bg-white/5 text-zinc-300 font-mono text-[9px]">
+                    ({{ p.case_number }})
+                  </span>
+                  <span v-for="c in (p.commercial_citations || [])" :key="c"
+                    class="px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 font-mono text-[9px] border border-white/5">
+                    {{ c }}
+                  </span>
+                  <span v-if="p.decision_date"
+                    class="text-[9px] text-zinc-500 inline-flex items-center gap-1 font-mono">
+                    <Calendar class="w-2.5 h-2.5 text-zinc-400" />
+                    {{ p.decision_date }}
+                  </span>
+                </div>
+                <p v-if="p.reasoning && p.reasoning !== 'null' && p.reasoning !== 'None'"
+                  class="text-[10px] text-zinc-400 mt-1.5 italic line-clamp-2">
+                  {{ p.reasoning }}
+                </p>
+              </td>
+              <td class="py-2.5 px-2 align-top">
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold inline-block mt-0.5"
+                  :class="p.treatment === 'Applied/Followed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : (p.treatment === 'Distinguished/Overruled' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-primary/10 text-primary border border-primary/20')">
+                  {{ p.treatment && p.treatment !== 'null' ? p.treatment : 'Referred' }}
                 </span>
               </td>
-              <td class="py-2 px-2 text-right">
-                <a v-if="p.url" :href="p.url" target="_blank" rel="noopener noreferrer"
-                  class="text-primary hover:underline inline-flex items-center gap-1 text-[10px]">
+              <td class="py-2.5 px-2 text-right align-top">
+                <a v-if="p.url && p.url !== 'null'" :href="p.url" target="_blank" rel="noopener noreferrer"
+                  class="text-primary hover:underline inline-flex items-center gap-1 text-[10px] font-medium mt-0.5">
                   LawCite
                   <ExternalLink class="w-3 h-3" />
                 </a>
+                <span v-else class="text-zinc-600 text-[10px]">—</span>
               </td>
             </tr>
           </tbody>
@@ -278,16 +306,15 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
         class="py-8 flex flex-col items-center justify-center text-center space-y-3 bg-black/40 rounded-xl border border-white/5 p-6">
         <Lock class="w-6 h-6 text-primary" />
         <div class="space-y-1">
-          <h5 class="text-xs font-bold uppercase tracking-wider text-white">Precedent &amp; Citation Network
-            Locked</h5>
+          <h5 class="text-xs font-bold uppercase tracking-wider text-white">Footnotes &amp; Precedent Network Locked</h5>
           <p class="text-[11px] text-zinc-400 max-w-sm">
-            Trace citations, judicial treatments (Applied, Distinguished, Overruled), and direct LawCite
+            Trace footnotes, cited authorities, judicial treatments (Applied, Distinguished, Overruled), and direct LawCite
             references with a Pro subscription.
           </p>
         </div>
         <a href="/#pricing"
           class="btn btn-primary px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl shadow-md shadow-primary/20 flex items-center gap-1">
-          <span>Unlock Precedent Citations</span>
+          <span>Unlock Footnotes &amp; Precedents</span>
           <ArrowRight class="w-3 h-3" />
         </a>
       </div>

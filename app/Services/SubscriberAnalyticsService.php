@@ -251,7 +251,7 @@ class SubscriberAnalyticsService
 
             // Precedents citations
             foreach ($item['precedents_cited'] as $prec) {
-                $cName = trim((string) ($prec['case_name_citation'] ?? ''));
+                $cName = trim((string) ($prec['raw_citation'] ?? $prec['case_name'] ?? $prec['case_name_citation'] ?? ''));
                 if ($cName) {
                     if (! isset($precedentsFrequency[$cName])) {
                         $precedentsFrequency[$cName] = [

@@ -486,7 +486,12 @@ class LegalRecordTest extends TestCase
                 'ratio_decidendi' => 'The fundamental right to fair trial cannot be arbitrarily suspended.',
                 'judges' => ['Chief Justice Zondo'],
                 'precedents_cited' => [
-                    ['case_name_citation' => 'Makwanyane [1995] ZACC 3', 'treatment' => 'Applied/Followed'],
+                    [
+                        'raw_citation' => 'S v Makwanyane [1995] ZACC 3',
+                        'case_name' => 'S v Makwanyane',
+                        'neutral_citation' => '[1995] ZACC 3',
+                        'treatment' => 'Applied/Followed',
+                    ],
                 ],
                 'order' => 'The application is upheld with costs.',
                 'summary' => 'Constitutional challenge concerning administrative justice timelines.',
@@ -501,7 +506,8 @@ class LegalRecordTest extends TestCase
         $response->assertJsonPath('data.case_number', 'CCT 100/26');
         $response->assertJsonPath('data.ratio_decidendi', 'The fundamental right to fair trial cannot be arbitrarily suspended.');
         $response->assertJsonPath('data.judges.0', 'Chief Justice Zondo');
-        $response->assertJsonPath('data.precedents_cited.0.case_name_citation', 'Makwanyane [1995] ZACC 3');
+        $response->assertJsonPath('data.precedents_cited.0.raw_citation', 'S v Makwanyane [1995] ZACC 3');
+        $response->assertJsonPath('data.precedents_cited.0.neutral_citation', '[1995] ZACC 3');
     }
 
     public function test_journal_record_returns_publication_fields_and_formatted_text(): void

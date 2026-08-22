@@ -261,7 +261,7 @@ onMounted(() => {
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            South African Case Law from Superior Courts, High Courts, and more
+            South African Case Law from High Courts, Labour Courts, Constitutional Court and more
           </p>
         </div>
       </div>
