@@ -24,7 +24,7 @@ const sectionHeader = (field) => {
   const defaults = {
     eyebrow: 'Data Solutions and IT Consulting',
     title: 'SA Labour Law Datasets & Analytics for Legal, HR, and Data Professionals',
-    subtitle: 'Access structured South African public legal data (currently CCMA & Labour Courts, with more arriving soon) via download and API, or explore trends visually using our analytics dashboard.',
+    subtitle: 'Access structured South African public legal data via download and API, or explore trends visually using our analytics dashboard.',
   };
   return props.sectionHeaders?.services?.[field] || defaults[field] || '';
 };

@@ -122,7 +122,7 @@ onMounted(() => {
             </p>
           </div>
         </div>
-        <div class="bezel-card-outer col-span-6 reveal-item">
+        <!-- <div class="bezel-card-outer col-span-6 reveal-item">
           <div class="bezel-card-inner">
             <h4 class="card-title-small">
               <i class="ph-light ph-tree-structure"></i>
@@ -134,7 +134,7 @@ onMounted(() => {
               public data pipelines and IT consulting.
             </p>
           </div>
-        </div>
+        </div> -->
       </div>
     </section>
   </div>

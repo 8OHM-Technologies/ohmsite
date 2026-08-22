@@ -63,10 +63,10 @@ const formatDate = (dateString) => {
 };
 
 const codeSnippets = {
-    curl: `curl -X GET "https://ohmbase.io/api/v1/cases?dataset=ccma&page=1&limit=10" \\
+    curl: `curl -X GET "https://8ohm.co.za/api/v1/cases?dataset=ccma&page=1&limit=10" \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Accept: application/json"`,
-    javascript: `fetch('https://ohmbase.io/api/v1/cases?dataset=ccma&page=1&limit=10', {
+    javascript: `fetch('https://8ohm.co.za/api/v1/cases?dataset=ccma&page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
     'Accept': 'application/json'
@@ -76,7 +76,7 @@ const codeSnippets = {
 .then(data => console.log(data));`,
     php: `$client = new \\GuzzleHttp\\Client();
 
-$response = $client->request('GET', 'https://ohmbase.io/api/v1/cases', [
+$response = $client->request('GET', 'https://8ohm.co.za/api/v1/cases', [
     'query' => [
         'dataset' => 'ccma',
         'page' => 1,
@@ -91,7 +91,7 @@ $response = $client->request('GET', 'https://ohmbase.io/api/v1/cases', [
 echo $response->getBody();`,
     python: `import requests
 
-url = "https://ohmbase.io/api/v1/cases"
+url = "https://8ohm.co.za/api/v1/cases"
 headers = {
     "Authorization": "Bearer YOUR_API_KEY",
     "Accept": "application/json"

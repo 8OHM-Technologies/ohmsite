@@ -6,7 +6,6 @@ import BackgroundVisuals from '@/Pages/Home/Partials/BackgroundVisuals.vue'
 import HeroSection from '@/Pages/Home/Partials/HeroSection.vue'
 import PricingSection from '@/Pages/Home/Partials/PricingSection.vue'
 import PhilosophySection from '@/Pages/Home/Partials/PhilosophySection.vue'
-import OhmBaseSection from '@/Pages/Home/Partials/OhmBaseSection.vue'
 import FaqSection from '@/Pages/Home/Partials/FaqSection.vue'
 import ContactSection from '@/Pages/Home/Partials/ContactSection.vue'
 import FooterSection from '@/Pages/Home/Partials/FooterSection.vue'
@@ -125,16 +124,6 @@ onUnmounted(() => {
       extraction, and ETL workflows tailored to your operational needs, delivering structured data directly into your
       private ecosystem."
       }
-      },
-      {
-      "@type": "Question",
-      "name": "How do the consumer (OhmBase) and business divisions relate?",
-      "acceptedAnswer": {
-      "@type": "Answer",
-      "text": "Both share our core philosophy of digital sovereignty. OhmBase is our open-source initiative empowering
-      individuals to self-host secure smart homes, while our business division delivers professional-grade public data
-      pipelines and IT consulting."
-      }
       }
       ]
       }
@@ -155,7 +144,7 @@ onUnmounted(() => {
 
       <PhilosophySection :section-headers="sectionHeaders" />
 
-      <OhmBaseSection :section-headers="sectionHeaders" />
+      <!-- <OhmBaseSection :section-headers="sectionHeaders" /> -->
 
       <FaqSection :section-headers="sectionHeaders" />
 
