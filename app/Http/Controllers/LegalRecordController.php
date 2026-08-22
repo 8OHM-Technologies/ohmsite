@@ -288,9 +288,9 @@ class LegalRecordController extends Controller
         $ratioDecidendi = $ext['ratio_decidendi'] ?? $srData['ratio_decidendi'] ?? null;
         $obiterDicta = $ext['obiter_dicta'] ?? $srData['obiter_dicta'] ?? null;
         $order = $ext['order'] ?? $srData['order'] ?? null;
-        $summary = $srData['ai_summary'] ?? $ext['summary'] ?? $srData['summary'] ?? $srData['abstract'] ?? $ext['reason_for_dismissal'] ?? $srData['reason_for_dismissal'] ?? null;
-        $subjects = $ext['reason_for_dismissal'] ?? $srData['reason_for_dismissal'] ?? $ext['subjects'] ?? $srData['subjects'] ?? null;
-        $outcome = $ext['result'] ?? $order ?? $ext['holding'] ?? null;
+        $summary = $srData['ai_summary'] ?? $ext['summary'] ?? $srData['summary'] ?? null;
+        $subjects = $ext['subjects'] ?? $srData['subjects'] ?? null;
+        $outcome = $ext['result'] ?? $order ?? null;
         $sourceUrl = $row->source_url ?? $ext['source_url'] ?? $meta['source_url'] ?? null;
 
         $category = $ext['category'] ?? $srData['category'] ?? $erData['category'] ?? null;
