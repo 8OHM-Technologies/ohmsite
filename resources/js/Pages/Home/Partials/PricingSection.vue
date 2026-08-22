@@ -83,8 +83,6 @@ const analyticsFeatures = computed(() => {
       'Precedents & citation network intelligence',
       'Judicial bench & panel analytics',
       'Case intelligence & automated Ratio Decidendi extraction',
-      'Automated Reports & CSV/JSON exports',
-      'Priority Helpdesk Ticket Support',
       'POPIA Compliant Data Entries',
     ];
 });
