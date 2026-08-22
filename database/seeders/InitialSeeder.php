@@ -94,7 +94,7 @@ class InitialSeeder extends Seeder
         Product::updateOrCreate(
             ['slug' => 'developer-api'],
             [
-                'name' => '8OHM Case Law',
+                'name' => 'Pro Case Law',
                 'description' => 'API access to all case law records and advanced extracted dataset attributes for your applications.',
                 'price' => 1580.00,
                 'image' => '/assets/images/products/api.png',
@@ -114,7 +114,7 @@ class InitialSeeder extends Seeder
         Product::updateOrCreate(
             ['slug' => 'pro-analytics'],
             [
-                'name' => '8OHM Legal Analytics',
+                'name' => 'Pro Legal Analytics',
                 'description' => 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.',
                 'price' => 5800.00,
                 'image' => '/assets/images/products/analytics.png',

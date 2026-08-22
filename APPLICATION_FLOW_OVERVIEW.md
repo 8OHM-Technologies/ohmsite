@@ -87,7 +87,7 @@ flowchart TD
 | **Middleware** | `has.dataset.access` → [DatasetAccessMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/DatasetAccessMiddleware.php) |
 | **Protected resource** | `GET /downloads/{dataset}` → [DownloadController::download](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/DownloadController.php) — streams CSV file |
 
-#### Developer API / 8OHM Case Law (`slug: developer-api`)
+#### Developer API / Pro Case Law (`slug: developer-api`)
 
 | Aspect | Detail |
 |---|---|

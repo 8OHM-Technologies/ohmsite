@@ -294,10 +294,10 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Tier 2: 8OHM Case Law -->
+              <!-- Tier 2: Pro Case Law -->
               <div class="pricing-card" id="card-developer">
                 <div class="pricing-card-header">
-                  <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || '8OHM Case Law' }}</h3>
+                  <h3 id="tier-developer" class="pricing-tier-name">{{ developerProduct.name || 'Pro Case Law' }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
                     {{ developerProduct.description || 'API access to all case law records and advanced extracteddataset attributes for your applications.' }}
                   </p>
@@ -337,11 +337,11 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Tier 3: 8OHM Legal Analytics -->
+              <!-- Tier 3: Pro Legal Analytics -->
               <div class="pricing-card featured" id="card-analytics">
                 <div class="pricing-card-header">
                   <div class="featured-badge">Recommended</div>
-                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || '8OHM Legal Analytics'
+                  <h3 id="tier-analytics" class="pricing-tier-name">{{ analyticsProduct.name || 'Pro Legal Analytics'
                   }}</h3>
                   <p class="card-desc-small" style="margin-bottom: 20px;">
                     {{ analyticsProduct.description || 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.' }}

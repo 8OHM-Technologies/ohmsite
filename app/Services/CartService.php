@@ -174,7 +174,7 @@ class CartService
             return $base;
         }
 
-        // Developer API (8OHM Case Law)
+        // Developer API (Pro Case Law)
         if ($product->slug === 'developer-api') {
             $frequency = $options['frequency'] ?? 'monthly';
             $base = (float) $product->price;

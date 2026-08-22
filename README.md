@@ -23,8 +23,8 @@ This platform is a data-centric SaaS and digital licensing platform tailored for
 
 ### Core Offerings
 - **Tier 1: FREE Case Law**: Free access to basic South African case law records with standard public metadata for High Courts and Labour Courts.
-- **Tier 2: 8OHM Case Law**: API access to all case law records, advanced dataset features (ratio decidendi, scrubbed records, acts cited), and live continuous data feed.
-- **Tier 3: 8OHM Legal Analytics**: Complete no-code analytics platform, higher API limits (3,000 req/mo), interactive jurisprudence and citation network dashboards, and automated exports.
+- **Tier 2: Pro Case Law**: API access to all case law records, advanced dataset features (ratio decidendi, scrubbed records, acts cited), and live continuous data feed.
+- **Tier 3: Pro Legal Analytics**: Complete no-code analytics platform, higher API limits (3,000 req/mo), interactive jurisprudence and citation network dashboards, and automated exports.
 - **Tier 4: Once-off Datasets**: POPIA-compliant raw case law datasets available for bulk download in CSV/JSON formats for AI training and offline research.
 - **Managed Data Infrastructure**: Custom web scraping, ETL data engineering, and private LLM deployments.
 
