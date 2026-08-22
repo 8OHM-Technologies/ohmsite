@@ -256,12 +256,12 @@ onMounted(() => {
             <Scale class="w-5 h-5" />
           </div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
-            Case Law &amp; Judgments
+            South African Case Law
           </h1>
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            Open Access South African Case Law from Superior Courts, High Courts, and CCMA Awards
+            South African Case Law from Superior Courts, High Courts, and more
           </p>
         </div>
       </div>
