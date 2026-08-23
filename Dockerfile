@@ -63,6 +63,9 @@ COPY --from=frontend_builder --chown=dev:www-data /app/public/build /var/www/pub
 # Set explicit execution permissions for Laravel cache and storage directories
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+# Copy custom PHP-FPM pool configuration
+COPY docker/php-fpm/custom.conf /usr/local/etc/php-fpm.d/zz-custom.conf
+
 EXPOSE 9000
 
 COPY laravel-entrypoint.sh /usr/local/bin/laravel-entrypoint.sh

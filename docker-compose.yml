@@ -14,6 +14,7 @@ services:
     volumes:
       - .:/var/www
       - ./storage:/var/www/storage
+      - ./docker/php-fpm/custom.conf:/usr/local/etc/php-fpm.d/zz-custom.conf:ro
     networks:
       - 8ohm-network
 

@@ -38,7 +38,7 @@ This platform is a data-centric SaaS and digital licensing platform tailored for
 - **Auth**: Laravel Breeze (Breeze scaffolding) + Laravel Socialite (OAuth)
 - **Database**: PostgreSQL (`laravel` & `pgsql_coeus` on Production) & SQLite (In-Memory for Tests)
 - **Caching**: Redis (Aggregated analytics & high-throughput dataset caching)
-- **Web Server**: Nginx with Gzip compression and FastCGI buffer tuning
+- **Web Server & Runtime**: Nginx with Gzip compression, FastCGI buffer tuning & optimized PHP-FPM process pool
 - **CI/CD**: GitHub Actions
 
 ---
