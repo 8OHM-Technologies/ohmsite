@@ -237,7 +237,7 @@ const datasetStats = computed(() => {
                             </Link>
 
                             <!-- Journals & Gazettes -->
-                            <Link :href="route('legal-records.journals')"
+                            <!-- <Link :href="route('legal-records.journals')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
                                     isUrl(route('legal-records.journals'))
@@ -247,10 +247,10 @@ const datasetStats = computed(() => {
                                 <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 Journals &amp; Gazettes
-                            </Link>
+                            </Link> -->
 
                             <!-- Court Rolls -->
-                            <Link :href="route('legal-records.court-rolls')"
+                            <!-- <Link :href="route('legal-records.court-rolls')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
                                     isUrl(route('legal-records.court-rolls'))
@@ -260,7 +260,7 @@ const datasetStats = computed(() => {
                                 <Calendar class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.court-rolls')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 Court Rolls
-                            </Link>
+                            </Link> -->
                         </div>
                     </div>
 
@@ -286,7 +286,7 @@ const datasetStats = computed(() => {
                         <div v-show="isAnalyticsExpanded"
                             class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                             <!-- CCMA Awards -->
-                            <Link :href="route('subscriber.analytics.ccma')"
+                            <!-- <Link :href="route('subscriber.analytics.ccma')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
                                     isUrl(route('subscriber.analytics.ccma'))
@@ -296,7 +296,7 @@ const datasetStats = computed(() => {
                                 <Briefcase class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('subscriber.analytics.ccma')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 CCMA Awards
-                            </Link>
+                            </Link> -->
 
                             <!-- SAFLII Courts -->
                             <Link :href="route('subscriber.analytics.saflii')"
