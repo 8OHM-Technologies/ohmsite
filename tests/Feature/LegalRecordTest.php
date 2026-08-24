@@ -122,6 +122,7 @@ class LegalRecordTest extends TestCase
             'scrubbed_at' => now(),
             'scraped_at' => now(),
             'detailed_at' => now(),
+            'updated_at' => now(),
         ]);
 
         DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
@@ -129,6 +130,7 @@ class LegalRecordTest extends TestCase
             'extracted_record_id' => $extId,
             'data' => json_encode($scrubbedData),
             'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         $this->createdExtractedIds[] = $extId;
