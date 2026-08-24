@@ -108,7 +108,6 @@ class LegalRecordController extends Controller
 
         $query = DB::connection('pgsql_coeus')->table('scrubbed_records')
             ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id')
-            ->whereNotNull('extracted_records.scrubbed_at')
             ->select([
                 'scrubbed_records.id',
                 'scrubbed_records.extracted_record_id',
