@@ -118,7 +118,7 @@ const getHref = (link) => {
             <div class="absolute left-1/2 -translate-x-1/2 nav:static nav:translate-x-0 nav:justify-self-start transition-all duration-500 flex items-center"
                 :class="[isScrolled ? 'nav:w-40' : 'nav:w-auto']">
                 <Link :href="route('home')" class="block">
-                    <img src="/assets/images/8OHM_Logo.webp" alt="8OHM. | End-to-end Data Solutions | Logo"
+                    <img src="/assets/images/8OHM_Logo.webp" alt="8OHM | End-to-end Data Solutions | Logo"
                         class="transition-all duration-500" :style="{
                             height: isScrolled ? '24px' : '48px',
                             maxHeight: '128px'
@@ -237,12 +237,12 @@ const getHref = (link) => {
 
                 <div class="flex-1 overflow-y-auto p-8 space-y-8">
                     <!-- Mobile Search -->
-                    <div class="relative group">
+                    <!-- <div class="relative group">
                         <Search class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" />
                         <input type="text" v-model="searchQuery" @keyup.enter="performSearch"
                             placeholder="Search products..."
                             class="w-full bg-black border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold uppercase tracking-widest text-white focus:ring-1 focus:ring-white/20" />
-                    </div>
+                    </div> -->
 
                     <!-- Main Links -->
                     <nav class="space-y-2">

@@ -313,12 +313,12 @@ onMounted(() => {
       <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
 
         <!-- Global Search Field -->
-        <div class="relative flex-1 max-w-2xl">
+        <!-- <div class="relative flex-1 max-w-2xl">
           <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input type="text" v-model="searchQuery" @input="onSearchInput"
             placeholder="Search by Case #, Applicant, Respondent, Court, or Legal Keywords..."
             class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
-        </div>
+        </div> -->
 
         <!-- Court / Source Dropdown Selection -->
         <div class="flex flex-wrap items-center gap-3">
