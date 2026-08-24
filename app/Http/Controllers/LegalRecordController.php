@@ -169,10 +169,7 @@ class LegalRecordController extends Controller
         if ($search !== '') {
             $query->where(function ($q) use ($search, $isPgsql) {
                 if ($isPgsql) {
-                    $q->where(function ($sub) use ($search) {
-                        $sub->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('extracted_records.data::text ILIKE ?', ["%{$search}%"]);
-                    });
+                    $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$search}%"]);
                 } else {
                     $q->where(function ($sub) use ($search) {
                         $sub->whereRaw('scrubbed_records.data LIKE ?', ["%{$search}%"])
@@ -199,8 +196,7 @@ class LegalRecordController extends Controller
                 NULLIF(scrubbed_records.data->'extracted_data'->>'award_date', ''),
                 NULLIF(scrubbed_records.data->'extracted_data'->>'hearing_date', ''),
                 NULLIF(scrubbed_records.data->'metadata'->>'document_date', ''),
-                NULLIF(scrubbed_records.data->'metadata'->>'hearing_date', ''),
-                extracted_records.document_date::text
+                NULLIF(scrubbed_records.data->'metadata'->>'hearing_date', '')
             )"
             : "COALESCE(
                 json_extract(scrubbed_records.data, '$.extracted_data.judgment_date'),
