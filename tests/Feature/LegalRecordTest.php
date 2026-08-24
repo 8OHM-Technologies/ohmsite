@@ -125,10 +125,15 @@ class LegalRecordTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        $scrubbedPayload = array_merge(['category' => $category], $scrubbedData);
+        if ($docDate && ! isset($scrubbedPayload['metadata']['document_date']) && ! isset($scrubbedPayload['extracted_data']['judgment_date'])) {
+            $scrubbedPayload['metadata'] = array_merge($scrubbedPayload['metadata'] ?? [], ['document_date' => $docDate]);
+        }
+
         DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
             'id' => $scrubbedId,
             'extracted_record_id' => $extId,
-            'data' => json_encode($scrubbedData),
+            'data' => json_encode($scrubbedPayload),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
