@@ -118,48 +118,62 @@ class LegalRecordController extends Controller
                 'scrubbed_records.created_at',
             ]);
 
+        $useFunctionalIndex = $isPgsql && ! app()->runningUnitTests();
+
         // Category filter
         if ($category === 'cases') {
-            $query->where(function ($q) use ($isPgsql) {
-                if ($isPgsql) {
-                    $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
-                    $q->where('extracted_records.record_type', 'sabinet_ccma')
-                        ->orWhereRaw("{$categorySql} = 'cases'")
-                        ->orWhereRaw("(jsonb_exists(scrubbed_records.data, 'metadata') OR jsonb_exists(scrubbed_records.data, 'extracted_data') OR jsonb_exists(scrubbed_records.data, 'case_number')) AND NOT (jsonb_exists(scrubbed_records.data, 'formatted_text') OR jsonb_exists(scrubbed_records.data, 'roll_type'))");
-                } else {
-                    $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
-                    $q->where('extracted_records.record_type', 'sabinet_ccma')
-                        ->orWhereRaw("{$categorySql} = 'cases'");
-                }
-            });
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'cases'");
+            } else {
+                $query->where(function ($q) use ($isPgsql) {
+                    if ($isPgsql) {
+                        $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
+                        $q->where('extracted_records.record_type', 'sabinet_ccma')
+                            ->orWhereRaw("{$categorySql} = 'cases'")
+                            ->orWhereRaw("{$categorySql} IS NULL AND (jsonb_exists(scrubbed_records.data, 'metadata') OR jsonb_exists(scrubbed_records.data, 'extracted_data') OR jsonb_exists(scrubbed_records.data, 'case_number')) AND NOT (jsonb_exists(scrubbed_records.data, 'formatted_text') OR jsonb_exists(scrubbed_records.data, 'roll_type'))");
+                    } else {
+                        $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
+                        $q->where('extracted_records.record_type', 'sabinet_ccma')
+                            ->orWhereRaw("{$categorySql} = 'cases'");
+                    }
+                });
+            }
         } elseif ($category === 'journals') {
-            $query->where(function ($q) use ($isPgsql) {
-                if ($isPgsql) {
-                    $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
-                    $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
-                        ->orWhereRaw("jsonb_exists(scrubbed_records.data, 'formatted_text')")
-                        ->orWhere('extracted_records.record_type', 'like', '%journal%')
-                        ->orWhere('extracted_records.record_type', 'like', '%gaz%');
-                } else {
-                    $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
-                    $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
-                        ->orWhere('extracted_records.record_type', 'like', '%journal%')
-                        ->orWhere('extracted_records.record_type', 'like', '%gaz%');
-                }
-            });
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'journals'");
+            } else {
+                $query->where(function ($q) use ($isPgsql) {
+                    if ($isPgsql) {
+                        $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
+                        $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
+                            ->orWhereRaw("jsonb_exists(scrubbed_records.data, 'formatted_text')")
+                            ->orWhere('extracted_records.record_type', 'like', '%journal%')
+                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
+                    } else {
+                        $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
+                        $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
+                            ->orWhere('extracted_records.record_type', 'like', '%journal%')
+                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
+                    }
+                });
+            }
         } elseif ($category === 'court_rolls') {
-            $query->where(function ($q) use ($isPgsql) {
-                if ($isPgsql) {
-                    $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
-                    $q->whereRaw("{$categorySql} = 'other'")
-                        ->orWhereRaw("(jsonb_exists(scrubbed_records.data, 'roll_type') OR jsonb_exists(scrubbed_records.data, 'rows'))")
-                        ->orWhere('extracted_records.record_type', 'like', '%roll%');
-                } else {
-                    $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
-                    $q->whereRaw("{$categorySql} = 'other'")
-                        ->orWhere('extracted_records.record_type', 'like', '%roll%');
-                }
-            });
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'court_rolls'");
+            } else {
+                $query->where(function ($q) use ($isPgsql) {
+                    if ($isPgsql) {
+                        $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
+                        $q->whereRaw("{$categorySql} = 'other'")
+                            ->orWhereRaw("(jsonb_exists(scrubbed_records.data, 'roll_type') OR jsonb_exists(scrubbed_records.data, 'rows'))")
+                            ->orWhere('extracted_records.record_type', 'like', '%roll%');
+                    } else {
+                        $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
+                        $q->whereRaw("{$categorySql} = 'other'")
+                            ->orWhere('extracted_records.record_type', 'like', '%roll%');
+                    }
+                });
+            }
         }
 
         // Record type / target filter

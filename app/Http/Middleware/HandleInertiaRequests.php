@@ -71,45 +71,45 @@ class HandleInertiaRequests extends Middleware
             'dataset_summary' => function () {
                 try {
                     return Cache::remember('dataset_summary', 3600, function () {
-                        $summary = DB::connection('pgsql_coeus')->table('scrubbed_records')
-                            ->join('extracted_records', 'extracted_records.id', '=', 'scrubbed_records.extracted_record_id')
-                            ->selectRaw("
-                                COUNT(*) as total_records,
-                                COUNT(*) FILTER (
-                                    WHERE extracted_records.record_type = 'sabinet_ccma'
-                                       OR extracted_records.data->>'category' = 'cases'
-                                       OR (
-                                           extracted_records.data->>'category' IS NULL
-                                           AND extracted_records.record_type NOT ILIKE '%journal%'
-                                           AND extracted_records.record_type NOT ILIKE '%gaz%'
-                                           AND extracted_records.record_type NOT ILIKE '%roll%'
-                                       )
-                                ) as total_cases,
-                                COUNT(*) FILTER (
-                                    WHERE extracted_records.data->>'category' IN ('journals', 'gaz')
-                                       OR extracted_records.record_type ILIKE '%journal%'
-                                       OR extracted_records.record_type ILIKE '%gaz%'
-                                ) as total_gazettes,
-                                COUNT(*) FILTER (
-                                    WHERE extracted_records.data->>'category' IN ('other', 'court_rolls')
-                                       OR extracted_records.record_type ILIKE '%roll%'
-                                ) as total_court_rolls,
-                                MIN(EXTRACT(YEAR FROM extracted_records.document_date)::int) as min_year,
-                                MAX(EXTRACT(YEAR FROM extracted_records.document_date)::int) as max_year
-                            ")
-                            ->first();
+                        $isPgsql = DB::connection('pgsql_coeus')->getDriverName() === 'pgsql';
 
-                        $minYear = $summary->min_year ?? null;
-                        $maxYear = $summary->max_year ?? null;
+                        if ($isPgsql) {
+                            $totalRecords = DB::connection('pgsql_coeus')->table('scrubbed_records')->count();
+                            $totalCases = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                                ->whereRaw("get_scrubbed_record_category(data) = 'cases'")
+                                ->count();
+                            $totalGazettes = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                                ->whereRaw("get_scrubbed_record_category(data) = 'journals'")
+                                ->count();
+                            $totalCourtRolls = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                                ->whereRaw("get_scrubbed_record_category(data) = 'court_rolls'")
+                                ->count();
+
+                            $yearRange = DB::connection('pgsql_coeus')->table('extracted_records')
+                                ->whereNotNull('scrubbed_at')
+                                ->selectRaw('MIN(EXTRACT(YEAR FROM document_date)::int) as min_year, MAX(EXTRACT(YEAR FROM document_date)::int) as max_year')
+                                ->first();
+
+                            $minYear = $yearRange->min_year ?? null;
+                            $maxYear = $yearRange->max_year ?? null;
+                        } else {
+                            $totalRecords = DB::connection('pgsql_coeus')->table('scrubbed_records')->count();
+                            $totalCases = $totalRecords;
+                            $totalGazettes = 0;
+                            $totalCourtRolls = 0;
+                            $minYear = 2020;
+                            $maxYear = (int) date('Y');
+                        }
+
                         $dateRange = $minYear && $maxYear
                             ? ($minYear === $maxYear ? (string) $minYear : "{$minYear} – {$maxYear}")
                             : 'N/A';
 
                         return [
-                            'total_records' => (int) ($summary->total_records ?? 0),
-                            'total_cases' => (int) ($summary->total_cases ?? 0),
-                            'total_gazettes' => (int) ($summary->total_gazettes ?? 0),
-                            'total_court_rolls' => (int) ($summary->total_court_rolls ?? 0),
+                            'total_records' => (int) $totalRecords,
+                            'total_cases' => (int) $totalCases,
+                            'total_gazettes' => (int) $totalGazettes,
+                            'total_court_rolls' => (int) $totalCourtRolls,
                             'date_range' => $dateRange,
                         ];
                     });
