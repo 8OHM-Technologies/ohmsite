@@ -32,6 +32,75 @@ const props = defineProps({
     filters: { type: Array, default: () => [] },
 });
 
+const COURT_NAMES_MAP = {
+    'ZACC': 'Constitutional Court of South Africa',
+    'ZASCA': 'Supreme Court of Appeal of South Africa',
+    'ZAGPPHC': 'Gauteng High Court, Pretoria',
+    'ZAGPJHC': 'Gauteng High Court, Johannesburg',
+    'ZAWCHC': 'Western Cape High Court, Cape Town',
+    'ZAFSHC': 'Free State High Court, Bloemfontein',
+    'ZAKZNDHC': 'KwaZulu-Natal High Court, Durban',
+    'ZAKZNHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+    'ZAECGHC': 'Eastern Cape High Court, Grahamstown',
+    'ZAECPEHC': 'Eastern Cape High Court, Port Elizabeth',
+    'ZAECELHC': 'Eastern Cape High Court, East London',
+    'ZAECBHC': 'Eastern Cape High Court, Bhisho',
+    'ZALMPPHC': 'Limpopo High Court, Polokwane',
+    'ZANWHC': 'North West High Court, Mahikeng',
+    'ZANCHC': 'Northern Cape High Court, Kimberley',
+    'ZALC': 'Labour Court of South Africa',
+    'ZALAC': 'Labour Appeal Court of South Africa',
+    'ZACAC': 'Competition Appeal Court of South Africa',
+    'ZAEQC': 'Equality Court of South Africa',
+    'ZALCC': 'Land Claims Court of South Africa',
+    'ZATC': 'Tax Court of South Africa',
+    'ZAECC': 'Electoral Court of South Africa',
+    'ZALCJHB': 'Labour Court, Johannesburg',
+    'ZALCPE': 'Labour Court, Port Elizabeth',
+    'ZALCCT': 'Labour Court, Cape Town',
+    'ZALCD': 'Labour Court, Durban',
+    'ZALMPTHC': 'Limpopo High Court, Thohoyandou',
+    'ZAMPMHC': 'Mpumalanga High Court, Middelburg',
+    'ZAMPMBHC': 'Mpumalanga High Court, Mbombela',
+    'ZAKZDHC': 'KwaZulu-Natal High Court, Durban',
+    'ZAKZPHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+    'ZAGPHC': 'Gauteng High Court',
+    'ZAKZHC': 'KwaZulu-Natal High Court',
+    'ZAECHC': 'Eastern Cape High Court',
+};
+
+const formatCourtName = (court) => {
+    if (!court) return '';
+    const cStr = String(court).trim();
+    const cUpper = cStr.toUpperCase();
+    if (COURT_NAMES_MAP[cUpper]) {
+        return COURT_NAMES_MAP[cUpper];
+    }
+    return cStr;
+};
+
+// Standardised courts list for the dropdown
+const standardizedCourts = computed(() => {
+    if (props.filters && props.filters.length > 0) {
+        const courtFilters = props.filters.filter(f =>
+            (f.target_type === 'cases' || !f.target_type) &&
+            f.target_name !== 'sabinet_ccma' &&
+            f.vanity_name !== 'CCMA Awards'
+        );
+        if (courtFilters.length > 0) {
+            return courtFilters;
+        }
+    }
+
+    return Object.entries(COURT_NAMES_MAP)
+        .map(([target_name, vanity_name]) => ({
+            target_name,
+            vanity_name,
+            target_type: 'cases'
+        }))
+        .sort((a, b) => a.vanity_name.localeCompare(b.vanity_name));
+});
+
 const analyticsData = ref(null);
 const analyticsLoading = ref(false);
 
@@ -279,7 +348,7 @@ const filterByJudgeQuick = (judgeName) => {
                             <select v-model="filterCourt"
                                 class="w-full bg-zinc-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:border-admin-modern focus:outline-none">
                                 <option value="All">All Superior Courts</option>
-                                <option v-for="c in filterOptions.courts" :key="c" :value="c">{{ c }}</option>
+                                <option v-for="c in standardizedCourts" :key="c.target_name" :value="c.target_name">{{ c.vanity_name }}</option>
                             </select>
                         </div>
                         <!-- Judge -->
@@ -408,7 +477,7 @@ const filterByJudgeQuick = (judgeName) => {
                         <div v-for="c in courtsBreakdown" :key="c.court" class="bg-zinc-900/40 border border-white/5 p-5 rounded-2xl flex items-center justify-between">
                             <div class="space-y-1">
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-admin-modern">Court Authority</span>
-                                <h4 class="text-sm font-bold text-white">{{ c.court }}</h4>
+                                <h4 class="text-sm font-bold text-white">{{ formatCourtName(c.court) }}</h4>
                                 <p class="text-xs text-zinc-400">{{ c.count }} Judgments published</p>
                             </div>
                             <div class="text-right">

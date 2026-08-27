@@ -58,6 +58,53 @@ const searchQuery = ref('');
 // Helper to parse date strings
 const parseDate = (dStr) => dStr ? new Date(dStr.split('T')[0]) : null;
 
+const COURT_NAMES_MAP = {
+    'ZACC': 'Constitutional Court of South Africa',
+    'ZASCA': 'Supreme Court of Appeal of South Africa',
+    'ZAGPPHC': 'Gauteng High Court, Pretoria',
+    'ZAGPJHC': 'Gauteng High Court, Johannesburg',
+    'ZAWCHC': 'Western Cape High Court, Cape Town',
+    'ZAFSHC': 'Free State High Court, Bloemfontein',
+    'ZAKZNDHC': 'KwaZulu-Natal High Court, Durban',
+    'ZAKZNHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+    'ZAECGHC': 'Eastern Cape High Court, Grahamstown',
+    'ZAECPEHC': 'Eastern Cape High Court, Port Elizabeth',
+    'ZAECELHC': 'Eastern Cape High Court, East London',
+    'ZAECBHC': 'Eastern Cape High Court, Bhisho',
+    'ZALMPPHC': 'Limpopo High Court, Polokwane',
+    'ZANWHC': 'North West High Court, Mahikeng',
+    'ZANCHC': 'Northern Cape High Court, Kimberley',
+    'ZALC': 'Labour Court of South Africa',
+    'ZALAC': 'Labour Appeal Court of South Africa',
+    'ZACAC': 'Competition Appeal Court of South Africa',
+    'ZAEQC': 'Equality Court of South Africa',
+    'ZALCC': 'Land Claims Court of South Africa',
+    'ZATC': 'Tax Court of South Africa',
+    'ZAECC': 'Electoral Court of South Africa',
+    'ZALCJHB': 'Labour Court, Johannesburg',
+    'ZALCPE': 'Labour Court, Port Elizabeth',
+    'ZALCCT': 'Labour Court, Cape Town',
+    'ZALCD': 'Labour Court, Durban',
+    'ZALMPTHC': 'Limpopo High Court, Thohoyandou',
+    'ZAMPMHC': 'Mpumalanga High Court, Middelburg',
+    'ZAMPMBHC': 'Mpumalanga High Court, Mbombela',
+    'ZAKZDHC': 'KwaZulu-Natal High Court, Durban',
+    'ZAKZPHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
+    'ZAGPHC': 'Gauteng High Court',
+    'ZAKZHC': 'KwaZulu-Natal High Court',
+    'ZAECHC': 'Eastern Cape High Court',
+};
+
+const formatCourtName = (court) => {
+    if (!court) return '';
+    const cStr = String(court).trim();
+    const cUpper = cStr.toUpperCase();
+    if (COURT_NAMES_MAP[cUpper]) {
+        return COURT_NAMES_MAP[cUpper];
+    }
+    return cStr;
+};
+
 // Parse cases data from prop
 const allCases = computed(() => {
     const rawCases = props.cases && props.cases.length > 0 ? props.cases : [];
@@ -92,7 +139,8 @@ const allCases = computed(() => {
             keywords = typeof keywords === 'string' ? keywords.split(',').map(s => s.trim()) : [];
         }
 
-        const courtName = item.court || item.target_name || 'Superior Court';
+        const rawCourtName = item.court || item.target_name || 'Superior Court';
+        const courtName = formatCourtName(rawCourtName);
         const courtLocation = item.court_location || 'South Africa';
         const isReportable = typeof item.reportable === 'boolean' ? item.reportable : true;
 
@@ -123,7 +171,11 @@ const allCases = computed(() => {
 // Dynamic Filter Lists
 const courtsList = computed(() => {
     const list = new Set(allCases.value.map(c => c.court));
-    return ['All', ...Array.from(list).filter(Boolean).sort()];
+    const dynamicList = Array.from(list).filter(Boolean);
+    if (dynamicList.length > 0) {
+        return ['All', ...dynamicList.sort((a, b) => a.localeCompare(b))];
+    }
+    return ['All', ...Object.values(COURT_NAMES_MAP).sort((a, b) => a.localeCompare(b))];
 });
 
 const judgesList = computed(() => {

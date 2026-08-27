@@ -271,6 +271,48 @@ class SubscriberAnalyticsTest extends TestCase
         $response->assertJsonPath('totals.total', 4);
     }
 
+    public function test_analytics_data_endpoint_filters_saflii_by_court_acronym_and_standard_name(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        LegalAnalytics::factory()->create([
+            'target_name' => 'ZACC',
+            'target_type' => 'cases',
+            'court' => 'ZACC',
+            'data' => [
+                'extracted_data' => [
+                    'court' => 'Constitutional Court of South Africa',
+                    'reportable' => true,
+                ],
+            ],
+        ]);
+
+        LegalAnalytics::factory()->create([
+            'target_name' => 'ZASCA',
+            'target_type' => 'cases',
+            'court' => 'ZASCA',
+            'data' => [
+                'extracted_data' => [
+                    'court' => 'Supreme Court of Appeal of South Africa',
+                    'reportable' => true,
+                ],
+            ],
+        ]);
+
+        // Filter by acronym 'ZACC'
+        $responseZacc = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts&court=ZACC');
+        $responseZacc->assertStatus(200);
+        $this->assertCount(1, $responseZacc->json('cases'));
+        $this->assertEquals('ZACC', $responseZacc->json('cases.0.target_name'));
+
+        // Filter by full standardized court name 'Supreme Court of Appeal of South Africa'
+        $responseSca = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts&court=' . urlencode('Supreme Court of Appeal of South Africa'));
+        $responseSca->assertStatus(200);
+        $this->assertCount(1, $responseSca->json('cases'));
+        $this->assertEquals('ZASCA', $responseSca->json('cases.0.target_name'));
+    }
+
     public function test_old_analytics_route_no_longer_exists(): void
     {
         $user = User::factory()->create();
@@ -281,3 +323,4 @@ class SubscriberAnalyticsTest extends TestCase
         $response->assertNotFound();
     }
 }
+

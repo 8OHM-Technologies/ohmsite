@@ -12,14 +12,75 @@ use Illuminate\Support\Facades\Cache;
 class SubscriberAnalyticsService
 {
     /**
+     * Standardised South African Superior Courts Map.
+     */
+    public const COURT_NAMES_MAP = [
+        'ZACC' => 'Constitutional Court of South Africa',
+        'ZASCA' => 'Supreme Court of Appeal of South Africa',
+        'ZAGPPHC' => 'Gauteng High Court, Pretoria',
+        'ZAGPJHC' => 'Gauteng High Court, Johannesburg',
+        'ZAWCHC' => 'Western Cape High Court, Cape Town',
+        'ZAFSHC' => 'Free State High Court, Bloemfontein',
+        'ZAKZNDHC' => 'KwaZulu-Natal High Court, Durban',
+        'ZAKZNHC' => 'KwaZulu-Natal High Court, Pietermaritzburg',
+        'ZAECGHC' => 'Eastern Cape High Court, Grahamstown',
+        'ZAECPEHC' => 'Eastern Cape High Court, Port Elizabeth',
+        'ZAECELHC' => 'Eastern Cape High Court, East London',
+        'ZAECBHC' => 'Eastern Cape High Court, Bhisho',
+        'ZALMPPHC' => 'Limpopo High Court, Polokwane',
+        'ZANWHC' => 'North West High Court, Mahikeng',
+        'ZANCHC' => 'Northern Cape High Court, Kimberley',
+        'ZALC' => 'Labour Court of South Africa',
+        'ZALAC' => 'Labour Appeal Court of South Africa',
+        'ZACAC' => 'Competition Appeal Court of South Africa',
+        'ZAEQC' => 'Equality Court of South Africa',
+        'ZALCC' => 'Land Claims Court of South Africa',
+        'ZATC' => 'Tax Court of South Africa',
+        'ZAECC' => 'Electoral Court of South Africa',
+        'ZALCJHB' => 'Labour Court, Johannesburg',
+        'ZALCPE' => 'Labour Court, Port Elizabeth',
+        'ZALCCT' => 'Labour Court, Cape Town',
+        'ZALCD' => 'Labour Court, Durban',
+        'ZALMPTHC' => 'Limpopo High Court, Thohoyandou',
+        'ZAMPMHC' => 'Mpumalanga High Court, Middelburg',
+        'ZAMPMBHC' => 'Mpumalanga High Court, Mbombela',
+        'ZAKZDHC' => 'KwaZulu-Natal High Court, Durban',
+        'ZAKZPHC' => 'KwaZulu-Natal High Court, Pietermaritzburg',
+        'ZAGPHC' => 'Gauteng High Court',
+        'ZAKZHC' => 'KwaZulu-Natal High Court',
+        'ZAECHC' => 'Eastern Cape High Court',
+    ];
+
+    /**
+     * Format/standardise court acronyms or names.
+     */
+    public static function formatCourtName(?string $court): string
+    {
+        if (! $court) {
+            return '';
+        }
+        $cTrim = trim($court);
+        $cUpper = strtoupper($cTrim);
+        if (isset(self::COURT_NAMES_MAP[$cUpper])) {
+            return self::COURT_NAMES_MAP[$cUpper];
+        }
+
+        return $cTrim;
+    }
+
+    /**
      * Return the list of available dataset filters for the selector.
      *
      * @return array<int, array{target_name: string, vanity_name: string, target_type: string}>
      */
-    public function getFilters(): array
+    public function getFilters(?string $targetType = null): array
     {
-        return TargetVanity::orderBy('vanity_name')
-            ->get()
+        $query = TargetVanity::orderBy('vanity_name');
+        if ($targetType !== null) {
+            $query->where('target_type', $targetType);
+        }
+
+        return $query->get()
             ->map(fn ($v) => [
                 'target_name' => $v->target_name,
                 'vanity_name' => $v->vanity_name,
@@ -277,8 +338,8 @@ class SubscriberAnalyticsService
             }
 
             // Courts breakdown
-            $cName = $item['court'] ?: 'Other Court';
-            // Normalize court naming
+            $cRaw = $item['court'] ?: ($item['target_name'] ?: 'Other Court');
+            $cName = self::formatCourtName($cRaw) ?: (self::formatCourtName($item['target_name'] ?? '') ?: $cRaw);
             if (stripos($cName, 'constitutional') !== false) {
                 $cName = 'Constitutional Court of South Africa';
             } elseif (stripos($cName, 'competition appeal') !== false) {
@@ -358,7 +419,21 @@ class SubscriberAnalyticsService
         // Apply filters to returned cases list
         $filteredCases = array_values(array_filter($rawItems, function ($item) use ($courtFilter, $judgeFilter, $yearFilter, $reportableFilter, $searchFilter) {
             if ($courtFilter !== 'All') {
-                if (stripos($item['court'], $courtFilter) === false && stripos($item['target_name'], $courtFilter) === false) {
+                $cFilterUpper = strtoupper($courtFilter);
+                $standardCourt = self::COURT_NAMES_MAP[$cFilterUpper] ?? $courtFilter;
+
+                $itemCourt = $item['court'] ?? '';
+                $itemTarget = $item['target_name'] ?? '';
+
+                $matches = (stripos($itemCourt, $courtFilter) !== false)
+                    || (stripos($itemTarget, $courtFilter) !== false)
+                    || (stripos($itemCourt, $standardCourt) !== false)
+                    || (stripos(self::formatCourtName($itemCourt), $courtFilter) !== false)
+                    || (stripos(self::formatCourtName($itemTarget), $courtFilter) !== false)
+                    || (stripos(self::formatCourtName($itemCourt), $standardCourt) !== false)
+                    || (stripos(self::formatCourtName($itemTarget), $standardCourt) !== false);
+
+                if (! $matches) {
                     return false;
                 }
             }
