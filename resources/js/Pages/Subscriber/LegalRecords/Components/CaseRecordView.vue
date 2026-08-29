@@ -15,7 +15,8 @@ import {
   BookOpen,
   Lock,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from 'lucide-vue-next';
 
 const props = defineProps<{
@@ -27,6 +28,19 @@ const dataObj = computed(() => {
   if (!props.recordDetail) return {};
   return props.recordDetail.data || props.recordDetail;
 });
+
+const requiresHumanReview = computed(() => Boolean(
+  props.recordDetail?.requires_human_review ||
+  props.recordDetail?.data?.requires_human_review ||
+  dataObj.value?.requires_human_review
+));
+
+const reviewReason = computed(() => 
+  props.recordDetail?.review_reason ||
+  props.recordDetail?.data?.review_reason ||
+  dataObj.value?.review_reason ||
+  null
+);
 
 const title = computed(() => dataObj.value.title || dataObj.value.name || 'Legal Record Dossier');
 const caseNumber = computed(() => dataObj.value.case_number || dataObj.value.award_number || null);
@@ -58,6 +72,25 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
 
 <template>
   <div class="space-y-6">
+    <!-- Human Review Alert Banner (if flagged) -->
+    <div v-if="requiresHumanReview"
+      class="bg-amber-500/10 border border-amber-500/30 p-4 sm:p-5 rounded-2xl flex items-start sm:items-center gap-4">
+      <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+        <AlertCircle class="w-5 h-5" />
+      </div>
+      <div class="space-y-0.5 flex-1 min-w-0">
+        <div class="flex items-center gap-2 text-amber-400 font-black uppercase text-xs tracking-wider">
+          Flagged for Human Review
+        </div>
+        <p v-if="reviewReason" class="text-xs text-zinc-300">
+          <strong>Review Note:</strong> {{ reviewReason }}
+        </p>
+        <p v-else class="text-xs text-zinc-400">
+          This record has been marked for quality review and manual verification by an administrator.
+        </p>
+      </div>
+    </div>
+
     <!-- Standard Tier Upgrade Notice Banner (if not Pro) -->
     <div v-if="!isPro"
       class="bg-gradient-to-r from-amber-500/10 via-primary/10 to-transparent border border-primary/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

@@ -80,6 +80,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/licenses', [InventoryController::class, 'index'])->name('licenses.index');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    Route::get('/legal-records/human-review', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'index'])->name('legal-records.human-review');
+    Route::get('/legal-records/human-review/data', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'data'])->name('legal-records.human-review.data');
+    Route::get('/legal-records/{id}/states', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'show'])->name('legal-records.states');
+    Route::post('/legal-records/{id}/human-review', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'toggleHumanReview'])->name('legal-records.human-review.toggle');
+    Route::post('/legal-records/batch-human-review', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'batchMarkHumanReview'])->name('legal-records.human-review.batch');
+    Route::put('/legal-records/{id}', [\App\Http\Controllers\Admin\LegalRecordReviewController::class, 'update'])->name('legal-records.update');
 });
 
 use App\Http\Controllers\LegalRecordController;

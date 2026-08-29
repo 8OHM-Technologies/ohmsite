@@ -65,6 +65,7 @@ When a purchase or subscription is made, a database transaction handles the prov
 Protected by `admin` middleware, the dashboard acts as the business control center:
 
 - **📊 Overview**: Real-time sales, subscriptions, MRR, and active user metrics.
+- **⚖️ Legal Records Human Review Queue**: Administrative queue and 3-state data refinement console (`extracted_record`, `parsed_record`, and `scrubbed_record`) to inspect and refine OCR/LLM extracted metadata, parties, judges, and rulings with single and batch review triggers.
 - **🛍️ Services & Products**: CRUD operations for data packages, pricing, and license terms.
 - **🔑 Licenses**: Manage API keys, active client tokens, and custom API limit overrides.
 - **👥 Customers & VIP**: CRM to manage client accounts, toggle VIP access, and view LTV.

@@ -20,7 +20,9 @@ import {
   Clock,
   Sparkles,
   Lock,
-  ArrowRight
+  ArrowRight,
+  AlertCircle,
+  CheckSquare
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -64,6 +66,7 @@ const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberL
 
 interface RecordSummary {
   id: string;
+  extracted_record_id?: string;
   source_table: string;
   record_type: string;
   document_date: string | null;
@@ -86,11 +89,16 @@ interface RecordSummary {
   reportable?: boolean;
   duration_days?: number | null;
   court_location?: string | null;
+  requires_human_review?: boolean;
+  review_reason?: string | null;
 }
 
 const records = ref<RecordSummary[]>([]);
+const selectedRecords = ref<RecordSummary[]>([]);
 const totalRecords = ref(0);
 const loading = ref(false);
+const batchReviewLoading = ref(false);
+const batchSuccessMessage = ref('');
 const searchQuery = ref('');
 const selectedRecordType = ref('');
 const viewMode = ref<'cards' | 'table'>('cards');
@@ -98,6 +106,47 @@ const viewMode = ref<'cards' | 'table'>('cards');
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
+
+const batchMarkForReview = async (requiresReview = true) => {
+  if (!selectedRecords.value.length || batchReviewLoading.value) return;
+
+  batchReviewLoading.value = true;
+  batchSuccessMessage.value = '';
+  const ids = selectedRecords.value.map(r => r.extracted_record_id || r.id);
+
+  try {
+    const response = await axios.post('/admin/legal-records/batch-human-review', {
+      ids,
+      requires_human_review: requiresReview,
+      review_reason: 'Flagged via Cases table grid batch action by admin.'
+    });
+
+    // Update local records
+    const affectedIds = new Set(ids);
+    records.value.forEach(r => {
+      if (affectedIds.has(r.id) || (r.extracted_record_id && affectedIds.has(r.extracted_record_id))) {
+        r.requires_human_review = requiresReview;
+      }
+    });
+
+    batchSuccessMessage.value = response.data.message || `Successfully updated ${ids.length} record(s).`;
+    selectedRecords.value = [];
+    setTimeout(() => {
+      batchSuccessMessage.value = '';
+    }, 4000);
+  } catch (error) {
+    console.error('Failed to batch mark records for human review:', error);
+  } finally {
+    batchReviewLoading.value = false;
+  }
+};
+
+const handleReviewUpdated = (payload: { id: string; requires_human_review: boolean }) => {
+  const match = records.value.find(r => r.id === payload.id || r.extracted_record_id === payload.id);
+  if (match) {
+    match.requires_human_review = payload.requires_human_review;
+  }
+};
 
 const lazyParams = ref<{
   first: number;
@@ -468,8 +517,43 @@ onMounted(() => {
     </div>
 
     <!-- VIEW MODE 2: PRIME VUE DATATABLE -->
-    <div v-else class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
-      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading" :sortField="lazyParams.sortField"
+    <div v-else class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8 space-y-4">
+      <!-- Admin Batch Selection Action Bar -->
+      <div v-if="isAdmin && selectedRecords.length > 0"
+        class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+            {{ selectedRecords.length }}
+          </div>
+          <div>
+            <p class="text-xs font-black uppercase tracking-wider text-white">
+              {{ selectedRecords.length }} Record(s) Selected
+            </p>
+            <p class="text-[10px] text-zinc-400">Perform bulk administrative review operations</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button @click="batchMarkForReview(true)" :disabled="batchReviewLoading"
+            class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50">
+            <AlertCircle class="w-3.5 h-3.5" />
+            <span>{{ batchReviewLoading ? 'Marking...' : 'Mark for Human Review' }}</span>
+          </button>
+          <button @click="selectedRecords = []"
+            class="px-3 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Batch Success Notification -->
+      <div v-if="batchSuccessMessage"
+        class="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-400 font-bold animate-in fade-in duration-200">
+        <CheckSquare class="w-4 h-4 text-emerald-400 shrink-0" />
+        <span>{{ batchSuccessMessage }}</span>
+      </div>
+
+      <DataTable :value="records" v-model:selection="selectedRecords" :lazy="true" :totalRecords="totalRecords" :loading="loading" :sortField="lazyParams.sortField"
         :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows"
         :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
         tableStyle="min-width: 60rem" class="p-datatable-dark-custom">
@@ -484,13 +568,24 @@ onMounted(() => {
           </div>
         </template>
 
+        <!-- Selection Checkbox Column (Admin & Standard) -->
+        <Column v-if="isAdmin" selectionMode="multiple" headerStyle="width: 3rem" />
+
         <Column field="case_number" header="Case Reference" sortable style="width: 18%">
           <template #body="{ data }">
-            <span v-if="data.case_number"
-              class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
-              {{ data.case_number }}
-            </span>
-            <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
+            <div class="flex items-center gap-2">
+              <span v-if="data.case_number"
+                class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
+                {{ data.case_number }}
+              </span>
+              <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
+
+              <span v-if="data.requires_human_review"
+                class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider shrink-0"
+                title="Marked for Human Review">
+                Review
+              </span>
+            </div>
           </template>
           <template #loading>
             <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
@@ -555,6 +650,7 @@ onMounted(() => {
       :record-detail="selectedDetail"
       category="cases"
       @close="detailModalVisible = false"
+      @review-updated="handleReviewUpdated"
     />
   </component>
 </template>

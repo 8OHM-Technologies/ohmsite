@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import axios from 'axios';
 import {
   Scale,
   Calendar,
@@ -9,7 +10,9 @@ import {
   BookOpen,
   Lock,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  AlertCircle,
+  Check
 } from 'lucide-vue-next';
 import Modal from '@/Components/Modal.vue';
 import Skeleton from 'primevue/skeleton';
@@ -26,10 +29,55 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close'): void;
+  (e: 'review-updated', payload: { id: string; requires_human_review: boolean }): void;
 }>();
 
 const page = usePage();
 const authUser = computed(() => page.props.auth?.user as any);
+const isAdmin = computed(() => authUser.value?.role === 'admin');
+
+const requiresHumanReview = ref(false);
+const reviewSubmitting = ref(false);
+
+watch(() => props.recordDetail, (newVal) => {
+  if (newVal) {
+    requiresHumanReview.value = Boolean(
+      newVal.requires_human_review || 
+      newVal.data?.requires_human_review || 
+      false
+    );
+  } else {
+    requiresHumanReview.value = false;
+  }
+}, { immediate: true });
+
+const toggleHumanReview = async () => {
+  if (!props.recordDetail || reviewSubmitting.value) return;
+  const targetId = props.recordDetail.extracted_record_id || props.recordDetail.id;
+  if (!targetId) return;
+
+  reviewSubmitting.value = true;
+  try {
+    const response = await axios.post(`/admin/legal-records/${targetId}/human-review`, {
+      requires_human_review: !requiresHumanReview.value,
+    });
+    requiresHumanReview.value = response.data.requires_human_review;
+    if (props.recordDetail) {
+      props.recordDetail.requires_human_review = response.data.requires_human_review;
+      if (props.recordDetail.data) {
+        props.recordDetail.data.requires_human_review = response.data.requires_human_review;
+      }
+    }
+    emit('review-updated', {
+      id: String(props.recordDetail.id),
+      requires_human_review: response.data.requires_human_review
+    });
+  } catch (error) {
+    console.error('Failed to toggle human review:', error);
+  } finally {
+    reviewSubmitting.value = false;
+  }
+};
 
 const isPro = computed(() => {
   if (authUser.value?.role === 'admin') return true;
@@ -216,9 +264,25 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             <ArrowRight class="w-3.5 h-3.5" />
           </a>
         </div>
-        <button @click="emit('close')" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
-          {{ resolvedCategory === 'journals' || resolvedCategory === 'gaz' ? 'Close Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Close Schedule' : 'Close Dossier') }}
-        </button>
+
+        <div class="flex items-center gap-3">
+          <!-- Admin Mark for Human Review Button -->
+          <button
+            v-if="isAdmin"
+            @click="toggleHumanReview"
+            :disabled="reviewSubmitting"
+            type="button"
+            class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-md disabled:opacity-50"
+            :class="requiresHumanReview ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 shadow-amber-500/10' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-white/10'"
+          >
+            <AlertCircle class="w-4 h-4" :class="requiresHumanReview ? 'text-amber-400' : 'text-zinc-400'" />
+            <span>{{ requiresHumanReview ? 'Marked for Human Review' : 'Mark for Human Review' }}</span>
+          </button>
+
+          <button @click="emit('close')" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
+            {{ resolvedCategory === 'journals' || resolvedCategory === 'gaz' ? 'Close Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Close Schedule' : 'Close Dossier') }}
+          </button>
+        </div>
       </div>
     </div>
   </Modal>

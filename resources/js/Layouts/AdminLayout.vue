@@ -22,7 +22,9 @@ import {
     LogOut,
     UserCircle,
     Database,
-    Scale
+    Scale,
+    ChevronDown,
+    AlertCircle
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -47,8 +49,17 @@ const markAllAsRead = () => {
 const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
+const isLegalRecordsUrl = computed(() => {
+    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
+    return current === 'legal-records' || current.startsWith('legal-records/') || current.startsWith('admin/legal-records');
+});
+
+const isLegalRecordsExpanded = ref(true);
+
 const searchItems = [
     { name: 'Dashboard', href: route('dashboard'), keywords: ['home', 'overview', 'main', 'stats'] },
+    { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'court', 'case law'] },
+    { name: 'Human Review Queue', href: route('admin.legal-records.human-review'), keywords: ['human review', 'review queue', 'legal records review', 'scrubbed', 'parsed', 'extracted', 'quality'] },
     { name: 'Licenses', href: route('admin.licenses.index'), keywords: ['subscriptions', 'access', 'customers', 'active'] },
     { name: 'Products', href: route('admin.products.index'), keywords: ['catalog', 'services', 'plans'] },
     { name: 'Datasets', href: route('admin.datasets.index'), keywords: ['database', 'dataset', 'ccma', 'courts'] },
@@ -76,8 +87,7 @@ const handleSearch = () => {
 
 const navigation = [
     { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard },
-    { name: 'Legal Records', href: route('legal-records.index'), icon: Scale },
-    { name: 'Home Page', href: route('admin.home.edit'), icon: Home },
+    { name: 'Home Page', href: route.has('admin.home.edit') ? route('admin.home.edit') : '#', icon: Home },
     { name: 'Products', href: route('admin.products.index'), icon: Package },
     { name: 'Datasets', href: route('admin.datasets.index'), icon: Database },
     { name: 'Orders', href: route('admin.orders.index'), icon: ShoppingCart },
@@ -157,7 +167,71 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
 
                 <!-- Navigation -->
                 <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
-                    <div v-for="item in navigation" :key="item.name">
+                    <!-- Dashboard -->
+                    <div>
+                        <Link :href="route('dashboard')"
+                            class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
+                            :class="[
+                                isUrl(route('dashboard'))
+                                    ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
+                                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                            ]">
+                            <LayoutDashboard class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                :class="[isUrl(route('dashboard')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                            Dashboard
+                        </Link>
+                    </div>
+
+                    <!-- Expandable Legal Records Menu -->
+                    <div class="space-y-1 pt-1">
+                        <button type="button" @click="isLegalRecordsExpanded = !isLegalRecordsExpanded"
+                            class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
+                            :class="[
+                                isLegalRecordsUrl
+                                    ? 'text-white bg-white/[0.04]'
+                                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                            ]">
+                            <div class="flex items-center">
+                                <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                    :class="[isLegalRecordsUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Legal Records</span>
+                            </div>
+                            <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
+                                :class="{ 'transform rotate-180 text-admin-modern': isLegalRecordsExpanded }" />
+                        </button>
+
+                        <!-- Legal Records Sub-menu Items -->
+                        <div v-show="isLegalRecordsExpanded"
+                            class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <!-- Case Law -->
+                            <Link :href="route('legal-records.cases')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('admin.legal-records.human-review')))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Scale class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('admin.legal-records.human-review'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Case Law
+                            </Link>
+
+                            <!-- Human Review -->
+                            <Link :href="route('admin.legal-records.human-review')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('admin.legal-records.human-review'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <AlertCircle class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('admin.legal-records.human-review')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Human Review
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div v-for="item in navigation.filter(n => n.name !== 'Dashboard')" :key="item.name">
                         <Link :href="item.href"
                             class="group flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
                             :class="[

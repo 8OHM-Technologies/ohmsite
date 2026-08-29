@@ -115,6 +115,8 @@ class LegalRecordController extends Controller
                 'extracted_records.record_type',
                 'extracted_records.source_url',
                 'extracted_records.document_date',
+                'extracted_records.requires_human_review',
+                'extracted_records.review_reason',
                 'scrubbed_records.created_at',
             ]);
 
@@ -284,6 +286,8 @@ class LegalRecordController extends Controller
                 'extracted_records.record_type',
                 'extracted_records.source_url',
                 'extracted_records.document_date',
+                'extracted_records.requires_human_review',
+                'extracted_records.review_reason',
                 'extracted_records.data as er_data',
             ])
             ->first();
@@ -293,10 +297,13 @@ class LegalRecordController extends Controller
 
             return response()->json([
                 'id' => (string) $scrubbed->id,
+                'extracted_record_id' => (string) $scrubbed->extracted_record_id,
                 'source_table' => 'scrubbed',
                 'record_type' => $scrubbed->record_type,
                 'document_date' => $formatted['document_date'] ?? null,
                 'source_url' => $formatted['source_url'] ?? null,
+                'requires_human_review' => (bool) ($scrubbed->requires_human_review ?? false),
+                'review_reason' => $scrubbed->review_reason ?? null,
                 'is_pro' => $isPro,
                 'data' => $formatted,
             ]);
@@ -390,6 +397,7 @@ class LegalRecordController extends Controller
 
             return [
                 'id' => (string) $row->id,
+                'extracted_record_id' => isset($row->extracted_record_id) ? (string) $row->extracted_record_id : null,
                 'source_table' => 'scrubbed',
                 'record_type' => $row->record_type ?? 'saflii_courts',
                 'category' => $category,
@@ -402,6 +410,8 @@ class LegalRecordController extends Controller
                 'case_number' => $maskedCaseNumber,
                 'title' => $title,
                 'source_url' => null,
+                'requires_human_review' => (bool) ($row->requires_human_review ?? false),
+                'review_reason' => $row->review_reason ?? null,
                 'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
                 'respondent' => $respondent ? 'Respondent (Locked - Pro Required)' : null,
                 'author' => $author ? 'Author (Locked - Pro Required)' : null,
@@ -426,6 +436,7 @@ class LegalRecordController extends Controller
 
         return [
             'id' => (string) $row->id,
+            'extracted_record_id' => isset($row->extracted_record_id) ? (string) $row->extracted_record_id : null,
             'source_table' => 'scrubbed',
             'record_type' => $row->record_type ?? 'saflii_courts',
             'category' => $category,
@@ -438,6 +449,8 @@ class LegalRecordController extends Controller
             'case_number' => $caseNumber,
             'title' => $title,
             'source_url' => $sourceUrl,
+            'requires_human_review' => (bool) ($row->requires_human_review ?? false),
+            'review_reason' => $row->review_reason ?? null,
             'applicant' => $applicant,
             'respondent' => $respondent,
             'author' => $author,
