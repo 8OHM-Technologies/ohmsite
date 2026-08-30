@@ -87,7 +87,7 @@ const handleSearch = () => {
 
 const navigation = [
     { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard },
-    { name: 'Home Page', href: route.has('admin.home.edit') ? route('admin.home.edit') : '#', icon: Home },
+    { name: 'Home Page', href: route('admin.home.edit'), icon: Home },
     { name: 'Products', href: route('admin.products.index'), icon: Package },
     { name: 'Datasets', href: route('admin.datasets.index'), icon: Database },
     { name: 'Orders', href: route('admin.orders.index'), icon: ShoppingCart },
