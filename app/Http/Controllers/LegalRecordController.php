@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -270,6 +271,10 @@ class LegalRecordController extends Controller
      */
     public function show(Request $request, string $id): JsonResponse
     {
+        if (! Str::isUuid($id)) {
+            abort(404, 'Record not found in scrubbed records.');
+        }
+
         $user = auth()->user();
         $isPro = $user && ($user->isAdmin() || $user->hasLegalProAccess());
 
@@ -310,6 +315,55 @@ class LegalRecordController extends Controller
         }
 
         abort(404, 'Record not found in scrubbed records.');
+    }
+
+    /**
+     * Report a legal record as containing errors, flagging it for human review.
+     */
+    public function reportError(Request $request, string $id): JsonResponse
+    {
+        if (! Str::isUuid($id)) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        }
+
+        $user = auth()->user();
+        $extracted = DB::connection('pgsql_coeus')->table('extracted_records')
+            ->where('id', $id)
+            ->first();
+
+        if (! $extracted) {
+            $scrubbedRecord = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                ->where('id', $id)
+                ->first();
+
+            if ($scrubbedRecord && $scrubbedRecord->extracted_record_id) {
+                $extracted = DB::connection('pgsql_coeus')->table('extracted_records')
+                    ->where('id', $scrubbedRecord->extracted_record_id)
+                    ->first();
+            }
+        }
+
+        if (! $extracted) {
+            return response()->json(['error' => 'Record not found.'], 404);
+        }
+
+        $reason = 'Reported by user ('.($user?->email ?? 'subscriber').') as containing errors.';
+
+        DB::connection('pgsql_coeus')->table('extracted_records')
+            ->where('id', $extracted->id)
+            ->update([
+                'requires_human_review' => true,
+                'review_reason' => $reason,
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'extracted_record_id' => (string) $extracted->id,
+            'requires_human_review' => true,
+            'review_reason' => $reason,
+            'message' => 'Thank you. This record has been reported and flagged for quality review.',
+        ]);
     }
 
     /**

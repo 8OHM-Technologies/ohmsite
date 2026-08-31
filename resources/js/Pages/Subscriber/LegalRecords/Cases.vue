@@ -22,6 +22,7 @@ import {
   Lock,
   ArrowRight,
   AlertCircle,
+  AlertTriangle,
   CheckSquare
 } from 'lucide-vue-next';
 
@@ -641,6 +642,21 @@ onMounted(() => {
           </template>
         </Column>
       </DataTable>
+    </div>
+
+    <!-- AI Disclaimer Notice -->
+    <div class="mt-8 bg-zinc-900/40 border border-white/5 rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex items-start gap-4 text-xs text-zinc-400">
+      <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+        <AlertTriangle class="w-4 h-4" />
+      </div>
+      <div class="space-y-1 leading-relaxed">
+        <h4 class="font-black uppercase tracking-wider text-zinc-300 text-[11px] flex items-center gap-1.5">
+          <span>AI-Assisted Legal Intelligence &amp; Analysis Disclaimer</span>
+        </h4>
+        <p class="text-zinc-400 text-xs">
+          Executive summaries, extracted binding principles (ratio decidendi), subject classifications, and case metadata are processed with the assistance of artificial intelligence and machine learning models. AI can make mistakes, misinterpret context, or produce factual errors. Always review and cross-reference citations and full judgments with the official court transcripts or law reports before relying on them for legal proceedings or formal advice.
+        </p>
+      </div>
     </div>
 
     <!-- Document Detail Modal -->

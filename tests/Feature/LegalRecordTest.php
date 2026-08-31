@@ -645,4 +645,47 @@ class LegalRecordTest extends TestCase
         Cache::forget('dataset_summary');
         $this->assertFalse(Cache::has('dataset_summary'));
     }
+
+    public function test_unauthenticated_user_cannot_report_record_errors(): void
+    {
+        $this->postJson('/legal-records/record/dummy-id/report-error')
+            ->assertUnauthorized();
+    }
+
+    public function test_authenticated_verified_user_can_report_record_errors(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'subscriber@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $scrubbedId = $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => 'Landmark Precedent Case',
+            'case_number' => 'LCC 55/26',
+        ]);
+
+        $response = $this->actingAs($user)->postJson("/legal-records/record/{$scrubbedId}/report-error");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('success', true);
+        $response->assertJsonPath('requires_human_review', true);
+        $this->assertStringContainsString('subscriber@example.com', (string) $response->json('review_reason'));
+
+        $scrubbed = DB::connection('pgsql_coeus')->table('scrubbed_records')->where('id', $scrubbedId)->first();
+        $this->assertDatabaseHas('extracted_records', [
+            'id' => $scrubbed->extracted_record_id,
+            'requires_human_review' => true,
+        ], 'pgsql_coeus');
+    }
+
+    public function test_reporting_nonexistent_record_returns_404(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->postJson('/legal-records/record/nonexistent-uuid/report-error');
+
+        $response->assertStatus(404);
+    }
 }

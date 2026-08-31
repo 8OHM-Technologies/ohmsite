@@ -79,6 +79,17 @@ const toggleHumanReview = async () => {
   }
 };
 
+const handleReviewUpdatedFromChild = (payload: { id: string; requires_human_review: boolean }) => {
+  requiresHumanReview.value = payload.requires_human_review;
+  if (props.recordDetail) {
+    props.recordDetail.requires_human_review = payload.requires_human_review;
+    if (props.recordDetail.data) {
+      props.recordDetail.data.requires_human_review = payload.requires_human_review;
+    }
+  }
+  emit('review-updated', payload);
+};
+
 const isPro = computed(() => {
   if (authUser.value?.role === 'admin') return true;
   if (authUser.value?.is_subscribed || authUser.value?.has_pro_access) return true;
@@ -242,6 +253,7 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             v-else
             :record-detail="recordDetail"
             :is-pro="isPro"
+            @review-updated="handleReviewUpdatedFromChild"
           />
         </div>
       </div>
