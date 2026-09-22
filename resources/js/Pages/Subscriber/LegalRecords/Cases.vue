@@ -496,14 +496,10 @@ onMounted(() => {
                 <BookOpen class="w-3.5 h-3.5" />
                 {{ c.precedents_count }} Citations
               </span>
-              <a v-if="isPro && c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
+              <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
                 class="hover:text-white flex items-center gap-1 transition text-zinc-400">
                 <span>SAFLII Link</span>
                 <ExternalLink class="w-3 h-3" />
-              </a>
-              <a v-else-if="!isPro" href="/#pricing" class="text-primary hover:underline flex items-center gap-1 font-bold">
-                <Lock class="w-3 h-3" />
-                <span>Unlock Pro</span>
               </a>
             </div>
           </div>
@@ -572,10 +568,16 @@ onMounted(() => {
         <!-- Selection Checkbox Column (Admin & Standard) -->
         <Column v-if="isAdmin" selectionMode="multiple" headerStyle="width: 3rem" />
 
-        <Column field="case_number" header="Case Reference" sortable style="width: 18%">
+        <Column field="case_number" header="Case Reference" sortable style="width: 16%">
           <template #body="{ data }">
             <div class="flex items-center gap-2">
-              <span v-if="data.case_number"
+              <a v-if="data.source_url && data.case_number" :href="data.source_url" target="_blank" rel="noopener noreferrer"
+                class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 hover:border-primary/50 text-primary hover:text-white rounded-lg inline-flex items-center gap-1.5 shadow-sm transition group"
+                title="Open source judgment on SAFLII">
+                <span>{{ data.case_number }}</span>
+                <ExternalLink class="w-2.5 h-2.5 opacity-50 group-hover:opacity-100" />
+              </a>
+              <span v-else-if="data.case_number"
                 class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
                 {{ data.case_number }}
               </span>
@@ -593,7 +595,7 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="court" header="Court / Forum" sortable style="width: 20%">
+        <Column field="court" header="Court / Forum" sortable style="width: 18%">
           <template #body="{ data }">
             <span
               class="px-3 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
@@ -605,10 +607,10 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="document_date" header="Date" sortable style="width: 12%">
+        <Column field="document_date" header="Judgment Date" sortable style="width: 14%">
           <template #body="{ data }">
             <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
-              {{ data.document_date || data.judgment_date || 'N/A' }}
+              {{ data.judgment_date || data.document_date || 'N/A' }}
             </span>
           </template>
           <template #loading>
@@ -616,7 +618,7 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="title" header="Title / Matter" style="width: 36%">
+        <Column field="title" header="Title / Matter" style="width: 34%">
           <template #body="{ data }">
             <div
               class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
@@ -632,13 +634,21 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column header="Actions" style="width: 14%" class="text-right">
+        <Column header="Actions" style="width: 18%" class="text-right">
           <template #body="{ data }">
-            <button @click="viewRecordDetail(data)"
-              class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
-              <Scale class="w-3.5 h-3.5" />
-              <span>Dossier</span>
-            </button>
+            <div class="flex items-center justify-end gap-2">
+              <a v-if="data.source_url" :href="data.source_url" target="_blank" rel="noopener noreferrer"
+                class="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 rounded-xl transition-all flex items-center gap-1.5 text-[10px] font-bold shrink-0 cursor-pointer"
+                title="Open original judgment on SAFLII">
+                <span>SAFLII</span>
+                <ExternalLink class="w-3 h-3 text-primary" />
+              </a>
+              <button @click="viewRecordDetail(data)"
+                class="btn btn-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer shrink-0">
+                <Scale class="w-3.5 h-3.5" />
+                <span>Dossier</span>
+              </button>
+            </div>
           </template>
         </Column>
       </DataTable>

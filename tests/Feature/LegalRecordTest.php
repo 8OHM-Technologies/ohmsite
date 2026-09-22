@@ -313,11 +313,11 @@ class LegalRecordTest extends TestCase
         $records = $response->json('records');
         $this->assertCount(3, $records);
         $this->assertSame("Newer Case {$uniq}", $records[0]['title']);
-        $this->assertSame('2026-••-••', $records[0]['document_date']);
+        $this->assertSame('2026-03-01', $records[0]['document_date']);
         $this->assertSame("Mid Date Case {$uniq}", $records[1]['title']);
-        $this->assertSame('2023-••-••', $records[1]['document_date']);
+        $this->assertSame('2023-06-20', $records[1]['document_date']);
         $this->assertSame("Older Case {$uniq}", $records[2]['title']);
-        $this->assertSame('2020-••-••', $records[2]['document_date']);
+        $this->assertSame('2020-01-15', $records[2]['document_date']);
 
         // Test with Pro User (Unmasked)
         $proUser = User::factory()->create([
@@ -470,11 +470,14 @@ class LegalRecordTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('is_pro', false);
-        $response->assertJsonPath('source_url', null);
+        $this->assertNotNull($response->json('source_url'));
+        $this->assertStringContainsString('saflii.org', (string) $response->json('source_url'));
         $response->assertJsonPath('data.is_locked', true);
+        $response->assertJsonPath('data.case_number', 'CCT 100/26');
+        $response->assertJsonPath('data.judgment_date', '2026-02-10');
+        $response->assertJsonPath('data.document_date', '2026-02-10');
         $response->assertJsonPath('data.title', 'Constitutional Rights Matter');
         $response->assertJsonPath('data.summary', 'Constitutional challenge concerning administrative justice timelines.');
-        $this->assertStringContainsString('••••', (string) $response->json('data.case_number'));
         $this->assertStringContainsString('Pro', (string) $response->json('data.ratio_decidendi'));
         $response->assertJsonPath('data.precedents_cited', []);
     }

@@ -21,8 +21,7 @@ Built with **Laravel 12** and **Inertia.js (Vue3)**, features a custom admin das
 
 This platform is a data-centric SaaS and digital licensing platform tailored for legal and analytical datasets. Decoupled from hardcoded business logic, the entire product ecosystem, subscription tiers, API access rights, and telemetry are managed dynamically.
 
-### Core Offerings
-- **Tier 1: FREE Case Law**: Free access to basic South African case law records with standard public metadata for High Courts and Labour Courts.
+- **Tier 1: FREE Case Law**: Free access to South African case law records with standard public metadata (case number, judgment date, hearing date, adjudication duration, court location, and direct SAFLII link) across table and docket modal views.
 - **Tier 2: Pro Case Law**: API access to all case law records, advanced dataset features (ratio decidendi, scrubbed records, acts cited), and live continuous data feed.
 - **Tier 3: Pro Legal Analytics**: Complete no-code analytics platform, higher API limits (3,000 req/mo), interactive jurisprudence and citation network dashboards, and automated exports.
 - **Tier 4: Once-off Datasets**: POPIA-compliant raw case law datasets available for bulk download in CSV/JSON formats for AI training and offline research.

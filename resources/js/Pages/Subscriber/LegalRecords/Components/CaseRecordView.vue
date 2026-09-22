@@ -164,8 +164,7 @@ const precedentsCount = computed(() => dataObj.value.precedents_count ?? precede
 
     <!-- Case Metadata 4-Grid -->
     <div class="relative rounded-2xl overflow-hidden">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs"
-        :class="{ 'filter blur-[2px] select-none opacity-60 pointer-events-none': !isPro }">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5">
           <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Judgment Date</span>
           <span class="font-bold text-white mt-1 block">{{ judgmentDate }}</span>

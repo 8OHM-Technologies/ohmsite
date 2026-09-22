@@ -446,9 +446,6 @@ class LegalRecordController extends Controller
         $citation = $ext['citation'] ?? $srData['citation'] ?? $meta['citation'] ?? $caseNumber ?? null;
 
         if (! $isPro) {
-            $maskedCaseNumber = $caseNumber ? (strlen($caseNumber) > 4 ? substr($caseNumber, 0, 4).'••••' : '••••') : null;
-            $maskedDate = $docDate ? substr($docDate, 0, 4).'-••-••' : null;
-
             return [
                 'id' => (string) $row->id,
                 'extracted_record_id' => isset($row->extracted_record_id) ? (string) $row->extracted_record_id : null,
@@ -457,13 +454,13 @@ class LegalRecordController extends Controller
                 'category' => $category,
                 'is_locked' => true,
                 'is_pro' => false,
-                'document_date' => $maskedDate,
-                'judgment_date' => $maskedDate,
-                'hearing_date' => $hearingDate ? substr((string) $hearingDate, 0, 4).'-••-••' : null,
+                'document_date' => $docDate,
+                'judgment_date' => $docDate,
+                'hearing_date' => $hearingDate,
                 'court' => $court,
-                'case_number' => $maskedCaseNumber,
+                'case_number' => $caseNumber,
                 'title' => $title,
-                'source_url' => null,
+                'source_url' => $sourceUrl,
                 'requires_human_review' => (bool) ($row->requires_human_review ?? false),
                 'review_reason' => $row->review_reason ?? null,
                 'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
