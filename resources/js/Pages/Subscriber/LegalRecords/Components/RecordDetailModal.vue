@@ -269,12 +269,12 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             </span>
             <ExternalLink class="w-3.5 h-3.5" />
           </a>
-          <a v-if="!isPro" href="/#pricing"
+          <!-- <a v-if="!isPro" href="/#pricing"
             class="btn btn-primary px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-primary/20">
             <Sparkles class="w-3.5 h-3.5" />
             <span>Unlock Now</span>
             <ArrowRight class="w-3.5 h-3.5" />
-          </a>
+          </a> -->
         </div>
 
         <div class="flex items-center gap-3">
