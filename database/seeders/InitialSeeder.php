@@ -96,13 +96,13 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Pro Case Law',
                 'description' => 'API access to all case law records and advanced extracted dataset attributes for your applications.',
-                'price' => 1580.00,
+                'price' => 299,
                 'image' => '/assets/images/products/api.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
                 'features' => [
-                    'API access to all case law records (High Courts & Labour Courts)',
-                    'Access to advanced dataset features (ratio_decidendi, scrubbed_records, acts cited, judicial entities)',
+                    'API access to all case law records (High Courts, Labour Courts, etc)',
+                    'Access to advanced dataset features (Ratio Decidendi, Obiter Dicta, Citations, etc)',
                     'Structured OpenAPI-standard REST endpoints',
                     'Standard API rate limits',
                     'Add-ons available to increase rate limits',
@@ -116,7 +116,7 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Pro Legal Analytics',
                 'description' => 'Complete no-code analytics platform and advanced legal intelligence for practitioners and firms.',
-                'price' => 5800.00,
+                'price' => 599,
                 'image' => '/assets/images/products/analytics.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
@@ -137,7 +137,7 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Once-off Datasets',
                 'description' => 'Raw sanitized case law datasets in bulk for AI training, local LLM fine-tuning, or offline research.',
-                'price' => 50000.00,
+                'price' => 20000,
                 'image' => '/assets/images/products/dataset.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
@@ -155,7 +155,7 @@ class InitialSeeder extends Seeder
             [
                 'name' => 'Managed Data Pipeline',
                 'description' => 'Build custom, automated extraction workflows tailored to your specific industry needs. We handle the extraction, transformation, and secure routing of structured data directly into your private ecosystem.',
-                'price' => 19500.00,
+                'price' => 9500,
                 'image' => '/assets/images/products/pipeline.png',
                 'stock' => 9999,
                 'category_id' => $dataSolutions->id,
