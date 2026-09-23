@@ -193,6 +193,14 @@ class LegalRecordReviewController extends Controller
             $title = $srData['title'] ?? $ext['title'] ?? 'Legal Matter';
             $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? $row->record_type ?? null;
             $caseNumber = $meta['case_number'] ?? $ext['case_number'] ?? $srData['case_number'] ?? $srData['award_number'] ?? null;
+            if (empty($caseNumber) || preg_match('/^\[?\d{4}\]?\s*ZA/i', trim((string) $caseNumber))) {
+                if (preg_match('/\(([^()]+)\)\s*\[\d{4}\]\s*ZA/i', (string) $title, $mCase)) {
+                    $cand = trim($mCase[1], " ;,()");
+                    if (preg_match('/\d/', $cand) && ! preg_match('/judgment|appeal|heard|delivered|unreported|coram/i', $cand)) {
+                        $caseNumber = $cand;
+                    }
+                }
+            }
             $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $ext['hearing_date'] ?? $meta['document_date'] ?? $meta['hearing_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
 
             return [
@@ -266,6 +274,14 @@ class LegalRecordReviewController extends Controller
 
         $title = $scrubbedData['title'] ?? $extData['title'] ?? $extractedData['title'] ?? 'Legal Matter';
         $caseNumber = $metaData['case_number'] ?? $extData['case_number'] ?? $scrubbedData['case_number'] ?? $scrubbedData['award_number'] ?? $extractedData['case_number'] ?? null;
+        if (empty($caseNumber) || preg_match('/^\[?\d{4}\]?\s*ZA/i', trim((string) $caseNumber))) {
+            if (preg_match('/\(([^()]+)\)\s*\[\d{4}\]\s*ZA/i', (string) $title, $mCase)) {
+                $cand = trim($mCase[1], " ;,()");
+                if (preg_match('/\d/', $cand) && ! preg_match('/judgment|appeal|heard|delivered|unreported|coram/i', $cand)) {
+                    $caseNumber = $cand;
+                }
+            }
+        }
         $court = $extData['court'] ?? $metaData['court'] ?? $metaData['target_name'] ?? $extracted->record_type ?? null;
         $docDate = $extData['judgment_date'] ?? $extData['award_date'] ?? $extData['hearing_date'] ?? $metaData['document_date'] ?? ($extracted->document_date ? substr((string) $extracted->document_date, 0, 10) : null);
         $hearingDate = $extData['hearing_date'] ?? $metaData['hearing_date'] ?? null;

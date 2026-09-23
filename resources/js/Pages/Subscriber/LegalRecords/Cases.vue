@@ -23,7 +23,9 @@ import {
   ArrowRight,
   AlertCircle,
   AlertTriangle,
-  CheckSquare
+  CheckSquare,
+  X,
+  Loader2
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -100,13 +102,82 @@ const totalRecords = ref(0);
 const loading = ref(false);
 const batchReviewLoading = ref(false);
 const batchSuccessMessage = ref('');
-const searchQuery = ref('');
-const selectedRecordType = ref('');
+const getInitialUrlParam = (param: string): string => {
+  if (typeof window === 'undefined') return '';
+  const searchParams = new URLSearchParams(window.location.search);
+  return searchParams.get(param) || '';
+};
+
+const searchQuery = ref(getInitialUrlParam('search'));
+const selectedRecordType = ref(getInitialUrlParam('court'));
 const viewMode = ref<'cards' | 'table'>('cards');
 
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
+
+let searchAbortController: AbortController | null = null;
+let searchDebounceTimer: any = null;
+
+const escapeHtml = (str: string): string => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+const escapeRegExp = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+const highlightMatch = (text: string | null | undefined, query: string): string => {
+  if (!text) return '';
+  const cleanQuery = query?.trim();
+  if (!cleanQuery) return escapeHtml(text);
+
+  let tokens: string[] = [];
+  if (cleanQuery.startsWith('"') && cleanQuery.endsWith('"') && cleanQuery.length > 2) {
+    tokens = [cleanQuery.slice(1, -1).trim()];
+  } else {
+    tokens = cleanQuery
+      .split(/\s+/)
+      .map(t => t.trim())
+      .filter(t => t.length >= 2);
+  }
+
+  if (tokens.length === 0) return escapeHtml(text);
+
+  const pattern = new RegExp(`(${tokens.map(escapeRegExp).join('|')})`, 'gi');
+  const parts = text.split(pattern);
+
+  return parts
+    .map((part) => {
+      if (tokens.some(t => part.toLowerCase() === t.toLowerCase())) {
+        return `<mark class="bg-primary/25 text-primary font-bold px-0.5 rounded">${escapeHtml(part)}</mark>`;
+      }
+      return escapeHtml(part);
+    })
+    .join('');
+};
+
+const updateUrlParams = () => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  const q = searchQuery.value.trim();
+  if (q) {
+    url.searchParams.set('search', q);
+  } else {
+    url.searchParams.delete('search');
+  }
+  if (selectedRecordType.value) {
+    url.searchParams.set('court', selectedRecordType.value);
+  } else {
+    url.searchParams.delete('court');
+  }
+  window.history.replaceState({}, '', url.toString());
+};
 
 const batchMarkForReview = async (requiresReview = true) => {
   if (!selectedRecords.value.length || batchReviewLoading.value) return;
@@ -161,10 +232,7 @@ const lazyParams = ref<{
   sortOrder: -1
 });
 
-let searchDebounceTimer: any = null;
-
 const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page: number; first: number; rows: number }) => {
-  loading.value = true;
   if (event) {
     if (event.first !== undefined) lazyParams.value.first = event.first;
     if (event.rows !== undefined) lazyParams.value.rows = event.rows;
@@ -177,25 +245,42 @@ const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page:
   const sortField = lazyParams.value.sortField || 'document_date';
   const sortOrder = lazyParams.value.sortOrder ?? -1;
 
+  if (searchAbortController) {
+    searchAbortController.abort();
+  }
+  searchAbortController = new AbortController();
+  const currentController = searchAbortController;
+
+  loading.value = true;
+  updateUrlParams();
+
   try {
     const response = await axios.get('/legal-records/data', {
       params: {
         offset: first,
         limit: rows,
         category: 'cases',
-        search: searchQuery.value,
+        search: searchQuery.value.trim(),
         record_type: selectedRecordType.value,
         sort_field: sortField,
         sort_order: sortOrder
-      }
+      },
+      signal: currentController.signal
     });
 
-    records.value = response.data.records;
-    totalRecords.value = response.data.total;
-  } catch (error) {
+    if (!currentController.signal.aborted) {
+      records.value = response.data.records;
+      totalRecords.value = response.data.total;
+    }
+  } catch (error: any) {
+    if (axios.isCancel(error) || error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED' || currentController.signal.aborted) {
+      return;
+    }
     console.error('Failed to fetch case law records:', error);
   } finally {
-    loading.value = false;
+    if (searchAbortController === currentController) {
+      loading.value = false;
+    }
   }
 };
 
@@ -215,6 +300,19 @@ const onSearchInput = () => {
     lazyParams.value.first = 0;
     loadLazyRecords();
   }, 350);
+};
+
+const triggerSearchNow = () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  lazyParams.value.first = 0;
+  loadLazyRecords();
+};
+
+const clearSearch = () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchQuery.value = '';
+  lazyParams.value.first = 0;
+  loadLazyRecords();
 };
 
 const setRecordType = (type: string) => {
@@ -336,7 +434,8 @@ onMounted(() => {
         <span
           class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary shadow-md">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          {{ totalRecords.toLocaleString() }} Active Records
+          <span v-if="searchQuery.trim()">{{ totalRecords.toLocaleString() }} Matches Found</span>
+          <span v-else>{{ totalRecords.toLocaleString() }} Active Records</span>
         </span>
       </div>
     </div>
@@ -363,12 +462,23 @@ onMounted(() => {
       <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
 
         <!-- Global Search Field -->
-        <!-- <div class="relative flex-1 max-w-2xl">
+        <div class="relative flex-1 max-w-2xl">
           <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <input type="text" v-model="searchQuery" @input="onSearchInput"
-            placeholder="Search by Case #, Applicant, Respondent, Court, or Legal Keywords..."
-            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
-        </div> -->
+          <input type="text" v-model="searchQuery" @input="onSearchInput" @keydown.enter="triggerSearchNow"
+            placeholder="Search by Case #, Applicant, Respondent, Court, or Keywords (Enter to search)..."
+            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
+          <div class="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+            <Loader2 v-if="loading" class="w-4 h-4 text-primary animate-spin" />
+            <button
+              v-else-if="searchQuery"
+              @click="clearSearch"
+              type="button"
+              class="p-1 text-zinc-500 hover:text-white rounded-md hover:bg-white/10 transition cursor-pointer"
+              title="Clear search">
+              <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
 
         <!-- Court / Source Dropdown Selection -->
         <div class="flex flex-wrap items-center gap-3">
@@ -385,7 +495,7 @@ onMounted(() => {
           <button @click="loadLazyRecords()"
             class="p-3 bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-xl transition-all flex items-center justify-center cursor-pointer"
             title="Refresh Dataset">
-            <RefreshCw class="w-4 h-4" />
+            <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
           </button>
         </div>
       </div>
@@ -405,8 +515,8 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Loading State Skeleton -->
-      <div v-if="loading" class="space-y-4">
+      <!-- Loading State Skeleton (Initial or Empty Load) -->
+      <div v-if="loading && records.length === 0" class="space-y-4">
         <div v-for="i in 4" :key="i" class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
           <div class="flex items-center justify-between">
             <Skeleton width="30%" height="1.5rem" class="bg-zinc-800" />
@@ -422,20 +532,29 @@ onMounted(() => {
         <div class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
           <Database class="w-8 h-8 text-zinc-600" />
         </div>
-        <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No case records found</h3>
-        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or court filter</p>
+        <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
+          <span v-if="searchQuery.trim()">No case records found for &ldquo;{{ searchQuery }}&rdquo;</span>
+          <span v-else>No case records found</span>
+        </h3>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or court filter</p>
+        <button
+          v-if="searchQuery || selectedRecordType"
+          @click="clearSearch(); selectedRecordType = ''; loadLazyRecords();"
+          class="btn btn-primary px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl cursor-pointer">
+          Reset All Filters
+        </button>
       </div>
 
       <!-- Dossier Cards Grid -->
-      <div v-else class="space-y-4">
+      <div v-else class="space-y-4 transition-opacity duration-200" :class="{ 'opacity-60 pointer-events-none': loading }">
         <div v-for="c in records" :key="c.id"
           class="bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all p-6 rounded-2xl space-y-4 group">
           <!-- Card Header Badges & View Dossier Button -->
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
               <span v-if="c.case_number"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
-                {{ c.case_number }}
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20"
+                v-html="highlightMatch(c.case_number, searchQuery)">
               </span>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
                 {{ formatCourtName(c.court) }}
@@ -467,8 +586,8 @@ onMounted(() => {
           </div>
 
           <!-- Case Title (Always Visible) -->
-          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)">
-            {{ c.title }}
+          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)"
+            v-html="highlightMatch(c.title, searchQuery)">
           </h4>
 
           <!-- Summary / Ratio Decidendi Excerpt -->
@@ -477,8 +596,8 @@ onMounted(() => {
               <Bookmark class="w-3.5 h-3.5" />
               {{ c.ratio_decidendi && isPro ? 'Ratio Decidendi / Core Principle' : 'Executive Summary / Matter' }}
             </span>
-            <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300">
-              {{ c.summary || c.ratio_decidendi }}
+            <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300"
+              v-html="highlightMatch(c.summary || c.ratio_decidendi, searchQuery)">
             </p>
           </div>
 
@@ -486,8 +605,8 @@ onMounted(() => {
           <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
             <div class="flex items-center gap-2">
               <Users class="w-3.5 h-3.5 text-zinc-500" />
-              <span class="text-zinc-300 font-medium">
-                {{ c.judges && c.judges.length ? c.judges.join(', ') : (c.applicant && c.respondent ? c.applicant + ' v ' + c.respondent : 'Bench / Commissioner Panel') }}
+              <span class="text-zinc-300 font-medium"
+                v-html="highlightMatch(c.judges && c.judges.length ? c.judges.join(', ') : (c.applicant && c.respondent ? c.applicant + ' v ' + c.respondent : 'Bench / Commissioner Panel'), searchQuery)">
               </span>
             </div>
 
@@ -560,8 +679,17 @@ onMounted(() => {
               class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
               <Database class="w-8 h-8 text-zinc-600" />
             </div>
-            <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No case records found</h3>
-            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or filters</p>
+            <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
+              <span v-if="searchQuery.trim()">No case records found for &ldquo;{{ searchQuery }}&rdquo;</span>
+              <span v-else>No case records found</span>
+            </h3>
+            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or filters</p>
+            <button
+              v-if="searchQuery || selectedRecordType"
+              @click="clearSearch(); selectedRecordType = ''; loadLazyRecords();"
+              class="btn btn-primary px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl cursor-pointer">
+              Reset All Filters
+            </button>
           </div>
         </template>
 
@@ -574,12 +702,12 @@ onMounted(() => {
               <a v-if="data.source_url && data.case_number" :href="data.source_url" target="_blank" rel="noopener noreferrer"
                 class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 hover:border-primary/50 text-primary hover:text-white rounded-lg inline-flex items-center gap-1.5 shadow-sm transition group"
                 title="Open source judgment on SAFLII">
-                <span>{{ data.case_number }}</span>
+                <span v-html="highlightMatch(data.case_number, searchQuery)"></span>
                 <ExternalLink class="w-2.5 h-2.5 opacity-50 group-hover:opacity-100" />
               </a>
               <span v-else-if="data.case_number"
-                class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
-                {{ data.case_number }}
+                class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm"
+                v-html="highlightMatch(data.case_number, searchQuery)">
               </span>
               <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
 
@@ -622,11 +750,11 @@ onMounted(() => {
           <template #body="{ data }">
             <div
               class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
-              @click="viewRecordDetail(data)">
-              {{ data.title }}
+              @click="viewRecordDetail(data)"
+              v-html="highlightMatch(data.title, searchQuery)">
             </div>
-            <div v-if="data.ratio_decidendi || data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1">
-              {{ data.ratio_decidendi || data.summary }}
+            <div v-if="data.ratio_decidendi || data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1"
+              v-html="highlightMatch(data.ratio_decidendi || data.summary, searchQuery)">
             </div>
           </template>
           <template #loading>

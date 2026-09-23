@@ -191,24 +191,59 @@ class LegalRecordController extends Controller
             });
         }
 
-        // Search query: search directly across scrubbed_records JSON data using GIN trigram index
+        // Search query: support exact quoted phrases or space-separated tokens across scrubbed_records JSON data
         if ($search !== '') {
-            $query->where(function ($q) use ($search, $isPgsql) {
-                if ($isPgsql) {
-                    $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$search}%"]);
+            $isExactPhrase = (bool) preg_match('/^"[^"]+"$/', $search);
+            if ($isExactPhrase) {
+                $phrase = trim($search, '"');
+                $query->where(function ($q) use ($phrase, $isPgsql) {
+                    if ($isPgsql) {
+                        $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$phrase}%"]);
+                    } else {
+                        $q->where(function ($sub) use ($phrase) {
+                            $sub->whereRaw('scrubbed_records.data LIKE ?', ["%{$phrase}%"])
+                                ->orWhereRaw('extracted_records.data LIKE ?', ["%{$phrase}%"]);
+                        });
+                    }
+                });
+            } else {
+                $rawTokens = preg_split('/\s+/', $search);
+                $tokens = array_slice(array_values(array_filter($rawTokens, fn ($t) => mb_strlen($t) >= 2)), 0, 6);
+
+                if (count($tokens) <= 1) {
+                    $query->where(function ($q) use ($search, $isPgsql) {
+                        if ($isPgsql) {
+                            $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$search}%"]);
+                        } else {
+                            $q->where(function ($sub) use ($search) {
+                                $sub->whereRaw('scrubbed_records.data LIKE ?', ["%{$search}%"])
+                                    ->orWhereRaw('extracted_records.data LIKE ?', ["%{$search}%"]);
+                            });
+                        }
+                    });
                 } else {
-                    $q->where(function ($sub) use ($search) {
-                        $sub->whereRaw('scrubbed_records.data LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('extracted_records.data LIKE ?', ["%{$search}%"]);
+                    $query->where(function ($q) use ($tokens, $isPgsql) {
+                        if ($isPgsql) {
+                            foreach ($tokens as $token) {
+                                $q->whereRaw('scrubbed_records.data::text ILIKE ?', ["%{$token}%"]);
+                            }
+                        } else {
+                            foreach ($tokens as $token) {
+                                $q->where(function ($sub) use ($token) {
+                                    $sub->whereRaw('scrubbed_records.data LIKE ?', ["%{$token}%"])
+                                        ->orWhereRaw('extracted_records.data LIKE ?', ["%{$token}%"]);
+                                });
+                            }
+                        }
                     });
                 }
-            });
+            }
         }
 
         $countCacheKey = 'legal_records:count:'.md5(serialize([
             'category' => $category,
             'record_type' => $recordType,
-            'search' => $search,
+            'search' => mb_strtolower($search),
         ]));
         $total = app()->runningUnitTests()
             ? (clone $query)->count()
@@ -256,8 +291,22 @@ class LegalRecordController extends Controller
                 ->orderBy('scrubbed_records.created_at', 'desc');
         }
 
-        $rows = $query->offset($offset)->limit($limit)->get();
-        $records = $rows->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro, false));
+        $dataCacheKey = 'legal_records:data:'.md5(serialize([
+            'offset' => $offset,
+            'limit' => $limit,
+            'search' => mb_strtolower($search),
+            'category' => $category,
+            'record_type' => $recordType,
+            'sort_field' => $sortField,
+            'sort_order' => $sortOrder,
+            'is_pro' => $isPro,
+        ]));
+
+        $records = app()->runningUnitTests()
+            ? $query->offset($offset)->limit($limit)->get()->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro, false))
+            : Cache::remember($dataCacheKey, 60, function () use ($query, $offset, $limit, $isPro) {
+                return $query->offset($offset)->limit($limit)->get()->map(fn ($row) => $this->formatScrubbedRecord($row, $isPro, false));
+            });
 
         return response()->json([
             'total' => $total,
@@ -379,6 +428,14 @@ class LegalRecordController extends Controller
         $title = $srData['title'] ?? $erData['title'] ?? $ext['title'] ?? 'Legal Matter';
         $court = $ext['court'] ?? $meta['court'] ?? $meta['target_name'] ?? null;
         $caseNumber = $meta['case_number'] ?? $ext['case_number'] ?? $srData['case_number'] ?? $srData['award_number'] ?? null;
+        if (empty($caseNumber) || preg_match('/^\[?\d{4}\]?\s*ZA/i', trim((string) $caseNumber))) {
+            if (preg_match('/\(([^()]+)\)\s*\[\d{4}\]\s*ZA/i', (string) $title, $mCase)) {
+                $cand = trim($mCase[1], " ;,()");
+                if (preg_match('/\d/', $cand) && ! preg_match('/judgment|appeal|heard|delivered|unreported|coram/i', $cand)) {
+                    $caseNumber = $cand;
+                }
+            }
+        }
         $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $ext['hearing_date'] ?? $meta['document_date'] ?? $meta['hearing_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
         $hearingDate = $ext['hearing_date'] ?? $meta['hearing_date'] ?? null;
 

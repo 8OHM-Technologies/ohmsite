@@ -691,4 +691,84 @@ class LegalRecordTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_legal_records_data_endpoint_supports_multi_token_search(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        // Record 1: Has "Zondo" in judges, and "Constitutional" in court
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case Alpha {$uniq}",
+            'extracted_data' => [
+                'judges' => ['Justice Zondo'],
+                'court' => 'Constitutional Court',
+                'summary' => 'Dismissal of appeal with costs.',
+            ],
+        ]);
+
+        // Record 2: Has "Zondo" in judges, but Labour Court
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case Beta {$uniq}",
+            'extracted_data' => [
+                'judges' => ['Justice Zondo'],
+                'court' => 'Labour Court',
+                'summary' => 'Arbitration award upheld.',
+            ],
+        ]);
+
+        // Record 3: Has "Maya" in judges, and "Constitutional Court"
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Case Gamma {$uniq}",
+            'extracted_data' => [
+                'judges' => ['Justice Maya'],
+                'court' => 'Constitutional Court',
+                'summary' => 'Constitutional rights interpretation.',
+            ],
+        ]);
+
+        // Searching "Zondo Constitutional" should match only Record 1
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search=Zondo%20Constitutional%20{$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertCount(1, $records);
+        $this->assertSame("Case Alpha {$uniq}", $records[0]['title']);
+    }
+
+    public function test_legal_records_data_endpoint_supports_quoted_exact_phrase_search(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Unfair Dismissal Matter {$uniq}",
+            'extracted_data' => [
+                'summary' => 'A dispute involving an alleged unfair dismissal of an employee.',
+            ],
+        ]);
+
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Dismissal for Misconduct {$uniq}",
+            'extracted_data' => [
+                'summary' => 'The dismissal was fair and reasonable, but procedure was unfair.',
+            ],
+        ]);
+
+        // Exact phrase in quotes: "unfair dismissal"
+        $phrase = urlencode('"unfair dismissal"');
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$phrase}&search_suffix={$uniq}");
+
+        $response->assertStatus(200);
+        $records = $response->json('records');
+        $this->assertTrue(collect($records)->contains(fn ($r) => str_contains($r['title'], "Unfair Dismissal Matter {$uniq}")));
+    }
 }
