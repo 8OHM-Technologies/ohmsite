@@ -37,6 +37,13 @@ class LegalRecordTest extends TestCase
             });
         }
 
+        if (! Schema::connection('pgsql_coeus')->hasColumn('extracted_records', 'requires_human_review')) {
+            Schema::connection('pgsql_coeus')->table('extracted_records', function ($table) {
+                $table->boolean('requires_human_review')->default(false);
+                $table->text('review_reason')->nullable();
+            });
+        }
+
         if (! Schema::connection('pgsql_coeus')->hasTable('scrubbed_records')) {
             Schema::connection('pgsql_coeus')->create('scrubbed_records', function ($table) {
                 $table->uuid('id')->primary();
@@ -106,7 +113,7 @@ class LegalRecordTest extends TestCase
         parent::tearDown();
     }
 
-    private function createScrubbedRecord(string $recordType, string $category, array $scrubbedData, array $extractedData = [], ?string $docDate = '2026-02-10'): string
+    private function createScrubbedRecord(string $recordType, string $category, array $scrubbedData, array $extractedData = [], ?string $docDate = '2026-02-10', bool $requiresHumanReview = false): string
     {
         $extId = (string) Str::uuid();
         $scrubbedId = (string) Str::uuid();
@@ -118,6 +125,8 @@ class LegalRecordTest extends TestCase
             'source_url' => $extractedData['source_url'] ?? 'https://www.saflii.org/za/cases/ZACC/2026/'.Str::random(10).'.html',
             'document_date' => $docDate,
             'data' => json_encode(array_merge(['category' => $category], $extractedData)),
+            'requires_human_review' => $requiresHumanReview ?: ($extractedData['requires_human_review'] ?? false),
+            'review_reason' => $extractedData['review_reason'] ?? ($requiresHumanReview ? 'Flagged for quality review in test.' : null),
             'status' => 'detailed',
             'scrubbed_at' => now(),
             'scraped_at' => now(),
@@ -770,5 +779,95 @@ class LegalRecordTest extends TestCase
         $response->assertStatus(200);
         $records = $response->json('records');
         $this->assertTrue(collect($records)->contains(fn ($r) => str_contains($r['title'], "Unfair Dismissal Matter {$uniq}")));
+    }
+
+    public function test_case_records_marked_for_human_review_do_not_appear_in_cases_data_endpoint(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        $uniq = Str::random(8);
+
+        // 1. Regular case record (not marked for review)
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Active Valid Case {$uniq}",
+            'case_number' => "VALID-{$uniq}",
+        ], [], '2026-03-01', false);
+
+        // 2. Case record marked for human review
+        $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Flagged Unreviewed Case {$uniq}",
+            'case_number' => "FLAGGED-{$uniq}",
+        ], [], '2026-03-01', true);
+
+        // Fetch case law records
+        $response = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$uniq}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('total', 1);
+        $records = $response->json('records');
+        $this->assertCount(1, $records);
+        $this->assertEquals("Active Valid Case {$uniq}", $records[0]['title']);
+    }
+
+    public function test_reporting_error_on_case_record_excludes_it_from_subsequent_data_queries(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'subscriber@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $uniq = Str::random(8);
+
+        $scrubbedId = $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Disputed Quality Case {$uniq}",
+            'case_number' => "DISPUTED-{$uniq}",
+        ]);
+
+        // Initially visible
+        $initialResponse = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$uniq}");
+        $initialResponse->assertStatus(200);
+        $initialResponse->assertJsonPath('total', 1);
+
+        // Flag record for human review
+        $reportResponse = $this->actingAs($user)->postJson("/legal-records/record/{$scrubbedId}/report-error");
+        $reportResponse->assertStatus(200);
+        $reportResponse->assertJsonPath('success', true);
+
+        // Subsequent query must not return the record anymore
+        $afterResponse = $this->actingAs($user)->getJson("/legal-records/data?category=cases&search={$uniq}");
+        $afterResponse->assertStatus(200);
+        $afterResponse->assertJsonPath('total', 0);
+        $this->assertEmpty($afterResponse->json('records'));
+    }
+
+    public function test_case_record_marked_for_human_review_cannot_be_viewed_by_subscriber_in_show_endpoint(): void
+    {
+        $subscriber = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'user',
+        ]);
+
+        $admin = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $uniq = Str::random(8);
+
+        $scrubbedId = $this->createScrubbedRecord('saflii_courts', 'cases', [
+            'title' => "Quarantined Case {$uniq}",
+            'case_number' => "QUARANTINED-{$uniq}",
+        ], [], '2026-03-01', true);
+
+        // Regular subscriber receives 404
+        $subResponse = $this->actingAs($subscriber)->getJson("/legal-records/record/{$scrubbedId}");
+        $subResponse->assertStatus(404);
+
+        // Admin can inspect it
+        $adminResponse = $this->actingAs($admin)->getJson("/legal-records/record/{$scrubbedId}");
+        $adminResponse->assertStatus(200);
+        $adminResponse->assertJsonPath('requires_human_review', true);
     }
 }

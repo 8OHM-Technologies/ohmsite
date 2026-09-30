@@ -416,6 +416,12 @@ class LegalRecordReviewController extends Controller
             ->where('id', $extracted->id)
             ->update($updateData);
 
+        if (! Cache::has('legal_records:version')) {
+            Cache::forever('legal_records:version', 2);
+        } else {
+            Cache::increment('legal_records:version');
+        }
+
         return response()->json([
             'success' => true,
             'extracted_record_id' => (string) $extracted->id,
@@ -465,6 +471,12 @@ class LegalRecordReviewController extends Controller
         $affected = DB::connection('pgsql_coeus')->table('extracted_records')
             ->whereIn('id', $allTargetExtractedIds)
             ->update($updateData);
+
+        if (! Cache::has('legal_records:version')) {
+            Cache::forever('legal_records:version', 2);
+        } else {
+            Cache::increment('legal_records:version');
+        }
 
         return response()->json([
             'success' => true,
@@ -670,6 +682,12 @@ class LegalRecordReviewController extends Controller
         }
 
         Cache::forget('dataset_summary');
+
+        if (! Cache::has('legal_records:version')) {
+            Cache::forever('legal_records:version', 2);
+        } else {
+            Cache::increment('legal_records:version');
+        }
 
         return response()->json([
             'success' => true,

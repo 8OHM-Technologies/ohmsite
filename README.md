@@ -86,7 +86,7 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 - Instant exports of sanitized datasets.
 
 ### 3. Open Access Legal Records
-- **Case Law & Judgments**: Superior court case law (Constitutional Court, Supreme Court of Appeal, High Courts) and CCMA arbitration awards with procedural summaries, holdings, dismissal reasons, full judgment viewer, high-performance multi-token keyword/phrase search with PostgreSQL GIN trigram acceleration and contextual keyword match highlighting, explicit AI-assisted processing disclaimers, and a one-click user error reporting mechanism that routes flagged records directly into the Admin Human Review queue.
+- **Case Law & Judgments**: Superior court case law (Constitutional Court, Supreme Court of Appeal, High Courts) and CCMA arbitration awards with procedural summaries, holdings, dismissal reasons, full judgment viewer, high-performance multi-token keyword/phrase search with PostgreSQL GIN trigram acceleration and contextual keyword match highlighting, explicit AI-assisted processing disclaimers, and a one-click user error reporting mechanism that routes flagged records directly into the Admin Human Review queue (instantly quarantining and hiding flagged records from appearing in the frontend Case Law module until reviewed and resolved by an administrator).
 - **Law Journals & Gazettes**: Academic law journals (PER, De Rebus, AHRLJ, ADRY, etc.) and official Government/Provincial Gazettes with formatted document reader layout.
 - **Court Rolls & Schedules**: Motion court hearing schedules, cause lists, and court roll calendar tracking.
 

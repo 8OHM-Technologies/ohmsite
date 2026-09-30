@@ -125,6 +125,12 @@ class LegalRecordController extends Controller
 
         // Category filter
         if ($category === 'cases') {
+            // Case law records flagged for human review must never appear in the frontend Case Law module
+            $query->where(function ($q) {
+                $q->where('extracted_records.requires_human_review', false)
+                    ->orWhereNull('extracted_records.requires_human_review');
+            });
+
             if ($useFunctionalIndex) {
                 $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'cases'");
             } else {
@@ -240,7 +246,9 @@ class LegalRecordController extends Controller
             }
         }
 
-        $countCacheKey = 'legal_records:count:'.md5(serialize([
+        $cacheVersion = (int) Cache::get('legal_records:version', 1);
+
+        $countCacheKey = "legal_records:v{$cacheVersion}:count:".md5(serialize([
             'category' => $category,
             'record_type' => $recordType,
             'search' => mb_strtolower($search),
@@ -291,7 +299,7 @@ class LegalRecordController extends Controller
                 ->orderBy('scrubbed_records.created_at', 'desc');
         }
 
-        $dataCacheKey = 'legal_records:data:'.md5(serialize([
+        $dataCacheKey = "legal_records:v{$cacheVersion}:data:".md5(serialize([
             'offset' => $offset,
             'limit' => $limit,
             'search' => mb_strtolower($search),
@@ -349,6 +357,11 @@ class LegalRecordController extends Controller
         if ($scrubbed) {
             $formatted = $this->formatScrubbedRecord($scrubbed, $isPro, true);
 
+            // Case law records flagged for human review must not appear in the frontend module
+            if ((bool) ($scrubbed->requires_human_review ?? false) && ($formatted['category'] ?? '') === 'cases' && ! ($user && $user->isAdmin())) {
+                abort(404, 'Record is currently undergoing human review and is unavailable.');
+            }
+
             return response()->json([
                 'id' => (string) $scrubbed->id,
                 'extracted_record_id' => (string) $scrubbed->extracted_record_id,
@@ -405,6 +418,12 @@ class LegalRecordController extends Controller
                 'review_reason' => $reason,
                 'updated_at' => now(),
             ]);
+
+        if (! Cache::has('legal_records:version')) {
+            Cache::forever('legal_records:version', 2);
+        } else {
+            Cache::increment('legal_records:version');
+        }
 
         return response()->json([
             'success' => true,

@@ -193,13 +193,18 @@ const batchMarkForReview = async (requiresReview = true) => {
       review_reason: 'Flagged via Cases table grid batch action by admin.'
     });
 
-    // Update local records
+    // Update local records: if marked for human review, remove from the local records list
     const affectedIds = new Set(ids);
-    records.value.forEach(r => {
-      if (affectedIds.has(r.id) || (r.extracted_record_id && affectedIds.has(r.extracted_record_id))) {
-        r.requires_human_review = requiresReview;
-      }
-    });
+    if (requiresReview) {
+      records.value = records.value.filter(r => !affectedIds.has(r.id) && (!r.extracted_record_id || !affectedIds.has(r.extracted_record_id)));
+      totalRecords.value = Math.max(0, totalRecords.value - affectedIds.size);
+    } else {
+      records.value.forEach(r => {
+        if (affectedIds.has(r.id) || (r.extracted_record_id && affectedIds.has(r.extracted_record_id))) {
+          r.requires_human_review = requiresReview;
+        }
+      });
+    }
 
     batchSuccessMessage.value = response.data.message || `Successfully updated ${ids.length} record(s).`;
     selectedRecords.value = [];
@@ -214,9 +219,15 @@ const batchMarkForReview = async (requiresReview = true) => {
 };
 
 const handleReviewUpdated = (payload: { id: string; requires_human_review: boolean }) => {
-  const match = records.value.find(r => r.id === payload.id || r.extracted_record_id === payload.id);
-  if (match) {
-    match.requires_human_review = payload.requires_human_review;
+  if (payload.requires_human_review) {
+    // If marked for human review, immediately remove from the frontend Case Law list
+    records.value = records.value.filter(r => r.id !== payload.id && r.extracted_record_id !== payload.id);
+    totalRecords.value = Math.max(0, totalRecords.value - 1);
+  } else {
+    const match = records.value.find(r => r.id === payload.id || r.extracted_record_id === payload.id);
+    if (match) {
+      match.requires_human_review = payload.requires_human_review;
+    }
   }
 };
 
@@ -710,12 +721,6 @@ onMounted(() => {
                 v-html="highlightMatch(data.case_number, searchQuery)">
               </span>
               <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
-
-              <span v-if="data.requires_human_review"
-                class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider shrink-0"
-                title="Marked for Human Review">
-                Review
-              </span>
             </div>
           </template>
           <template #loading>
