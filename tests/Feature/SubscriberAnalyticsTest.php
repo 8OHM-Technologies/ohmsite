@@ -15,6 +15,12 @@ class SubscriberAnalyticsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \Illuminate\Support\Facades\Cache::flush();
+    }
+
     protected function subscribeUser(User $user): void
     {
         if (! $user->email_verified_at) {
@@ -227,12 +233,60 @@ class SubscriberAnalyticsTest extends TestCase
             'timeline_trend' => ['years', 'counts', 'avg_duration_days'],
             'precedents_intelligence' => ['top_cited', 'treatment_distribution', 'density_distribution'],
             'bench_intelligence' => ['top_judges', 'panel_sizes'],
+            'typology_distribution' => ['labels', 'series'],
             'cases',
+            'total_filtered_cases',
             'filter_options' => ['courts', 'judges', 'years'],
         ]);
         $response->assertJsonPath('type', 'saflii_courts');
         $response->assertJsonPath('totals.total_cases', 1);
         $this->assertCount(1, $response->json('cases'));
+        $this->assertEquals('Section 27 enforces right to access.', $response->json('cases.0.ratio_decidendi'));
+        $this->assertNotEmpty($response->json('typology_distribution.labels'));
+    }
+
+    public function test_analytics_data_endpoint_supports_limit_parameter(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        LegalAnalytics::factory()->count(5)->create([
+            'target_name' => 'ZACC',
+            'target_type' => 'cases',
+            'court' => 'ZACC',
+            'data' => [
+                'extracted_data' => [
+                    'court' => 'Constitutional Court of South Africa',
+                    'reportable' => true,
+                    'ratio_decidendi' => 'Constitutional precedent.',
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts&limit=2');
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->json('cases'));
+        $this->assertEquals(5, $response->json('total_filtered_cases'));
+    }
+
+    public function test_analytics_data_endpoint_falls_back_to_demo_data_when_no_records_exist(): void
+    {
+        $user = User::factory()->create();
+        $this->subscribeUser($user);
+
+        // Ensure database tables for legal records are completely empty
+        LegalAnalytics::query()->delete();
+        if (\Illuminate\Support\Facades\Schema::hasTable('scrubbed_records')) {
+            \Illuminate\Support\Facades\DB::table('scrubbed_records')->delete();
+        }
+
+        $response = $this->actingAs($user)->getJson('/subscriber/analytics/data?type=saflii_courts');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('type', 'saflii_courts');
+        $this->assertGreaterThan(0, $response->json('totals.total_cases'));
+        $this->assertNotEmpty($response->json('cases'));
     }
 
     public function test_analytics_data_endpoint_returns_legal_payload(): void

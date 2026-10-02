@@ -82,7 +82,9 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 
 ### 2. Pro Analytics Dashboard (`subscribed`)
 - **CCMA Awards Analytics**: Labor arbitration trends, procedural velocity (hearing duration, award delay, ingestion latency), regional exposure, and employer risk profiling.
-- **SAFLII Courts Jurisprudence Intelligence**: Superior court analytics (Constitutional Court & Competition Appeal Court), precedent citation networks, citation treatment breakdown (Applied, Referred, Distinguished), judicial bench analysis, and comprehensive case dossier viewer with *Ratio Decidendi* and *Obiter Dicta* extraction.
+- **SAFLII Courts Jurisprudence Intelligence**: Superior court analytics (Constitutional Court & Competition Appeal Court), precedent citation networks, citation treatment breakdown (Applied, Referred, Distinguished), judicial bench analysis, legal subject typology distribution, and comprehensive case dossier viewer with *Ratio Decidendi* and *Obiter Dicta* extraction.
+- **Ratio Decidendi Explorer**: Searchable and filterable binding legal principles, turnaround velocity badges, judicial panel sizes, and one-click case intelligence dossiers.
+- **Metrics Transparency**: Integrated metrics logic modal explaining algorithmic formulations for litigation turnaround, citation classification, and LLM extraction pipelines.
 - Instant exports of sanitized datasets.
 
 ### 3. Open Access Legal Records

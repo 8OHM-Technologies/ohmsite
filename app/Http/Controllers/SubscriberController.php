@@ -47,6 +47,7 @@ class SubscriberController extends Controller
                 'year' => (string) $request->input('year', 'All'),
                 'reportable' => (string) $request->input('reportable', 'All'),
                 'search' => (string) $request->input('search', ''),
+                'limit' => (int) $request->input('limit', 100),
             ];
 
             return response()->json($this->analytics->getSafliiCourtsPayload($filters));

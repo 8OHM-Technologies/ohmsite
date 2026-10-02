@@ -107,7 +107,7 @@ flowchart TD
 | **Pricing logic** | [CartService::resolveUnitPrice](file:///home/tiaanf/Dev/ohmsite/app/Services/CartService.php#L192-L197) — Monthly = base; Annual = base × 10 |
 | **Access gate** | [User::isSubscribed](file:///home/tiaanf/Dev/ohmsite/app/Models/User.php#L85-L97) — checks for a paid order with this slug |
 | **Middleware** | `subscribed` → [SubscribedMiddleware](file:///home/tiaanf/Dev/ohmsite/app/Http/Middleware/SubscribedMiddleware.php) |
-| **Protected resource** | `GET /subscriber` → [SubscriberController::index](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/SubscriberController.php), `GET /subscriber/analytics/saflii` → [SafliiCourts.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/Analytics/SafliiCourts.vue), `GET /subscriber/analytics/ccma` → [CcmaAwards.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/Analytics/CcmaAwards.vue) |
+| **Protected resource** | `GET /subscriber` → [SubscriberController::index](file:///home/tiaanf/Dev/ohmsite/app/Http/Controllers/SubscriberController.php), `GET /subscriber/analytics/saflii` → [SafliiCourts.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/Analytics/SafliiCourts.vue) (Jurisprudence Overview, Citation Treatment Network, Bench Analysis, and Ratio Decidendi Explorer), `GET /subscriber/analytics/ccma` → [CcmaAwards.vue](file:///home/tiaanf/Dev/ohmsite/resources/js/Pages/Subscriber/Analytics/CcmaAwards.vue) |
 
 #### Legal Records Module (`/legal-records`)
 

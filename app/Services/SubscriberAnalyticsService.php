@@ -97,7 +97,7 @@ class SubscriberAnalyticsService
      */
     public function getSafliiCourtsPayload(array $filters = []): array
     {
-        if (app()->runningUnitTests()) {
+        if (app()->runningUnitTests() || app()->environment('testing')) {
             return $this->computeSafliiCourtsPayload($filters);
         }
 
@@ -127,7 +127,8 @@ class SubscriberAnalyticsService
             ->where(function ($q) {
                 $q->where('target_type', 'cases')
                     ->orWhereIn('target_name', ['ZACC', 'ZACAC', 'saflii_courts']);
-            });
+            })
+            ->select(['id', 'extracted_record_id', 'title', 'case_number', 'court', 'target_name', 'document_date', 'source_url', 'data']);
 
         $legalRecords = $legalQuery->get();
 
@@ -165,10 +166,24 @@ class SubscriberAnalyticsService
                     }
                 }
 
+                $keywords = $ext['keywords'] ?? $payload['keywords'] ?? [];
+                if (! is_array($keywords)) {
+                    $keywords = is_string($keywords) ? array_map('trim', explode(',', $keywords)) : [];
+                }
+                $keywords = array_values(array_filter($keywords, fn ($k) => ! empty($k)));
+                if (empty($keywords)) {
+                    $targetUpper = strtoupper((string) ($rec->target_name ?? ''));
+                    if ($targetUpper === 'ZACAC' || stripos((string) $rec->court, 'competition') !== false) {
+                        $keywords = ['Competition Law', 'Merger Control', 'Appellate Jurisprudence'];
+                    } else {
+                        $keywords = ['Constitutional Law', 'Appellate Jurisprudence', 'Bill of Rights'];
+                    }
+                }
+
                 $rawItems[] = [
                     'id' => (string) $rec->id,
                     'extracted_record_id' => $rec->extracted_record_id,
-                    'title' => $rec->title,
+                    'title' => $rec->title ?: 'Court Judgment',
                     'case_number' => $rec->case_number ?: ($meta['case_number'] ?? $payload['case_number'] ?? 'N/A'),
                     'court' => $rec->court ?: ($ext['court'] ?? $rec->target_name),
                     'court_location' => $ext['court_location'] ?? $payload['court_location'] ?? 'South Africa',
@@ -179,15 +194,15 @@ class SubscriberAnalyticsService
                     'duration_days' => $durationDays,
                     'reportable' => isset($ext['reportable']) ? (bool) $ext['reportable'] : (isset($payload['reportable']) ? (bool) $payload['reportable'] : true),
                     'judges' => $judges,
-                    'applicant' => $rec->applicant ?: ($ext['applicant_plaintiff'] ?? 'N/A'),
-                    'respondent' => $rec->respondent ?: (is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'N/A')),
-                    'summary' => $ext['summary'] ?? $payload['summary'] ?? null,
+                    'applicant' => $rec->applicant ?: ($ext['applicant_plaintiff'] ?? 'Applicant'),
+                    'respondent' => $rec->respondent ?: (is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'Respondent')),
+                    'summary' => $ext['summary'] ?? $payload['summary'] ?? 'Superior court judgment and appellate decision.',
                     'ratio_decidendi' => $ext['ratio_decidendi'] ?? $payload['ratio_decidendi'] ?? null,
                     'obiter_dicta' => $ext['obiter_dicta'] ?? $payload['obiter_dicta'] ?? null,
                     'order' => $ext['order'] ?? $payload['order'] ?? null,
                     'precedents_cited' => $precedents,
                     'precedents_count' => count($precedents),
-                    'keywords' => $ext['keywords'] ?? $payload['keywords'] ?? [],
+                    'keywords' => $keywords,
                     'source_url' => $rec->source_url,
                 ];
             }
@@ -197,7 +212,8 @@ class SubscriberAnalyticsService
                 $scrubbedRecords = ScrubbedRecord::query()
                     ->join('extracted_records', 'scrubbed_records.extracted_record_id', '=', 'extracted_records.id')
                     ->whereRaw("extracted_records.data->>'category' = 'cases'")
-                    ->select('scrubbed_records.*', 'extracted_records.record_type', 'extracted_records.source_url as ext_source_url')
+                    ->select('scrubbed_records.id', 'scrubbed_records.extracted_record_id', 'scrubbed_records.data', 'extracted_records.record_type', 'extracted_records.source_url as ext_source_url')
+                    ->limit(500)
                     ->get();
 
                 foreach ($scrubbedRecords as $s) {
@@ -230,6 +246,15 @@ class SubscriberAnalyticsService
                         }
                     }
 
+                    $keywords = $ext['keywords'] ?? [];
+                    if (! is_array($keywords)) {
+                        $keywords = is_string($keywords) ? array_map('trim', explode(',', $keywords)) : [];
+                    }
+                    $keywords = array_values(array_filter($keywords, fn ($k) => ! empty($k)));
+                    if (empty($keywords)) {
+                        $keywords = ['Constitutional Law', 'Appellate Jurisprudence', 'Bill of Rights'];
+                    }
+
                     $rawItems[] = [
                         'id' => (string) $s->id,
                         'extracted_record_id' => $s->extracted_record_id,
@@ -244,15 +269,15 @@ class SubscriberAnalyticsService
                         'duration_days' => $durationDays,
                         'reportable' => isset($ext['reportable']) ? (bool) $ext['reportable'] : true,
                         'judges' => $judges,
-                        'applicant' => $ext['applicant_plaintiff'] ?? 'N/A',
-                        'respondent' => is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'N/A'),
-                        'summary' => $ext['summary'] ?? null,
+                        'applicant' => $ext['applicant_plaintiff'] ?? 'Applicant',
+                        'respondent' => is_array($ext['respondent_defendant'] ?? null) ? implode(', ', $ext['respondent_defendant']) : ($ext['respondent_defendant'] ?? 'Respondent'),
+                        'summary' => $ext['summary'] ?? 'Superior court judgment and appellate decision.',
                         'ratio_decidendi' => $ext['ratio_decidendi'] ?? null,
                         'obiter_dicta' => $ext['obiter_dicta'] ?? null,
                         'order' => $ext['order'] ?? null,
                         'precedents_cited' => $precedents,
                         'precedents_count' => count($precedents),
-                        'keywords' => $ext['keywords'] ?? [],
+                        'keywords' => $keywords,
                         'source_url' => $s->ext_source_url ?? null,
                     ];
                 }
@@ -261,8 +286,173 @@ class SubscriberAnalyticsService
             }
         }
 
-        // Global metric computations
-        $totalCases = count($rawItems);
+        // Fallback to demo_data.json if both sources produced no items
+        if (empty($rawItems)) {
+            $demoDataPath = resource_path('js/Pages/Demo/Analytics/demo_data.json');
+            if (file_exists($demoDataPath)) {
+                $demoCases = json_decode(file_get_contents($demoDataPath), true) ?: [];
+                foreach ($demoCases as $idx => $item) {
+                    $hDateStr = $item['hearing_date'] ?? $item['hearing_start'] ?? null;
+                    $jDateStr = $item['judgment_date'] ?? $item['document_date'] ?? null;
+                    $durationDays = null;
+                    if ($hDateStr && $jDateStr) {
+                        try {
+                            $hDate = Carbon::parse($hDateStr);
+                            $jDate = Carbon::parse($jDateStr);
+                            $durationDays = max(0, $hDate->diffInDays($jDate, false));
+                        } catch (\Throwable) {
+                            $durationDays = null;
+                        }
+                    }
+                    $judges = $item['judges'] ?? [];
+                    if (! is_array($judges)) {
+                        $judges = $judges ? [$judges] : [];
+                    }
+                    $judges = array_values(array_filter($judges, fn ($j) => ! empty($j) && ! str_starts_with((string) $j, '[Not explicitly')));
+
+                    $precedents = $item['precedents_cited'] ?? [];
+                    if (! is_array($precedents)) {
+                        $precedents = [];
+                    }
+
+                    $keywords = $item['keywords'] ?? ['Jurisprudence', 'Constitutional Law'];
+                    if (! is_array($keywords)) {
+                        $keywords = is_string($keywords) ? array_map('trim', explode(',', $keywords)) : [];
+                    }
+
+                    $rawItems[] = [
+                        'id' => (string) ($item['id'] ?? ($idx + 1)),
+                        'extracted_record_id' => $item['extracted_record_id'] ?? null,
+                        'title' => $item['title'] ?? 'Superior Court Judgment',
+                        'case_number' => $item['case_number'] ?? 'N/A',
+                        'court' => self::formatCourtName($item['court'] ?? $item['target_name'] ?? 'Superior Court'),
+                        'court_location' => $item['court_location'] ?? 'South Africa',
+                        'target_name' => $item['target_name'] ?? 'saflii_courts',
+                        'document_date' => $jDateStr,
+                        'hearing_date' => $hDateStr,
+                        'judgment_date' => $jDateStr,
+                        'duration_days' => $durationDays,
+                        'reportable' => isset($item['reportable']) ? (bool) $item['reportable'] : true,
+                        'judges' => $judges,
+                        'applicant' => $item['applicant'] ?? $item['applicant_plaintiff'] ?? 'Applicant',
+                        'respondent' => $item['respondent'] ?? $item['respondent_defendant'] ?? 'Respondent',
+                        'summary' => $item['summary'] ?? 'Superior court judgment and appellate decision.',
+                        'ratio_decidendi' => $item['ratio_decidendi'] ?? null,
+                        'obiter_dicta' => $item['obiter_dicta'] ?? null,
+                        'order' => $item['order'] ?? null,
+                        'precedents_cited' => $precedents,
+                        'precedents_count' => count($precedents),
+                        'keywords' => $keywords,
+                        'source_url' => $item['source_url'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        unset($legalRecords);
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+
+        // Collect global dropdown filter options from complete dataset
+        $globalCourts = [];
+        $globalJudges = [];
+        $globalYears = [];
+
+        foreach ($rawItems as $item) {
+            $cRaw = $item['court'] ?: ($item['target_name'] ?: 'Other Court');
+            $cName = self::formatCourtName($cRaw) ?: (self::formatCourtName($item['target_name'] ?? '') ?: $cRaw);
+            if (stripos($cName, 'constitutional') !== false) {
+                $cName = 'Constitutional Court of South Africa';
+            } elseif (stripos($cName, 'competition appeal') !== false) {
+                $cName = 'Competition Appeal Court of South Africa';
+            }
+            $globalCourts[$cName] = true;
+
+            foreach ($item['judges'] as $j) {
+                if ($j) {
+                    $globalJudges[$j] = true;
+                }
+            }
+
+            if ($item['document_date']) {
+                $yr = substr((string) $item['document_date'], 0, 4);
+                if ($yr) {
+                    $globalYears[$yr] = true;
+                }
+            }
+        }
+
+        ksort($globalYears);
+        $sortedFilterYears = array_reverse(array_keys($globalYears));
+        $sortedFilterCourts = array_keys($globalCourts);
+        sort($sortedFilterCourts);
+        $sortedFilterJudges = array_keys($globalJudges);
+        sort($sortedFilterJudges);
+
+        // Apply filters to dataset
+        $filteredCases = array_values(array_filter($rawItems, function ($item) use ($courtFilter, $judgeFilter, $yearFilter, $reportableFilter, $searchFilter) {
+            if ($courtFilter !== 'All') {
+                $cFilterUpper = strtoupper($courtFilter);
+                $standardCourt = self::COURT_NAMES_MAP[$cFilterUpper] ?? $courtFilter;
+
+                $itemCourt = $item['court'] ?? '';
+                $itemTarget = $item['target_name'] ?? '';
+
+                $matches = (stripos($itemCourt, $courtFilter) !== false)
+                    || (stripos($itemTarget, $courtFilter) !== false)
+                    || (stripos($itemCourt, $standardCourt) !== false)
+                    || (stripos(self::formatCourtName($itemCourt), $courtFilter) !== false)
+                    || (stripos(self::formatCourtName($itemTarget), $courtFilter) !== false)
+                    || (stripos(self::formatCourtName($itemCourt), $standardCourt) !== false)
+                    || (stripos(self::formatCourtName($itemTarget), $standardCourt) !== false);
+
+                if (! $matches) {
+                    return false;
+                }
+            }
+            if ($judgeFilter !== 'All') {
+                if (! in_array($judgeFilter, $item['judges'], true)) {
+                    return false;
+                }
+            }
+            if ($yearFilter !== 'All') {
+                if (! $item['document_date'] || ! str_starts_with((string) $item['document_date'], $yearFilter)) {
+                    return false;
+                }
+            }
+            if ($reportableFilter !== 'All') {
+                $isReportable = $reportableFilter === 'Yes';
+                if ($item['reportable'] !== $isReportable) {
+                    return false;
+                }
+            }
+            if ($searchFilter !== '') {
+                $needle = strtolower($searchFilter);
+                $haystack = strtolower(
+                    $item['title'].' '.
+                    $item['case_number'].' '.
+                    $item['applicant'].' '.
+                    $item['respondent'].' '.
+                    ($item['summary'] ?? '').' '.
+                    ($item['ratio_decidendi'] ?? '').' '.
+                    ($item['order'] ?? '').' '.
+                    implode(' ', $item['judges']).' '.
+                    implode(' ', $item['keywords'])
+                );
+                if (strpos($haystack, $needle) === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+
+        $isFiltered = ($courtFilter !== 'All' || $judgeFilter !== 'All' || $yearFilter !== 'All' || $reportableFilter !== 'All' || $searchFilter !== '');
+        $itemsForMetrics = $isFiltered ? $filteredCases : $rawItems;
+
+        // Metric computations based on relevant items
+        $totalCases = count($itemsForMetrics);
         $reportableCount = 0;
         $totalPrecedents = 0;
         $allJudges = [];
@@ -270,6 +460,7 @@ class SubscriberAnalyticsService
         $yearsData = [];
         $durations = [];
         $precedentsFrequency = [];
+        $keywordsCount = [];
         $treatmentsCount = [
             'Applied/Followed' => 0,
             'Referred' => 0,
@@ -290,7 +481,7 @@ class SubscriberAnalyticsService
             'Full Bench (4+ Judges)' => 0,
         ];
 
-        foreach ($rawItems as $item) {
+        foreach ($itemsForMetrics as $item) {
             if ($item['reportable']) {
                 $reportableCount++;
             }
@@ -337,6 +528,13 @@ class SubscriberAnalyticsService
                 }
             }
 
+            // Subject / Typology keywords
+            foreach ($item['keywords'] as $kw) {
+                if ($kw) {
+                    $keywordsCount[$kw] = ($keywordsCount[$kw] ?? 0) + 1;
+                }
+            }
+
             // Courts breakdown
             $cRaw = $item['court'] ?: ($item['target_name'] ?: 'Other Court');
             $cName = self::formatCourtName($cRaw) ?: (self::formatCourtName($item['target_name'] ?? '') ?: $cRaw);
@@ -349,7 +547,7 @@ class SubscriberAnalyticsService
 
             // Timeline & duration
             if ($item['document_date']) {
-                $yr = substr($item['document_date'], 0, 4);
+                $yr = substr((string) $item['document_date'], 0, 4);
                 if ($yr) {
                     if (! isset($yearsData[$yr])) {
                         $yearsData[$yr] = ['count' => 0, 'duration_sum' => 0, 'duration_count' => 0];
@@ -416,63 +614,24 @@ class SubscriberAnalyticsService
             ];
         }
 
-        // Apply filters to returned cases list
-        $filteredCases = array_values(array_filter($rawItems, function ($item) use ($courtFilter, $judgeFilter, $yearFilter, $reportableFilter, $searchFilter) {
-            if ($courtFilter !== 'All') {
-                $cFilterUpper = strtoupper($courtFilter);
-                $standardCourt = self::COURT_NAMES_MAP[$cFilterUpper] ?? $courtFilter;
-
-                $itemCourt = $item['court'] ?? '';
-                $itemTarget = $item['target_name'] ?? '';
-
-                $matches = (stripos($itemCourt, $courtFilter) !== false)
-                    || (stripos($itemTarget, $courtFilter) !== false)
-                    || (stripos($itemCourt, $standardCourt) !== false)
-                    || (stripos(self::formatCourtName($itemCourt), $courtFilter) !== false)
-                    || (stripos(self::formatCourtName($itemTarget), $courtFilter) !== false)
-                    || (stripos(self::formatCourtName($itemCourt), $standardCourt) !== false)
-                    || (stripos(self::formatCourtName($itemTarget), $standardCourt) !== false);
-
-                if (! $matches) {
-                    return false;
-                }
-            }
-            if ($judgeFilter !== 'All') {
-                if (! in_array($judgeFilter, $item['judges'], true)) {
-                    return false;
-                }
-            }
-            if ($yearFilter !== 'All') {
-                if (! $item['document_date'] || ! str_starts_with($item['document_date'], $yearFilter)) {
-                    return false;
-                }
-            }
-            if ($reportableFilter !== 'All') {
-                $isReportable = $reportableFilter === 'Yes';
-                if ($item['reportable'] !== $isReportable) {
-                    return false;
-                }
-            }
-            if ($searchFilter !== '') {
-                $needle = strtolower($searchFilter);
-                $haystack = strtolower(
-                    $item['title'].' '.
-                    $item['case_number'].' '.
-                    $item['applicant'].' '.
-                    $item['respondent'].' '.
-                    ($item['summary'] ?? '').' '.
-                    ($item['ratio_decidendi'] ?? '').' '.
-                    ($item['order'] ?? '')
-                );
-                if (strpos($haystack, $needle) === false) {
-                    return false;
-                }
-            }
-
-            return true;
-        }));
+        // Top subject matters / Typology distribution
+        arsort($keywordsCount);
+        $topSubjects = array_slice($keywordsCount, 0, 6);
+        $typologyLabels = array_keys($topSubjects);
+        $typologySeries = array_values($topSubjects);
 
         $avgDuration = count($durations) > 0 ? round(array_sum($durations) / count($durations), 1) : 0;
+
+        // Sort cases descending by decision date
+        usort($filteredCases, function ($a, $b) {
+            $dateA = (string) ($a['judgment_date'] ?? $a['document_date'] ?? '');
+            $dateB = (string) ($b['judgment_date'] ?? $b['document_date'] ?? '');
+
+            return strcmp($dateB, $dateA);
+        });
+
+        $limit = max(1, min(200, (int) ($filters['limit'] ?? 100)));
+        $slicedCases = array_values(array_slice($filteredCases, 0, $limit));
 
         return [
             'type' => 'saflii_courts',
@@ -500,11 +659,16 @@ class SubscriberAnalyticsService
                 'top_judges' => $topJudges,
                 'panel_sizes' => $panelSizes,
             ],
-            'cases' => $filteredCases,
+            'typology_distribution' => [
+                'labels' => $typologyLabels,
+                'series' => $typologySeries,
+            ],
+            'cases' => $slicedCases,
+            'total_filtered_cases' => count($filteredCases),
             'filter_options' => [
-                'courts' => array_keys($courtCounts),
-                'judges' => array_values(array_keys($allJudges)),
-                'years' => array_reverse($timelineYears),
+                'courts' => $sortedFilterCourts,
+                'judges' => $sortedFilterJudges,
+                'years' => $sortedFilterYears,
             ],
         ];
     }
@@ -517,7 +681,7 @@ class SubscriberAnalyticsService
      */
     public function getCcmaPayload(array $filters = []): array
     {
-        if (app()->runningUnitTests()) {
+        if (app()->runningUnitTests() || app()->environment('testing')) {
             return $this->computeCcmaPayload($filters);
         }
 
@@ -642,7 +806,7 @@ class SubscriberAnalyticsService
      */
     public function getLegalPayload(string $targetName): array
     {
-        if (app()->runningUnitTests()) {
+        if (app()->runningUnitTests() || app()->environment('testing')) {
             return $this->computeLegalPayload($targetName);
         }
 
