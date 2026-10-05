@@ -193,7 +193,7 @@ onMounted(() => {
   <SubscriberLayout>
     <Head title="South African Compliance & Enforcement Intelligence" />
 
-    <div class="space-y-6 sm:space-y-8 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div class="space-y-6 sm:space-y-8 w-full">
       <!-- Header Banner -->
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border border-white/10 p-6 sm:p-8 shadow-2xl">
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>

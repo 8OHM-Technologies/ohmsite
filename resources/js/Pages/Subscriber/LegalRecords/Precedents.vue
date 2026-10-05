@@ -219,7 +219,7 @@ onMounted(() => {
   <component :is="LayoutComponent">
     <Head title="Legal Precedent & Compliance Search" />
 
-    <div class="space-y-6 sm:space-y-8 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+    <div class="space-y-6 sm:space-y-8 w-full">
       <!-- Header Banner -->
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border border-white/10 p-6 sm:p-8 shadow-2xl">
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -377,7 +377,7 @@ onMounted(() => {
               :value="records"
               :loading="loading"
               responsiveLayout="scroll"
-              class="p-datatable-sm w-full text-left"
+              class="p-datatable-sm w-full text-left p-datatable-dark-custom"
               rowHover>
               <template #empty>
                 <div class="p-12 text-center text-zinc-500 space-y-2">
@@ -503,7 +503,7 @@ onMounted(() => {
               @page="onPageChange"
               template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
-              class="bg-transparent text-xs text-zinc-400"
+              class="p-datatable-dark-custom"
             />
           </div>
         </div>
@@ -770,3 +770,121 @@ onMounted(() => {
     </div>
   </component>
 </template>
+
+<style>
+.p-datatable-dark-custom,
+.p-datatable-dark-custom .p-datatable-wrapper,
+.p-datatable-dark-custom .p-datatable-table-container,
+.p-datatable-dark-custom .p-datatable-table {
+  background: transparent !important;
+}
+
+.p-datatable-dark-custom .p-datatable-header,
+.p-datatable-dark-custom .p-datatable-footer {
+  background: transparent !important;
+  border: none !important;
+}
+
+.p-datatable-dark-custom .p-datatable-thead>tr>th {
+  background: transparent !important;
+  color: #a1a1aa !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  letter-spacing: 0.15em !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 1rem 1.25rem !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody>tr {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody>tr:hover {
+  background: rgba(39, 39, 42, 0.6) !important;
+}
+
+.p-datatable-dark-custom .p-datatable-tbody>tr>td {
+  padding: 1.15rem 1.25rem !important;
+  border: none !important;
+  background: transparent !important;
+  color: #d4d4d8 !important;
+}
+
+.p-datatable-dark-custom .p-datatable-emptymessage td {
+  background: transparent !important;
+  border: none !important;
+}
+
+.p-datatable-dark-custom.p-paginator,
+.p-datatable-dark-custom .p-paginator {
+  background: transparent !important;
+  border: none !important;
+  padding: 1rem 0 !important;
+  color: #e4e4e7 !important;
+}
+
+.p-datatable-dark-custom.p-paginator .p-paginator-first,
+.p-datatable-dark-custom .p-paginator .p-paginator-first,
+.p-datatable-dark-custom.p-paginator .p-paginator-prev,
+.p-datatable-dark-custom .p-paginator .p-paginator-prev,
+.p-datatable-dark-custom.p-paginator .p-paginator-next,
+.p-datatable-dark-custom .p-paginator .p-paginator-next,
+.p-datatable-dark-custom.p-paginator .p-paginator-last,
+.p-datatable-dark-custom .p-paginator .p-paginator-last,
+.p-datatable-dark-custom.p-paginator .p-paginator-page,
+.p-datatable-dark-custom .p-paginator .p-paginator-page {
+  background: rgba(39, 39, 42, 0.8) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.75rem !important;
+  margin: 0 0.125rem !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.75rem !important;
+}
+
+.p-datatable-dark-custom.p-paginator .p-paginator-page.p-highlight,
+.p-datatable-dark-custom .p-paginator .p-paginator-page.p-highlight {
+  background: var(--color-primary, #ff8800) !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  border-color: var(--color-primary, #ff8800) !important;
+}
+
+.p-datatable-dark-custom.p-paginator svg,
+.p-datatable-dark-custom .p-paginator svg,
+.p-datatable-dark-custom.p-paginator .p-icon,
+.p-datatable-dark-custom .p-paginator .p-icon {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  width: 0.875rem !important;
+  height: 0.875rem !important;
+}
+
+.p-datatable-dark-custom.p-paginator .p-paginator-rpp-select,
+.p-datatable-dark-custom .p-paginator .p-paginator-rpp-select,
+.p-datatable-dark-custom.p-paginator .p-dropdown,
+.p-datatable-dark-custom .p-paginator .p-dropdown,
+.p-datatable-dark-custom.p-paginator .p-select,
+.p-datatable-dark-custom .p-paginator .p-select {
+  background: rgba(39, 39, 42, 0.8) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.5rem !important;
+}
+
+.p-datatable-dark-custom.p-paginator .p-paginator-current,
+.p-datatable-dark-custom .p-paginator-current {
+  color: #71717a !important;
+  font-size: 0.75rem !important;
+}
+</style>
