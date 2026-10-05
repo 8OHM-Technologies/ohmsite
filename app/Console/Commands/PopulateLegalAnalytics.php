@@ -58,9 +58,20 @@ class PopulateLegalAnalytics extends Command
         $localIds = $fresh ? [] : LegalAnalytics::whereNotNull('extracted_record_id')->pluck('extracted_record_id')->toArray();
         $localIdsMap = array_flip($localIds);
 
-        // 2. Retrieve all valid IDs from scrubbed_records (where extracted_records.record_type != 'sabinet_ccma')
+        // 2. Retrieve all valid IDs from scrubbed_records (strictly superior court case law)
         $coeusIds = ScrubbedRecord::join('extracted_records', 'scrubbed_records.extracted_record_id', '=', 'extracted_records.id')
-            ->where('extracted_records.record_type', '!=', 'sabinet_ccma')
+            ->whereNotIn('extracted_records.record_type', [
+                'sabinet_ccma',
+                'fsca_enforcement_records',
+                'fsca_regulatory_records',
+                'pa_insurance_records',
+                'popia_records',
+                'nfo_cases',
+                'fais_ombud_cases',
+                'fais_determinations',
+                'fst_cases',
+                'fst_decisions',
+            ])
             ->pluck('scrubbed_records.extracted_record_id')
             ->toArray();
         $coeusIdsMap = array_flip($coeusIds);

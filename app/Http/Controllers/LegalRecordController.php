@@ -131,6 +131,19 @@ class LegalRecordController extends Controller
                     ->orWhereNull('extracted_records.requires_human_review');
             });
 
+            // Exclude regulatory enforcement, prudential standards, ombud determinations, and tribunal decisions from Case Law
+            $query->whereNotIn('extracted_records.record_type', [
+                'fsca_enforcement_records',
+                'fsca_regulatory_records',
+                'pa_insurance_records',
+                'popia_records',
+                'nfo_cases',
+                'fais_ombud_cases',
+                'fais_determinations',
+                'fst_cases',
+                'fst_decisions',
+            ]);
+
             if ($useFunctionalIndex) {
                 $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'cases'");
             } else {
@@ -146,6 +159,36 @@ class LegalRecordController extends Controller
                             ->orWhereRaw("{$categorySql} = 'cases'");
                     }
                 });
+            }
+        } elseif ($category === 'regulatory') {
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'regulatory'");
+            } else {
+                $query->whereIn('extracted_records.record_type', [
+                    'fsca_enforcement_records',
+                    'fsca_regulatory_records',
+                    'pa_insurance_records',
+                    'popia_records',
+                ]);
+            }
+        } elseif ($category === 'tribunal') {
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'tribunal'");
+            } else {
+                $query->whereIn('extracted_records.record_type', [
+                    'fst_cases',
+                    'fst_decisions',
+                ]);
+            }
+        } elseif ($category === 'ombud') {
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'ombud'");
+            } else {
+                $query->whereIn('extracted_records.record_type', [
+                    'nfo_cases',
+                    'fais_ombud_cases',
+                    'fais_determinations',
+                ]);
             }
         } elseif ($category === 'journals') {
             if ($useFunctionalIndex) {
