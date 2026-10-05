@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TargetVanity;
+use App\Services\ComplianceAnalyticsClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +14,10 @@ use Inertia\Response as InertiaResponse;
 
 class LegalRecordController extends Controller
 {
+    public function __construct(
+        protected ComplianceAnalyticsClient $complianceClient
+    ) {}
+
     /**
      * Display the legal record index view (defaults to cases).
      */
@@ -40,6 +45,42 @@ class LegalRecordController extends Controller
         return Inertia::render('Subscriber/LegalRecords/Cases', [
             'filters' => $filters,
         ]);
+    }
+
+    /**
+     * Display the Compliance Precedent Search & Statutory Cross-Reference view.
+     */
+    public function precedents(Request $request): InertiaResponse
+    {
+        return Inertia::render('Subscriber/LegalRecords/Precedents', [
+            'initialSummary' => $this->complianceClient->getSummary(),
+        ]);
+    }
+
+    /**
+     * Search compliance precedents via FastAPI DuckDB microservice.
+     */
+    public function precedentsData(Request $request): JsonResponse
+    {
+        return response()->json($this->complianceClient->searchPrecedents($request->all()));
+    }
+
+    /**
+     * Cross reference statute section across regulators and tribunals.
+     */
+    public function crossReference(Request $request): JsonResponse
+    {
+        $section = trim((string) $request->input('statute_section', ''));
+        return response()->json($this->complianceClient->crossReference($section));
+    }
+
+    /**
+     * Fetch entity compliance profile and sanctions timeline.
+     */
+    public function entityProfile(Request $request): JsonResponse
+    {
+        $entityName = trim((string) $request->input('entity_name', ''));
+        return response()->json($this->complianceClient->getEntityProfile($entityName));
     }
 
     /**

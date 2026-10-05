@@ -94,6 +94,10 @@ use App\Http\Controllers\LegalRecordController;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/legal-records', [LegalRecordController::class, 'index'])->name('legal-records.index');
     Route::get('/legal-records/cases', [LegalRecordController::class, 'cases'])->name('legal-records.cases');
+    Route::get('/legal-records/precedents', [LegalRecordController::class, 'precedents'])->name('legal-records.precedents');
+    Route::get('/legal-records/precedents/data', [LegalRecordController::class, 'precedentsData'])->name('legal-records.precedents.data');
+    Route::get('/legal-records/precedents/cross-reference', [LegalRecordController::class, 'crossReference'])->name('legal-records.precedents.cross-reference');
+    Route::get('/legal-records/precedents/entity-profile', [LegalRecordController::class, 'entityProfile'])->name('legal-records.precedents.entity-profile');
     Route::get('/legal-records/journals', [LegalRecordController::class, 'journals'])->name('legal-records.journals');
     Route::get('/legal-records/court-rolls', [LegalRecordController::class, 'courtRolls'])->name('legal-records.court-rolls');
     Route::get('/legal-records/data', [LegalRecordController::class, 'data'])->name('legal-records.data');
@@ -114,6 +118,8 @@ Route::middleware(['auth', 'verified', 'subscribed'])->prefix('subscriber')->nam
     Route::get('/', [SubscriberController::class, 'index'])->name('index');
     Route::get('/analytics/ccma', [SubscriberController::class, 'ccma'])->name('analytics.ccma');
     Route::get('/analytics/saflii', [SubscriberController::class, 'saflii'])->name('analytics.saflii');
+    Route::get('/analytics/compliance', [SubscriberController::class, 'compliance'])->name('analytics.compliance');
+    Route::get('/analytics/compliance/data', [SubscriberController::class, 'complianceData'])->name('analytics.compliance.data');
     Route::get('/analytics/data', [SubscriberController::class, 'data'])->name('analytics.data');
 });
 

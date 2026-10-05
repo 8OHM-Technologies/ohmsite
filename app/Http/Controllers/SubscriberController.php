@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ComplianceAnalyticsClient;
 use App\Services\SubscriberAnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,8 @@ use Inertia\Response;
 class SubscriberController extends Controller
 {
     public function __construct(
-        protected SubscriberAnalyticsService $analytics
+        protected SubscriberAnalyticsService $analytics,
+        protected ComplianceAnalyticsClient $complianceClient
     ) {}
 
     public function index(): Response
@@ -33,6 +35,19 @@ class SubscriberController extends Controller
         return Inertia::render('Subscriber/Analytics/SafliiCourts', [
             'filters' => $this->analytics->getFilters(),
         ]);
+    }
+
+    public function compliance(): Response
+    {
+        return Inertia::render('Subscriber/Analytics/ComplianceAnalytics', [
+            'filters' => $this->analytics->getFilters(),
+            'initialSummary' => $this->complianceClient->getSummary(),
+        ]);
+    }
+
+    public function complianceData(Request $request): JsonResponse
+    {
+        return response()->json($this->complianceClient->getSummary());
     }
 
     public function data(Request $request): JsonResponse

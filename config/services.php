@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'compliance_analytics' => [
+        'url' => env('COMPLIANCE_ANALYTICS_URL', 'http://172.18.0.1:8086'),
+        'timeout' => env('COMPLIANCE_ANALYTICS_TIMEOUT', 10),
+    ],
+
 ];

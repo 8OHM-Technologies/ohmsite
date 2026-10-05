@@ -24,7 +24,8 @@ import {
     ChevronDown,
     Briefcase,
     Gavel,
-    AlertCircle
+    AlertCircle,
+    ShieldAlert
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -66,6 +67,8 @@ const isLegalRecordsExpanded = ref(true);
 const searchItems = [
     { name: 'CCMA Awards Analytics', href: route('subscriber.analytics.ccma'), keywords: ['ccma', 'awards', 'labour', 'labor', 'dismissal', 'arbitration', 'analytics', 'stats', 'trends'] },
     { name: 'SAFLII Courts Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
+    { name: 'Compliance Analytics', href: route('subscriber.analytics.compliance'), keywords: ['compliance', 'enforcement', 'penalties', 'sanctions', 'fsca', 'popia', 'prudential', 'analytics'] },
+    { name: 'Precedent & Compliance Search', href: route('legal-records.precedents'), keywords: ['precedents', 'fsca', 'prudential', 'popia', 'tribunal', 'ombud', 'sanction', 'penalty', 'cross-reference'] },
     { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
     { name: 'Law Journals & Gazettes', href: route('legal-records.journals'), keywords: ['journals', 'gazettes', 'gazette', 'law review', 'per', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
     { name: 'Court Rolls & Schedules', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list', 'motion', 'trial'] },
@@ -228,13 +231,26 @@ const datasetStats = computed(() => {
                             <Link :href="route('legal-records.cases')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
-                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review')))
+                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents')))
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
                                 <Scale class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 Case Law
+                            </Link>
+
+                            <!-- Precedent Search -->
+                            <Link :href="route('legal-records.precedents')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.precedents'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Precedent Search
                             </Link>
 
                             <!-- Human Review (Admin Only) -->
@@ -316,13 +332,26 @@ const datasetStats = computed(() => {
                             <Link :href="route('subscriber.analytics.saflii')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
-                                    isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')))
+                                    isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')) && !isUrl(route('subscriber.analytics.compliance')))
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
                                 <Gavel class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                    :class="[isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')) && !isUrl(route('subscriber.analytics.compliance'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 SAFLII Courts
+                            </Link>
+
+                            <!-- Compliance & Enforcement -->
+                            <Link :href="route('subscriber.analytics.compliance')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('subscriber.analytics.compliance'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('subscriber.analytics.compliance')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                Compliance Analytics
                             </Link>
                         </div>
                     </div>

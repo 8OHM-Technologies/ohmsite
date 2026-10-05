@@ -12,13 +12,19 @@ import {
   ArrowRight,
   Sparkles,
   AlertCircle,
-  Check
+  Check,
+  ShieldAlert,
+  Gavel,
+  Award
 } from 'lucide-vue-next';
 import Modal from '@/Components/Modal.vue';
 import Skeleton from 'primevue/skeleton';
 import CaseRecordView from './CaseRecordView.vue';
 import JournalRecordView from './JournalRecordView.vue';
 import CourtRollRecordView from './CourtRollRecordView.vue';
+import RegulatoryRecordView from './RegulatoryRecordView.vue';
+import OmbudRecordView from './OmbudRecordView.vue';
+import TribunalRecordView from './TribunalRecordView.vue';
 
 const props = defineProps<{
   show: boolean;
@@ -158,12 +164,15 @@ const resolvedCategory = computed(() => {
   if (rt.includes('gaz')) return 'gaz';
   if (rt.includes('journal')) return 'journals';
   if (rt.includes('roll')) return 'court_rolls';
+  if (rt.includes('fsca') || rt.includes('pa_') || rt.includes('popia')) return 'regulatory';
+  if (rt.includes('fst')) return 'tribunal';
+  if (rt.includes('fais') || rt.includes('nfo')) return 'ombud';
   return 'cases';
 });
 
 const title = computed(() => dataObj.value.title || dataObj.value.name || 'Legal Record Dossier');
 const caseNumber = computed(() => dataObj.value.case_number || dataObj.value.award_number || dataObj.value.citation || null);
-const court = computed(() => formatCourtName(dataObj.value.court) || dataObj.value.court || dataObj.value.author || 'Court Authority');
+const court = computed(() => formatCourtName(dataObj.value.court) || dataObj.value.court || dataObj.value.author || (resolvedCategory.value === 'regulatory' ? 'Regulatory Authority' : (resolvedCategory.value === 'tribunal' ? 'Financial Services Tribunal' : (resolvedCategory.value === 'ombud' ? 'Ombud Authority' : 'Court Authority'))));
 const reportable = computed(() => Boolean(dataObj.value.reportable));
 const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?.source_url || null);
 </script>
@@ -179,7 +188,22 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
           <div class="flex flex-wrap items-center gap-2">
             <!-- Icon Badge based on Category -->
             <span
-              v-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
+              v-if="resolvedCategory === 'regulatory'"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+              <ShieldAlert class="w-3 h-3" /> Regulatory Enforcement
+            </span>
+            <span
+              v-else-if="resolvedCategory === 'tribunal'"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
+              <Gavel class="w-3 h-3" /> Tribunal Reconsideration
+            </span>
+            <span
+              v-else-if="resolvedCategory === 'ombud'"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+              <Award class="w-3 h-3" /> Ombud Determination
+            </span>
+            <span
+              v-else-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
               class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
               <BookOpen class="w-3 h-3" />
               {{ resolvedCategory === 'gaz' ? 'Government Gazette' : 'Law Review / Journal' }}
@@ -234,21 +258,45 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
 
         <!-- Loaded Content by Category -->
         <div v-else-if="recordDetail">
-          <!-- 1. Journals & Gazettes Formatted Text Reader View -->
+          <!-- 1. Regulatory Enforcement Sanction View -->
+          <RegulatoryRecordView
+            v-if="resolvedCategory === 'regulatory'"
+            :record-detail="recordDetail"
+            :is-pro="isPro"
+            @review-updated="handleReviewUpdatedFromChild"
+          />
+
+          <!-- 2. Ombud Determination Dispute View -->
+          <OmbudRecordView
+            v-else-if="resolvedCategory === 'ombud'"
+            :record-detail="recordDetail"
+            :is-pro="isPro"
+            @review-updated="handleReviewUpdatedFromChild"
+          />
+
+          <!-- 3. Financial Services Tribunal Decision View -->
+          <TribunalRecordView
+            v-else-if="resolvedCategory === 'tribunal'"
+            :record-detail="recordDetail"
+            :is-pro="isPro"
+            @review-updated="handleReviewUpdatedFromChild"
+          />
+
+          <!-- 4. Journals & Gazettes Formatted Text Reader View -->
           <JournalRecordView
-            v-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
+            v-else-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
             :record-detail="recordDetail"
             :is-pro="isPro"
           />
 
-          <!-- 2. Court Rolls Table Format Schedule View -->
+          <!-- 5. Court Rolls Table Format Schedule View -->
           <CourtRollRecordView
             v-else-if="resolvedCategory === 'court_rolls' || resolvedCategory === 'other'"
             :record-detail="recordDetail"
             :is-pro="isPro"
           />
 
-          <!-- 3. Standard Case Law Dossier View -->
+          <!-- 6. Standard Case Law Dossier View -->
           <CaseRecordView
             v-else
             :record-detail="recordDetail"

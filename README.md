@@ -83,12 +83,15 @@ Protected by `admin` middleware, the dashboard acts as the business control cent
 ### 2. Pro Analytics Dashboard (`subscribed`)
 - **CCMA Awards Analytics**: Labor arbitration trends, procedural velocity (hearing duration, award delay, ingestion latency), regional exposure, and employer risk profiling.
 - **SAFLII Courts Jurisprudence Intelligence**: Superior court analytics (Constitutional Court & Competition Appeal Court), precedent citation networks, citation treatment breakdown (Applied, Referred, Distinguished), judicial bench analysis, legal subject typology distribution, and comprehensive case dossier viewer with *Ratio Decidendi* and *Obiter Dicta* extraction.
+- **Compliance & Enforcement Intelligence** (`/subscriber/analytics/compliance`): Macro-level monitoring of administrative sanctions, cumulative financial penalties in ZAR, POPIA infringement notices, Prudential Authority standards, and top fine leaderboards powered by the vectorized DuckDB + FastAPI microservice.
 - **Ratio Decidendi Explorer**: Searchable and filterable binding legal principles, turnaround velocity badges, judicial panel sizes, and one-click case intelligence dossiers.
 - **Metrics Transparency**: Integrated metrics logic modal explaining algorithmic formulations for litigation turnaround, citation classification, and LLM extraction pipelines.
 - Instant exports of sanitized datasets.
 
-### 3. Open Access Legal Records
+### 3. Open Access Legal Records & Precedents
 - **Case Law & Judgments**: Superior court case law (Constitutional Court, Supreme Court of Appeal, High Courts) and CCMA arbitration awards with procedural summaries, holdings, dismissal reasons, full judgment viewer, high-performance multi-token keyword/phrase search with PostgreSQL GIN trigram acceleration and contextual keyword match highlighting, explicit AI-assisted processing disclaimers, and a one-click user error reporting mechanism that routes flagged records directly into the Admin Human Review queue (instantly quarantining and hiding flagged records from appearing in the frontend Case Law module until reviewed and resolved by an administrator).
+- **Regulatory Precedent & Statutory Cross-Reference Search** (`/legal-records/precedents`): Unified search across FSCA enforcement actions, Financial Services Tribunal reconsiderations, FAIS & NFO Ombud determinations, Prudential Standards, and POPIA notices with statutory section cross-referencing and entity compliance profiles.
+- **Specialized Regulatory, Tribunal & Ombud Dossier Views**: Custom dossier layouts (`RegulatoryRecordView`, `TribunalRecordView`, `OmbudRecordView`) visualizing administrative penalties in ZAR, debarments, insurer repudiation grounds, ombud compensation awards, and tribunal remittal directives.
 - **Law Journals & Gazettes**: Academic law journals (PER, De Rebus, AHRLJ, ADRY, etc.) and official Government/Provincial Gazettes with formatted document reader layout.
 - **Court Rolls & Schedules**: Motion court hearing schedules, cause lists, and court roll calendar tracking.
 
