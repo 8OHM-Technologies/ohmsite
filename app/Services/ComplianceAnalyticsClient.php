@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ComplianceAnalyticsClient
 {
     protected string $baseUrl;
+
     protected int $timeout;
 
     public function __construct()
@@ -24,9 +25,11 @@ class ComplianceAnalyticsClient
     {
         try {
             $response = Http::timeout(3)->get("{$this->baseUrl}/health");
+
             return $response->successful() && ($response->json('status') === 'healthy');
         } catch (\Throwable $e) {
             Log::warning('ComplianceAnalyticsClient: Health check failed', ['error' => $e->getMessage()]);
+
             return false;
         }
     }
@@ -70,108 +73,140 @@ class ComplianceAnalyticsClient
     /**
      * Search compliance precedents and regulatory enforcement records.
      *
-     * @param array<string, mixed> $params
+     * @param  array<string, mixed>  $params
      * @return array<string, mixed>
      */
     public function searchPrecedents(array $params = []): array
     {
-        try {
-            $queryParams = array_filter([
-                'q' => $params['q'] ?? null,
-                'regulator' => $params['regulator'] ?? null,
-                'category' => $params['category'] ?? null,
-                'min_penalty' => isset($params['min_penalty']) && $params['min_penalty'] !== '' ? (float) $params['min_penalty'] : null,
-                'offset' => isset($params['offset']) ? (int) $params['offset'] : 0,
-                'limit' => isset($params['limit']) ? (int) $params['limit'] : 25,
-            ], fn ($v) => $v !== null && $v !== '');
+        $queryParams = array_filter([
+            'q' => $params['q'] ?? null,
+            'regulator' => $params['regulator'] ?? null,
+            'category' => $params['category'] ?? null,
+            'min_penalty' => isset($params['min_penalty']) && $params['min_penalty'] !== '' ? (float) $params['min_penalty'] : null,
+            'offset' => isset($params['offset']) ? (int) $params['offset'] : 0,
+            'limit' => isset($params['limit']) ? (int) $params['limit'] : 25,
+        ], fn ($v) => $v !== null && $v !== '');
 
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/precedents", $queryParams);
+        $cacheKey = 'compliance:precedents:'.md5(serialize($queryParams));
 
-            if ($response->successful()) {
-                return $response->json();
+        return Cache::remember($cacheKey, 60, function () use ($queryParams) {
+            try {
+                $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/precedents", $queryParams);
+
+                if ($response->successful()) {
+                    return $response->json();
+                }
+
+                Log::error('ComplianceAnalyticsClient: Precedents search failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('ComplianceAnalyticsClient: Precedents search exception', ['error' => $e->getMessage()]);
             }
 
-            Log::error('ComplianceAnalyticsClient: Precedents search failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('ComplianceAnalyticsClient: Precedents search exception', ['error' => $e->getMessage()]);
-        }
-
-        return [
-            'total' => 0,
-            'records' => [],
-            'regulators' => ['FSCA', 'Prudential Authority', 'Information Regulator', 'Financial Services Tribunal', 'FAIS Ombud', 'National Financial Ombud'],
-            'categories' => ['regulatory', 'tribunal', 'ombud'],
-        ];
+            return [
+                'total' => 0,
+                'records' => [],
+                'regulators' => ['FSCA', 'Prudential Authority', 'Information Regulator', 'Financial Services Tribunal', 'FAIS Ombud', 'National Financial Ombud'],
+                'categories' => ['regulatory', 'tribunal', 'ombud'],
+            ];
+        });
     }
 
     /**
      * Cross-reference a specific statute section or rule across regulators and tribunals.
      *
-     * @param string $statuteSection
      * @return array<string, mixed>
      */
     public function crossReference(string $statuteSection): array
     {
-        try {
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/cross-reference", [
-                'statute_section' => $statuteSection,
-            ]);
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            Log::error('ComplianceAnalyticsClient: Cross-reference failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('ComplianceAnalyticsClient: Cross-reference exception', ['error' => $e->getMessage()]);
+        $clean = trim($statuteSection);
+        if ($clean === '') {
+            return [
+                'statute_section' => '',
+                'total_occurrences' => 0,
+                'breakdown_by_regulator' => [],
+                'common_contraventions' => [],
+                'records' => [],
+            ];
         }
 
-        return [
-            'statute_section' => $statuteSection,
-            'total_occurrences' => 0,
-            'breakdown_by_regulator' => [],
-            'common_contraventions' => [],
-            'records' => [],
-        ];
+        $cacheKey = 'compliance:cross_ref:'.md5(mb_strtolower($clean));
+
+        return Cache::remember($cacheKey, 300, function () use ($clean) {
+            try {
+                $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/cross-reference", [
+                    'statute_section' => $clean,
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json();
+                }
+
+                Log::error('ComplianceAnalyticsClient: Cross-reference failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('ComplianceAnalyticsClient: Cross-reference exception', ['error' => $e->getMessage()]);
+            }
+
+            return [
+                'statute_section' => $clean,
+                'total_occurrences' => 0,
+                'breakdown_by_regulator' => [],
+                'common_contraventions' => [],
+                'records' => [],
+            ];
+        });
     }
 
     /**
      * Fetch complete compliance profile for a financial institution or individual respondent.
      *
-     * @param string $entityName
      * @return array<string, mixed>
      */
     public function getEntityProfile(string $entityName): array
     {
-        try {
-            $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/entity-profile", [
-                'entity_name' => $entityName,
-            ]);
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            Log::error('ComplianceAnalyticsClient: Entity profile failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('ComplianceAnalyticsClient: Entity profile exception', ['error' => $e->getMessage()]);
+        $clean = trim($entityName);
+        if ($clean === '') {
+            return [
+                'entity_name' => '',
+                'total_actions' => 0,
+                'total_penalties' => 0.0,
+                'involved_regulators' => [],
+                'actions_timeline' => [],
+            ];
         }
 
-        return [
-            'entity_name' => $entityName,
-            'total_actions' => 0,
-            'total_penalties' => 0.0,
-            'involved_regulators' => [],
-            'actions_timeline' => [],
-        ];
+        $cacheKey = 'compliance:profile:'.md5(mb_strtolower($clean));
+
+        return Cache::remember($cacheKey, 300, function () use ($clean) {
+            try {
+                $response = Http::timeout($this->timeout)->get("{$this->baseUrl}/api/v1/compliance/entity-profile", [
+                    'entity_name' => $clean,
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json();
+                }
+
+                Log::error('ComplianceAnalyticsClient: Entity profile failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('ComplianceAnalyticsClient: Entity profile exception', ['error' => $e->getMessage()]);
+            }
+
+            return [
+                'entity_name' => $clean,
+                'total_actions' => 0,
+                'total_penalties' => 0.0,
+                'involved_regulators' => [],
+                'actions_timeline' => [],
+            ];
+        });
     }
 }
