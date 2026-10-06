@@ -158,15 +158,15 @@ const dataObj = computed(() => {
 
 const resolvedCategory = computed(() => {
   if (props.category) return props.category;
-  if (dataObj.value.category) return dataObj.value.category;
-  if (props.recordDetail?.category) return props.recordDetail.category;
   const rt = String(dataObj.value.record_type || props.recordDetail?.record_type || '').toLowerCase();
   if (rt.includes('gaz')) return 'gaz';
   if (rt.includes('journal')) return 'journals';
   if (rt.includes('roll')) return 'court_rolls';
   if (rt.includes('fsca') || rt.includes('pa_') || rt.includes('popia')) return 'regulatory';
   if (rt.includes('fst')) return 'tribunal';
-  if (rt.includes('fais') || rt.includes('nfo')) return 'ombud';
+  if (rt.includes('fais') || rt.includes('_nfo') || rt.startsWith('nfo')) return 'ombud';
+  if (dataObj.value.category) return dataObj.value.category;
+  if (props.recordDetail?.category) return props.recordDetail.category;
   return 'cases';
 });
 

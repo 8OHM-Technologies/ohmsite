@@ -5,7 +5,10 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CompliancePrecedentsTest extends TestCase
@@ -16,7 +19,45 @@ class CompliancePrecedentsTest extends TestCase
     {
         parent::setUp();
         Cache::flush();
+
+        if (! Schema::connection('pgsql_coeus')->hasTable('extracted_records')) {
+            Schema::connection('pgsql_coeus')->create('extracted_records', function ($table) {
+                $table->uuid('id')->primary();
+                $table->string('record_type')->nullable();
+                $table->string('source_url')->nullable();
+                $table->date('document_date')->nullable();
+                $table->json('data')->nullable();
+                $table->string('status')->nullable();
+                $table->timestamp('scrubbed_at')->nullable();
+                $table->boolean('requires_human_review')->default(false);
+                $table->text('review_reason')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::connection('pgsql_coeus')->hasTable('scrubbed_records')) {
+            Schema::connection('pgsql_coeus')->create('scrubbed_records', function ($table) {
+                $table->uuid('id')->primary();
+                $table->uuid('extracted_record_id')->nullable();
+                $table->json('data')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        $existingTarget = DB::connection('pgsql_coeus')->table('targets')->first();
+        if (! $existingTarget) {
+            $this->targetId = (string) Str::uuid();
+            DB::connection('pgsql_coeus')->table('targets')->insert([
+                'id' => $this->targetId,
+                'name' => 'fsca',
+                'created_at' => now(),
+            ]);
+        } else {
+            $this->targetId = $existingTarget->id;
+        }
     }
+
+    private string $targetId;
 
     public function test_unauthenticated_user_cannot_access_precedents(): void
     {
@@ -179,5 +220,102 @@ class CompliancePrecedentsTest extends TestCase
         $dataResponse = $this->actingAs($adminUser)->getJson('/subscriber/analytics/compliance/data');
         $dataResponse->assertStatus(200);
         $this->assertEquals(1500000, $dataResponse->json('total_penalties_amount'));
+    }
+
+    public function test_compliance_record_detail_endpoint_returns_specialized_regulatory_dossier(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $extractedId = (string) Str::uuid();
+        $scrubbedId = (string) Str::uuid();
+
+        $sourceUrl = 'https://fsca.co.za/actions/'.(string) Str::uuid();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $extractedId,
+            'target_id' => $this->targetId,
+            'record_type' => 'fsca_enforcement_records',
+            'document_date' => '2024-06-01',
+            'source_url' => $sourceUrl,
+            'data' => json_encode([
+                'title' => 'Administrative Sanction - Alpha Capital',
+                'applicant' => 'FSCA',
+                'respondent' => 'Alpha Capital',
+                'action_type' => 'Administrative Penalty',
+                'penalty_amount' => 750000,
+                'sanctions' => ['Administrative Penalty of R750 000'],
+                'contraventions' => ['Section 167 of FSR Act'],
+            ]),
+            'status' => 'detailed',
+            'scraped_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => $scrubbedId,
+            'extracted_record_id' => $extractedId,
+            'data' => json_encode([
+                'title' => 'Administrative Sanction - Alpha Capital',
+                'regulator' => 'FSCA',
+                'applicant' => 'FSCA',
+                'respondent' => 'Alpha Capital',
+                'action_type' => 'Administrative Penalty',
+                'penalty_amount' => 750000,
+                'sanctions' => ['Administrative Penalty of R750 000'],
+                'contraventions' => ['Section 167 of FSR Act'],
+                'key_provisions' => ['Section 167'],
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$scrubbedId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.category', 'regulatory');
+        $response->assertJsonPath('data.regulator', 'FSCA');
+        $response->assertJsonPath('data.respondent', 'Alpha Capital');
+        $this->assertEquals(750000, $response->json('data.penalty_amount'));
+        $this->assertEquals(['Section 167 of FSR Act'], $response->json('data.contraventions'));
+    }
+
+    public function test_unscrubbed_tribunal_record_detail_endpoint_resolves_from_extracted_records(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        $extractedId = (string) Str::uuid();
+        $sourceUrl = 'https://fsca.co.za/fst/decision-'.(string) Str::uuid();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $extractedId,
+            'target_id' => $this->targetId,
+            'record_type' => 'fst_decisions',
+            'document_date' => '2024-07-15',
+            'source_url' => $sourceUrl,
+            'data' => json_encode([
+                'title' => 'Beta Brokerage v FSCA',
+                'applicant' => 'Beta Brokerage',
+                'respondent' => 'FSCA',
+                'division' => 'Financial Services Tribunal',
+                'action_type' => 'Tribunal Reconsideration',
+                'sanction_outcome' => 'Decision Set Aside',
+            ]),
+            'status' => 'detailed',
+            'scraped_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/legal-records/record/{$extractedId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.category', 'tribunal');
+        $response->assertJsonPath('data.regulator', 'Financial Services Tribunal');
+        $response->assertJsonPath('data.applicant', 'Beta Brokerage');
     }
 }

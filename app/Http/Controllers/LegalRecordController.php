@@ -438,6 +438,26 @@ class LegalRecordController extends Controller
             ])
             ->first();
 
+        if (! $scrubbed) {
+            $extracted = DB::connection('pgsql_coeus')->table('extracted_records')
+                ->where('id', $id)
+                ->first();
+
+            if ($extracted) {
+                $scrubbed = (object) [
+                    'id' => (string) $extracted->id,
+                    'extracted_record_id' => (string) $extracted->id,
+                    'data' => $extracted->data,
+                    'record_type' => $extracted->record_type,
+                    'source_url' => $extracted->source_url,
+                    'document_date' => $extracted->document_date,
+                    'requires_human_review' => (bool) ($extracted->requires_human_review ?? false),
+                    'review_reason' => $extracted->review_reason ?? null,
+                    'er_data' => $extracted->data,
+                ];
+            }
+        }
+
         if ($scrubbed) {
             $formatted = $this->formatScrubbedRecord($scrubbed, $isPro, true);
 
@@ -574,32 +594,100 @@ class LegalRecordController extends Controller
         $outcome = $ext['result'] ?? $order ?? null;
         $sourceUrl = $row->source_url ?? $ext['source_url'] ?? $meta['source_url'] ?? null;
 
+        $recordType = (string) ($row->record_type ?? '');
+        $isCompliance = str_contains($recordType, 'fsca')
+            || str_contains($recordType, 'pa_')
+            || str_contains($recordType, 'popia')
+            || str_contains($recordType, 'fst')
+            || str_contains($recordType, 'fais')
+            || str_contains($recordType, 'nfo');
+
         $category = $ext['category'] ?? $srData['category'] ?? $erData['category'] ?? null;
         if (! $category) {
             if ($row->record_type === 'sabinet_ccma') {
                 $category = 'cases';
-            } elseif (str_contains($row->record_type ?? '', 'gaz')) {
+            } elseif (str_contains($recordType, 'gaz')) {
                 $category = 'gaz';
-            } elseif (str_contains($row->record_type ?? '', 'journal')) {
+            } elseif (str_contains($recordType, 'journal')) {
                 $category = 'journals';
-            } elseif (str_contains($row->record_type ?? '', 'roll')) {
+            } elseif (str_contains($recordType, 'roll')) {
                 $category = 'court_rolls';
+            } elseif (str_contains($recordType, 'fsca') || str_contains($recordType, 'pa_') || str_contains($recordType, 'popia')) {
+                $category = 'regulatory';
+            } elseif (str_contains($recordType, 'fst')) {
+                $category = 'tribunal';
+            } elseif (str_contains($recordType, 'fais') || str_starts_with($recordType, 'nfo') || str_contains($recordType, '_nfo')) {
+                $category = 'ombud';
             } else {
                 $category = 'cases';
             }
         }
+
+        // Parse compliance and regulatory specific fields
+        $innerSrData = is_array($srData['data'] ?? null) ? $srData['data'] : [];
+        $innerErData = is_array($erData['data'] ?? null) ? $erData['data'] : [];
+
+        $rawPenalty = $ext['penalty_amount'] ?? $ext['administrative_penalty_amount'] ?? $ext['fine_amount'] ?? $ext['award_amount'] ?? $srData['penalty_amount'] ?? $innerSrData['penalty_amount'] ?? $erData['penalty_amount'] ?? $innerErData['penalty_amount'] ?? null;
+        $penaltyAmount = null;
+        if ($rawPenalty !== null && $rawPenalty !== '') {
+            $cleaned = is_numeric($rawPenalty) ? (float) $rawPenalty : (float) preg_replace('/[^0-9.]/', '', (string) $rawPenalty);
+            $penaltyAmount = $cleaned > 0 ? $cleaned : null;
+        }
+
+        $rawSanctions = $ext['sanctions'] ?? $ext['sanction_outcome'] ?? $ext['enforcement_action'] ?? $ext['final_order'] ?? $srData['sanctions'] ?? $innerSrData['sanction_outcome'] ?? $erData['sanctions'] ?? [];
+        $sanctions = is_array($rawSanctions) ? array_values(array_filter($rawSanctions)) : (is_string($rawSanctions) && trim($rawSanctions) ? [trim($rawSanctions)] : []);
+
+        $rawContraventions = $ext['contraventions'] ?? $ext['statutory_contraventions'] ?? $ext['contravention_findings'] ?? $ext['repudiation_grounds'] ?? $srData['contraventions'] ?? $innerSrData['statutory_contraventions'] ?? $erData['contraventions'] ?? [];
+        $contraventions = is_array($rawContraventions) ? array_values(array_filter($rawContraventions)) : (is_string($rawContraventions) && trim($rawContraventions) ? [trim($rawContraventions)] : []);
+
+        $rawProvisions = $ext['key_provisions'] ?? $ext['statutory_sections_cited'] ?? $ext['keywords'] ?? $srData['key_provisions'] ?? $innerSrData['statutory_sections_cited'] ?? $erData['key_provisions'] ?? [];
+        $keyProvisions = is_array($rawProvisions) ? array_values(array_filter($rawProvisions)) : (is_string($rawProvisions) && trim($rawProvisions) ? array_values(array_filter(array_map('trim', explode(',', $rawProvisions)))) : []);
+
+        $regulator = $ext['regulator'] ?? $srData['regulator'] ?? null;
+        if (! $regulator) {
+            if (str_contains($recordType, 'fsca')) $regulator = 'FSCA';
+            elseif (str_contains($recordType, 'pa_')) $regulator = 'Prudential Authority';
+            elseif (str_contains($recordType, 'popia')) $regulator = 'Information Regulator';
+            elseif (str_contains($recordType, 'fst')) $regulator = 'Financial Services Tribunal';
+            elseif (str_contains($recordType, 'fais')) $regulator = 'FAIS Ombud';
+            elseif (str_contains($recordType, 'nfo') || str_starts_with($recordType, 'nfo')) $regulator = 'National Financial Ombud';
+        }
+
+        $actionType = $ext['action_type'] ?? $srData['action_type'] ?? $innerSrData['document_type'] ?? $innerSrData['document_category'] ?? $innerSrData['division'] ?? $srData['document_type'] ?? null;
+
+        if (! $respondent) {
+            $respondent = $ext['respondent'] ?? $ext['respondent_party'] ?? $ext['respondent_fsp'] ?? $ext['respondent_insurer'] ?? $srData['respondent'] ?? $innerSrData['respondent'] ?? $erData['respondent'] ?? $innerErData['respondent'] ?? null;
+        }
+
+        if (! $applicant) {
+            $applicant = $ext['applicant'] ?? $ext['complainant'] ?? $srData['applicant'] ?? $innerSrData['applicant'] ?? $erData['applicant'] ?? $innerErData['applicant'] ?? $regulator;
+        }
+
+        if ($title === 'Legal Matter' || empty($title)) {
+            $title = $innerSrData['title'] ?? $innerErData['title'] ?? $srData['title'] ?? $erData['title'] ?? $ext['title'] ?? ($actionType ? "{$regulator}: {$actionType}" : 'Compliance Record');
+        }
+
+        if (empty($caseNumber)) {
+            $caseNumber = $innerSrData['case_number'] ?? $innerErData['case_number'] ?? $srData['dataset_number'] ?? $innerSrData['dataset_number'] ?? null;
+        }
+
+        $debarment = $ext['debarment_period'] ?? $ext['debarment'] ?? null;
 
         // Only parse full text and heavy content when single-record detail is requested
         $fullText = null;
         $centerContent = null;
         $rollEntries = [];
         if ($isDetail) {
-            $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? null;
-            $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? null;
+            $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? $innerSrData['scraped_text'] ?? $innerSrData['center_content'] ?? $srData['scraped_text'] ?? $innerErData['scraped_text'] ?? null;
+            $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? $innerSrData['center_content'] ?? null;
             $rollEntries = $ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? [];
             if (! is_array($rollEntries)) {
                 $rollEntries = [];
             }
+        }
+
+        if (empty($summary)) {
+            $summary = $innerSrData['subject_matter'] ?? $ext['factual_summary'] ?? $ext['ombud_findings'] ?? $ext['tribunal_reasoning'] ?? null;
         }
 
         $author = $ext['author'] ?? $srData['author'] ?? $meta['author'] ?? $meta['publisher'] ?? $applicant ?? null;
@@ -623,8 +711,8 @@ class LegalRecordController extends Controller
                 'source_url' => $sourceUrl,
                 'requires_human_review' => (bool) ($row->requires_human_review ?? false),
                 'review_reason' => $row->review_reason ?? null,
-                'applicant' => $applicant ? 'Applicant (Locked - Pro Required)' : null,
-                'respondent' => $respondent ? 'Respondent (Locked - Pro Required)' : null,
+                'applicant' => $applicant,
+                'respondent' => $respondent,
                 'author' => $author ? 'Author (Locked - Pro Required)' : null,
                 'citation' => $citation ? 'Citation (Locked - Pro Required)' : null,
                 'subjects' => $subjects,
@@ -642,6 +730,13 @@ class LegalRecordController extends Controller
                 'reportable' => (bool) $reportable,
                 'duration_days' => $durationDays,
                 'court_location' => $courtLocation,
+                'penalty_amount' => $penaltyAmount,
+                'sanctions' => count($sanctions) > 2 ? array_slice($sanctions, 0, 2) : $sanctions,
+                'contraventions' => [],
+                'key_provisions' => $keyProvisions,
+                'regulator' => $regulator,
+                'action_type' => $actionType,
+                'debarment' => $debarment,
             ];
         }
 
@@ -681,6 +776,13 @@ class LegalRecordController extends Controller
             'reportable' => (bool) $reportable,
             'duration_days' => $durationDays,
             'court_location' => $courtLocation,
+            'penalty_amount' => $penaltyAmount,
+            'sanctions' => $sanctions,
+            'contraventions' => $contraventions,
+            'key_provisions' => $keyProvisions,
+            'regulator' => $regulator,
+            'action_type' => $actionType,
+            'debarment' => $debarment,
         ];
     }
 }

@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { Head, usePage } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import SubscriberLayout from '@/Layouts/SubscriberLayout.vue';
-import RecordDetailModal from './Components/RecordDetailModal.vue';
+import ComplianceRecordModal from './Components/ComplianceRecordModal.vue';
 import axios from 'axios';
 import {
   Scale,
@@ -82,13 +82,22 @@ const showDetailModal = ref(false);
 const openDetailModal = async (record: any) => {
   showDetailModal.value = true;
   modalLoading.value = true;
-  selectedRecord.value = record;
+  selectedRecord.value = { ...record };
 
   try {
     const res = await axios.get(`/legal-records/record/${record.id}`);
-    selectedRecord.value = res.data;
+    if (res.data) {
+      selectedRecord.value = {
+        ...record,
+        ...res.data,
+        data: {
+          ...record,
+          ...(res.data.data || {}),
+        },
+      };
+    }
   } catch (err) {
-    console.error('Failed to load full record detail:', err);
+    console.warn('Full database record lookup deferred or not found, using cached precedent data:', err);
   } finally {
     modalLoading.value = false;
   }
@@ -97,6 +106,13 @@ const openDetailModal = async (record: any) => {
 const closeDetailModal = () => {
   showDetailModal.value = false;
   selectedRecord.value = null;
+};
+
+const handleCrossReferenceFromModal = (section: string) => {
+  closeDetailModal();
+  activeTab.value = 'cross_reference';
+  crossRefSection.value = section;
+  fetchCrossReference(section);
 };
 
 // Fetch Precedents from Backend
@@ -731,9 +747,14 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Record Detail Modal (Specialized Regulatory / Tribunal / Ombud Dossier) -->
-      <RecordDetailModal :show="showDetailModal" :loading="modalLoading" :record-detail="selectedRecord"
-        @close="closeDetailModal" />
+      <!-- Specialized Compliance & Regulatory Precedent Dossier Modal -->
+      <ComplianceRecordModal
+        :show="showDetailModal"
+        :loading="modalLoading"
+        :record-detail="selectedRecord"
+        @close="closeDetailModal"
+        @cross-reference="handleCrossReferenceFromModal"
+      />
     </div>
   </component>
 </template>

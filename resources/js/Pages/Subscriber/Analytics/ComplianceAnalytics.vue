@@ -5,7 +5,7 @@ import SubscriberLayout from '@/Layouts/SubscriberLayout.vue';
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
 import Skeleton from 'primevue/skeleton';
-import RecordDetailModal from '../LegalRecords/Components/RecordDetailModal.vue';
+import ComplianceRecordModal from '../LegalRecords/Components/ComplianceRecordModal.vue';
 import {
   Scale,
   ShieldAlert,
@@ -60,13 +60,22 @@ const showDetailModal = ref(false);
 const openDetailModal = async (record) => {
   showDetailModal.value = true;
   modalLoading.value = true;
-  selectedRecord.value = record;
+  selectedRecord.value = { ...record };
 
   try {
     const res = await axios.get(`/legal-records/record/${record.id}`);
-    selectedRecord.value = res.data;
+    if (res.data) {
+      selectedRecord.value = {
+        ...record,
+        ...res.data,
+        data: {
+          ...record,
+          ...(res.data.data || {}),
+        },
+      };
+    }
   } catch (err) {
-    console.error('Failed to load full record detail:', err);
+    console.warn('Full database record lookup deferred or not found, using cached precedent data:', err);
   } finally {
     modalLoading.value = false;
   }
@@ -393,8 +402,8 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Record Detail Modal -->
-      <RecordDetailModal
+      <!-- Specialized Compliance & Regulatory Precedent Dossier Modal -->
+      <ComplianceRecordModal
         :show="showDetailModal"
         :loading="modalLoading"
         :record-detail="selectedRecord"
