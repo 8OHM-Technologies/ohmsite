@@ -638,8 +638,9 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-            <div v-else class="text-xs text-zinc-500 italic">
-              No individual precedent records linked yet for this section.
+            <div v-else class="text-xs text-zinc-500 italic p-6 text-center space-y-2">
+              <p>No precedent decisions specifically citing "{{ crossRefData.statute_section }}" were found in the current enforcement archives.</p>
+              <p class="text-[11px] text-zinc-600">Try searching foundational provisions such as <span class="text-primary font-medium cursor-pointer hover:underline" @click="fetchCrossReference('Section 167')">Section 167</span>, <span class="text-primary font-medium cursor-pointer hover:underline" @click="fetchCrossReference('Section 2')">Section 2</span>, or <span class="text-primary font-medium cursor-pointer hover:underline" @click="fetchCrossReference('Section 89')">Section 89</span>.</p>
             </div>
           </div>
         </div>

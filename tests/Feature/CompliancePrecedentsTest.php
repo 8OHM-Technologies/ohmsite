@@ -318,4 +318,149 @@ class CompliancePrecedentsTest extends TestCase
         $response->assertJsonPath('data.regulator', 'Financial Services Tribunal');
         $response->assertJsonPath('data.applicant', 'Beta Brokerage');
     }
+
+    public function test_cross_reference_normalizes_fastapi_schema(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Http::fake([
+            '*/api/v1/compliance/cross-reference*' => Http::response([
+                'query_statute' => 'Financial Sector Regulation Act',
+                'query_section' => 'Section 167',
+                'total_matches' => 2,
+                'fsca_sanctions' => [
+                    [
+                        'id' => 'rec-fsca-1',
+                        'record_type' => 'fsca_enforcement_records',
+                        'regulator' => 'FSCA',
+                        'category' => 'regulatory',
+                        'title' => 'Enforcement Sanction',
+                        'document_date' => '2024-03-01',
+                        'penalty_amount' => 100000.0,
+                        'contraventions' => ['Section 167(1)'],
+                        'summary' => 'Failure to comply with section 167.',
+                    ],
+                ],
+                'tribunal_decisions' => [
+                    [
+                        'id' => 'rec-fst-1',
+                        'record_type' => 'fst_decisions',
+                        'regulator' => 'Financial Services Tribunal',
+                        'category' => 'tribunal',
+                        'title' => 'Reconsideration Application',
+                        'document_date' => '2024-04-10',
+                        'penalty_amount' => null,
+                        'contraventions' => ['Section 167'],
+                        'summary' => 'Tribunal confirmed the section 167 penalty.',
+                    ],
+                ],
+                'ombud_rulings' => [],
+                'popia_notices' => [],
+                'prudential_standards' => [],
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/legal-records/precedents/cross-reference?statute_section=Section%20167');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('statute_section', 'Section 167');
+        $response->assertJsonPath('total_occurrences', 2);
+        $response->assertJsonPath('breakdown_by_regulator.FSCA', 1);
+        $response->assertJsonPath('breakdown_by_regulator.Financial Services Tribunal', 1);
+        $this->assertCount(2, $response->json('records'));
+        $this->assertContains('Section 167(1)', $response->json('common_contraventions'));
+    }
+
+    public function test_cross_reference_falls_back_to_database_on_microservice_failure(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Http::fake([
+            '*/api/v1/compliance/cross-reference*' => Http::response(['error' => 'Internal Server Error'], 500),
+        ]);
+
+        $extractedId = (string) Str::uuid();
+        $scrubbedId = (string) Str::uuid();
+
+        DB::connection('pgsql_coeus')->table('extracted_records')->insert([
+            'id' => $extractedId,
+            'target_id' => $this->targetId,
+            'record_type' => 'fsca_enforcement_records',
+            'document_date' => '2024-06-01',
+            'source_url' => 'https://fsca.co.za/fallback-test-'.(string) Str::uuid(),
+            'data' => json_encode(['title' => 'Fallback Sanction Order']),
+            'status' => 'detailed',
+            'scraped_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::connection('pgsql_coeus')->table('scrubbed_records')->insert([
+            'id' => $scrubbedId,
+            'extracted_record_id' => $extractedId,
+            'data' => json_encode([
+                'title' => 'Fallback Sanction Order',
+                'extracted_data' => [
+                    'regulator' => 'FSCA',
+                    'respondent' => 'Fallback Insurer Ltd',
+                    'action_type' => 'Administrative Penalty',
+                    'penalty_amount' => 250000,
+                    'factual_summary' => 'Contravened Section 167 of the Financial Sector Regulation Act.',
+                    'statutory_contraventions' => ['Section 167'],
+                ],
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/legal-records/precedents/cross-reference?statute_section=Section%20167');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('statute_section', 'Section 167');
+        $this->assertGreaterThanOrEqual(1, $response->json('total_occurrences'));
+        $this->assertNotEmpty($response->json('records'));
+        $recordTitles = array_column($response->json('records'), 'title');
+        $this->assertContains('Fallback Sanction Order', $recordTitles);
+    }
+
+    public function test_entity_profile_normalizes_fastapi_schema(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Http::fake([
+            '*/api/v1/compliance/entity-profile*' => Http::response([
+                'entity_name' => 'Old Mutual',
+                'total_actions' => 1,
+                'total_penalties_levied' => 450000.0,
+                'actions_by_type' => ['Administrative Penalty' => 1],
+                'timeline' => [
+                    [
+                        'id' => 'action-om-1',
+                        'record_type' => 'fsca_enforcement_records',
+                        'regulator' => 'FSCA',
+                        'category' => 'regulatory',
+                        'title' => 'Compliance Notice',
+                        'document_date' => '2024-02-15',
+                        'penalty_amount' => 450000.0,
+                        'summary' => 'Late filing penalty.',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/legal-records/precedents/entity-profile?entity_name=Old%20Mutual');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('entity_name', 'Old Mutual');
+        $response->assertJsonPath('total_actions', 1);
+        $this->assertEquals(450000.0, $response->json('total_penalties'));
+        $this->assertCount(1, $response->json('actions_timeline'));
+        $this->assertEquals('2024-02-15', $response->json('actions_timeline.0.date'));
+        $this->assertEquals(450000.0, $response->json('actions_timeline.0.penalty'));
+    }
 }

@@ -49,6 +49,7 @@ Business logic is completely isolated within **Services** to keep Controllers th
 - `CartService`: Manages cart arithmetic, pricing adjustments, and discounts.
 - `CustomerService`: Tracks lifetime value (LTV) and updates VIP customer tiers.
 - `AnalyticsService`: Aggregates usage patterns, revenue trends, and growth metrics.
+- `ComplianceAnalyticsClient`: Interfaces with the FastAPI + DuckDB analytical microservice and `pgsql_coeus` database for legal precedent research, statutory cross-referencing, and entity compliance profiles.
 
 ### Atomic Checkout & Provisioning
 When a purchase or subscription is made, a database transaction handles the provisioning atomically:
