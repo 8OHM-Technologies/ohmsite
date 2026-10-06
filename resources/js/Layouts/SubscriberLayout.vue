@@ -250,7 +250,7 @@ const datasetStats = computed(() => {
                                 ]">
                                 <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Precedent Search
+                                Compliance Engine
                             </Link>
 
                             <!-- Human Review (Admin Only) -->
