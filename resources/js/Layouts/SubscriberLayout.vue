@@ -66,7 +66,7 @@ const isLegalRecordsExpanded = ref(true);
 
 const searchItems = [
     { name: 'CCMA Awards Analytics', href: route('subscriber.analytics.ccma'), keywords: ['ccma', 'awards', 'labour', 'labor', 'dismissal', 'arbitration', 'analytics', 'stats', 'trends'] },
-    { name: 'SAFLII Courts Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
+    { name: 'Jurisprudence Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
     { name: 'Compliance Analytics', href: route('subscriber.analytics.compliance'), keywords: ['compliance', 'enforcement', 'penalties', 'sanctions', 'fsca', 'popia', 'prudential', 'analytics'] },
     { name: 'Precedent & Compliance Search', href: route('legal-records.precedents'), keywords: ['precedents', 'fsca', 'prudential', 'popia', 'tribunal', 'ombud', 'sanction', 'penalty', 'cross-reference'] },
     { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
@@ -338,7 +338,7 @@ const datasetStats = computed(() => {
                                 ]">
                                 <Gavel class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')) && !isUrl(route('subscriber.analytics.compliance'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                SAFLII Courts
+                                Jurisprudence Analytics
                             </Link>
 
                             <!-- Compliance & Enforcement -->
