@@ -217,21 +217,26 @@ onMounted(() => {
 
 <template>
   <component :is="LayoutComponent">
+
     <Head title="Legal Precedent & Compliance Search" />
 
     <div class="space-y-6 sm:space-y-8 w-full">
       <!-- Header Banner -->
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border border-white/10 p-6 sm:p-8 shadow-2xl">
+      <div
+        class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-950 to-black border border-white/10 p-6 sm:p-8 shadow-2xl">
         <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none">
+        </div>
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="space-y-3 max-w-2xl">
             <div class="flex items-center gap-2">
-              <span class="px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-primary/10 text-primary border border-primary/20 flex items-center gap-1.5 shadow-sm">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase bg-primary/10 text-primary border border-primary/20 flex items-center gap-1.5 shadow-sm">
                 <Scale class="w-3.5 h-3.5" /> Legal Precedent &amp; Compliance Engine
               </span>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/5 text-zinc-400 border border-white/5">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/5 text-zinc-400 border border-white/5">
                 DuckDB Vectorized
               </span>
             </div>
@@ -239,26 +244,24 @@ onMounted(() => {
               Regulatory Precedent Search
             </h1>
             <p class="text-sm text-zinc-400 leading-relaxed">
-              Instant cross-referencing across FSCA administrative sanctions, Prudential Authority standards, Financial Services Tribunal reconsiderations, FAIS &amp; NFO Ombud determinations, and POPIA notices.
+              Instant cross-referencing across FSCA administrative sanctions, Prudential Authority standards, Financial
+              Services Tribunal reconsiderations, FAIS &amp; NFO Ombud determinations, and POPIA notices.
             </p>
           </div>
 
           <!-- Quick Navigation Pill Switcher -->
           <div class="flex flex-wrap md:flex-col gap-2 shrink-0">
-            <button
-              @click="activeTab = 'precedents'"
+            <button @click="activeTab = 'precedents'"
               :class="[activeTab === 'precedents' ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10']"
               class="px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
               <Search class="w-4 h-4" /> Precedent Search
             </button>
-            <button
-              @click="activeTab = 'cross_reference'; if (!crossRefData) fetchCrossReference();"
+            <button @click="activeTab = 'cross_reference'; if (!crossRefData) fetchCrossReference();"
               :class="[activeTab === 'cross_reference' ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10']"
               class="px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
               <Layers class="w-4 h-4" /> Statutory Cross-Reference
             </button>
-            <button
-              @click="activeTab = 'entity_profile'"
+            <button @click="activeTab = 'entity_profile'"
               :class="[activeTab === 'entity_profile' ? 'bg-primary text-black font-bold shadow-lg shadow-primary/20' : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10']"
               class="px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
               <Building2 class="w-4 h-4" /> Entity Enforcement History
@@ -276,13 +279,9 @@ onMounted(() => {
           <!-- Main Search Input -->
           <div class="relative">
             <Search class="w-5 h-5 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" />
-            <input
-              v-model="searchQuery"
-              @input="debouncedSearch"
-              type="text"
+            <input v-model="searchQuery" @input="debouncedSearch" type="text"
               placeholder="Search by keywords, respondent name, contravention (e.g. 'non-disclosure', 'unauthorized trade', 'Discovery')..."
-              class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-            />
+              class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all" />
           </div>
 
           <!-- Faceted Filter Row -->
@@ -291,9 +290,7 @@ onMounted(() => {
               <!-- Regulator Dropdown -->
               <div class="flex items-center gap-2">
                 <span class="text-xs text-zinc-500 font-medium">Regulator:</span>
-                <select
-                  v-model="selectedRegulator"
-                  @change="currentPage = 0; fetchPrecedents()"
+                <select v-model="selectedRegulator" @change="currentPage = 0; fetchPrecedents()"
                   class="bg-zinc-800/80 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-primary">
                   <option value="All">All Regulatory Bodies</option>
                   <option value="FSCA">FSCA (Conduct Authority)</option>
@@ -308,9 +305,7 @@ onMounted(() => {
               <!-- Category Dropdown -->
               <div class="flex items-center gap-2">
                 <span class="text-xs text-zinc-500 font-medium">Category:</span>
-                <select
-                  v-model="selectedCategory"
-                  @change="currentPage = 0; fetchPrecedents()"
+                <select v-model="selectedCategory" @change="currentPage = 0; fetchPrecedents()"
                   class="bg-zinc-800/80 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-primary">
                   <option value="All">All Categories</option>
                   <option value="regulatory">Regulatory Enforcement &amp; Sanctions</option>
@@ -323,26 +318,22 @@ onMounted(() => {
             <!-- Penalty Threshold Filter Pills -->
             <div class="flex items-center gap-1.5">
               <span class="text-xs text-zinc-500 font-medium mr-1">Penalty:</span>
-              <button
-                @click="setPenaltyFilter(null)"
+              <button @click="setPenaltyFilter(null)"
                 :class="[selectedMinPenalty === null ? 'bg-primary/20 text-primary border-primary/40 font-bold' : 'bg-white/5 text-zinc-400 hover:text-white border-white/5']"
                 class="px-2.5 py-1 rounded-lg text-[11px] border transition-all cursor-pointer">
                 All
               </button>
-              <button
-                @click="setPenaltyFilter(100000)"
+              <button @click="setPenaltyFilter(100000)"
                 :class="[selectedMinPenalty === 100000 ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 font-bold' : 'bg-white/5 text-zinc-400 hover:text-white border-white/5']"
                 class="px-2.5 py-1 rounded-lg text-[11px] border transition-all cursor-pointer">
                 &gt; R100k
               </button>
-              <button
-                @click="setPenaltyFilter(500000)"
+              <button @click="setPenaltyFilter(500000)"
                 :class="[selectedMinPenalty === 500000 ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 font-bold' : 'bg-white/5 text-zinc-400 hover:text-white border-white/5']"
                 class="px-2.5 py-1 rounded-lg text-[11px] border transition-all cursor-pointer">
                 &gt; R500k
               </button>
-              <button
-                @click="setPenaltyFilter(1000000)"
+              <button @click="setPenaltyFilter(1000000)"
                 :class="[selectedMinPenalty === 1000000 ? 'bg-rose-500/30 text-rose-300 border-rose-500/50 font-bold' : 'bg-white/5 text-zinc-400 hover:text-white border-white/5']"
                 class="px-2.5 py-1 rounded-lg text-[11px] border transition-all cursor-pointer">
                 &gt; R1M
@@ -363,8 +354,7 @@ onMounted(() => {
               </span>
             </div>
 
-            <button
-              @click="fetchPrecedents"
+            <button @click="fetchPrecedents"
               class="p-2 text-zinc-400 hover:text-white rounded-lg bg-white/5 hover:bg-white/10 transition-all cursor-pointer"
               title="Refresh Records">
               <RefreshCw :class="{ 'animate-spin': loading }" class="w-4 h-4" />
@@ -373,12 +363,8 @@ onMounted(() => {
 
           <!-- PrimeVue DataTable -->
           <div class="overflow-x-auto">
-            <DataTable
-              :value="records"
-              :loading="loading"
-              responsiveLayout="scroll"
-              class="p-datatable-sm w-full text-left p-datatable-dark-custom"
-              rowHover>
+            <DataTable :value="records" :loading="loading" responsiveLayout="scroll"
+              class="p-datatable-sm w-full text-left p-datatable-dark-custom" rowHover>
               <template #empty>
                 <div class="p-12 text-center text-zinc-500 space-y-2">
                   <FileText class="w-8 h-8 mx-auto text-zinc-600 mb-2" />
@@ -396,7 +382,7 @@ onMounted(() => {
               </template>
 
               <!-- Date Column -->
-              <Column header="Date" style="min-width: 7rem">
+              <Column header="Date" style="min-width: 10rem">
                 <template #body="{ data }">
                   <div class="text-xs text-zinc-400 font-mono flex items-center gap-1.5">
                     <Calendar class="w-3.5 h-3.5 text-zinc-500 shrink-0" />
@@ -406,31 +392,26 @@ onMounted(() => {
               </Column>
 
               <!-- Regulator Badge -->
-              <Column header="Authority / Regulator" style="min-width: 12rem">
+              <Column header="Authority / Regulator" style="min-width: 10rem">
                 <template #body="{ data }">
                   <div class="flex items-center gap-2">
-                    <span
-                      v-if="data.regulator === 'FSCA'"
+                    <span v-if="data.regulator === 'FSCA'"
                       class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
                       <ShieldAlert class="w-3 h-3" /> FSCA
                     </span>
-                    <span
-                      v-else-if="data.regulator === 'Prudential Authority'"
+                    <span v-else-if="data.regulator === 'Prudential Authority'"
                       class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
                       <Building2 class="w-3 h-3" /> Prudential Authority
                     </span>
-                    <span
-                      v-else-if="data.regulator === 'Information Regulator'"
+                    <span v-else-if="data.regulator === 'Information Regulator'"
                       class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center gap-1">
                       <Lock class="w-3 h-3" /> POPIA Regulator
                     </span>
-                    <span
-                      v-else-if="data.regulator === 'Financial Services Tribunal'"
+                    <span v-else-if="data.regulator === 'Financial Services Tribunal'"
                       class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
                       <Gavel class="w-3 h-3" /> Tribunal
                     </span>
-                    <span
-                      v-else
+                    <span v-else
                       class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                       <Award class="w-3 h-3" /> {{ data.regulator }}
                     </span>
@@ -442,14 +423,17 @@ onMounted(() => {
               <Column header="Matter & Respondent" style="min-width: 18rem">
                 <template #body="{ data }">
                   <div class="space-y-1">
-                    <div class="text-xs font-bold text-white leading-snug line-clamp-1 hover:text-primary transition-colors cursor-pointer" @click="openDetailModal(data)">
+                    <div
+                      class="text-xs font-bold text-white leading-snug line-clamp-1 hover:text-primary transition-colors cursor-pointer"
+                      @click="openDetailModal(data)">
                       {{ data.title }}
                     </div>
                     <div class="text-[11px] text-zinc-400 flex items-center gap-2">
                       <span v-if="data.respondent" class="text-zinc-300 font-medium">
                         Target: {{ data.respondent }}
                       </span>
-                      <span v-if="data.case_number" class="font-mono text-[10px] bg-black/40 px-1.5 py-0.5 rounded border border-white/5 text-zinc-500">
+                      <span v-if="data.case_number"
+                        class="font-mono text-[10px] bg-black/40 px-1.5 py-0.5 rounded border border-white/5 text-zinc-500">
                         {{ data.case_number }}
                       </span>
                     </div>
@@ -460,7 +444,8 @@ onMounted(() => {
               <!-- Financial Penalty / Award -->
               <Column header="Penalty / Award" style="min-width: 9rem">
                 <template #body="{ data }">
-                  <div v-if="data.penalty_amount" class="text-xs font-black font-mono text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-lg inline-flex items-center gap-1">
+                  <div v-if="data.penalty_amount"
+                    class="text-xs font-black font-mono text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-lg inline-flex items-center gap-1">
                     <Coins class="w-3 h-3 text-rose-400" />
                     {{ formatCurrency(data.penalty_amount) }}
                   </div>
@@ -472,7 +457,8 @@ onMounted(() => {
               <Column header="Action / Outcome" style="min-width: 14rem">
                 <template #body="{ data }">
                   <div class="space-y-0.5">
-                    <span class="text-xs text-zinc-300 font-medium">{{ data.action_type || 'Regulatory Determination' }}</span>
+                    <span class="text-xs text-zinc-300 font-medium">{{ data.action_type || 'Regulatory Determination'
+                      }}</span>
                     <p v-if="data.summary" class="text-[11px] text-zinc-500 line-clamp-1">
                       {{ data.summary }}
                     </p>
@@ -483,8 +469,7 @@ onMounted(() => {
               <!-- Actions Column -->
               <Column header="Actions" style="min-width: 7rem" alignFrozen="right">
                 <template #body="{ data }">
-                  <button
-                    @click="openDetailModal(data)"
+                  <button @click="openDetailModal(data)"
                     class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 hover:bg-primary hover:text-black text-zinc-300 transition-all flex items-center gap-1.5 cursor-pointer">
                     <Eye class="w-3.5 h-3.5" /> View
                   </button>
@@ -495,16 +480,11 @@ onMounted(() => {
 
           <!-- Paginator -->
           <div class="p-4 border-t border-white/5 bg-zinc-900/40">
-            <Paginator
-              :rows="rowsPerPage"
-              :totalRecords="totalRecords"
-              :first="currentPage * rowsPerPage"
-              :rowsPerPageOptions="[10, 20, 50, 100]"
-              @page="onPageChange"
+            <Paginator :rows="rowsPerPage" :totalRecords="totalRecords" :first="currentPage * rowsPerPage"
+              :rowsPerPageOptions="[10, 20, 50, 100]" @page="onPageChange"
               template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
-              class="p-datatable-dark-custom"
-            />
+              class="p-datatable-dark-custom" />
           </div>
         </div>
       </div>
@@ -520,7 +500,9 @@ onMounted(() => {
               <Layers class="w-5 h-5 text-primary" /> Statute Section Cross-Referencer
             </h3>
             <p class="text-xs text-zinc-400">
-              Enter any legislative section or regulatory rule to discover how the FSCA, Financial Services Tribunal, FAIS Ombud, and High Courts interpret, contravene, or enforce it.
+              Enter any legislative section or regulatory rule to discover how the FSCA, Financial Services Tribunal,
+              FAIS
+              Ombud, and High Courts interpret, contravene, or enforce it.
             </p>
           </div>
 
@@ -528,16 +510,11 @@ onMounted(() => {
           <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
               <BookOpen class="w-5 h-5 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                v-model="crossRefSection"
-                @keyup.enter="fetchCrossReference()"
-                type="text"
+              <input v-model="crossRefSection" @keyup.enter="fetchCrossReference()" type="text"
                 placeholder="e.g. 'Section 167', 'Rule 17', 'Section 89'..."
-                class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-all"
-              />
+                class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-all" />
             </div>
-            <button
-              @click="fetchCrossReference()"
+            <button @click="fetchCrossReference()"
               class="px-6 py-3 rounded-xl text-xs font-bold bg-primary text-black hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20 shrink-0">
               <Search class="w-4 h-4" /> Cross-Reference Section
             </button>
@@ -546,10 +523,7 @@ onMounted(() => {
           <!-- Quick Chips -->
           <div class="pt-2 flex flex-wrap items-center gap-2">
             <span class="text-xs text-zinc-500 mr-1">Foundational Sections:</span>
-            <button
-              v-for="chip in quickSections"
-              :key="chip.value"
-              @click="fetchCrossReference(chip.value)"
+            <button v-for="chip in quickSections" :key="chip.value" @click="fetchCrossReference(chip.value)"
               class="px-3 py-1 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/5 transition-all cursor-pointer">
               {{ chip.label }}
             </button>
@@ -575,17 +549,18 @@ onMounted(() => {
             </div>
             <div class="bg-zinc-900/60 border border-white/5 rounded-2xl p-5 space-y-1">
               <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Authorities Regulating</div>
-              <div class="text-xl font-bold text-amber-400 font-mono">{{ Object.keys(crossRefData.breakdown_by_regulator || {}).length }}</div>
+              <div class="text-xl font-bold text-amber-400 font-mono">{{ Object.keys(crossRefData.breakdown_by_regulator
+                ||
+                {}).length }}</div>
             </div>
           </div>
 
           <!-- Breakdown by Regulator Pills -->
-          <div v-if="Object.keys(crossRefData.breakdown_by_regulator || {}).length > 0" class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-3">
+          <div v-if="Object.keys(crossRefData.breakdown_by_regulator || {}).length > 0"
+            class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-3">
             <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Regulator Action Breakdown</h4>
             <div class="flex flex-wrap gap-3">
-              <div
-                v-for="(count, reg) in crossRefData.breakdown_by_regulator"
-                :key="reg"
+              <div v-for="(count, reg) in crossRefData.breakdown_by_regulator" :key="reg"
                 class="px-3.5 py-2 rounded-xl bg-black/40 border border-white/5 flex items-center gap-3">
                 <span class="text-xs text-zinc-300 font-medium">{{ reg }}</span>
                 <span class="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-primary/20 text-primary">
@@ -596,14 +571,13 @@ onMounted(() => {
           </div>
 
           <!-- Common Contraventions Discovered -->
-          <div v-if="(crossRefData.common_contraventions || []).length > 0" class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-3">
+          <div v-if="(crossRefData.common_contraventions || []).length > 0"
+            class="bg-zinc-900/40 border border-white/5 rounded-2xl p-5 space-y-3">
             <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
               <AlertTriangle class="w-4 h-4 text-amber-400" /> Frequent Contraventions Under This Section
             </h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div
-                v-for="(contra, idx) in crossRefData.common_contraventions"
-                :key="idx"
+              <div v-for="(contra, idx) in crossRefData.common_contraventions" :key="idx"
                 class="bg-black/30 border border-white/5 rounded-xl p-3 text-xs text-zinc-300 flex items-start gap-2">
                 <span class="text-amber-400 font-bold">•</span>
                 <span>{{ contra }}</span>
@@ -614,13 +588,12 @@ onMounted(() => {
           <!-- Citing Precedents List -->
           <div class="bg-zinc-900/60 border border-white/5 rounded-2xl p-6 space-y-4">
             <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-              <BookOpen class="w-4 h-4 text-primary" /> Key Precedent Decisions Citing {{ crossRefData.statute_section }}
+              <BookOpen class="w-4 h-4 text-primary" /> Key Precedent Decisions Citing {{ crossRefData.statute_section
+              }}
             </h4>
 
             <div v-if="(crossRefData.records || []).length > 0" class="space-y-3">
-              <div
-                v-for="rec in crossRefData.records"
-                :key="rec.id"
+              <div v-for="rec in crossRefData.records" :key="rec.id"
                 class="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-white/20 transition-all">
                 <div class="space-y-1 flex-1">
                   <div class="flex items-center gap-2">
@@ -629,7 +602,8 @@ onMounted(() => {
                     </span>
                     <span class="text-xs text-zinc-500 font-mono">{{ rec.document_date || '—' }}</span>
                   </div>
-                  <h5 class="text-sm font-bold text-white hover:text-primary transition-colors cursor-pointer" @click="openDetailModal(rec)">
+                  <h5 class="text-sm font-bold text-white hover:text-primary transition-colors cursor-pointer"
+                    @click="openDetailModal(rec)">
                     {{ rec.title }}
                   </h5>
                   <p v-if="rec.summary" class="text-xs text-zinc-400 line-clamp-2">
@@ -641,8 +615,7 @@ onMounted(() => {
                   <div v-if="rec.penalty_amount" class="text-xs font-mono font-bold text-rose-300">
                     {{ formatCurrency(rec.penalty_amount) }}
                   </div>
-                  <button
-                    @click="openDetailModal(rec)"
+                  <button @click="openDetailModal(rec)"
                     class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/5 hover:bg-primary hover:text-black text-zinc-300 transition-all cursor-pointer">
                     View Dossier
                   </button>
@@ -667,7 +640,9 @@ onMounted(() => {
               <Building2 class="w-5 h-5 text-primary" /> Institution &amp; Individual Compliance Profile
             </h3>
             <p class="text-xs text-zinc-400">
-              Investigate the enforcement track record, total penalties, and dispute determinations for any insurer, broker, FSP, or director.
+              Investigate the enforcement track record, total penalties, and dispute determinations for any insurer,
+              broker,
+              FSP, or director.
             </p>
           </div>
 
@@ -675,16 +650,11 @@ onMounted(() => {
           <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
               <Building2 class="w-5 h-5 text-zinc-500 absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                v-model="entityQuery"
-                @keyup.enter="fetchEntityProfile()"
-                type="text"
+              <input v-model="entityQuery" @keyup.enter="fetchEntityProfile()" type="text"
                 placeholder="Enter financial institution or individual name (e.g. 'Discovery', 'Sanlam', 'Old Mutual')..."
-                class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-all"
-              />
+                class="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-all" />
             </div>
-            <button
-              @click="fetchEntityProfile()"
+            <button @click="fetchEntityProfile()"
               class="px-6 py-3 rounded-xl text-xs font-bold bg-primary text-black hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20 shrink-0">
               <Search class="w-4 h-4" /> Search Entity Profile
             </button>
@@ -693,10 +663,7 @@ onMounted(() => {
           <!-- Popular Entities Chips -->
           <div class="pt-2 flex flex-wrap items-center gap-2">
             <span class="text-xs text-zinc-500 mr-1">Popular Entities:</span>
-            <button
-              v-for="eName in popularEntities"
-              :key="eName"
-              @click="fetchEntityProfile(eName)"
+            <button v-for="eName in popularEntities" :key="eName" @click="fetchEntityProfile(eName)"
               class="px-3 py-1 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/5 transition-all cursor-pointer">
               {{ eName }}
             </button>
@@ -721,8 +688,11 @@ onMounted(() => {
               <div class="text-xl font-bold text-primary font-mono">{{ entityProfileData.total_actions }}</div>
             </div>
             <div class="bg-zinc-900/60 border border-white/5 rounded-2xl p-5 space-y-1">
-              <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Cumulative Penalties Levied</div>
-              <div class="text-xl font-bold text-rose-300 font-mono">{{ formatCurrency(entityProfileData.total_penalties) }}</div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Cumulative Penalties Levied
+              </div>
+              <div class="text-xl font-bold text-rose-300 font-mono">{{
+                formatCurrency(entityProfileData.total_penalties) }}
+              </div>
             </div>
           </div>
 
@@ -732,20 +702,21 @@ onMounted(() => {
               <History class="w-4 h-4 text-primary" /> Enforcement &amp; Ruling Timeline
             </h4>
 
-            <div v-if="(entityProfileData.actions_timeline || []).length > 0" class="space-y-4 relative before:absolute before:inset-0 before:left-3 before:w-0.5 before:bg-white/10">
-              <div
-                v-for="item in entityProfileData.actions_timeline"
-                :key="item.id"
-                class="relative pl-8 space-y-1">
+            <div v-if="(entityProfileData.actions_timeline || []).length > 0"
+              class="space-y-4 relative before:absolute before:inset-0 before:left-3 before:w-0.5 before:bg-white/10">
+              <div v-for="item in entityProfileData.actions_timeline" :key="item.id" class="relative pl-8 space-y-1">
                 <div class="absolute left-2 top-1.5 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-zinc-950"></div>
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-mono text-zinc-500">{{ item.date || 'Undated' }}</span>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-zinc-400">{{ item.regulator }}</span>
-                  <span v-if="item.penalty" class="text-xs font-mono font-bold text-rose-300 bg-rose-500/10 px-1.5 py-0.5 rounded">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-zinc-400">{{ item.regulator
+                    }}</span>
+                  <span v-if="item.penalty"
+                    class="text-xs font-mono font-bold text-rose-300 bg-rose-500/10 px-1.5 py-0.5 rounded">
                     {{ formatCurrency(item.penalty) }}
                   </span>
                 </div>
-                <h5 class="text-sm font-bold text-white hover:text-primary transition-colors cursor-pointer" @click="openDetailModal(item)">
+                <h5 class="text-sm font-bold text-white hover:text-primary transition-colors cursor-pointer"
+                  @click="openDetailModal(item)">
                   {{ item.title }}
                 </h5>
                 <p v-if="item.summary" class="text-xs text-zinc-400">
@@ -761,12 +732,8 @@ onMounted(() => {
       </div>
 
       <!-- Record Detail Modal (Specialized Regulatory / Tribunal / Ombud Dossier) -->
-      <RecordDetailModal
-        :show="showDetailModal"
-        :loading="modalLoading"
-        :record-detail="selectedRecord"
-        @close="closeDetailModal"
-      />
+      <RecordDetailModal :show="showDetailModal" :loading="modalLoading" :record-detail="selectedRecord"
+        @close="closeDetailModal" />
     </div>
   </component>
 </template>
