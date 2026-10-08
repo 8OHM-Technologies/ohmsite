@@ -463,7 +463,7 @@ onMounted(() => {
     </div>
 
     <!-- VIEW MODE 1: PRIME VUE DATATABLE (PRIMARY VIEW) -->
-    <div v-if="viewMode === 'table'" class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8 space-y-4">
+    <div v-if="viewMode === 'table'" class="space-y-4">
       <!-- Admin Batch Selection Action Bar -->
       <div v-if="isAdmin && selectedRecords.length > 0"
         class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -568,7 +568,7 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="title" header="Article Title &amp; Abstract" style="width: 33%">
+        <Column field="title" header="Article Title &amp; Abstract" style="width: 31%">
           <template #body="{ data }">
             <div
               class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
@@ -584,24 +584,32 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="document_date" header="Date" sortable style="width: 10%">
+        <Column field="document_date" header="Publication Date" sortable style="width: 13%">
           <template #body="{ data }">
-            <span class="text-xs font-bold font-mono text-zinc-400 tracking-wider">
-              {{ data.document_date || data.year || 'N/A' }}
-            </span>
+            <div class="flex items-center gap-1.5">
+              <Calendar class="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+              <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
+                {{ data.publication_date || data.document_date || data.year || 'N/A' }}
+              </span>
+            </div>
           </template>
           <template #loading>
             <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
           </template>
         </Column>
 
-        <Column header="Actions" style="width: 16%" class="text-right">
+        <Column header="Actions" style="width: 15%" class="text-right">
           <template #body="{ data }">
             <div class="flex items-center justify-end gap-2">
               <a v-if="data.pdf_url" :href="data.pdf_url" target="_blank" rel="noopener noreferrer"
                 class="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer"
                 title="Download original article PDF">
                 <Download class="w-3.5 h-3.5" />
+              </a>
+              <a v-if="data.source_url" :href="data.source_url" target="_blank" rel="noopener noreferrer"
+                class="px-2 py-1.5 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 rounded-xl transition-all flex items-center gap-1 text-[10px] font-bold shrink-0 cursor-pointer"
+                title="Open source repository">
+                <ExternalLink class="w-3 h-3 text-primary" />
               </a>
               <button @click="viewRecordDetail(data)"
                 class="btn btn-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer shrink-0">

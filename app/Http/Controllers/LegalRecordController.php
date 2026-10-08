@@ -382,15 +382,26 @@ class LegalRecordController extends Controller
                 NULLIF(scrubbed_records.data->'extracted_data'->>'judgment_date', ''),
                 NULLIF(scrubbed_records.data->'extracted_data'->>'award_date', ''),
                 NULLIF(scrubbed_records.data->'extracted_data'->>'hearing_date', ''),
+                NULLIF(scrubbed_records.data->'extracted_data'->>'publication_date', ''),
+                NULLIF(scrubbed_records.data->>'hearing_date', ''),
+                NULLIF(scrubbed_records.data->>'publication_date', ''),
+                NULLIF(scrubbed_records.data->>'document_date', ''),
                 NULLIF(scrubbed_records.data->'metadata'->>'document_date', ''),
-                NULLIF(scrubbed_records.data->'metadata'->>'hearing_date', '')
+                NULLIF(scrubbed_records.data->'metadata'->>'hearing_date', ''),
+                NULLIF(scrubbed_records.data->'metadata'->>'publication_date', ''),
+                extracted_records.document_date::text
             )"
             : "COALESCE(
                 json_extract(scrubbed_records.data, '$.extracted_data.judgment_date'),
                 json_extract(scrubbed_records.data, '$.extracted_data.award_date'),
                 json_extract(scrubbed_records.data, '$.extracted_data.hearing_date'),
+                json_extract(scrubbed_records.data, '$.extracted_data.publication_date'),
+                json_extract(scrubbed_records.data, '$.hearing_date'),
+                json_extract(scrubbed_records.data, '$.publication_date'),
+                json_extract(scrubbed_records.data, '$.document_date'),
                 json_extract(scrubbed_records.data, '$.metadata.document_date'),
                 json_extract(scrubbed_records.data, '$.metadata.hearing_date'),
+                json_extract(scrubbed_records.data, '$.metadata.publication_date'),
                 extracted_records.document_date
             )";
 
@@ -593,8 +604,18 @@ class LegalRecordController extends Controller
                 }
             }
         }
-        $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $ext['hearing_date'] ?? $meta['document_date'] ?? $meta['hearing_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
-        $hearingDate = $ext['hearing_date'] ?? $meta['hearing_date'] ?? null;
+        $hearingDate = $ext['hearing_date'] ?? $srData['hearing_date'] ?? $meta['hearing_date'] ?? null;
+        if ($hearingDate) {
+            $hearingDate = substr((string) $hearingDate, 0, 10);
+        }
+        $publicationDate = $ext['publication_date'] ?? $srData['publication_date'] ?? $meta['publication_date'] ?? null;
+        if ($publicationDate) {
+            $publicationDate = substr((string) $publicationDate, 0, 10);
+        }
+        $docDate = $ext['judgment_date'] ?? $ext['award_date'] ?? $hearingDate ?? $publicationDate ?? $srData['document_date'] ?? $meta['document_date'] ?? ($row->document_date ? substr((string) $row->document_date, 0, 10) : null);
+        if ($docDate) {
+            $docDate = substr((string) $docDate, 0, 10);
+        }
 
         $applicant = $ext['applicant_plaintiff'] ?? $srData['applicant_plaintiff'] ?? $ext['employee'] ?? $srData['employee'] ?? $meta['publisher'] ?? null;
         if (is_array($applicant)) {
@@ -775,6 +796,7 @@ class LegalRecordController extends Controller
                 'document_date' => $docDate,
                 'judgment_date' => $docDate,
                 'hearing_date' => $hearingDate,
+                'publication_date' => $publicationDate,
                 'court' => $court,
                 'case_number' => $caseNumber,
                 'title' => $title,
@@ -837,6 +859,7 @@ class LegalRecordController extends Controller
             'document_date' => $docDate,
             'judgment_date' => $docDate,
             'hearing_date' => $hearingDate,
+            'publication_date' => $publicationDate,
             'court' => $court,
             'case_number' => $caseNumber,
             'title' => $title,

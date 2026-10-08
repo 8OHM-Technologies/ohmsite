@@ -40,7 +40,7 @@ const citation = computed(() => dataObj.value.citation || dataObj.value.case_num
 const volume = computed(() => dataObj.value.volume || null);
 const issue = computed(() => dataObj.value.issue || null);
 const year = computed(() => dataObj.value.year || null);
-const publicationDate = computed(() => dataObj.value.document_date || dataObj.value.judgment_date || year.value || 'N/A');
+const publicationDate = computed(() => dataObj.value.publication_date || dataObj.value.document_date || dataObj.value.judgment_date || year.value || 'N/A');
 const summary = computed(() => dataObj.value.abstract || dataObj.value.summary || null);
 const fullText = computed(() => dataObj.value.full_text || dataObj.value.formatted_text || dataObj.value.content || null);
 const pdfUrl = computed(() => dataObj.value.pdf_url || null);

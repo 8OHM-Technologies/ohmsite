@@ -32,7 +32,7 @@ const jurisdiction = computed(() => dataObj.value.jurisdiction || dataObj.value.
 const gazetteType = computed(() => dataObj.value.gazette_type || 'Government Gazette');
 const gazetteNumber = computed(() => dataObj.value.gazette_number || dataObj.value.case_number || 'N/A');
 const volume = computed(() => dataObj.value.volume || null);
-const publicationDate = computed(() => dataObj.value.document_date || dataObj.value.judgment_date || 'N/A');
+const publicationDate = computed(() => dataObj.value.publication_date || dataObj.value.document_date || dataObj.value.judgment_date || 'N/A');
 const summary = computed(() => dataObj.value.summary || dataObj.value.abstract || null);
 const fullText = computed(() => dataObj.value.full_text || dataObj.value.formatted_text || dataObj.value.content || null);
 const pdfUrl = computed(() => dataObj.value.pdf_url || null);

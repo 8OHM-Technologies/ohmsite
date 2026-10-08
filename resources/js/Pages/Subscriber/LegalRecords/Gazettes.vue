@@ -561,7 +561,7 @@ onMounted(() => {
             <div class="flex items-center gap-1.5">
               <Calendar class="w-3.5 h-3.5 text-zinc-500 shrink-0" />
               <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
-                {{ data.document_date || 'N/A' }}
+                {{ data.publication_date || data.document_date || 'N/A' }}
               </span>
             </div>
           </template>
@@ -663,8 +663,8 @@ onMounted(() => {
             </div>
 
             <div class="flex items-center gap-3 text-xs text-zinc-400">
-              <span v-if="c.document_date" class="font-bold font-mono text-[11px] text-zinc-400">
-                {{ c.document_date }}
+              <span v-if="c.publication_date || c.document_date" class="font-bold font-mono text-[11px] text-zinc-400">
+                {{ c.publication_date || c.document_date }}
               </span>
               <button @click="viewRecordDetail(c)"
                 class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">

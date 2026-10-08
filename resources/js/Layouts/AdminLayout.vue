@@ -201,13 +201,13 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                             <div class="flex items-center">
                                 <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
                                     :class="[isLegalRecordsUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Legal Records</span>
+                                <span>Legal Resources</span>
                             </div>
                             <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
                                 :class="{ 'transform rotate-180 text-admin-modern': isLegalRecordsExpanded }" />
                         </button>
 
-                        <!-- Legal Records Sub-menu Items -->
+                        <!-- Legal Resources Sub-menu Items -->
                         <div v-show="isLegalRecordsExpanded"
                             class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                             <!-- Case Law -->
@@ -221,19 +221,6 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                 <Scale class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 <span>Case Law</span>
-                            </Link>
-
-                            <!-- Law Journals & Reviews -->
-                            <Link :href="route('legal-records.journals')"
-                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
-                                :class="[
-                                    isUrl(route('legal-records.journals'))
-                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
-                                ]">
-                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Journals</span>
                             </Link>
 
                             <!-- Court Rolls -->
@@ -259,10 +246,23 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                 ]">
                                 <Scroll class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.gazettes')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Gazettes</span>
+                                <span>Government Gazettes</span>
                             </Link>
 
-                            <!-- Precedent Search -->
+                            <!-- Legal Journals -->
+                            <Link :href="route('legal-records.journals')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.journals'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Legal Journals</span>
+                            </Link>
+
+                            <!-- Compliance Engine -->
                             <Link :href="route('legal-records.precedents')"
                                 class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
@@ -272,7 +272,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                 ]">
                                 <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Precedent Search</span>
+                                <span>Compliance Engine</span>
                             </Link>
 
                             <!-- Human Review -->

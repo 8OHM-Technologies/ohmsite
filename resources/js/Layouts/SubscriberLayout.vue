@@ -25,7 +25,10 @@ import {
     Briefcase,
     Gavel,
     AlertCircle,
-    ShieldAlert
+    ShieldAlert,
+    ShieldCheck,
+    TrendingUp,
+    Activity
 } from 'lucide-vue-next';
 
 const page = usePage();
@@ -50,6 +53,26 @@ const markAllAsRead = () => {
 const isSidebarOpen = ref(false);
 const searchQuery = ref('');
 
+const isLegalResourcesUrl = computed(() => {
+    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
+    return current === 'legal-records'
+        || current.startsWith('legal-records/cases')
+        || current.startsWith('legal-records/court-rolls')
+        || current.startsWith('legal-records/gazettes')
+        || current.startsWith('legal-records/journals')
+        || current.startsWith('legal-records/record')
+        || current.startsWith('admin/legal-records');
+});
+
+const isLegalResourcesExpanded = ref(true);
+
+const isComplianceUrl = computed(() => {
+    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
+    return current === 'legal-records/precedents' || current.startsWith('legal-records/precedents');
+});
+
+const isComplianceExpanded = ref(true);
+
 const isAnalyticsUrl = computed(() => {
     const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
     return current === 'subscriber' || current.startsWith('subscriber/analytics');
@@ -57,22 +80,15 @@ const isAnalyticsUrl = computed(() => {
 
 const isAnalyticsExpanded = ref(true);
 
-const isLegalRecordsUrl = computed(() => {
-    const current = page.url.split('?')[0].replace(/^\/|\/$/g, '');
-    return current === 'legal-records' || current.startsWith('legal-records/');
-});
-
-const isLegalRecordsExpanded = ref(true);
-
 const searchItems = [
     { name: 'CCMA Awards Analytics', href: route('subscriber.analytics.ccma'), keywords: ['ccma', 'awards', 'labour', 'labor', 'dismissal', 'arbitration', 'analytics', 'stats', 'trends'] },
-    { name: 'Jurisprudence Analytics', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics'] },
-    { name: 'Compliance Analytics', href: route('subscriber.analytics.compliance'), keywords: ['compliance', 'enforcement', 'penalties', 'sanctions', 'fsca', 'popia', 'prudential', 'analytics'] },
-    { name: 'Precedent & Compliance Search', href: route('legal-records.precedents'), keywords: ['precedents', 'fsca', 'prudential', 'popia', 'tribunal', 'ombud', 'sanction', 'penalty', 'cross-reference'] },
-    { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
-    { name: 'Law Journals & Reviews', href: route('legal-records.journals'), keywords: ['journals', 'law review', 'per', 'pelj', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
-    { name: 'Court Rolls & Schedules', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list', 'motion', 'trial'] },
-    { name: 'Government & Provincial Gazettes', href: route('legal-records.gazettes'), keywords: ['gazettes', 'gazette', 'government gazette', 'provincial gazette', 'notices', 'proclamations', 'regulations'] },
+    { name: 'Legal Trends & Insights', href: route('subscriber.analytics.saflii'), keywords: ['saflii', 'courts', 'jurisprudence', 'judges', 'precedents', 'constitutional court', 'competition appeal court', 'ratio decidendi', 'obiter', 'case law', 'analytics', 'legal trends', 'insights'] },
+    { name: 'Compliance Metrics', href: route('subscriber.analytics.compliance'), keywords: ['compliance', 'enforcement', 'penalties', 'sanctions', 'fsca', 'popia', 'prudential', 'analytics', 'metrics'] },
+    { name: 'Compliance Engine', href: route('legal-records.precedents'), keywords: ['compliance', 'compliance engine', 'precedents', 'fsca', 'prudential', 'popia', 'tribunal', 'ombud', 'sanction', 'penalty', 'cross-reference'] },
+    { name: 'Case Law', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
+    { name: 'Court Rolls', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list', 'motion', 'trial'] },
+    { name: 'Government Gazettes', href: route('legal-records.gazettes'), keywords: ['gazettes', 'gazette', 'government gazette', 'provincial gazette', 'notices', 'proclamations', 'regulations'] },
+    { name: 'Legal Journals', href: route('legal-records.journals'), keywords: ['journals', 'legal journals', 'law review', 'per', 'pelj', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
 ];
 
 const handleSearch = () => {
@@ -208,26 +224,26 @@ const datasetStats = computed(() => {
 
                 <!-- Navigation -->
                 <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2 custom-scrollbar">
-                    <!-- Expandable Legal Records Menu -->
+                    <!-- 1. Expandable Legal Resources Menu -->
                     <div class="space-y-1">
-                        <button type="button" @click="isLegalRecordsExpanded = !isLegalRecordsExpanded"
+                        <button type="button" @click="isLegalResourcesExpanded = !isLegalResourcesExpanded"
                             class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
                             :class="[
-                                isLegalRecordsUrl
+                                isLegalResourcesUrl
                                     ? 'text-white bg-white/[0.04]'
                                     : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
                             ]">
                             <div class="flex items-center">
                                 <Scale class="mr-3.5 h-5 w-5 transition-colors duration-200"
-                                    :class="[isLegalRecordsUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Legal Records</span>
+                                    :class="[isLegalResourcesUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Legal Resources</span>
                             </div>
                             <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
-                                :class="{ 'transform rotate-180 text-admin-modern': isLegalRecordsExpanded }" />
+                                :class="{ 'transform rotate-180 text-admin-modern': isLegalResourcesExpanded }" />
                         </button>
 
-                        <!-- Legal Records Sub-menu Items -->
-                        <div v-show="isLegalRecordsExpanded"
+                        <!-- Legal Resources Sub-menu Items -->
+                        <div v-show="isLegalResourcesExpanded"
                             class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
                             <!-- Case Law -->
                             <Link :href="route('legal-records.cases')"
@@ -241,20 +257,6 @@ const datasetStats = computed(() => {
                                     :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
                                 <span>Case Law</span>
                                 <span v-if="datasetStats.cases" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.cases.toLocaleString() }}</span>
-                            </Link>
-
-                            <!-- Law Journals & Reviews -->
-                            <Link :href="route('legal-records.journals')"
-                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
-                                :class="[
-                                    isUrl(route('legal-records.journals'))
-                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
-                                ]">
-                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Journals</span>
-                                <span v-if="datasetStats.journals" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.journals.toLocaleString() }}</span>
                             </Link>
 
                             <!-- Court Rolls -->
@@ -271,7 +273,7 @@ const datasetStats = computed(() => {
                                 <span v-if="datasetStats.courtRolls" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.courtRolls.toLocaleString() }}</span>
                             </Link>
 
-                            <!-- Government & Provincial Gazettes -->
+                            <!-- Government Gazettes -->
                             <Link :href="route('legal-records.gazettes')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
@@ -281,21 +283,22 @@ const datasetStats = computed(() => {
                                 ]">
                                 <Scroll class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.gazettes')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Gazettes</span>
+                                <span>Government Gazettes</span>
                                 <span v-if="datasetStats.gazettes" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.gazettes.toLocaleString() }}</span>
                             </Link>
 
-                            <!-- Precedent Search / Compliance Engine -->
-                            <Link :href="route('legal-records.precedents')"
+                            <!-- Legal Journals -->
+                            <Link :href="route('legal-records.journals')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
-                                    isUrl(route('legal-records.precedents'))
+                                    isUrl(route('legal-records.journals'))
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
-                                <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                <span>Compliance Engine</span>
+                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Legal Journals</span>
+                                <span v-if="datasetStats.journals" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.journals.toLocaleString() }}</span>
                             </Link>
 
                             <!-- Human Review (Admin Only) -->
@@ -313,7 +316,43 @@ const datasetStats = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Expandable Analytics Menu -->
+                    <!-- 2. Expandable Compliance Menu -->
+                    <div class="space-y-1">
+                        <button type="button" @click="isComplianceExpanded = !isComplianceExpanded"
+                            class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
+                            :class="[
+                                isComplianceUrl
+                                    ? 'text-white bg-white/[0.04]'
+                                    : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
+                            ]">
+                            <div class="flex items-center">
+                                <ShieldCheck class="mr-3.5 h-5 w-5 transition-colors duration-200"
+                                    :class="[isComplianceUrl ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Compliance</span>
+                            </div>
+                            <ChevronDown class="w-4 h-4 transition-transform duration-200 text-zinc-500"
+                                :class="{ 'transform rotate-180 text-admin-modern': isComplianceExpanded }" />
+                        </button>
+
+                        <!-- Compliance Sub-menu Items -->
+                        <div v-show="isComplianceExpanded"
+                            class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <!-- Compliance Engine -->
+                            <Link :href="route('legal-records.precedents')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.precedents'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Compliance Engine</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <!-- 3. Expandable Analytics Menu -->
                     <div class="space-y-1">
                         <button type="button" @click="isAnalyticsExpanded = !isAnalyticsExpanded"
                             class="w-full group flex items-center justify-between px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200"
@@ -334,20 +373,7 @@ const datasetStats = computed(() => {
                         <!-- Sub-menu Items -->
                         <div v-show="isAnalyticsExpanded"
                             class="pl-6 pr-1 py-1 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
-                            <!-- CCMA Awards -->
-                            <!-- <Link :href="route('subscriber.analytics.ccma')"
-                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
-                                :class="[
-                                    isUrl(route('subscriber.analytics.ccma'))
-                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
-                                ]">
-                                <Briefcase class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('subscriber.analytics.ccma')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                CCMA Awards
-                            </Link> -->
-
-                            <!-- SAFLII Courts -->
+                            <!-- Legal Trends & Insights -->
                             <Link :href="route('subscriber.analytics.saflii')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
@@ -355,12 +381,12 @@ const datasetStats = computed(() => {
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
-                                <Gavel class="mr-2.5 h-4 w-4 transition-colors"
+                                <TrendingUp class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('subscriber.analytics.saflii')) || (isUrl(route('subscriber.index')) && !isUrl(route('subscriber.analytics.ccma')) && !isUrl(route('subscriber.analytics.compliance'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Jurisprudence Analytics
+                                <span>Legal Trends &amp; Insights</span>
                             </Link>
 
-                            <!-- Compliance & Enforcement -->
+                            <!-- Compliance Metrics -->
                             <Link :href="route('subscriber.analytics.compliance')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
@@ -368,9 +394,9 @@ const datasetStats = computed(() => {
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
-                                <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
+                                <Activity class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('subscriber.analytics.compliance')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Compliance Analytics
+                                <span>Compliance Metrics</span>
                             </Link>
                         </div>
                     </div>
