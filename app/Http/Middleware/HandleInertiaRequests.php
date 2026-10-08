@@ -78,11 +78,14 @@ class HandleInertiaRequests extends Middleware
                             $totalCases = DB::connection('pgsql_coeus')->table('scrubbed_records')
                                 ->whereRaw("get_scrubbed_record_category(data) = 'cases'")
                                 ->count();
-                            $totalGazettes = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                            $totalJournals = DB::connection('pgsql_coeus')->table('scrubbed_records')
                                 ->whereRaw("get_scrubbed_record_category(data) = 'journals'")
                                 ->count();
                             $totalCourtRolls = DB::connection('pgsql_coeus')->table('scrubbed_records')
                                 ->whereRaw("get_scrubbed_record_category(data) = 'court_rolls'")
+                                ->count();
+                            $totalGazettes = DB::connection('pgsql_coeus')->table('scrubbed_records')
+                                ->whereRaw("get_scrubbed_record_category(data) = 'gazettes'")
                                 ->count();
 
                             $yearRange = DB::connection('pgsql_coeus')->table('extracted_records')
@@ -95,6 +98,7 @@ class HandleInertiaRequests extends Middleware
                         } else {
                             $totalRecords = DB::connection('pgsql_coeus')->table('scrubbed_records')->count();
                             $totalCases = $totalRecords;
+                            $totalJournals = 0;
                             $totalGazettes = 0;
                             $totalCourtRolls = 0;
                             $minYear = 2020;
@@ -108,6 +112,7 @@ class HandleInertiaRequests extends Middleware
                         return [
                             'total_records' => (int) $totalRecords,
                             'total_cases' => (int) $totalCases,
+                            'total_journals' => (int) $totalJournals,
                             'total_gazettes' => (int) $totalGazettes,
                             'total_court_rolls' => (int) $totalCourtRolls,
                             'date_range' => $dateRange,
@@ -117,6 +122,7 @@ class HandleInertiaRequests extends Middleware
                     return [
                         'total_records' => 0,
                         'total_cases' => 0,
+                        'total_journals' => 0,
                         'total_gazettes' => 0,
                         'total_court_rolls' => 0,
                         'date_range' => 'N/A',

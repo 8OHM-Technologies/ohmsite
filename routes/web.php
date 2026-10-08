@@ -100,6 +100,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/legal-records/precedents/entity-profile', [LegalRecordController::class, 'entityProfile'])->name('legal-records.precedents.entity-profile');
     Route::get('/legal-records/journals', [LegalRecordController::class, 'journals'])->name('legal-records.journals');
     Route::get('/legal-records/court-rolls', [LegalRecordController::class, 'courtRolls'])->name('legal-records.court-rolls');
+    Route::get('/legal-records/gazettes', [LegalRecordController::class, 'gazettes'])->name('legal-records.gazettes');
     Route::get('/legal-records/data', [LegalRecordController::class, 'data'])->name('legal-records.data');
     Route::get('/legal-records/record/{id}', [LegalRecordController::class, 'show'])->name('legal-records.show');
     Route::post('/legal-records/record/{id}/report-error', [LegalRecordController::class, 'reportError'])->name('legal-records.report-error');

@@ -23,6 +23,9 @@ import {
     UserCircle,
     Database,
     Scale,
+    BookOpen,
+    Calendar,
+    Scroll,
     ChevronDown,
     AlertCircle,
     ShieldAlert
@@ -60,6 +63,9 @@ const isLegalRecordsExpanded = ref(true);
 const searchItems = [
     { name: 'Dashboard', href: route('dashboard'), keywords: ['home', 'overview', 'main', 'stats'] },
     { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'court', 'case law'] },
+    { name: 'Law Journals & Reviews', href: route('legal-records.journals'), keywords: ['journals', 'law review', 'per', 'pelj', 'de rebus', 'academic', 'articles'] },
+    { name: 'Court Rolls & Schedules', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list'] },
+    { name: 'Government & Provincial Gazettes', href: route('legal-records.gazettes'), keywords: ['gazettes', 'gazette', 'government gazette', 'provincial gazette', 'notices'] },
     { name: 'Human Review Queue', href: route('admin.legal-records.human-review'), keywords: ['human review', 'review queue', 'legal records review', 'scrubbed', 'parsed', 'extracted', 'quality'] },
     { name: 'Licenses', href: route('admin.licenses.index'), keywords: ['subscriptions', 'access', 'customers', 'active'] },
     { name: 'Products', href: route('admin.products.index'), keywords: ['catalog', 'services', 'plans'] },
@@ -208,13 +214,52 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                             <Link :href="route('legal-records.cases')"
                                 class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
-                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents')))
+                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents')))
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
                                 <Scale class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Case Law
+                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Case Law</span>
+                            </Link>
+
+                            <!-- Law Journals & Reviews -->
+                            <Link :href="route('legal-records.journals')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.journals'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Journals</span>
+                            </Link>
+
+                            <!-- Court Rolls -->
+                            <Link :href="route('legal-records.court-rolls')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.court-rolls'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Calendar class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.court-rolls')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Court Rolls</span>
+                            </Link>
+
+                            <!-- Government & Provincial Gazettes -->
+                            <Link :href="route('legal-records.gazettes')"
+                                class="group flex items-center px-3.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.gazettes'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Scroll class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.gazettes')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Gazettes</span>
                             </Link>
 
                             <!-- Precedent Search -->
@@ -227,7 +272,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                 ]">
                                 <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Precedent Search
+                                <span>Precedent Search</span>
                             </Link>
 
                             <!-- Human Review -->
@@ -240,7 +285,7 @@ onUnmounted(() => window.removeEventListener('resize', handleResize));
                                 ]">
                                 <AlertCircle class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('admin.legal-records.human-review')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Human Review
+                                <span>Human Review</span>
                             </Link>
                         </div>
                     </div>

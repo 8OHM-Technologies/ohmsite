@@ -70,8 +70,9 @@ const searchItems = [
     { name: 'Compliance Analytics', href: route('subscriber.analytics.compliance'), keywords: ['compliance', 'enforcement', 'penalties', 'sanctions', 'fsca', 'popia', 'prudential', 'analytics'] },
     { name: 'Precedent & Compliance Search', href: route('legal-records.precedents'), keywords: ['precedents', 'fsca', 'prudential', 'popia', 'tribunal', 'ombud', 'sanction', 'penalty', 'cross-reference'] },
     { name: 'Case Law & Judgments', href: route('legal-records.cases'), keywords: ['legal', 'records', 'cases', 'judgments', 'awards', 'labour', 'court', 'ccma', 'commission', 'high court', 'case law'] },
-    { name: 'Law Journals & Gazettes', href: route('legal-records.journals'), keywords: ['journals', 'gazettes', 'gazette', 'law review', 'per', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
+    { name: 'Law Journals & Reviews', href: route('legal-records.journals'), keywords: ['journals', 'law review', 'per', 'pelj', 'de rebus', 'academic', 'articles', 'disability rights', 'human rights'] },
     { name: 'Court Rolls & Schedules', href: route('legal-records.court-rolls'), keywords: ['court rolls', 'rolls', 'schedules', 'hearing', 'motion court', 'cause list', 'motion', 'trial'] },
+    { name: 'Government & Provincial Gazettes', href: route('legal-records.gazettes'), keywords: ['gazettes', 'gazette', 'government gazette', 'provincial gazette', 'notices', 'proclamations', 'regulations'] },
 ];
 
 const handleSearch = () => {
@@ -161,6 +162,7 @@ const datasetStats = computed(() => {
     return {
         total: summary.total_records ?? 0,
         cases: summary.total_cases ?? 0,
+        journals: summary.total_journals ?? 0,
         gazettes: summary.total_gazettes ?? 0,
         courtRolls: summary.total_court_rolls ?? 0,
         dateRange: summary.date_range ?? 'N/A',
@@ -231,16 +233,59 @@ const datasetStats = computed(() => {
                             <Link :href="route('legal-records.cases')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
-                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents')))
+                                    isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents')))
                                         ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                                 ]">
                                 <Scale class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Case Law
+                                    :class="[isUrl(route('legal-records.cases')) || (isUrl(route('legal-records.index')) && !isUrl(route('legal-records.journals')) && !isUrl(route('legal-records.court-rolls')) && !isUrl(route('legal-records.gazettes')) && !isUrl(route('admin.legal-records.human-review')) && !isUrl(route('legal-records.precedents'))) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Case Law</span>
+                                <span v-if="datasetStats.cases" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.cases.toLocaleString() }}</span>
                             </Link>
 
-                            <!-- Precedent Search -->
+                            <!-- Law Journals & Reviews -->
+                            <Link :href="route('legal-records.journals')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.journals'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Journals</span>
+                                <span v-if="datasetStats.journals" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.journals.toLocaleString() }}</span>
+                            </Link>
+
+                            <!-- Court Rolls -->
+                            <Link :href="route('legal-records.court-rolls')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.court-rolls'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Calendar class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.court-rolls')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Court Rolls</span>
+                                <span v-if="datasetStats.courtRolls" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.courtRolls.toLocaleString() }}</span>
+                            </Link>
+
+                            <!-- Government & Provincial Gazettes -->
+                            <Link :href="route('legal-records.gazettes')"
+                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
+                                :class="[
+                                    isUrl(route('legal-records.gazettes'))
+                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                                ]">
+                                <Scroll class="mr-2.5 h-4 w-4 transition-colors"
+                                    :class="[isUrl(route('legal-records.gazettes')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
+                                <span>Gazettes</span>
+                                <span v-if="datasetStats.gazettes" class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 font-mono">{{ datasetStats.gazettes.toLocaleString() }}</span>
+                            </Link>
+
+                            <!-- Precedent Search / Compliance Engine -->
                             <Link :href="route('legal-records.precedents')"
                                 class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
                                 :class="[
@@ -250,7 +295,7 @@ const datasetStats = computed(() => {
                                 ]">
                                 <ShieldAlert class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('legal-records.precedents')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Compliance Engine
+                                <span>Compliance Engine</span>
                             </Link>
 
                             <!-- Human Review (Admin Only) -->
@@ -263,34 +308,8 @@ const datasetStats = computed(() => {
                                 ]">
                                 <AlertCircle class="mr-2.5 h-4 w-4 transition-colors"
                                     :class="[isUrl(route('admin.legal-records.human-review')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Human Review
+                                <span>Human Review</span>
                             </Link>
-
-                            <!-- Journals & Gazettes -->
-                            <!-- <Link :href="route('legal-records.journals')"
-                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
-                                :class="[
-                                    isUrl(route('legal-records.journals'))
-                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
-                                ]">
-                                <BookOpen class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.journals')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Journals &amp; Gazettes
-                            </Link> -->
-
-                            <!-- Court Rolls -->
-                            <!-- <Link :href="route('legal-records.court-rolls')"
-                                class="group flex items-center px-3.5 py-2.5 text-xs font-semibold rounded-lg transition-all duration-200"
-                                :class="[
-                                    isUrl(route('legal-records.court-rolls'))
-                                        ? 'bg-admin-modern/10 text-admin-modern border border-admin-modern/20 shadow-sm'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
-                                ]">
-                                <Calendar class="mr-2.5 h-4 w-4 transition-colors"
-                                    :class="[isUrl(route('legal-records.court-rolls')) ? 'text-admin-modern' : 'text-zinc-500 group-hover:text-zinc-300']" />
-                                Court Rolls
-                            </Link> -->
                         </div>
                     </div>
 
@@ -430,7 +449,7 @@ const datasetStats = computed(() => {
                         <!-- Divider -->
                         <div class="h-8 w-px bg-white/10 shrink-0"></div>
 
-                        <!-- Journals / Gazettes -->
+                        <!-- Journals -->
                         <div class="flex items-center gap-2.5">
                             <div
                                 class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
@@ -438,10 +457,9 @@ const datasetStats = computed(() => {
                             </div>
                             <div class="flex flex-col">
                                 <span
-                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Journals
-                                    &amp; Gaz.</span>
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Journals</span>
                                 <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
-                                    datasetStats.gazettes.toLocaleString() }}</span>
+                                    datasetStats.journals.toLocaleString() }}</span>
                             </div>
                         </div>
 
@@ -452,7 +470,7 @@ const datasetStats = computed(() => {
                         <div class="flex items-center gap-2.5">
                             <div
                                 class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
-                                <Scroll class="w-4 h-4" />
+                                <Calendar class="w-4 h-4" />
                             </div>
                             <div class="flex flex-col">
                                 <span
@@ -460,6 +478,23 @@ const datasetStats = computed(() => {
                                     Rolls</span>
                                 <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
                                     datasetStats.courtRolls.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="h-8 w-px bg-white/10 shrink-0"></div>
+
+                        <!-- Gazettes -->
+                        <div class="flex items-center gap-2.5">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-admin-modern/10 flex items-center justify-center text-admin-modern shrink-0">
+                                <Scroll class="w-4 h-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-zinc-500 uppercase tracking-widest text-[8px] sm:text-[9px] font-bold leading-none">Gazettes</span>
+                                <span class="text-white font-extrabold text-xs sm:text-sm mt-1 leading-none">{{
+                                    datasetStats.gazettes.toLocaleString() }}</span>
                             </div>
                         </div>
 

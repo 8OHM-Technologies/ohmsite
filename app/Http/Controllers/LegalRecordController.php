@@ -84,11 +84,11 @@ class LegalRecordController extends Controller
     }
 
     /**
-     * Display the Law Journals & Official Gazettes view.
+     * Display the Law Journals & Reviews view.
      */
     public function journals(Request $request): InertiaResponse
     {
-        $filters = TargetVanity::whereIn('target_type', ['journals', 'gaz'])
+        $filters = TargetVanity::where('target_type', 'journals')
             ->orderBy('vanity_name')
             ->get()
             ->map(function ($vanity) {
@@ -109,7 +109,7 @@ class LegalRecordController extends Controller
      */
     public function courtRolls(Request $request): InertiaResponse
     {
-        $filters = TargetVanity::where('target_type', 'other')
+        $filters = TargetVanity::whereIn('target_type', ['court_rolls', 'other'])
             ->orderBy('vanity_name')
             ->get()
             ->map(function ($vanity) {
@@ -121,6 +121,27 @@ class LegalRecordController extends Controller
             });
 
         return Inertia::render('Subscriber/LegalRecords/CourtRolls', [
+            'filters' => $filters,
+        ]);
+    }
+
+    /**
+     * Display the Government & Provincial Gazettes view.
+     */
+    public function gazettes(Request $request): InertiaResponse
+    {
+        $filters = TargetVanity::whereIn('target_type', ['gaz', 'gazettes'])
+            ->orderBy('vanity_name')
+            ->get()
+            ->map(function ($vanity) {
+                return [
+                    'target_name' => $vanity->target_name,
+                    'vanity_name' => $vanity->vanity_name,
+                    'target_type' => $vanity->target_type,
+                ];
+            });
+
+        return Inertia::render('Subscriber/LegalRecords/Gazettes', [
             'filters' => $filters,
         ]);
     }
@@ -238,15 +259,12 @@ class LegalRecordController extends Controller
                 $query->where(function ($q) use ($isPgsql) {
                     if ($isPgsql) {
                         $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
-                        $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
-                            ->orWhereRaw("jsonb_exists(scrubbed_records.data, 'formatted_text')")
-                            ->orWhere('extracted_records.record_type', 'like', '%journal%')
-                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
+                        $q->whereRaw("{$categorySql} IN ('journals', 'journal')")
+                            ->orWhere('extracted_records.record_type', 'like', '%journal%');
                     } else {
                         $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
-                        $q->whereRaw("{$categorySql} IN ('journals', 'gaz')")
-                            ->orWhere('extracted_records.record_type', 'like', '%journal%')
-                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
+                        $q->whereRaw("{$categorySql} IN ('journals', 'journal')")
+                            ->orWhere('extracted_records.record_type', 'like', '%journal%');
                     }
                 });
             }
@@ -257,13 +275,29 @@ class LegalRecordController extends Controller
                 $query->where(function ($q) use ($isPgsql) {
                     if ($isPgsql) {
                         $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
-                        $q->whereRaw("{$categorySql} = 'other'")
+                        $q->whereRaw("{$categorySql} IN ('court_rolls', 'other')")
                             ->orWhereRaw("(jsonb_exists(scrubbed_records.data, 'roll_type') OR jsonb_exists(scrubbed_records.data, 'rows'))")
                             ->orWhere('extracted_records.record_type', 'like', '%roll%');
                     } else {
                         $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
-                        $q->whereRaw("{$categorySql} = 'other'")
+                        $q->whereRaw("{$categorySql} IN ('court_rolls', 'other')")
                             ->orWhere('extracted_records.record_type', 'like', '%roll%');
+                    }
+                });
+            }
+        } elseif ($category === 'gazettes' || $category === 'gaz') {
+            if ($useFunctionalIndex) {
+                $query->whereRaw("get_scrubbed_record_category(scrubbed_records.data) = 'gazettes'");
+            } else {
+                $query->where(function ($q) use ($isPgsql) {
+                    if ($isPgsql) {
+                        $categorySql = "COALESCE(scrubbed_records.data->'extracted_data'->>'category', scrubbed_records.data->'metadata'->>'category', scrubbed_records.data->>'category')";
+                        $q->whereRaw("{$categorySql} IN ('gazettes', 'gaz')")
+                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
+                    } else {
+                        $categorySql = "COALESCE(json_extract(scrubbed_records.data, '$.extracted_data.category'), json_extract(scrubbed_records.data, '$.metadata.category'), json_extract(scrubbed_records.data, '$.category'), json_extract(extracted_records.data, '$.category'))";
+                        $q->whereRaw("{$categorySql} IN ('gazettes', 'gaz')")
+                            ->orWhere('extracted_records.record_type', 'like', '%gaz%');
                     }
                 });
             }
@@ -603,11 +637,21 @@ class LegalRecordController extends Controller
             || str_contains($recordType, 'nfo');
 
         $category = $ext['category'] ?? $srData['category'] ?? $erData['category'] ?? null;
+        if ($category === 'gaz') {
+            $category = 'gazettes';
+        }
         if (! $category) {
-            if ($row->record_type === 'sabinet_ccma') {
+            $url = (string) ($row->source_url ?? '');
+            if (str_contains($url, '/za/journals/')) {
+                $category = 'journals';
+            } elseif (str_contains($url, '/za/other/')) {
+                $category = 'court_rolls';
+            } elseif (str_contains($url, '/za/gaz/')) {
+                $category = 'gazettes';
+            } elseif ($row->record_type === 'sabinet_ccma') {
                 $category = 'cases';
             } elseif (str_contains($recordType, 'gaz')) {
-                $category = 'gaz';
+                $category = 'gazettes';
             } elseif (str_contains($recordType, 'journal')) {
                 $category = 'journals';
             } elseif (str_contains($recordType, 'roll')) {
@@ -673,24 +717,50 @@ class LegalRecordController extends Controller
 
         $debarment = $ext['debarment_period'] ?? $ext['debarment'] ?? null;
 
+        // Non-case specialized fields:
+        $journalName = $srData['journal_name'] ?? $ext['journal_name'] ?? null;
+        $authors = $srData['authors'] ?? $ext['authors'] ?? [];
+        if (! is_array($authors)) {
+            $authors = $authors ? [$authors] : [];
+        }
+        $volume = $srData['volume'] ?? $ext['volume'] ?? null;
+        $issue = $srData['issue'] ?? $ext['issue'] ?? null;
+        $year = $srData['year'] ?? $ext['year'] ?? null;
+        $abstract = $srData['abstract'] ?? $ext['abstract'] ?? null;
+        $pdfUrl = $srData['pdf_url'] ?? $ext['pdf_url'] ?? null;
+
+        $rollType = $srData['roll_type'] ?? $ext['roll_type'] ?? null;
+        $presidingJudge = $srData['presiding_judge'] ?? $ext['presiding_judge'] ?? null;
+        $courtroom = $srData['courtroom'] ?? $ext['courtroom'] ?? null;
+        $totalMatters = isset($srData['total_matters']) ? (int) $srData['total_matters'] : (isset($ext['total_matters']) ? (int) $ext['total_matters'] : (is_array($srData['rows'] ?? null) ? count($srData['rows']) : 0));
+        $rows = $srData['rows'] ?? $ext['rows'] ?? [];
+        if (! is_array($rows)) {
+            $rows = [];
+        }
+
+        $jurisdiction = $srData['jurisdiction'] ?? $ext['jurisdiction'] ?? null;
+        $gazetteType = $srData['gazette_type'] ?? $ext['gazette_type'] ?? null;
+        $gazetteNumber = $srData['gazette_number'] ?? $ext['gazette_number'] ?? null;
+        $hasHtmlContent = isset($srData['has_html_content']) ? (bool) $srData['has_html_content'] : (isset($ext['has_html_content']) ? (bool) $ext['has_html_content'] : true);
+
         // Only parse full text and heavy content when single-record detail is requested
         $fullText = null;
         $centerContent = null;
         $rollEntries = [];
         if ($isDetail) {
-            $fullText = $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? $innerSrData['scraped_text'] ?? $innerSrData['center_content'] ?? $srData['scraped_text'] ?? $innerErData['scraped_text'] ?? null;
+            $fullText = $srData['formatted_text'] ?? $srData['full_text'] ?? $srData['text'] ?? $srData['content'] ?? $srData['body'] ?? $erData['full_text'] ?? $erData['text'] ?? $erData['content'] ?? $ext['full_text'] ?? $ext['content'] ?? $innerSrData['scraped_text'] ?? $innerSrData['center_content'] ?? $srData['scraped_text'] ?? $innerErData['scraped_text'] ?? null;
             $centerContent = $srData['center_content'] ?? $erData['center_content'] ?? $innerSrData['center_content'] ?? null;
-            $rollEntries = $ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? [];
+            $rollEntries = ! empty($rows) ? $rows : ($ext['roll_entries'] ?? $ext['schedule'] ?? $srData['roll_entries'] ?? $srData['schedule'] ?? $srData['entries'] ?? $erData['roll_entries'] ?? $erData['entries'] ?? []);
             if (! is_array($rollEntries)) {
                 $rollEntries = [];
             }
         }
 
         if (empty($summary)) {
-            $summary = $innerSrData['subject_matter'] ?? $ext['factual_summary'] ?? $ext['ombud_findings'] ?? $ext['tribunal_reasoning'] ?? null;
+            $summary = $abstract ?? ($innerSrData['subject_matter'] ?? $ext['factual_summary'] ?? $ext['ombud_findings'] ?? $ext['tribunal_reasoning'] ?? null);
         }
 
-        $author = $ext['author'] ?? $srData['author'] ?? $meta['author'] ?? $meta['publisher'] ?? $applicant ?? null;
+        $author = $ext['author'] ?? $srData['author'] ?? (! empty($authors) ? implode(', ', $authors) : null) ?? $meta['author'] ?? $meta['publisher'] ?? $applicant ?? null;
         $citation = $ext['citation'] ?? $srData['citation'] ?? $meta['citation'] ?? $caseNumber ?? null;
 
         if (! $isPro) {
@@ -737,6 +807,22 @@ class LegalRecordController extends Controller
                 'regulator' => $regulator,
                 'action_type' => $actionType,
                 'debarment' => $debarment,
+                'journal_name' => $journalName,
+                'authors' => $authors,
+                'volume' => $volume,
+                'issue' => $issue,
+                'year' => $year,
+                'abstract' => $abstract,
+                'pdf_url' => $pdfUrl,
+                'roll_type' => $rollType,
+                'presiding_judge' => $presidingJudge,
+                'courtroom' => $courtroom,
+                'total_matters' => $totalMatters,
+                'rows' => count($rows) > 3 ? array_slice($rows, 0, 3) : $rows,
+                'jurisdiction' => $jurisdiction,
+                'gazette_type' => $gazetteType,
+                'gazette_number' => $gazetteNumber,
+                'has_html_content' => $hasHtmlContent,
             ];
         }
 
@@ -783,6 +869,22 @@ class LegalRecordController extends Controller
             'regulator' => $regulator,
             'action_type' => $actionType,
             'debarment' => $debarment,
+            'journal_name' => $journalName,
+            'authors' => $authors,
+            'volume' => $volume,
+            'issue' => $issue,
+            'year' => $year,
+            'abstract' => $abstract,
+            'pdf_url' => $pdfUrl,
+            'roll_type' => $rollType,
+            'presiding_judge' => $presidingJudge,
+            'courtroom' => $courtroom,
+            'total_matters' => $totalMatters,
+            'rows' => $rows,
+            'jurisdiction' => $jurisdiction,
+            'gazette_type' => $gazetteType,
+            'gazette_number' => $gazetteNumber,
+            'has_html_content' => $hasHtmlContent,
         ];
     }
 }

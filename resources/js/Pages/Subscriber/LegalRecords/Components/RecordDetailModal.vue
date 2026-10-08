@@ -15,13 +15,15 @@ import {
   Check,
   ShieldAlert,
   Gavel,
-  Award
+  Award,
+  Scroll
 } from 'lucide-vue-next';
 import Modal from '@/Components/Modal.vue';
 import Skeleton from 'primevue/skeleton';
 import CaseRecordView from './CaseRecordView.vue';
 import JournalRecordView from './JournalRecordView.vue';
 import CourtRollRecordView from './CourtRollRecordView.vue';
+import GazetteRecordView from './GazetteRecordView.vue';
 import RegulatoryRecordView from './RegulatoryRecordView.vue';
 import OmbudRecordView from './OmbudRecordView.vue';
 import TribunalRecordView from './TribunalRecordView.vue';
@@ -157,16 +159,25 @@ const dataObj = computed(() => {
 });
 
 const resolvedCategory = computed(() => {
-  if (props.category) return props.category;
+  if (props.category) {
+    if (props.category === 'gaz' || props.category === 'gazettes') return 'gazettes';
+    return props.category;
+  }
   const rt = String(dataObj.value.record_type || props.recordDetail?.record_type || '').toLowerCase();
-  if (rt.includes('gaz')) return 'gaz';
+  if (rt.includes('gaz')) return 'gazettes';
   if (rt.includes('journal')) return 'journals';
   if (rt.includes('roll')) return 'court_rolls';
   if (rt.includes('fsca') || rt.includes('pa_') || rt.includes('popia')) return 'regulatory';
   if (rt.includes('fst')) return 'tribunal';
   if (rt.includes('fais') || rt.includes('_nfo') || rt.startsWith('nfo')) return 'ombud';
-  if (dataObj.value.category) return dataObj.value.category;
-  if (props.recordDetail?.category) return props.recordDetail.category;
+  if (dataObj.value.category) {
+    if (dataObj.value.category === 'gaz') return 'gazettes';
+    return dataObj.value.category;
+  }
+  if (props.recordDetail?.category) {
+    if (props.recordDetail.category === 'gaz') return 'gazettes';
+    return props.recordDetail.category;
+  }
   return 'cases';
 });
 
@@ -203,10 +214,14 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
               <Award class="w-3 h-3" /> Ombud Determination
             </span>
             <span
-              v-else-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
+              v-else-if="resolvedCategory === 'gazettes'"
               class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
-              <BookOpen class="w-3 h-3" />
-              {{ resolvedCategory === 'gaz' ? 'Government Gazette' : 'Law Review / Journal' }}
+              <Scroll class="w-3 h-3" /> Government Gazette
+            </span>
+            <span
+              v-else-if="resolvedCategory === 'journals'"
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
+              <BookOpen class="w-3 h-3" /> Law Review / Journal
             </span>
             <span
               v-else-if="resolvedCategory === 'court_rolls' || resolvedCategory === 'other'"
@@ -282,14 +297,21 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
             @review-updated="handleReviewUpdatedFromChild"
           />
 
-          <!-- 4. Journals & Gazettes Formatted Text Reader View -->
-          <JournalRecordView
-            v-else-if="resolvedCategory === 'journals' || resolvedCategory === 'gaz'"
+          <!-- 4. Gazettes Formatted Text Reader View -->
+          <GazetteRecordView
+            v-else-if="resolvedCategory === 'gazettes'"
             :record-detail="recordDetail"
             :is-pro="isPro"
           />
 
-          <!-- 5. Court Rolls Table Format Schedule View -->
+          <!-- 5. Journals Formatted Text Reader View -->
+          <JournalRecordView
+            v-else-if="resolvedCategory === 'journals'"
+            :record-detail="recordDetail"
+            :is-pro="isPro"
+          />
+
+          <!-- 6. Court Rolls Table Format Schedule View -->
           <CourtRollRecordView
             v-else-if="resolvedCategory === 'court_rolls' || resolvedCategory === 'other'"
             :record-detail="recordDetail"
@@ -313,7 +335,7 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
           <a v-if="sourceUrl" :href="sourceUrl" target="_blank" rel="noopener noreferrer"
             class="px-4 py-2.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/15 text-white flex items-center gap-2 transition-all">
             <span>
-              {{ resolvedCategory === 'journals' || resolvedCategory === 'gaz' ? 'Open Source Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Open Source Schedule' : 'Open Source Record') }}
+              {{ resolvedCategory === 'gazettes' ? 'Open Source Gazette' : (resolvedCategory === 'journals' ? 'Open Source Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Open Source Schedule' : 'Open Source Record')) }}
             </span>
             <ExternalLink class="w-3.5 h-3.5" />
           </a>
@@ -340,7 +362,7 @@ const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?
           </button>
 
           <button @click="emit('close')" class="btn btn-primary px-5 py-2.5 rounded-xl text-xs font-black cursor-pointer">
-            {{ resolvedCategory === 'journals' || resolvedCategory === 'gaz' ? 'Close Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Close Schedule' : 'Close Dossier') }}
+            {{ resolvedCategory === 'gazettes' ? 'Close Gazette' : (resolvedCategory === 'journals' ? 'Close Publication' : (resolvedCategory === 'court_rolls' || resolvedCategory === 'other' ? 'Close Schedule' : 'Close Dossier')) }}
           </button>
         </div>
       </div>

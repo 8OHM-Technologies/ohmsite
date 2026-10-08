@@ -271,6 +271,102 @@ class TargetVanitySeeder extends Seeder
                 'vanity_name' => 'De Rebus Journal',
                 'target_type' => 'journals',
             ],
+            // Court Rolls (court_rolls)
+            [
+                'target_name' => 'ZACCRolls',
+                'vanity_name' => 'Constitutional Court of South Africa (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZASCARolls',
+                'vanity_name' => 'Supreme Court of Appeal of South Africa (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAGPPHCRolls',
+                'vanity_name' => 'Gauteng High Court, Pretoria (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAGPJHCRolls',
+                'vanity_name' => 'Gauteng High Court, Johannesburg (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAWCHCRolls',
+                'vanity_name' => 'Western Cape High Court, Cape Town (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAFSHCRolls',
+                'vanity_name' => 'Free State High Court, Bloemfontein (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAKZDHCRolls',
+                'vanity_name' => 'KwaZulu-Natal High Court, Durban (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAKZPHCRolls',
+                'vanity_name' => 'KwaZulu-Natal High Court, Pietermaritzburg (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAECGHCRolls',
+                'vanity_name' => 'Eastern Cape High Court, Makhanda / Grahamstown (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAECPEHCRolls',
+                'vanity_name' => 'Eastern Cape High Court, Gqeberha / Port Elizabeth (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAECELLCRolls',
+                'vanity_name' => 'Eastern Cape High Court, East London (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAECBHCRolls',
+                'vanity_name' => 'Eastern Cape High Court, Bhisho (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZAECMHCRolls',
+                'vanity_name' => 'Eastern Cape High Court, Mthatha (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZALMPPHCRolls',
+                'vanity_name' => 'Limpopo High Court, Polokwane (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZALMPHCRolls',
+                'vanity_name' => 'Limpopo High Court, Thohoyandou (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZANCHCRolls',
+                'vanity_name' => 'Northern Cape High Court, Kimberley (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZALRC',
+                'vanity_name' => 'Land Claims Court of South Africa (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZARC',
+                'vanity_name' => 'Regional / Restitution Court (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
+            [
+                'target_name' => 'ZASTRolls',
+                'vanity_name' => 'Special Tribunal (Court Rolls)',
+                'target_type' => 'court_rolls',
+            ],
         ];
 
         foreach ($vanities as $v) {

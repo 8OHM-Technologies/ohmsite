@@ -6,7 +6,7 @@ import SubscriberLayout from '@/Layouts/SubscriberLayout.vue';
 import RecordDetailModal from './Components/RecordDetailModal.vue';
 import axios from 'axios';
 import {
-  Calendar,
+  Scroll,
   Search,
   RefreshCw,
   Database,
@@ -14,19 +14,17 @@ import {
   List,
   ExternalLink,
   MapPin,
-  Clock,
+  Calendar,
   Sparkles,
   Lock,
   ArrowRight,
-  Building,
-  User,
-  Users,
   FileText,
   Download,
   AlertCircle,
   CheckSquare,
   X,
-  Loader2
+  Loader2,
+  Building
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -74,16 +72,15 @@ interface RecordSummary {
   source_table: string;
   record_type: string;
   document_date: string | null;
-  hearing_date?: string | null;
   court: string;
   case_number: string | null;
   title: string;
   source_url: string | null;
   summary: string | null;
-  roll_type?: string | null;
-  presiding_judge?: string | null;
-  courtroom?: string | null;
-  total_matters?: number | null;
+  jurisdiction?: string | null;
+  gazette_type?: string | null;
+  gazette_number?: string | null;
+  volume?: string | null;
   pdf_url?: string | null;
   requires_human_review?: boolean;
 }
@@ -102,7 +99,7 @@ const getInitialUrlParam = (param: string): string => {
 };
 
 const searchQuery = ref(getInitialUrlParam('search'));
-const selectedRecordType = ref(getInitialUrlParam('court'));
+const selectedRecordType = ref(getInitialUrlParam('gazette'));
 const viewMode = ref<'cards' | 'table'>('table');
 
 const detailModalVisible = ref(false);
@@ -165,58 +162,11 @@ const updateUrlParams = () => {
     url.searchParams.delete('search');
   }
   if (selectedRecordType.value) {
-    url.searchParams.set('court', selectedRecordType.value);
+    url.searchParams.set('gazette', selectedRecordType.value);
   } else {
-    url.searchParams.delete('court');
+    url.searchParams.delete('gazette');
   }
   window.history.replaceState({}, '', url.toString());
-};
-
-const COURT_NAMES_MAP: Record<string, string> = {
-  'ZACC': 'Constitutional Court of South Africa',
-  'ZASCA': 'Supreme Court of Appeal of South Africa',
-  'ZAGPPHC': 'Gauteng High Court, Pretoria',
-  'ZAGPJHC': 'Gauteng High Court, Johannesburg',
-  'ZAWCHC': 'Western Cape High Court, Cape Town',
-  'ZAFSHC': 'Free State High Court, Bloemfontein',
-  'ZAKZNDHC': 'KwaZulu-Natal High Court, Durban',
-  'ZAKZNHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
-  'ZAECGHC': 'Eastern Cape High Court, Grahamstown',
-  'ZAECPEHC': 'Eastern Cape High Court, Port Elizabeth',
-  'ZAECELHC': 'Eastern Cape High Court, East London',
-  'ZAECBHC': 'Eastern Cape High Court, Bhisho',
-  'ZALMPPHC': 'Limpopo High Court, Polokwane',
-  'ZANWHC': 'North West High Court, Mahikeng',
-  'ZANCHC': 'Northern Cape High Court, Kimberley',
-  'ZALC': 'Labour Court of South Africa',
-  'ZALAC': 'Labour Appeal Court of South Africa',
-  'ZACAC': 'Competition Appeal Court of South Africa',
-  'ZAEQC': 'Equality Court of South Africa',
-  'ZALCC': 'Land Claims Court of South Africa',
-  'ZATC': 'Tax Court of South Africa',
-  'ZAECC': 'Electoral Court of South Africa',
-  'ZALCJHB': 'Labour Court, Johannesburg',
-  'ZALCPE': 'Labour Court, Port Elizabeth',
-  'ZALCCT': 'Labour Court, Cape Town',
-  'ZALCD': 'Labour Court, Durban',
-  'ZALMPTHC': 'Limpopo High Court, Thohoyandou',
-  'ZAMPMHC': 'Mpumalanga High Court, Middelburg',
-  'ZAMPMBHC': 'Mpumalanga High Court, Mbombela',
-  'ZAKZDHC': 'KwaZulu-Natal High Court, Durban',
-  'ZAKZPHC': 'KwaZulu-Natal High Court, Pietermaritzburg',
-  'ZAGPHC': 'Gauteng High Court',
-  'ZAKZHC': 'KwaZulu-Natal High Court',
-  'ZAECHC': 'Eastern Cape High Court'
-};
-
-const formatCourtName = (court: any): string => {
-  if (!court) return '';
-  const cStr = String(court).trim();
-  const cUpper = cStr.toUpperCase();
-  if (COURT_NAMES_MAP[cUpper]) {
-    return COURT_NAMES_MAP[cUpper];
-  }
-  return cStr;
 };
 
 const lazyParams = ref<{
@@ -258,7 +208,7 @@ const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page:
       params: {
         offset: first,
         limit: rows,
-        category: 'court_rolls',
+        category: 'gazettes',
         search: searchQuery.value.trim(),
         record_type: selectedRecordType.value,
         sort_field: sortField,
@@ -275,7 +225,7 @@ const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page:
     if (axios.isCancel(error) || error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED' || currentController.signal.aborted) {
       return;
     }
-    console.error('Failed to fetch court roll records:', error);
+    console.error('Failed to fetch gazette records:', error);
   } finally {
     if (searchAbortController === currentController) {
       loading.value = false;
@@ -333,7 +283,7 @@ const viewRecordDetail = async (record: RecordSummary) => {
     });
     selectedDetail.value = response.data;
   } catch (error) {
-    console.error('Failed to load court roll details:', error);
+    console.error('Failed to load gazette details:', error);
   } finally {
     detailLoading.value = false;
   }
@@ -350,7 +300,7 @@ const batchMarkForReview = async (requiresReview = true) => {
     const response = await axios.post('/admin/legal-records/batch-human-review', {
       ids,
       requires_human_review: requiresReview,
-      review_reason: 'Flagged via Court Rolls table grid batch action by admin.'
+      review_reason: 'Flagged via Gazettes table grid batch action by admin.'
     });
 
     const affectedIds = new Set(ids);
@@ -371,7 +321,7 @@ const batchMarkForReview = async (requiresReview = true) => {
       batchSuccessMessage.value = '';
     }, 4000);
   } catch (error) {
-    console.error('Failed to batch mark court roll records for human review:', error);
+    console.error('Failed to batch mark gazette records for human review:', error);
   } finally {
     batchReviewLoading.value = false;
   }
@@ -395,7 +345,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head title="8OHM | Court Rolls &amp; Hearing Schedules" />
+  <Head title="8OHM | Government &amp; Provincial Gazettes" />
 
   <component :is="LayoutComponent">
     <!-- Page Header -->
@@ -403,15 +353,15 @@ onMounted(() => {
       <div>
         <div class="flex items-center gap-3 mb-2">
           <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-            <Calendar class="w-5 h-5" />
+            <Scroll class="w-5 h-5" />
           </div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
-            Court Rolls &amp; Hearing Schedules
+            Government &amp; Provincial Gazettes
           </h1>
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            South African High Court daily rolls, motion court cause lists, hearing rosters, and allocated matter schedules
+            Official South African National Government Gazettes, Provincial Gazettes, regulations, and statutory notices
           </p>
         </div>
       </div>
@@ -437,7 +387,7 @@ onMounted(() => {
           class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary shadow-md">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           <span v-if="searchQuery.trim()">{{ totalRecords.toLocaleString() }} Matches</span>
-          <span v-else>{{ totalRecords.toLocaleString() }} Active Schedules</span>
+          <span v-else>{{ totalRecords.toLocaleString() }} Active Gazettes</span>
         </span>
       </div>
     </div>
@@ -449,7 +399,7 @@ onMounted(() => {
           <Sparkles class="w-4 h-4" /> Standard Registered Preview Mode
         </div>
         <p class="text-xs text-zinc-300 leading-relaxed">
-          You are viewing basic hearing schedule overviews. Complete motion court cause lists, enrolled case numbers, and courtroom rosters require an active Pro subscription.
+          You are viewing basic gazette publication headers and summaries. Unredacted full-text statutory proclamations, regulations, and authenticated downloadable PDF files require an active Pro subscription.
         </p>
       </div>
       <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
@@ -467,7 +417,7 @@ onMounted(() => {
         <div class="relative flex-1 max-w-2xl">
           <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input type="text" v-model="searchQuery" @input="onSearchInput" @keydown.enter="triggerSearchNow"
-            placeholder="Search by Court, Judge, Case #, Roll Type, or Hearing Details..."
+            placeholder="Search by Gazette #, Notice Title, Jurisdiction, Type, or Keywords..."
             class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
           <div class="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
             <Loader2 v-if="loading" class="w-4 h-4 text-primary animate-spin" />
@@ -482,12 +432,12 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Court Roll Venue Dropdown Selection -->
+        <!-- Gazette Jurisdiction Dropdown Selection -->
         <div class="flex flex-wrap items-center gap-3">
           <div class="relative min-w-[260px]">
             <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
               class="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50">
-              <option value="">All Court Roll Venues</option>
+              <option value="">All Gazettes &amp; Jurisdictions</option>
               <option v-for="filter in filters" :key="filter.target_name" :value="filter.target_name">
                 {{ filter.vanity_name }}
               </option>
@@ -551,10 +501,10 @@ onMounted(() => {
               <Database class="w-8 h-8 text-zinc-600" />
             </div>
             <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
-              <span v-if="searchQuery.trim()">No court rolls found for &ldquo;{{ searchQuery }}&rdquo;</span>
-              <span v-else>No court rolls found</span>
+              <span v-if="searchQuery.trim()">No gazettes found for &ldquo;{{ searchQuery }}&rdquo;</span>
+              <span v-else>No gazettes found</span>
             </h3>
-            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or venue filter</p>
+            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or jurisdiction filter</p>
             <button
               v-if="searchQuery || selectedRecordType"
               @click="clearSearch(); selectedRecordType = ''; loadLazyRecords();"
@@ -567,12 +517,51 @@ onMounted(() => {
         <!-- Selection Checkbox Column (Admin) -->
         <Column v-if="isAdmin" selectionMode="multiple" headerStyle="width: 3rem" />
 
-        <Column field="document_date" header="Hearing Date" sortable style="width: 14%">
+        <Column field="case_number" header="Gazette Ref" sortable style="width: 15%">
+          <template #body="{ data }">
+            <span v-if="data.gazette_number || data.case_number"
+              class="font-mono text-xs font-bold px-2.5 py-1 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
+              {{ data.gazette_number || data.case_number }}
+              <span v-if="data.volume" class="text-[10px] text-zinc-400 ml-1">Vol {{ data.volume }}</span>
+            </span>
+            <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
+          </template>
+          <template #loading>
+            <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="court" header="Jurisdiction" sortable style="width: 17%">
           <template #body="{ data }">
             <div class="flex items-center gap-1.5">
-              <Calendar class="w-3.5 h-3.5 text-primary shrink-0" />
-              <span class="text-xs font-bold font-mono text-zinc-200 tracking-wider">
-                {{ data.hearing_date || data.document_date || 'N/A' }}
+              <MapPin class="w-3.5 h-3.5 text-primary shrink-0" />
+              <span class="px-2.5 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
+                {{ data.jurisdiction || data.court || 'National' }}
+              </span>
+            </div>
+          </template>
+          <template #loading>
+            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="gazette_type" header="Gazette Type" style="width: 16%">
+          <template #body="{ data }">
+            <span class="text-xs font-medium text-zinc-300">
+              {{ data.gazette_type || 'Government Gazette' }}
+            </span>
+          </template>
+          <template #loading>
+            <Skeleton width="75%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="document_date" header="Publication Date" sortable style="width: 14%">
+          <template #body="{ data }">
+            <div class="flex items-center gap-1.5">
+              <Calendar class="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+              <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
+                {{ data.document_date || 'N/A' }}
               </span>
             </div>
           </template>
@@ -581,53 +570,7 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column field="court" header="Court / Venue" sortable style="width: 18%">
-          <template #body="{ data }">
-            <span
-              class="px-3 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
-              {{ formatCourtName(data.court) || data.record_type }}
-            </span>
-          </template>
-          <template #loading>
-            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="roll_type" header="Roll Type" style="width: 15%">
-          <template #body="{ data }">
-            <span v-if="data.roll_type"
-              class="font-mono text-[11px] font-bold px-2.5 py-1 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
-              {{ data.roll_type }}
-            </span>
-            <span v-else-if="data.case_number"
-              class="font-mono text-[11px] font-bold px-2.5 py-1 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
-              {{ data.case_number }}
-            </span>
-            <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">General Roll</span>
-          </template>
-          <template #loading>
-            <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="presiding_judge" header="Judge / Room" style="width: 17%">
-          <template #body="{ data }">
-            <div class="space-y-0.5">
-              <div class="text-xs font-medium text-white truncate flex items-center gap-1"
-                v-html="highlightMatch(data.presiding_judge || 'Allocated Bench', searchQuery)">
-              </div>
-              <div v-if="data.courtroom" class="text-[10px] text-zinc-400 font-mono flex items-center gap-1">
-                <MapPin class="w-3 h-3 text-emerald-400 shrink-0" />
-                <span>{{ data.courtroom }}</span>
-              </div>
-            </div>
-          </template>
-          <template #loading>
-            <Skeleton width="75%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="title" header="Schedule Title &amp; Details" style="width: 24%">
+        <Column field="title" header="Notice Title / Matter" style="width: 26%">
           <template #body="{ data }">
             <div
               class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
@@ -643,30 +586,18 @@ onMounted(() => {
           </template>
         </Column>
 
-        <Column header="Matters" style="width: 10%">
-          <template #body="{ data }">
-            <span v-if="data.total_matters && data.total_matters > 0"
-              class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              {{ data.total_matters }} Enrolled
-            </span>
-            <span v-else class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
-              Enrolled
-            </span>
-          </template>
-        </Column>
-
         <Column header="Actions" style="width: 12%" class="text-right">
           <template #body="{ data }">
             <div class="flex items-center justify-end gap-2">
               <a v-if="data.pdf_url" :href="data.pdf_url" target="_blank" rel="noopener noreferrer"
                 class="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer"
-                title="Download original court roll PDF">
+                title="Download authentic Gazette PDF">
                 <Download class="w-3.5 h-3.5" />
               </a>
               <button @click="viewRecordDetail(data)"
                 class="btn btn-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer shrink-0">
-                <Calendar class="w-3.5 h-3.5" />
-                <span>Schedule</span>
+                <Scroll class="w-3.5 h-3.5" />
+                <span>Notice</span>
               </button>
             </div>
           </template>
@@ -680,10 +611,10 @@ onMounted(() => {
         <div>
           <h3 class="text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
             <Sparkles class="w-4 h-4 text-primary" />
-            Hearing Schedule Explorer
+            Gazette Notice Explorer
           </h3>
           <p class="text-xs text-zinc-400">
-            Card-based explorer of daily court hearing lists and motion court rosters.
+            Card-based explorer of statutory regulations, notices, proclamations, and Government Gazettes.
           </p>
         </div>
       </div>
@@ -706,10 +637,10 @@ onMounted(() => {
           <Database class="w-8 h-8 text-zinc-600" />
         </div>
         <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
-          <span v-if="searchQuery.trim()">No court rolls found for &ldquo;{{ searchQuery }}&rdquo;</span>
-          <span v-else>No court rolls found</span>
+          <span v-if="searchQuery.trim()">No gazettes found for &ldquo;{{ searchQuery }}&rdquo;</span>
+          <span v-else>No gazettes found</span>
         </h3>
-        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or venue filter</p>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or jurisdiction filter</p>
       </div>
 
       <!-- Dossier Cards Grid -->
@@ -718,31 +649,27 @@ onMounted(() => {
           class="bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all p-6 rounded-2xl space-y-4 group">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
-                {{ formatCourtName(c.court) || c.record_type }}
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10 flex items-center gap-1">
+                <MapPin class="w-3 h-3 text-primary" /> {{ c.jurisdiction || c.court || 'National' }}
               </span>
-              <span v-if="c.roll_type"
+              <span v-if="c.gazette_number || c.case_number"
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
-                {{ c.roll_type }}
+                {{ c.gazette_number || c.case_number }}
               </span>
-              <span v-if="c.courtroom"
-                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                <MapPin class="w-3 h-3" /> {{ c.courtroom }}
-              </span>
-              <span v-if="c.total_matters && c.total_matters > 0"
-                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1">
-                <Clock class="w-3 h-3" /> {{ c.total_matters }} Matters
+              <span v-if="c.gazette_type"
+                class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                {{ c.gazette_type }}
               </span>
             </div>
 
             <div class="flex items-center gap-3 text-xs text-zinc-400">
-              <span v-if="c.hearing_date || c.document_date" class="font-bold font-mono text-[11px] text-zinc-400">
-                {{ c.hearing_date || c.document_date }}
+              <span v-if="c.document_date" class="font-bold font-mono text-[11px] text-zinc-400">
+                {{ c.document_date }}
               </span>
               <button @click="viewRecordDetail(c)"
                 class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
-                <span>View Schedule</span>
-                <Calendar class="w-3.5 h-3.5" />
+                <span>View Notice</span>
+                <Scroll class="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -752,7 +679,7 @@ onMounted(() => {
             v-html="highlightMatch(c.title, searchQuery)">
           </h4>
 
-          <!-- Summary / Remarks -->
+          <!-- Summary / Content excerpt -->
           <div v-if="c.summary" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
             <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300"
               v-html="highlightMatch(c.summary, searchQuery)">
@@ -761,22 +688,20 @@ onMounted(() => {
 
           <!-- Footer -->
           <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
-            <div class="flex items-center gap-2">
-              <Users class="w-3.5 h-3.5 text-zinc-500" />
-              <span class="text-zinc-300 font-medium"
-                v-html="highlightMatch(c.presiding_judge || formatCourtName(c.court), searchQuery)">
-              </span>
-            </div>
+            <span class="text-zinc-400 text-[11px] flex items-center gap-1">
+              <FileText class="w-3.5 h-3.5 text-zinc-500" />
+              {{ c.gazette_type || 'Government Gazette' }}
+            </span>
 
             <div class="flex items-center gap-4 text-[11px]">
               <a v-if="c.pdf_url" :href="c.pdf_url" target="_blank" rel="noopener noreferrer"
                 class="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition">
                 <Download class="w-3 h-3" />
-                <span>PDF Schedule</span>
+                <span>Download PDF</span>
               </a>
               <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
                 class="hover:text-white flex items-center gap-1 transition text-zinc-400">
-                <span>Court Registrar Source</span>
+                <span>Official Notice Link</span>
                 <ExternalLink class="w-3 h-3" />
               </a>
             </div>
@@ -796,7 +721,7 @@ onMounted(() => {
       :show="detailModalVisible"
       :loading="detailLoading"
       :record-detail="selectedDetail"
-      category="court_rolls"
+      category="gazettes"
       @close="detailModalVisible = false"
       @review-updated="handleReviewUpdated"
     />

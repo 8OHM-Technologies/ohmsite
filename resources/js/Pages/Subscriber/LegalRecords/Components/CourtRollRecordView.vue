@@ -14,7 +14,9 @@ import {
   List,
   ExternalLink,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  Download,
+  FileDown
 } from 'lucide-vue-next';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -33,14 +35,19 @@ const title = computed(() => dataObj.value.title || 'Court Hearing Roll');
 const court = computed(() => dataObj.value.court || 'Superior Court Jurisdiction');
 const rollDate = computed(() => dataObj.value.hearing_date || dataObj.value.document_date || dataObj.value.judgment_date || 'N/A');
 const rollNumber = computed(() => dataObj.value.case_number || dataObj.value.citation || 'Roll Schedule');
-const judges = computed(() => {
+const rollType = computed(() => dataObj.value.roll_type || 'Motion / Hearing Schedule');
+const courtroom = computed(() => dataObj.value.courtroom || null);
+const presidingJudge = computed(() => {
+  const pj = dataObj.value.presiding_judge;
+  if (pj && !pj.toLowerCase().includes('not explicitly')) return pj;
   const j = dataObj.value.judges;
   if (Array.isArray(j) && j.length > 0) return j.join(', ');
   if (typeof j === 'string' && j) return j;
-  return dataObj.value.presiding_judge || 'Allocated Judicial Bench';
+  return 'Allocated Judicial Bench';
 });
 const summary = computed(() => dataObj.value.summary || null);
-const fullText = computed(() => dataObj.value.full_text || dataObj.value.content || null);
+const fullText = computed(() => dataObj.value.full_text || dataObj.value.formatted_text || dataObj.value.content || null);
+const pdfUrl = computed(() => dataObj.value.pdf_url || null);
 const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?.source_url || null);
 
 // Table / Text View Switcher
@@ -58,57 +65,63 @@ export interface RollItem {
   status?: string;
 }
 
-// Extract or generate structured roll items
+// Extract structured roll items from rows or roll_entries
 const rollEntries = computed<RollItem[]>(() => {
-  const entries = dataObj.value.roll_entries;
-  if (Array.isArray(entries) && entries.length > 0) {
-    return entries.map((e: any, idx: number) => ({
+  const rows = dataObj.value.rows || dataObj.value.roll_entries;
+  if (Array.isArray(rows) && rows.length > 0) {
+    return rows.map((e: any, idx: number) => ({
       id: e.id || idx + 1,
       item_no: e.item_no || e.item_number || e.roll_no || idx + 1,
       case_number: e.case_number || e.case_no || e.citation || `Matter #${idx + 1}`,
       parties: e.parties || e.matter || e.title || e.applicant_respondent || 'Matter allocated on roll',
-      nature: e.nature || e.hearing_type || e.application_type || 'Motion / Trial',
-      courtroom: e.courtroom || e.court_room || e.slot || 'Court 1A',
-      judge: e.judge || e.presiding_judge || judges.value,
+      nature: e.matter_type || e.nature || e.hearing_type || e.application_type || rollType.value,
+      courtroom: e.courtroom || e.court_room || e.slot || courtroom.value || 'Chambers',
+      judge: e.presiding_judge || e.judge || presidingJudge.value,
       status: e.status || e.allocation_status || 'Enrolled'
     }));
   }
 
-  // If no structured entries but full text exists, try to parse lines or create displayable rows
+  // If no structured entries but full text exists, try to parse lines
   const text = fullText.value || summary.value;
   if (text) {
     const lines = text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 5);
     if (lines.length > 0) {
       return lines.slice(0, 50).map((line: string, idx: number) => {
-        // Try extracting case numbers like 1234/2024 or RC12/26 or CCT 12/26
         const caseMatch = line.match(/([A-Z0-9\/\-]{4,20})/);
         return {
           id: idx + 1,
           item_no: idx + 1,
           case_number: caseMatch ? caseMatch[0] : `Item #${idx + 1}`,
           parties: line,
-          nature: 'Motion Court / Schedule',
-          courtroom: 'Chambers',
-          judge: judges.value,
+          nature: rollType.value,
+          courtroom: courtroom.value || 'Court Forum',
+          judge: presidingJudge.value,
           status: 'Enrolled'
         };
       });
     }
   }
 
-  // Default placeholder entry if completely empty
+  // Default entry if empty
   return [
     {
       id: 1,
       item_no: 1,
       case_number: rollNumber.value !== 'Roll Schedule' ? rollNumber.value : 'Roll Entry 1',
       parties: title.value,
-      nature: 'Hearing Schedule',
-      courtroom: 'Court Forum',
-      judge: judges.value,
+      nature: rollType.value,
+      courtroom: courtroom.value || 'Court Forum',
+      judge: presidingJudge.value,
       status: 'Scheduled'
     }
   ];
+});
+
+const totalMattersCount = computed(() => {
+  if (dataObj.value.total_matters && dataObj.value.total_matters > 0) {
+    return dataObj.value.total_matters;
+  }
+  return rollEntries.value.length;
 });
 
 const filteredRollEntries = computed(() => {
@@ -134,7 +147,7 @@ const filteredRollEntries = computed(() => {
           <Sparkles class="w-4 h-4" /> Standard Preview: Court Roll Details Limited
         </div>
         <p class="text-xs text-zinc-300">
-          Subscribe now to view all enrolled matters, allocated times, and unredacted motion cause lists.
+          Subscribe now to view all enrolled matters, allocated courtroom numbers, and unredacted motion cause lists.
         </p>
       </div>
       <a href="/#pricing"
@@ -164,7 +177,7 @@ const filteredRollEntries = computed(() => {
         <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block flex items-center gap-1">
           <Users class="w-3 h-3 text-primary" /> Presiding Bench
         </span>
-        <span class="font-bold text-zinc-200 block truncate">{{ judges }}</span>
+        <span class="font-bold text-zinc-200 block truncate">{{ presidingJudge }}</span>
       </div>
 
       <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5 space-y-1">
@@ -172,9 +185,42 @@ const filteredRollEntries = computed(() => {
           <Clock class="w-3 h-3 text-primary" /> Enrolled Matters
         </span>
         <span class="font-bold text-primary block font-mono">
-          {{ isPro ? rollEntries.length + ' Listed' : 'Preview Mode' }}
+          {{ isPro ? totalMattersCount + ' Enrolled' : 'Preview Mode' }}
         </span>
       </div>
+    </div>
+
+    <!-- Additional Details Bar (Courtroom & Roll Type) -->
+    <div v-if="courtroom || rollType" class="flex flex-wrap items-center gap-2 text-xs">
+      <span v-if="rollType"
+        class="px-3 py-1 rounded-xl text-xs font-bold bg-white/5 text-zinc-300 border border-white/10 flex items-center gap-1.5">
+        <FileText class="w-3.5 h-3.5 text-primary" />
+        <span>{{ rollType }}</span>
+      </span>
+      <span v-if="courtroom"
+        class="px-3 py-1 rounded-xl text-xs font-bold bg-white/5 text-zinc-300 border border-white/10 flex items-center gap-1.5">
+        <MapPin class="w-3.5 h-3.5 text-emerald-400" />
+        <span>Courtroom: {{ courtroom }}</span>
+      </span>
+    </div>
+
+    <!-- Official PDF Action Banner (if PDF exists) -->
+    <div v-if="pdfUrl"
+      class="bg-gradient-to-r from-emerald-500/10 via-primary/10 to-transparent border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+          <FileDown class="w-5 h-5" />
+        </div>
+        <div>
+          <h4 class="text-xs font-black uppercase tracking-wider text-white">Authentic Court Roll PDF Available</h4>
+          <p class="text-[11px] text-zinc-400">Download the official scanned schedule directly from the court registrar.</p>
+        </div>
+      </div>
+      <a :href="pdfUrl" target="_blank" rel="noopener noreferrer"
+        class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-2 transition-all shadow-md shadow-emerald-500/20 shrink-0">
+        <Download class="w-3.5 h-3.5" />
+        <span>Download PDF</span>
+      </a>
     </div>
 
     <!-- Summary / Remarks (if present) -->

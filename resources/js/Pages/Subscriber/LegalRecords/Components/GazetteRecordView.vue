@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import {
-  BookOpen,
+  Scroll,
   Calendar,
   ExternalLink,
   Bookmark,
@@ -12,8 +12,7 @@ import {
   Copy,
   Check,
   Building,
-  User,
-  Type,
+  MapPin,
   Download,
   FileDown
 } from 'lucide-vue-next';
@@ -28,20 +27,13 @@ const dataObj = computed(() => {
   return props.recordDetail.data || props.recordDetail;
 });
 
-const title = computed(() => dataObj.value.title || 'Scholarly Journal Article');
-const journalName = computed(() => dataObj.value.journal_name || dataObj.value.court || dataObj.value.applicant || 'Law Journal / Review');
-const authors = computed(() => {
-  const a = dataObj.value.authors;
-  if (Array.isArray(a) && a.length > 0) return a.join(', ');
-  if (typeof a === 'string' && a) return a;
-  return dataObj.value.author || null;
-});
-const citation = computed(() => dataObj.value.citation || dataObj.value.case_number || null);
+const title = computed(() => dataObj.value.title || 'Government Gazette Notice');
+const jurisdiction = computed(() => dataObj.value.jurisdiction || dataObj.value.court || 'National Jurisdiction');
+const gazetteType = computed(() => dataObj.value.gazette_type || 'Government Gazette');
+const gazetteNumber = computed(() => dataObj.value.gazette_number || dataObj.value.case_number || 'N/A');
 const volume = computed(() => dataObj.value.volume || null);
-const issue = computed(() => dataObj.value.issue || null);
-const year = computed(() => dataObj.value.year || null);
-const publicationDate = computed(() => dataObj.value.document_date || dataObj.value.judgment_date || year.value || 'N/A');
-const summary = computed(() => dataObj.value.abstract || dataObj.value.summary || null);
+const publicationDate = computed(() => dataObj.value.document_date || dataObj.value.judgment_date || 'N/A');
+const summary = computed(() => dataObj.value.summary || dataObj.value.abstract || null);
 const fullText = computed(() => dataObj.value.full_text || dataObj.value.formatted_text || dataObj.value.content || null);
 const pdfUrl = computed(() => dataObj.value.pdf_url || null);
 const sourceUrl = computed(() => dataObj.value.source_url || props.recordDetail?.source_url || null);
@@ -81,10 +73,10 @@ const copyContent = async () => {
       class="bg-gradient-to-r from-amber-500/10 via-primary/10 to-transparent border border-primary/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div class="space-y-1">
         <div class="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-wider">
-          <Sparkles class="w-4 h-4" /> Standard Preview: Complete Text Index Locked
+          <Sparkles class="w-4 h-4" /> Standard Preview: Statutory Notice Index Locked
         </div>
         <p class="text-xs text-zinc-300">
-          Subscribe now to read unredacted full-text scholarly articles, indexed commentary, and download original files.
+          Subscribe to Pro to access unredacted full-text statutory notices, proclamations, regulations, and direct PDF downloads.
         </p>
       </div>
       <a href="/#pricing"
@@ -94,31 +86,28 @@ const copyContent = async () => {
       </a>
     </div>
 
-    <!-- Publication Metadata Strip -->
+    <!-- Gazette Metadata Strip -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
       <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5 space-y-1">
         <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block flex items-center gap-1">
-          <Building class="w-3 h-3 text-primary" /> Law Journal
+          <MapPin class="w-3 h-3 text-primary" /> Jurisdiction
         </span>
-        <span class="font-bold text-white block truncate">{{ journalName }}</span>
+        <span class="font-bold text-white block truncate">{{ jurisdiction }}</span>
       </div>
 
       <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5 space-y-1">
         <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block flex items-center gap-1">
-          <User class="w-3 h-3 text-primary" /> Author(s)
+          <FileText class="w-3 h-3 text-primary" /> Gazette Type
         </span>
-        <span class="font-bold text-zinc-200 block truncate">{{ authors || 'Editorial Board' }}</span>
+        <span class="font-bold text-zinc-200 block truncate">{{ gazetteType }}</span>
       </div>
 
       <div class="bg-zinc-900/50 p-3.5 rounded-2xl border border-white/5 space-y-1">
         <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block flex items-center gap-1">
-          <BookOpen class="w-3 h-3 text-primary" /> Vol / Issue / Year
+          <Scroll class="w-3 h-3 text-primary" /> Gazette No. / Vol
         </span>
         <span class="font-bold text-primary block truncate font-mono text-[11px]">
-          <span v-if="volume">Vol. {{ volume }}</span>
-          <span v-if="issue"> ({{ issue }})</span>
-          <span v-if="year"> [{{ year }}]</span>
-          <span v-if="!volume && !issue && !year">{{ citation || 'Indexed Publication' }}</span>
+          {{ gazetteNumber }} {{ volume ? `(Vol. ${volume})` : '' }}
         </span>
       </div>
 
@@ -130,7 +119,7 @@ const copyContent = async () => {
       </div>
     </div>
 
-    <!-- Official PDF Action Banner (if PDF exists) -->
+    <!-- Official PDF Action Banner (if PDF link exists) -->
     <div v-if="pdfUrl"
       class="bg-gradient-to-r from-emerald-500/10 via-primary/10 to-transparent border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -138,8 +127,8 @@ const copyContent = async () => {
           <FileDown class="w-5 h-5" />
         </div>
         <div>
-          <h4 class="text-xs font-black uppercase tracking-wider text-white">Full Publication PDF Available</h4>
-          <p class="text-[11px] text-zinc-400">Download the original peer-reviewed law review publication directly.</p>
+          <h4 class="text-xs font-black uppercase tracking-wider text-white">Official Gazette Document Available</h4>
+          <p class="text-[11px] text-zinc-400">Download or inspect the authentic Government / Provincial Gazette PDF document.</p>
         </div>
       </div>
       <a :href="pdfUrl" target="_blank" rel="noopener noreferrer"
@@ -149,12 +138,12 @@ const copyContent = async () => {
       </a>
     </div>
 
-    <!-- Abstract & Summary (if present) -->
+    <!-- Notice Summary / Abstract (if present) -->
     <div v-if="summary" class="bg-zinc-900/60 border border-white/10 p-5 sm:p-6 rounded-2xl space-y-2">
       <div class="flex items-center gap-2">
         <Bookmark class="w-4 h-4 text-amber-400" />
         <span class="text-xs font-black uppercase tracking-wider text-amber-400">
-          Abstract &amp; Executive Summary
+          Notice Summary &amp; Overview
         </span>
       </div>
       <p class="text-xs text-zinc-200 leading-relaxed whitespace-pre-line font-medium">
@@ -162,13 +151,13 @@ const copyContent = async () => {
       </p>
     </div>
 
-    <!-- Formatted Publication Text Reading Canvas -->
+    <!-- Formatted Gazette Text Reading Canvas -->
     <div class="bg-zinc-900/40 border border-white/5 rounded-2xl overflow-hidden">
       <!-- Reader Toolbar -->
       <div class="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-zinc-900/70">
         <div class="flex items-center gap-2 text-xs text-zinc-400">
-          <BookOpen class="w-4 h-4 text-primary" />
-          <span class="font-black uppercase tracking-wider text-white text-[11px]">Article Text</span>
+          <Scroll class="w-4 h-4 text-primary" />
+          <span class="font-black uppercase tracking-wider text-white text-[11px]">Gazette Notice Body</span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -222,42 +211,40 @@ const copyContent = async () => {
               <Lock class="w-5 h-5" />
             </div>
             <h4 class="text-sm font-black uppercase tracking-wider text-white">
-              Full Journal Article Reading Mode Locked
+              Full Statutory Notice Content Locked
             </h4>
             <p class="text-xs text-zinc-400 max-w-md">
-              Upgrade to a Pro subscription to read unredacted scholarly articles, complete citations, and download
-              original publication files.
+              Upgrade to a Pro subscription to read unredacted regulations, legal proclamations, and access original PDF files.
             </p>
             <a href="/#pricing"
               class="btn btn-primary px-5 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 mt-2">
-              <span>Unlock Full Article</span>
+              <span>Unlock Full Gazette</span>
               <ArrowRight class="w-4 h-4" />
             </a>
           </div>
         </div>
 
-        <!-- Fallback if no full text is stored -->
+        <!-- Fallback if no full text stored -->
         <div v-else class="py-12 flex flex-col items-center justify-center text-center space-y-4">
           <div
             class="w-12 h-12 rounded-2xl bg-zinc-800/60 border border-white/5 flex items-center justify-center text-zinc-400">
-            <FileText class="w-6 h-6 text-zinc-500" />
+            <Scroll class="w-6 h-6 text-zinc-500" />
           </div>
           <div class="space-y-1 max-w-md">
-            <h4 class="text-sm font-bold text-white uppercase tracking-wider">Indexed Journal Publication</h4>
+            <h4 class="text-sm font-bold text-white uppercase tracking-wider">Indexed Gazette Notice</h4>
             <p class="text-xs text-zinc-400 leading-relaxed">
-              The full publication body is hosted on the primary academic repository. You can inspect the complete source
-              document directly at the original provider.
+              This statutory notice is indexed from the official Government Gazettes repository. You can inspect the complete source notice directly.
             </p>
           </div>
           <div class="flex items-center gap-3">
             <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noopener noreferrer"
               class="btn btn-primary px-4 py-2 text-xs font-black uppercase tracking-wider rounded-xl shadow-md shadow-primary/20 flex items-center gap-2">
               <Download class="w-3.5 h-3.5" />
-              <span>Download PDF</span>
+              <span>Download Official PDF</span>
             </a>
             <a v-if="sourceUrl" :href="sourceUrl" target="_blank" rel="noopener noreferrer"
               class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold transition flex items-center gap-2">
-              <span>Open Source Publication</span>
+              <span>Original Source</span>
               <ExternalLink class="w-3.5 h-3.5" />
             </a>
           </div>

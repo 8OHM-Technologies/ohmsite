@@ -16,7 +16,15 @@ import {
   Bookmark,
   Sparkles,
   Lock,
-  ArrowRight
+  ArrowRight,
+  User,
+  Building,
+  Calendar,
+  Download,
+  AlertCircle,
+  CheckSquare,
+  X,
+  Loader2
 } from 'lucide-vue-next';
 
 import DataTable from 'primevue/datatable';
@@ -60,6 +68,7 @@ const LayoutComponent = computed(() => isAdmin.value ? AdminLayout : SubscriberL
 
 interface RecordSummary {
   id: string;
+  extracted_record_id?: string;
   source_table: string;
   record_type: string;
   document_date: string | null;
@@ -68,22 +77,106 @@ interface RecordSummary {
   title: string;
   source_url: string | null;
   applicant: string | null;
-  respondent: string | null;
-  subjects: string | null;
-  outcome: string | null;
   summary: string | null;
+  journal_name?: string | null;
+  authors?: string[] | string | null;
+  volume?: string | null;
+  issue?: string | null;
+  year?: string | null;
+  abstract?: string | null;
+  pdf_url?: string | null;
+  requires_human_review?: boolean;
 }
 
 const records = ref<RecordSummary[]>([]);
+const selectedRecords = ref<RecordSummary[]>([]);
 const totalRecords = ref(0);
 const loading = ref(false);
-const searchQuery = ref('');
-const selectedRecordType = ref('');
-const viewMode = ref<'cards' | 'table'>('cards');
+const batchReviewLoading = ref(false);
+const batchSuccessMessage = ref('');
+
+const getInitialUrlParam = (param: string): string => {
+  if (typeof window === 'undefined') return '';
+  const searchParams = new URLSearchParams(window.location.search);
+  return searchParams.get(param) || '';
+};
+
+const searchQuery = ref(getInitialUrlParam('search'));
+const selectedRecordType = ref(getInitialUrlParam('journal'));
+const viewMode = ref<'cards' | 'table'>('table');
 
 const detailModalVisible = ref(false);
 const detailLoading = ref(false);
 const selectedDetail = ref<any>(null);
+
+let searchAbortController: AbortController | null = null;
+let searchDebounceTimer: any = null;
+
+const escapeHtml = (str: string): string => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+const escapeRegExp = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+const highlightMatch = (text: string | null | undefined, query: string): string => {
+  if (!text) return '';
+  const cleanQuery = query?.trim();
+  if (!cleanQuery) return escapeHtml(text);
+
+  let tokens: string[] = [];
+  if (cleanQuery.startsWith('"') && cleanQuery.endsWith('"') && cleanQuery.length > 2) {
+    tokens = [cleanQuery.slice(1, -1).trim()];
+  } else {
+    tokens = cleanQuery
+      .split(/\s+/)
+      .map(t => t.trim())
+      .filter(t => t.length >= 2);
+  }
+
+  if (tokens.length === 0) return escapeHtml(text);
+
+  const pattern = new RegExp(`(${tokens.map(escapeRegExp).join('|')})`, 'gi');
+  const parts = text.split(pattern);
+
+  return parts
+    .map((part) => {
+      if (tokens.some(t => part.toLowerCase() === t.toLowerCase())) {
+        return `<mark class="bg-primary/25 text-primary font-bold px-0.5 rounded">${escapeHtml(part)}</mark>`;
+      }
+      return escapeHtml(part);
+    })
+    .join('');
+};
+
+const updateUrlParams = () => {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  const q = searchQuery.value.trim();
+  if (q) {
+    url.searchParams.set('search', q);
+  } else {
+    url.searchParams.delete('search');
+  }
+  if (selectedRecordType.value) {
+    url.searchParams.set('journal', selectedRecordType.value);
+  } else {
+    url.searchParams.delete('journal');
+  }
+  window.history.replaceState({}, '', url.toString());
+};
+
+const formatAuthors = (authors: any): string => {
+  if (!authors) return '';
+  if (Array.isArray(authors)) return authors.join(', ');
+  return String(authors);
+};
 
 const lazyParams = ref<{
   first: number;
@@ -97,10 +190,7 @@ const lazyParams = ref<{
   sortOrder: -1
 });
 
-let searchDebounceTimer: any = null;
-
 const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page: number; first: number; rows: number }) => {
-  loading.value = true;
   if (event) {
     if (event.first !== undefined) lazyParams.value.first = event.first;
     if (event.rows !== undefined) lazyParams.value.rows = event.rows;
@@ -113,25 +203,42 @@ const loadLazyRecords = async (event?: Partial<DataTableLazyLoadEvent> | { page:
   const sortField = lazyParams.value.sortField || 'document_date';
   const sortOrder = lazyParams.value.sortOrder ?? -1;
 
+  if (searchAbortController) {
+    searchAbortController.abort();
+  }
+  searchAbortController = new AbortController();
+  const currentController = searchAbortController;
+
+  loading.value = true;
+  updateUrlParams();
+
   try {
     const response = await axios.get('/legal-records/data', {
       params: {
         offset: first,
         limit: rows,
         category: 'journals',
-        search: searchQuery.value,
+        search: searchQuery.value.trim(),
         record_type: selectedRecordType.value,
         sort_field: sortField,
         sort_order: sortOrder
-      }
+      },
+      signal: currentController.signal
     });
 
-    records.value = response.data.records;
-    totalRecords.value = response.data.total;
-  } catch (error) {
+    if (!currentController.signal.aborted) {
+      records.value = response.data.records;
+      totalRecords.value = response.data.total;
+    }
+  } catch (error: any) {
+    if (axios.isCancel(error) || error?.name === 'CanceledError' || error?.code === 'ERR_CANCELED' || currentController.signal.aborted) {
+      return;
+    }
     console.error('Failed to fetch journal records:', error);
   } finally {
-    loading.value = false;
+    if (searchAbortController === currentController) {
+      loading.value = false;
+    }
   }
 };
 
@@ -153,6 +260,19 @@ const onSearchInput = () => {
   }, 350);
 };
 
+const triggerSearchNow = () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  lazyParams.value.first = 0;
+  loadLazyRecords();
+};
+
+const clearSearch = () => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchQuery.value = '';
+  lazyParams.value.first = 0;
+  loadLazyRecords();
+};
+
 const setRecordType = (type: string) => {
   selectedRecordType.value = type;
   lazyParams.value.first = 0;
@@ -172,9 +292,59 @@ const viewRecordDetail = async (record: RecordSummary) => {
     });
     selectedDetail.value = response.data;
   } catch (error) {
-    console.error('Failed to load record details:', error);
+    console.error('Failed to load journal record details:', error);
   } finally {
     detailLoading.value = false;
+  }
+};
+
+const batchMarkForReview = async (requiresReview = true) => {
+  if (!selectedRecords.value.length || batchReviewLoading.value) return;
+
+  batchReviewLoading.value = true;
+  batchSuccessMessage.value = '';
+  const ids = selectedRecords.value.map(r => r.extracted_record_id || r.id);
+
+  try {
+    const response = await axios.post('/admin/legal-records/batch-human-review', {
+      ids,
+      requires_human_review: requiresReview,
+      review_reason: 'Flagged via Journals table grid batch action by admin.'
+    });
+
+    const affectedIds = new Set(ids);
+    if (requiresReview) {
+      records.value = records.value.filter(r => !affectedIds.has(r.id) && (!r.extracted_record_id || !affectedIds.has(r.extracted_record_id)));
+      totalRecords.value = Math.max(0, totalRecords.value - affectedIds.size);
+    } else {
+      records.value.forEach(r => {
+        if (affectedIds.has(r.id) || (r.extracted_record_id && affectedIds.has(r.extracted_record_id))) {
+          r.requires_human_review = requiresReview;
+        }
+      });
+    }
+
+    batchSuccessMessage.value = response.data.message || `Successfully updated ${ids.length} record(s).`;
+    selectedRecords.value = [];
+    setTimeout(() => {
+      batchSuccessMessage.value = '';
+    }, 4000);
+  } catch (error) {
+    console.error('Failed to batch mark journal records for human review:', error);
+  } finally {
+    batchReviewLoading.value = false;
+  }
+};
+
+const handleReviewUpdated = (payload: { id: string; requires_human_review: boolean }) => {
+  if (payload.requires_human_review) {
+    records.value = records.value.filter(r => r.id !== payload.id && r.extracted_record_id !== payload.id);
+    totalRecords.value = Math.max(0, totalRecords.value - 1);
+  } else {
+    const match = records.value.find(r => r.id === payload.id || r.extracted_record_id === payload.id);
+    if (match) {
+      match.requires_human_review = payload.requires_human_review;
+    }
   }
 };
 
@@ -184,25 +354,23 @@ onMounted(() => {
 </script>
 
 <template>
-
-  <Head title="8OHM | Law Journals &amp; Gazettes" />
+  <Head title="8OHM | Law Journals &amp; Reviews" />
 
   <component :is="LayoutComponent">
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 lg:mb-12 gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <div
-            class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
             <BookOpen class="w-5 h-5" />
           </div>
           <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-primary">
-            Journals &amp; Gazettes
+            Law Journals &amp; Reviews
           </h1>
         </div>
         <div>
           <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
-            Academic Law Reviews, Official Government Gazettes, and Scholarly Legal Articles
+            Peer-reviewed South African legal journals, law faculty reviews, and academic legal scholarship
           </p>
         </div>
       </div>
@@ -210,42 +378,40 @@ onMounted(() => {
       <div class="flex items-center gap-3">
         <!-- View Mode Switcher -->
         <div class="flex items-center bg-black/60 border border-white/10 rounded-xl p-1">
-          <button @click="viewMode = 'cards'"
-            class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
-            :class="viewMode === 'cards' ? 'btn btn-primary font-bold shadow-md shadow-primary/20' : 'text-zinc-400 hover:text-white'">
-            <LayoutGrid class="w-3.5 h-3.5" />
-            <span class="hidden sm:inline">Dossier Cards</span>
-          </button>
           <button @click="viewMode = 'table'"
             class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
             :class="viewMode === 'table' ? 'btn btn-primary font-bold shadow-md shadow-primary/20' : 'text-zinc-400 hover:text-white'">
             <List class="w-3.5 h-3.5" />
             <span class="hidden sm:inline">Table Grid</span>
           </button>
+          <button @click="viewMode = 'cards'"
+            class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            :class="viewMode === 'cards' ? 'btn btn-primary font-bold shadow-md shadow-primary/20' : 'text-zinc-400 hover:text-white'">
+            <LayoutGrid class="w-3.5 h-3.5" />
+            <span class="hidden sm:inline">Dossier Cards</span>
+          </button>
         </div>
 
         <span
           class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-primary shadow-md">
           <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          {{ totalRecords.toLocaleString() }} Active Records
+          <span v-if="searchQuery.trim()">{{ totalRecords.toLocaleString() }} Matches</span>
+          <span v-else>{{ totalRecords.toLocaleString() }} Active Articles</span>
         </span>
       </div>
     </div>
 
     <!-- Standard Tier Upgrade Notice Banner (if not Pro) -->
-    <div v-if="!isPro"
-      class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
+    <div v-if="!isPro" class="bg-gradient-to-r from-primary/10 via-amber-500/10 to-transparent border border-primary/30 p-6 rounded-[2rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl mb-8">
       <div class="space-y-1.5 max-w-2xl">
         <div class="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-wider">
           <Sparkles class="w-4 h-4" /> Standard Registered Preview Mode
         </div>
         <p class="text-xs text-zinc-300 leading-relaxed">
-          You are viewing basic journal abstracts and publication notices. Full-text analytical indexing and complete
-          source dossiers require an active Pro subscription.
+          You are viewing basic journal metadata and abstracts. Unredacted scholarly full-text articles and complete downloadable PDF files require an active Pro subscription.
         </p>
       </div>
-      <a href="/#pricing"
-        class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
+      <a href="/#pricing" class="btn btn-primary px-5 py-3 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 shrink-0">
         <span>Unlock Now</span>
         <ArrowRight class="w-4 h-4" />
       </a>
@@ -259,17 +425,28 @@ onMounted(() => {
         <!-- Global Search Field -->
         <div class="relative flex-1 max-w-2xl">
           <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-          <input type="text" v-model="searchQuery" @input="onSearchInput"
-            placeholder="Search by Title, Publisher, Volume, or Article Keywords..."
-            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
+          <input type="text" v-model="searchQuery" @input="onSearchInput" @keydown.enter="triggerSearchNow"
+            placeholder="Search by Article Title, Authors, Journal Name, Citation, or Keywords..."
+            class="w-full bg-black/60 border border-white/10 rounded-xl py-3.5 pl-11 pr-11 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-zinc-500 shadow-inner" />
+          <div class="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center">
+            <Loader2 v-if="loading" class="w-4 h-4 text-primary animate-spin" />
+            <button
+              v-else-if="searchQuery"
+              @click="clearSearch"
+              type="button"
+              class="p-1 text-zinc-500 hover:text-white rounded-md hover:bg-white/10 transition cursor-pointer"
+              title="Clear search">
+              <X class="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
-        <!-- Journal / Gazette Dropdown Selection -->
+        <!-- Journal Dropdown Selection -->
         <div class="flex flex-wrap items-center gap-3">
           <div class="relative min-w-[260px]">
             <select :value="selectedRecordType" @change="setRecordType(($event.target as HTMLSelectElement).value)"
               class="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-xs font-bold text-white focus:ring-1 focus:ring-primary/50 focus:border-primary/50">
-              <option value="">All Journals &amp; Gazettes</option>
+              <option value="">All Law Journals</option>
               <option v-for="filter in filters" :key="filter.target_name" :value="filter.target_name">
                 {{ filter.vanity_name }}
               </option>
@@ -279,28 +456,180 @@ onMounted(() => {
           <button @click="loadLazyRecords()"
             class="p-3 bg-zinc-800 border border-white/10 text-zinc-300 hover:text-white hover:bg-zinc-700 rounded-xl transition-all flex items-center justify-center cursor-pointer"
             title="Refresh Dataset">
-            <RefreshCw class="w-4 h-4" />
+            <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
           </button>
         </div>
       </div>
     </div>
 
-    <!-- VIEW MODE 1: DOSSIER CARDS VIEW -->
-    <div v-if="viewMode === 'cards'" class="space-y-6">
+    <!-- VIEW MODE 1: PRIME VUE DATATABLE (PRIMARY VIEW) -->
+    <div v-if="viewMode === 'table'" class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8 space-y-4">
+      <!-- Admin Batch Selection Action Bar -->
+      <div v-if="isAdmin && selectedRecords.length > 0"
+        class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs">
+            {{ selectedRecords.length }}
+          </div>
+          <div>
+            <p class="text-xs font-black uppercase tracking-wider text-white">
+              {{ selectedRecords.length }} Record(s) Selected
+            </p>
+            <p class="text-[10px] text-zinc-400">Perform bulk administrative review operations</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button @click="batchMarkForReview(true)" :disabled="batchReviewLoading"
+            class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50">
+            <AlertCircle class="w-3.5 h-3.5" />
+            <span>{{ batchReviewLoading ? 'Marking...' : 'Mark for Human Review' }}</span>
+          </button>
+          <button @click="selectedRecords = []"
+            class="px-3 py-2 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Batch Success Notification -->
+      <div v-if="batchSuccessMessage"
+        class="bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-400 font-bold animate-in fade-in duration-200">
+        <CheckSquare class="w-4 h-4 text-emerald-400 shrink-0" />
+        <span>{{ batchSuccessMessage }}</span>
+      </div>
+
+      <DataTable :value="records" v-model:selection="selectedRecords" :lazy="true" :totalRecords="totalRecords" :loading="loading" :sortField="lazyParams.sortField"
+        :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy" @filter="onLazy" paginator :rows="lazyParams.rows"
+        :first="lazyParams.first" :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id"
+        tableStyle="min-width: 60rem" class="p-datatable-dark-custom">
+        <template #empty>
+          <div class="py-20 text-center flex flex-col items-center">
+            <div
+              class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
+              <Database class="w-8 h-8 text-zinc-600" />
+            </div>
+            <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
+              <span v-if="searchQuery.trim()">No journal articles found for &ldquo;{{ searchQuery }}&rdquo;</span>
+              <span v-else>No journal articles found</span>
+            </h3>
+            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or journal filter</p>
+            <button
+              v-if="searchQuery || selectedRecordType"
+              @click="clearSearch(); selectedRecordType = ''; loadLazyRecords();"
+              class="btn btn-primary px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl cursor-pointer">
+              Reset All Filters
+            </button>
+          </div>
+        </template>
+
+        <!-- Selection Checkbox Column (Admin) -->
+        <Column v-if="isAdmin" selectionMode="multiple" headerStyle="width: 3rem" />
+
+        <Column field="journal_name" header="Journal / Review" sortable style="width: 18%">
+          <template #body="{ data }">
+            <span
+              class="px-3 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
+              {{ data.journal_name || data.applicant || data.court || 'Law Journal' }}
+            </span>
+          </template>
+          <template #loading>
+            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="case_number" header="Citation / Vol" sortable style="width: 15%">
+          <template #body="{ data }">
+            <span v-if="data.volume || data.issue || data.year"
+              class="font-mono text-xs font-bold px-2.5 py-1 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
+              <span v-if="data.volume">Vol {{ data.volume }}</span>
+              <span v-if="data.issue"> ({{ data.issue }})</span>
+              <span v-if="data.year"> [{{ data.year }}]</span>
+            </span>
+            <span v-else-if="data.case_number"
+              class="font-mono text-xs font-bold px-2.5 py-1 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
+              {{ data.case_number }}
+            </span>
+            <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
+          </template>
+          <template #loading>
+            <Skeleton width="70%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="authors" header="Author(s)" style="width: 18%">
+          <template #body="{ data }">
+            <div class="text-xs font-medium text-zinc-300 line-clamp-2"
+              v-html="highlightMatch(formatAuthors(data.authors) || 'Editorial Board', searchQuery)">
+            </div>
+          </template>
+          <template #loading>
+            <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="title" header="Article Title &amp; Abstract" style="width: 33%">
+          <template #body="{ data }">
+            <div
+              class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
+              @click="viewRecordDetail(data)"
+              v-html="highlightMatch(data.title, searchQuery)">
+            </div>
+            <div v-if="data.abstract || data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1"
+              v-html="highlightMatch(data.abstract || data.summary, searchQuery)">
+            </div>
+          </template>
+          <template #loading>
+            <Skeleton width="90%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column field="document_date" header="Date" sortable style="width: 10%">
+          <template #body="{ data }">
+            <span class="text-xs font-bold font-mono text-zinc-400 tracking-wider">
+              {{ data.document_date || data.year || 'N/A' }}
+            </span>
+          </template>
+          <template #loading>
+            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
+          </template>
+        </Column>
+
+        <Column header="Actions" style="width: 16%" class="text-right">
+          <template #body="{ data }">
+            <div class="flex items-center justify-end gap-2">
+              <a v-if="data.pdf_url" :href="data.pdf_url" target="_blank" rel="noopener noreferrer"
+                class="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl transition-all flex items-center justify-center shrink-0 cursor-pointer"
+                title="Download original article PDF">
+                <Download class="w-3.5 h-3.5" />
+              </a>
+              <button @click="viewRecordDetail(data)"
+                class="btn btn-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer shrink-0">
+                <BookOpen class="w-3.5 h-3.5" />
+                <span>Read</span>
+              </button>
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
+
+    <!-- VIEW MODE 2: DOSSIER CARDS VIEW -->
+    <div v-else class="space-y-6">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-lg font-black uppercase tracking-tight text-white flex items-center gap-2">
             <Sparkles class="w-4 h-4 text-primary" />
-            Publication Explorer &amp; Index
+            Scholarly Article Dossier Index
           </h3>
           <p class="text-xs text-zinc-400">
-            Scholarly articles, gazette notices, and legal publications with abstract summaries and source references.
+            Card-based explorer of peer-reviewed South African legal articles and journal issues.
           </p>
         </div>
       </div>
 
       <!-- Loading State Skeleton -->
-      <div v-if="loading" class="space-y-4">
+      <div v-if="loading && records.length === 0" class="space-y-4">
         <div v-for="i in 4" :key="i" class="bg-zinc-900/40 border border-white/5 p-6 rounded-2xl space-y-4">
           <div class="flex items-center justify-between">
             <Skeleton width="30%" height="1.5rem" class="bg-zinc-800" />
@@ -312,72 +641,83 @@ onMounted(() => {
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="records.length === 0"
-        class="bg-zinc-900/40 rounded-[2rem] border border-white/5 py-20 text-center flex flex-col items-center">
+      <div v-else-if="records.length === 0" class="bg-zinc-900/40 rounded-[2rem] border border-white/5 py-20 text-center flex flex-col items-center">
         <div class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
           <Database class="w-8 h-8 text-zinc-600" />
         </div>
-        <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No publications found</h3>
-        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or
-          filter</p>
+        <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">
+          <span v-if="searchQuery.trim()">No journal articles found for &ldquo;{{ searchQuery }}&rdquo;</span>
+          <span v-else>No journal articles found</span>
+        </h3>
+        <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px] mb-4">Try adjusting your search terms or journal filter</p>
       </div>
 
       <!-- Dossier Cards Grid -->
-      <div v-else class="space-y-4">
+      <div v-else class="space-y-4 transition-opacity duration-200" :class="{ 'opacity-60 pointer-events-none': loading }">
         <div v-for="c in records" :key="c.id"
           class="bg-zinc-900/40 border border-white/5 hover:border-primary/40 transition-all p-6 rounded-2xl space-y-4 group">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
-              <span v-if="c.case_number"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
-                {{ c.case_number }}
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
+                {{ c.journal_name || c.applicant || c.court || 'Law Journal' }}
               </span>
-              <span
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/5 text-zinc-300 border border-white/10">
-                {{ c.applicant || c.court || c.record_type }}
+              <span v-if="c.volume || c.issue || c.year"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                <span v-if="c.volume">Vol {{ c.volume }}</span>
+                <span v-if="c.issue"> ({{ c.issue }})</span>
+                <span v-if="c.year"> [{{ c.year }}]</span>
               </span>
             </div>
 
             <div class="flex items-center gap-3 text-xs text-zinc-400">
-              <span v-if="c.document_date" class="font-bold font-mono text-[11px] text-zinc-400">
-                {{ c.document_date }}
+              <span v-if="c.document_date || c.year" class="font-bold font-mono text-[11px] text-zinc-400">
+                {{ c.document_date || c.year }}
               </span>
               <button @click="viewRecordDetail(c)"
                 class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
-                <span>Read Publication</span>
+                <span>Read Article</span>
                 <BookOpen class="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           <!-- Title -->
-          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer"
-            @click="viewRecordDetail(c)">
-            {{ c.title }}
+          <h4 class="text-base font-bold text-white hover:text-primary transition cursor-pointer" @click="viewRecordDetail(c)"
+            v-html="highlightMatch(c.title, searchQuery)">
           </h4>
 
-          <!-- Summary -->
-          <div v-if="c.summary" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
+          <!-- Abstract -->
+          <div v-if="c.abstract || c.summary" class="bg-zinc-900/60 p-4 rounded-xl border border-white/5 text-xs text-zinc-300">
             <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1 mb-1.5">
               <Bookmark class="w-3.5 h-3.5" />
               Abstract &amp; Summary
             </span>
-            <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300">
-              {{ c.summary }}
+            <p class="line-clamp-2 leading-relaxed font-sans text-zinc-300"
+              v-html="highlightMatch(c.abstract || c.summary, searchQuery)">
             </p>
           </div>
 
           <!-- Footer -->
-          <div
-            class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
-            <span class="text-zinc-400 text-[11px]">
-              Publisher / Source: <strong class="text-white">{{ c.applicant || c.court }}</strong>
-            </span>
-            <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
-              class="hover:text-white flex items-center gap-1 transition text-zinc-400 text-[11px]">
-              <span>Original Source</span>
-              <ExternalLink class="w-3 h-3" />
-            </a>
+          <div class="flex flex-wrap items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5 gap-2">
+            <div class="flex items-center gap-2">
+              <User class="w-3.5 h-3.5 text-zinc-500" />
+              <span class="text-zinc-300 font-medium"
+                v-html="highlightMatch(formatAuthors(c.authors) || 'Scholarly Authors', searchQuery)">
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4 text-[11px]">
+              <a v-if="c.pdf_url" :href="c.pdf_url" target="_blank" rel="noopener noreferrer"
+                class="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition">
+                <Download class="w-3 h-3" />
+                <span>PDF Document</span>
+              </a>
+              <a v-if="c.source_url" :href="c.source_url" target="_blank" rel="noopener noreferrer"
+                class="hover:text-white flex items-center gap-1 transition text-zinc-400">
+                <span>Source Repository</span>
+                <ExternalLink class="w-3 h-3" />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -389,169 +729,14 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- VIEW MODE 2: PRIME VUE DATATABLE -->
-    <div v-else
-      class="bg-zinc-900/40 rounded-[2rem] lg:rounded-[3rem] border border-white/5 overflow-hidden p-6 sm:p-8">
-      <DataTable :value="records" :lazy="true" :totalRecords="totalRecords" :loading="loading"
-        :sortField="lazyParams.sortField" :sortOrder="lazyParams.sortOrder" @page="onLazy" @sort="onLazy"
-        @filter="onLazy" paginator :rows="lazyParams.rows" :first="lazyParams.first"
-        :rowsPerPageOptions="[10, 25, 50, 100]" dataKey="id" tableStyle="min-width: 60rem"
-        class="p-datatable-dark-custom">
-        <template #empty>
-          <div class="py-20 text-center flex flex-col items-center">
-            <div
-              class="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
-              <Database class="w-8 h-8 text-zinc-600" />
-            </div>
-            <h3 class="text-xl font-black uppercase tracking-tighter text-zinc-400 mb-1">No publications found</h3>
-            <p class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Try adjusting your search terms or
-              filters</p>
-          </div>
-        </template>
-
-        <Column field="case_number" header="Citation / Volume" sortable style="width: 18%">
-          <template #body="{ data }">
-            <span v-if="data.case_number"
-              class="font-mono text-xs font-bold px-3 py-1.5 bg-black/60 border border-primary/20 text-primary rounded-lg inline-block shadow-sm">
-              {{ data.case_number }}
-            </span>
-            <span v-else class="text-xs text-zinc-500 font-bold uppercase tracking-widest">N/A</span>
-          </template>
-          <template #loading>
-            <Skeleton width="80%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="court" header="Journal / Forum" sortable style="width: 20%">
-          <template #body="{ data }">
-            <span
-              class="px-3 py-1 bg-white/5 border border-white/10 text-zinc-200 font-bold text-[10px] uppercase tracking-wider rounded-lg inline-block shadow-sm">
-              {{ data.applicant || data.court || data.record_type }}
-            </span>
-          </template>
-          <template #loading>
-            <Skeleton width="60%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="document_date" header="Publication Date" sortable style="width: 12%">
-          <template #body="{ data }">
-            <span class="text-xs font-bold font-mono text-zinc-300 tracking-wider">
-              {{ data.document_date || 'N/A' }}
-            </span>
-          </template>
-          <template #loading>
-            <Skeleton width="70%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column field="title" header="Article Title / Publication Name" style="width: 36%">
-          <template #body="{ data }">
-            <div
-              class="font-bold text-sm text-white uppercase tracking-tight hover:text-primary transition cursor-pointer"
-              @click="viewRecordDetail(data)">
-              {{ data.title }}
-            </div>
-            <div v-if="data.summary" class="text-[10px] text-zinc-400 font-medium line-clamp-1 mt-1">
-              {{ data.summary }}
-            </div>
-          </template>
-          <template #loading>
-            <Skeleton width="90%" height="1.5rem" class="bg-zinc-800" />
-          </template>
-        </Column>
-
-        <Column header="Actions" style="width: 14%" class="text-right">
-          <template #body="{ data }">
-            <button @click="viewRecordDetail(data)"
-              class="btn btn-primary px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-primary/20 cursor-pointer">
-              <BookOpen class="w-3.5 h-3.5" />
-              <span>Read</span>
-            </button>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
-
     <!-- Document Detail Modal -->
-    <RecordDetailModal :show="detailModalVisible" :loading="detailLoading" :record-detail="selectedDetail"
-      category="journals" @close="detailModalVisible = false" />
+    <RecordDetailModal
+      :show="detailModalVisible"
+      :loading="detailLoading"
+      :record-detail="selectedDetail"
+      category="journals"
+      @close="detailModalVisible = false"
+      @review-updated="handleReviewUpdated"
+    />
   </component>
 </template>
-
-<style>
-.p-datatable-dark-custom {
-  background: transparent !important;
-}
-
-.p-datatable-dark-custom .p-datatable-header,
-.p-datatable-dark-custom .p-datatable-footer {
-  background: transparent !important;
-  border: none !important;
-}
-
-.p-datatable-dark-custom .p-datatable-thead>tr>th {
-  background: transparent !important;
-  color: #a1a1aa !important;
-  font-weight: 900 !important;
-  text-transform: uppercase !important;
-  font-size: 10px !important;
-  letter-spacing: 0.2em !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  padding: 1rem 1.5rem !important;
-}
-
-.p-datatable-dark-custom .p-datatable-tbody>tr {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-  transition: all 0.2s ease !important;
-}
-
-.p-datatable-dark-custom .p-datatable-tbody>tr:hover {
-  background: rgba(39, 39, 42, 0.6) !important;
-}
-
-.p-datatable-dark-custom .p-datatable-tbody>tr>td {
-  padding: 1.25rem 1.5rem !important;
-  border: none !important;
-}
-
-.p-datatable-dark-custom .p-paginator {
-  background: transparent !important;
-  border: none !important;
-  padding-top: 1.5rem !important;
-  color: #e4e4e7 !important;
-}
-
-.p-datatable-dark-custom .p-paginator .p-paginator-first,
-.p-datatable-dark-custom .p-paginator .p-paginator-prev,
-.p-datatable-dark-custom .p-paginator .p-paginator-next,
-.p-datatable-dark-custom .p-paginator .p-paginator-last,
-.p-datatable-dark-custom .p-paginator .p-paginator-page {
-  background: rgba(39, 39, 42, 0.8) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 0.75rem !important;
-  margin: 0 0.125rem !important;
-  min-width: 2.5rem !important;
-  height: 2.5rem !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.p-datatable-dark-custom .p-paginator .p-paginator-page.p-highlight {
-  background: var(--color-primary, #ff8800) !important;
-  color: #000000 !important;
-  font-weight: 900 !important;
-  border-color: var(--color-primary, #ff8800) !important;
-}
-
-.p-datatable-dark-custom .p-paginator svg,
-.p-datatable-dark-custom .p-paginator .p-icon {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-  width: 1rem !important;
-  height: 1rem !important;
-}
-</style>
