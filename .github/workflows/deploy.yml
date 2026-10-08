@@ -99,6 +99,58 @@ jobs:
         run: |
           mkdir -p database
           touch database/database.sqlite
+      - name: Initialize Coeus Test Database Schema
+        run: |
+          PGPASSWORD=password psql -h 127.0.0.1 -U postgres -d coeus -c "
+            CREATE TABLE IF NOT EXISTS entities (
+              id UUID PRIMARY KEY,
+              name VARCHAR(255),
+              identifier VARCHAR(50),
+              created_at TIMESTAMP,
+              updated_at TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS targets (
+              id UUID PRIMARY KEY,
+              entity_id UUID,
+              target_name VARCHAR(255),
+              name VARCHAR(255),
+              target_type VARCHAR(50),
+              location TEXT,
+              created_at TIMESTAMP,
+              updated_at TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS extracted_records (
+              id UUID PRIMARY KEY,
+              target_id UUID,
+              record_type VARCHAR(100),
+              source_url TEXT,
+              document_date DATE,
+              data JSONB,
+              requires_human_review BOOLEAN DEFAULT FALSE,
+              review_reason TEXT,
+              status VARCHAR(50),
+              scraped_at TIMESTAMP,
+              detailed_at TIMESTAMP,
+              parsed_at TIMESTAMP,
+              scrubbed_at TIMESTAMP,
+              created_at TIMESTAMP,
+              updated_at TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS parsed_records (
+              id UUID PRIMARY KEY,
+              extracted_record_id UUID,
+              data JSONB,
+              created_at TIMESTAMP,
+              updated_at TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS scrubbed_records (
+              id UUID PRIMARY KEY,
+              extracted_record_id UUID,
+              data JSONB,
+              created_at TIMESTAMP,
+              updated_at TIMESTAMP
+            );
+          "
       - name: Execute tests
         env:
           DB_CONNECTION: sqlite

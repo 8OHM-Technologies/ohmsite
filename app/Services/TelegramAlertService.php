@@ -46,10 +46,6 @@ class TelegramAlertService
     public static function reportException(Throwable $e): void
     {
         try {
-            if (app()->environment('testing') || app()->runningUnitTests()) {
-                return;
-            }
-
             if (! config('telegraph.notifications.errors.enabled', true)) {
                 return;
             }
