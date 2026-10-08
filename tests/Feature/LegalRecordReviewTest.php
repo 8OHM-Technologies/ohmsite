@@ -64,6 +64,44 @@ class LegalRecordReviewTest extends TestCase
             });
         }
 
+        if (DB::connection('pgsql_coeus')->getDriverName() === 'pgsql') {
+            DB::connection('pgsql_coeus')->unprepared("
+                CREATE OR REPLACE FUNCTION get_scrubbed_record_category(data jsonb)
+                RETURNS text LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS \$function\$
+                DECLARE
+                  rt text := COALESCE(data->'metadata'->>'record_type', data->>'record_type');
+                  cat text := COALESCE(data->'metadata'->>'category', data->'extracted_data'->>'category', data->>'category');
+                BEGIN
+                  IF cat IN ('gazettes', 'gaz') 
+                     OR (data ? 'gazette_number' AND data ? 'jurisdiction')
+                     OR (data ? 'gazette_type' AND data ? 'jurisdiction')
+                     OR (data->>'title' ILIKE '%Gazette%' AND (data ? 'has_html_content' OR data->>'formatted_text' ILIKE '%no available HTML version%')) THEN
+                    RETURN 'gazettes';
+                  ELSIF data ? 'roll_type' OR data ? 'rows' OR cat IN ('court_rolls', 'other') THEN
+                    RETURN 'court_rolls';
+                  ELSIF cat IN ('journals', 'journal') 
+                     OR data ? 'journal_name' 
+                     OR (data ? 'formatted_text' AND NOT (data ? 'court' AND data ? 'parties')) THEN
+                    RETURN 'journals';
+                  ELSIF rt IN ('fsca_enforcement_records', 'fsca_regulatory_records', 'pa_insurance_records', 'popia_records')
+                     OR (data->'extracted_data' ? 'administrative_penalty_amount')
+                     OR (data->'extracted_data' ? 'prudential_standard_number')
+                     OR (data->'extracted_data' ? 'contravention_findings') THEN
+                    RETURN 'regulatory';
+                  ELSIF rt IN ('fst_cases', 'fst_decisions')
+                     OR (data->'extracted_data' ? 'decision_outcome') THEN
+                    RETURN 'tribunal';
+                  ELSIF rt IN ('nfo_cases', 'fais_ombud_cases', 'fais_determinations')
+                     OR (data->'extracted_data' ? 'repudiation_grounds') THEN
+                    RETURN 'ombud';
+                  ELSE
+                    RETURN 'cases';
+                  END IF;
+                END;
+                \$function\$;
+            ");
+        }
+
         TargetVanity::create([
             'target_name' => 'sabinet_ccma',
             'vanity_name' => 'CCMA Awards',

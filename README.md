@@ -141,6 +141,19 @@ vendor/bin/sail artisan test --compact --filter=CheckoutTest
 
 ---
 
+## 🚀 CI/CD & Deployment
+
+Automated builds and VPS deployments are handled via GitHub Actions in [`.github/workflows/deploy.yml`](file:///home/tiaanf/Dev/ohmsite/.github/workflows/deploy.yml) on push to `main`:
+
+- **Concurrency Control**: Enforces sequential deployments (`ohmsite-production-deploy`) to prevent race conditions during VPS updates.
+- **Selective Image Builds**: Uses `dorny/paths-filter` to trigger builds only when relevant application or Nginx web server files change.
+- **Quality Gates**:
+  - `laravel-tests`: Executes PHPUnit test suites on PHP 8.4 against an isolated SQLite test database and an integrated PostgreSQL 17 service container for `pgsql_coeus` integration queries.
+  - `frontend-tests`: Verifies clean asset bundling via `npm run build` with Node 24.
+- **Container Registry & Delivery**: Pushes production images (`ohmsite-app`, `ohmsite-web`) to GitHub Container Registry (`ghcr.io`) and executes atomic VPS deployments over Cloudflare Access SSH tunnels.
+
+---
+
 ## Installation
 
 ```bash

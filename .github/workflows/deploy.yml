@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ohmsite-production-deploy
+  cancel-in-progress: false
+
 jobs:
   # 1. Detect which Docker images actually need rebuilding
   detect-changes:
@@ -61,14 +65,28 @@ jobs:
     needs: detect-changes
     runs-on: ubuntu-latest
     environment: vps-prod
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: coeus
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
-          extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
-          coverage: xdebug
+          php-version: "8.4"
+          extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis, pgsql, pdo_pgsql
+          coverage: none
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       - name: Copy .env
@@ -85,6 +103,11 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
+          DB_COEUS_HOST: 127.0.0.1
+          DB_COEUS_PORT: 5432
+          DB_COEUS_DATABASE: coeus
+          DB_COEUS_USERNAME: postgres
+          DB_COEUS_PASSWORD: password
         run: php artisan test
       - name: Notify on Failure
         if: failure()
@@ -151,26 +174,6 @@ jobs:
           -d "text=🏗️ BUILD STAGE STARTED 🏗️ %0A----%0A%0A Repo: <a href='${{ github.server_url }}/${{ github.repository }}'>${{ github.repository }}</a> %0A Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>${{ github.run_id }}</a>"
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
-      - name: Set up PHP for production asset build
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          extensions: mbstring, dom, curl, libxml, mysql, sqlite, redis
-
-      - name: Install Composer Dependencies (Production)
-        run: composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-
-      - name: Set up Node for frontend asset build
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-
-      - name: Install Node Dependencies and Build Assets
-        run: |
-          rm -rf public/build
-          npm install
-          npm run build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@22b48a429f10e1de233237b5c534c9c3d2e41597
@@ -259,7 +262,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
       - name: Deploy via Git Pull on VPS
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         env:
           TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
