@@ -723,6 +723,9 @@ class LegalRecordTest extends TestCase
         $this->createScrubbedRecord('saflii_courts', 'journals', [
             'title' => 'Test Journal 1',
         ]);
+        $this->createScrubbedRecord('saflii_courts', 'gaz', [
+            'title' => 'Test Gazette 1',
+        ]);
         $this->createScrubbedRecord('saflii_courts', 'other', [
             'title' => 'Test Court Roll 1',
         ]);
@@ -732,8 +735,9 @@ class LegalRecordTest extends TestCase
         $response->assertInertia(fn (Assert $page) => $page
             ->component('Subscriber/LegalRecords/Cases')
             ->has('dataset_summary')
-            ->where('dataset_summary.total_records', fn ($val) => $val >= 3)
+            ->where('dataset_summary.total_records', fn ($val) => $val >= 4)
             ->where('dataset_summary.total_cases', fn ($val) => $val >= 1)
+            ->where('dataset_summary.total_journals', fn ($val) => $val >= 1)
             ->where('dataset_summary.total_gazettes', fn ($val) => $val >= 1)
             ->where('dataset_summary.total_court_rolls', fn ($val) => $val >= 1)
         );

@@ -38,15 +38,13 @@ class GenerateSitemapTest extends TestCase
         $this->assertFileExists(public_path('sitemap.xml'));
         $content = file_get_contents(public_path('sitemap.xml'));
 
-        $baseUrl = config('app.url');
-
-        $this->assertStringContainsString("<loc>{$baseUrl}/services</loc>", $content);
-        $this->assertStringContainsString("<loc>{$baseUrl}/privacy-policy</loc>", $content);
-        $this->assertStringContainsString("<loc>{$baseUrl}/terms</loc>", $content);
-        $this->assertStringContainsString("<loc>{$baseUrl}/fair-usage</loc>", $content);
+        $this->assertStringContainsString('<loc>' . url('/services') . '</loc>', $content);
+        $this->assertStringContainsString('<loc>' . url('/privacy-policy') . '</loc>', $content);
+        $this->assertStringContainsString('<loc>' . url('/terms') . '</loc>', $content);
+        $this->assertStringContainsString('<loc>' . url('/fair-usage') . '</loc>', $content);
 
         foreach ($products as $product) {
-            $this->assertStringContainsString("<loc>{$baseUrl}/services/{$product->id}</loc>", $content);
+            $this->assertStringContainsString('<loc>' . url("/services/{$product->id}") . '</loc>', $content);
         }
     }
 }
