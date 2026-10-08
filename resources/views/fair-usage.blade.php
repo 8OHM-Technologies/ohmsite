@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title inertia>8ohm.co.za | Fair Usage Policy</title>
-
+    <link rel="canonical" href="{{ config('app.url') ? rtrim(config('app.url'), '/') . '/fair-usage' : url('/fair-usage') }}">
 </head>
 
 <body>

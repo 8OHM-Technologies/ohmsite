@@ -48,7 +48,7 @@ onUnmounted(() => {
 <template>
 
   <Head title="End-to-end Data Solutions">
-    <link rel="canonical" href="https://8ohm.co.za" />
+    <link rel="canonical" head-key="canonical" href="https://8ohm.co.za" />
     <component :is="'script'" type="application/ld+json">
       {
       "@context": "https://schema.org",

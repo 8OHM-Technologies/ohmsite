@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title inertia>8ohm.co.za | Cancellation and Refund Policy</title>
+    <link rel="canonical" href="{{ config('app.url') ? rtrim(config('app.url'), '/') . '/refund-cancellation' : url('/refund-cancellation') }}">
 </head>
 
 <body>

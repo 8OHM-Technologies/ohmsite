@@ -117,6 +117,7 @@ The application integrates with Telegram via `defstudio/telegraph` to alert admi
 ## Authentication & Middleware
 
 Access levels are enforced via specialized middlewares:
+- `EnsureCanonicalHost`: Enforces canonical non-www apex routing by issuing 301 Permanent Redirects for all `www.` requests to prevent search engine duplicate content indexing.
 - `AdminMiddleware` (`admin`): Restricts access to administrative endpoints.
 - `SubscribedMiddleware` (`subscribed`): Restricts access to the Pro Analytics dashboard.
 - `DatasetAccessMiddleware` (`has.dataset.access`): Enforces download limits on once-off datasets.

@@ -3,6 +3,7 @@
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\ApiAccessMiddleware;
 use App\Http\Middleware\DatasetAccessMiddleware;
+use App\Http\Middleware\EnsureCanonicalHost;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SubscribedMiddleware;
 use App\Services\TelegramAlertService;
@@ -21,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+
+        $middleware->web(prepend: [
+            EnsureCanonicalHost::class,
+        ]);
 
         $middleware->web(append: [
             AuthenticateSession::class,

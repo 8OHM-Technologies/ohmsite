@@ -10,9 +10,16 @@
     <meta name="description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">
 
+    @php
+        $canonicalBase = config('app.url') ? rtrim(config('app.url'), '/') : url('/');
+        $canonicalPath = request()->getPathInfo();
+        $canonicalUrl = $canonicalPath === '/' ? $canonicalBase : $canonicalBase . $canonicalPath;
+    @endphp
+    <link rel="canonical" head-key="canonical" href="{{ $canonicalUrl }}">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:title" content="8OHM | End-to-end Data Solutions">
     <meta property="og:description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">
@@ -20,7 +27,7 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:url" content="{{ $canonicalUrl }}">
     <meta name="twitter:title" content="8OHM | End-to-end Data Solutions">
     <meta name="twitter:description"
         content="Analytics Platform for South African Public Data - CCMA Arbitration & Dispute Intelligence">

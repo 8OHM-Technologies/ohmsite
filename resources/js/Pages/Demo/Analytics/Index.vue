@@ -542,7 +542,7 @@ const quickFilterJudge = (judgeName) => {
 <template>
     <div>
         <Head title="8OHM | Legal Analytics & Jurisprudence Intelligence">
-            <link rel="canonical" href="https://8ohm.co.za/demo" />
+            <link rel="canonical" head-key="canonical" href="https://8ohm.co.za/demo" />
         </Head>
 
         <DemoLayout>
